@@ -1,0 +1,33 @@
+{
+  "name": "fantrio-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Fantrio - Creator subscription platform",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1069.0",
+    "@aws-sdk/s3-request-presigner": "^3.1069.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.2.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.3.1",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^6.9.13",
+    "socket.io": "^4.7.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "private": true
+}
