@@ -1,5 +1,8 @@
 const CreatorProfile = require('../models/CreatorProfile');
 const User = require('../models/User');
+const Subscription = require('../models/Subscription');
+const Transaction = require('../models/Transaction');
+const SystemSetting = require('../models/SystemSetting');
 const ApiError = require('../utils/apiError');
 const catchAsync = require('../utils/catchAsync');
 
@@ -198,5 +201,126 @@ exports.followCreator = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     following: !isFollowing
+  });
+});
+
+// Retrieve followed/favourite creators
+exports.getFavourites = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user._id);
+  
+  const creators = await CreatorProfile.find({
+    userId: { $in: user.following }
+  }).populate('userId', 'email isVerified');
+
+  res.status(200).json({
+    status: 'success',
+    creators
+  });
+});
+
+// Retrieve subscribed creators ribbon
+exports.getSubscribed = catchAsync(async (req, res, next) => {
+  const subscriptions = await Subscription.find({
+    userId: req.user._id,
+    status: 'active',
+    expiryDate: { $gt: new Date() }
+  });
+
+  const creatorIds = subscriptions.map(sub => sub.creatorId);
+
+  const creators = await CreatorProfile.find({
+    userId: { $in: creatorIds }
+  }).populate('userId', 'email isVerified');
+
+  res.status(200).json({
+    status: 'success',
+    creators
+  });
+});
+
+// Creator Analytics Dashboard
+exports.getCreatorDashboard = catchAsync(async (req, res, next) => {
+  const profile = await CreatorProfile.findOne({ userId: req.user._id });
+  if (!profile) {
+    return next(new ApiError(404, 'Creator profile not found'));
+  }
+
+  // Retrieve all completed payouts / earnings
+  const transactions = await Transaction.find({
+    receiverId: req.user._id,
+    status: 'completed'
+  });
+
+  // Retrieve dynamic platform settings
+  const systemSetting = await SystemSetting.findOne();
+  const commRate = systemSetting ? systemSetting.commissionRate : 0.20;
+
+  let totalEarnings = 0;
+  let subscriptionEarnings = 0;
+  let tipEarnings = 0;
+  let ppvEarnings = 0;
+  let callEarnings = 0;
+
+  for (const tx of transactions) {
+    let creatorShare = tx.amountCoins;
+    // Apply system fee deduction
+    if (['subscription', 'tip', 'ppv_unlock', 'call_billing'].includes(tx.type)) {
+      creatorShare = tx.amountCoins * (1 - commRate);
+    }
+    
+    totalEarnings += creatorShare;
+    
+    if (tx.type === 'subscription') {
+      subscriptionEarnings += creatorShare;
+    } else if (tx.type === 'tip') {
+      tipEarnings += creatorShare;
+    } else if (tx.type === 'ppv_unlock') {
+      ppvEarnings += creatorShare;
+    } else if (tx.type === 'call_billing') {
+      callEarnings += creatorShare;
+    }
+  }
+
+  // Fan Analytics (highest spenders)
+  const fanAnalytics = await Transaction.aggregate([
+    {
+      $match: {
+        receiverId: req.user._id,
+        status: 'completed'
+      }
+    },
+    {
+      $group: {
+        _id: '$senderId',
+        totalSpent: { $sum: '$amountCoins' },
+        txCount: { $sum: 1 }
+      }
+    },
+    {
+      $sort: { totalSpent: -1 }
+    }
+  ]);
+
+  const populatedFans = await User.populate(fanAnalytics, {
+    path: '_id',
+    select: 'username displayName avatarUrl email'
+  });
+
+  res.status(200).json({
+    status: 'success',
+    analytics: {
+      subscribersCount: profile.subscriberCount,
+      followersCount: profile.followerCount,
+      earnings: {
+        totalCoins: Number(totalEarnings.toFixed(2)),
+        byCategory: {
+          subscriptions: Number(subscriptionEarnings.toFixed(2)),
+          tips: Number(tipEarnings.toFixed(2)),
+          ppv: Number(ppvEarnings.toFixed(2)),
+          calls: Number(callEarnings.toFixed(2))
+        }
+      },
+      fans: populatedFans
+    }
   });
 });

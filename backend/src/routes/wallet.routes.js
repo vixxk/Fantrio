@@ -9,5 +9,6 @@ router.use(protect);
 router.get('/balance', walletController.getBalance);
 router.get('/transactions', walletController.getTransactions);
 router.post('/add-mock-coins', walletController.addMockCoins);
+router.post('/recharge', walletController.rechargeWallet);
 
 module.exports = router;

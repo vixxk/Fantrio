@@ -246,3 +246,21 @@ exports.heartbeat = catchAsync(async (req, res, next) => {
     callLog
   });
 });
+
+// Retrieve call history for the current user
+exports.getCallHistory = catchAsync(async (req, res, next) => {
+  const calls = await CallLog.find({
+    $or: [
+      { callerId: req.user._id },
+      { receiverId: req.user._id }
+    ]
+  })
+  .populate('callerId', 'username displayName avatarUrl')
+  .populate('receiverId', 'username displayName avatarUrl')
+  .sort({ createdAt: -1 });
+
+  res.status(200).json({
+    status: 'success',
+    calls
+  });
+});

@@ -16,5 +16,9 @@ router.post('/reports/:postId/moderate', adminController.moderatePost);
 router.get('/calls', adminController.getActiveCalls);
 router.get('/settings', adminController.getSystemSettings);
 router.put('/settings', adminController.updateSystemSettings);
+router.post('/creators/:creatorId/approve', adminController.approveCreator);
+router.post('/creators/:creatorId/reject', adminController.rejectCreator);
+router.post('/creators/:creatorId/verify', adminController.toggleCreatorVerification);
+router.post('/refund/:transactionId', adminController.refundTransaction);
 
 module.exports = router;

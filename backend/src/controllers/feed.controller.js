@@ -344,3 +344,21 @@ exports.getPresignedUpload = catchAsync(async (req, res, next) => {
     fileUrl
   });
 });
+
+// Share a post
+exports.sharePost = catchAsync(async (req, res, next) => {
+  const { postId } = req.params;
+
+  const post = await Post.findById(postId);
+  if (!post) {
+    return next(new ApiError(404, 'Post not found'));
+  }
+
+  post.sharesCount += 1;
+  await post.save({ validateBeforeSave: false });
+
+  res.status(200).json({
+    status: 'success',
+    sharesCount: post.sharesCount
+  });
+});

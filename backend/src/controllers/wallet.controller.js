@@ -1,5 +1,6 @@
 const Wallet = require('../models/Wallet');
 const Transaction = require('../models/Transaction');
+const walletService = require('../services/wallet.service');
 const ApiError = require('../utils/apiError');
 const catchAsync = require('../utils/catchAsync');
 
@@ -66,5 +67,30 @@ exports.addMockCoins = catchAsync(async (req, res, next) => {
     status: 'success',
     message: `${coins} mock coins credited to your wallet`,
     balanceCoins: wallet.balanceCoins
+  });
+});
+
+// Recharge wallet simulator
+exports.rechargeWallet = catchAsync(async (req, res, next) => {
+  const { coins } = req.body;
+
+  if (!coins || coins <= 0) {
+    return next(new ApiError(400, 'Please specify a positive number of coins to purchase'));
+  }
+
+  let wallet = await Wallet.findOne({ userId: req.user._id });
+  if (!wallet) {
+    wallet = await Wallet.create({ userId: req.user._id, balanceCoins: 0 });
+  }
+
+  // Credit wallet using service helper
+  await walletService.transferCoins(null, req.user._id, coins, 'deposit');
+
+  const updatedWallet = await Wallet.findOne({ userId: req.user._id });
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Wallet recharged successfully',
+    balanceCoins: updatedWallet.balanceCoins
   });
 });

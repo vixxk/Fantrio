@@ -1,4 +1,6 @@
+const mongoose = require('mongoose');
 const User = require('../models/User');
+const CreatorProfile = require('../models/CreatorProfile');
 const Wallet = require('../models/Wallet');
 const Transaction = require('../models/Transaction');
 const Post = require('../models/Post');
@@ -238,4 +240,128 @@ exports.updateSystemSettings = catchAsync(async (req, res, next) => {
     status: 'success',
     settings
   });
+});
+
+// Approve creator account
+exports.approveCreator = catchAsync(async (req, res, next) => {
+  const { creatorId } = req.params;
+
+  const profile = await CreatorProfile.findOne({ userId: creatorId });
+  if (!profile) {
+    return next(new ApiError(404, 'Creator profile not found'));
+  }
+
+  profile.verificationStatus = 'approved';
+  profile.isVerifiedBadge = true;
+  await profile.save();
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Creator application approved',
+    profile
+  });
+});
+
+// Reject creator account
+exports.rejectCreator = catchAsync(async (req, res, next) => {
+  const { creatorId } = req.params;
+
+  const profile = await CreatorProfile.findOne({ userId: creatorId });
+  if (!profile) {
+    return next(new ApiError(404, 'Creator profile not found'));
+  }
+
+  profile.verificationStatus = 'rejected';
+  profile.isVerifiedBadge = false;
+  await profile.save();
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Creator application rejected',
+    profile
+  });
+});
+
+// Toggle creator verification badge
+exports.toggleCreatorVerification = catchAsync(async (req, res, next) => {
+  const { creatorId } = req.params;
+
+  const profile = await CreatorProfile.findOne({ userId: creatorId });
+  if (!profile) {
+    return next(new ApiError(404, 'Creator profile not found'));
+  }
+
+  profile.isVerifiedBadge = !profile.isVerifiedBadge;
+  await profile.save();
+
+  res.status(200).json({
+    status: 'success',
+    message: `Verification badge ${profile.isVerifiedBadge ? 'granted' : 'revoked'}`,
+    profile
+  });
+});
+
+// Refund completed transaction (reverses coin balances and updates ledger)
+exports.refundTransaction = catchAsync(async (req, res, next) => {
+  const { transactionId } = req.params;
+
+  const tx = await Transaction.findById(transactionId);
+  if (!tx) {
+    return next(new ApiError(404, 'Transaction not found'));
+  }
+
+  if (tx.status !== 'completed') {
+    return next(new ApiError(400, 'Only completed transactions can be refunded'));
+  }
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const systemSetting = await SystemSetting.findOne().session(session);
+    const commRate = systemSetting ? systemSetting.commissionRate : 0.20;
+
+    // Calculate net amount received by receiver
+    let netAmount = tx.amountCoins;
+    if (['subscription', 'tip', 'ppv_unlock', 'call_billing'].includes(tx.type)) {
+      netAmount = tx.amountCoins * (1 - commRate);
+    }
+
+    // 1. Deduct net coins from receiver
+    if (tx.receiverId) {
+      let receiverWallet = await Wallet.findOne({ userId: tx.receiverId }).session(session);
+      if (receiverWallet) {
+        receiverWallet.balanceCoins = Number((receiverWallet.balanceCoins - netAmount).toFixed(2));
+        await receiverWallet.save({ session, validateBeforeSave: false });
+      }
+    }
+
+    // 2. Return original coins to sender
+    if (tx.senderId) {
+      let senderWallet = await Wallet.findOne({ userId: tx.senderId }).session(session);
+      if (!senderWallet) {
+        const [newWallet] = await Wallet.create([{ userId: tx.senderId, balanceCoins: 0 }], { session });
+        senderWallet = newWallet;
+      }
+      senderWallet.balanceCoins = Number((senderWallet.balanceCoins + tx.amountCoins).toFixed(2));
+      await senderWallet.save({ session, validateBeforeSave: false });
+    }
+
+    // 3. Update transaction status
+    tx.status = 'refunded';
+    await tx.save({ session, validateBeforeSave: false });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Transaction successfully refunded and reversed',
+      transaction: tx
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
 });

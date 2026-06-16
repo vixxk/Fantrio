@@ -10,7 +10,11 @@ router.get('/trending', creatorController.getTrending);
 router.get('/profile/:username', creatorController.getPublicProfile);
 
 // Protected routes
-router.put('/profile', protect, restrictTo('creator'), creatorController.updateProfile);
-router.post('/follow/:creatorId', protect, creatorController.followCreator);
+router.use(protect);
+router.put('/profile', restrictTo('creator'), creatorController.updateProfile);
+router.post('/follow/:creatorId', creatorController.followCreator);
+router.get('/following', creatorController.getFavourites);
+router.get('/subscribed', creatorController.getSubscribed);
+router.get('/dashboard', restrictTo('creator'), creatorController.getCreatorDashboard);
 
 module.exports = router;
