@@ -44,6 +44,7 @@ app.use('/api/v1/chat', require('./routes/chat.routes'));
 app.use('/api/v1/calls', require('./routes/call.routes'));
 // app.use('/api/v1/verification', require('./routes/verification.routes'));
 app.use('/api/v1/admin', require('./routes/admin.routes'));
+app.use('/api/v1/more', require('./routes/more.routes'));
 
 // Global 404 Route handler
 app.all('*', (req, res, next) => {

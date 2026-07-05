@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   padding: 1.5rem;
-  background-color: #0d0b16;
+  background-color: #0a0a0a;
   border-left: 1px solid rgba(255, 255, 255, 0.04);
   color: #ffffff;
   overflow-y: auto;
@@ -14,7 +14,7 @@
 
 /* Double Coins Promo Card */
 .doublePromoCard {
-  background: #0f0c16;
+  background: #121212;
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 20px;
   padding: 1.2rem;
@@ -275,7 +275,7 @@
 }
 
 .verifiedIcon {
-  color: #0d0b16; /* match dark sidebar background cutout */
+  color: #0a0a0a; /* match dark sidebar background cutout */
   fill: #ffffff;  /* match solid white badge shape */
 }
 
@@ -348,7 +348,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  background-image: linear-gradient(#0f0c16, #0f0c16), linear-gradient(90deg, #e10075, #7e00f3);
+  background-image: linear-gradient(#121212, #121212), linear-gradient(90deg, #e10075, #7e00f3);
   background-origin: border-box;
   background-clip: padding-box, border-box;
   border: 1.5px solid transparent;

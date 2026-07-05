@@ -95,7 +95,7 @@
   position: absolute;
   top: 110%;
   right: 0;
-  background: #0f0c16;
+  background: #121212;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   padding: 0.5rem;
@@ -353,7 +353,7 @@
 
 /* Filters Sidebar */
 .filtersSidebar {
-  background: #0f0c16;
+  background: #121212;
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 24px;
   padding: 1.5rem;
@@ -484,7 +484,7 @@
   top: 110%;
   left: 0;
   width: 100%;
-  background: #0f0c16;
+  background: #121212;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   padding: 0.5rem;
@@ -537,7 +537,7 @@
 
 /* Leaderboard */
 .leaderboardCard {
-  background: #0f0c16;
+  background: #121212;
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 24px;
   padding: 1.5rem;
@@ -720,7 +720,7 @@
 
 /* Loading & Empty states */
 .loadingContainer, .emptyContainer {
-  background: #0f0c16;
+  background: #121212;
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 20px;
   padding: 4rem 2rem;

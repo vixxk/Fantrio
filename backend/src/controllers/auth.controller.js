@@ -267,3 +267,54 @@ exports.getMe = catchAsync(async (req, res, next) => {
     }
   });
 });
+
+exports.updateMe = catchAsync(async (req, res, next) => {
+  // Prevent password update via this route
+  if (req.body.password || req.body.passwordConfirm) {
+    return next(new ApiError(400, 'This route is not for password updates. Please use /update-password'));
+  }
+
+  const allowedFields = ['username', 'displayName', 'avatarUrl', 'bio'];
+  const filteredBody = {};
+  Object.keys(req.body).forEach(key => {
+    if (allowedFields.includes(key)) {
+      filteredBody[key] = req.body[key];
+    }
+  });
+
+  const updatedUser = await User.findByIdAndUpdate(req.user._id, filteredBody, {
+    new: true,
+    runValidators: true
+  });
+
+  res.status(200).json({
+    status: 'success',
+    user: {
+      id: updatedUser._id,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      username: updatedUser.username,
+      displayName: updatedUser.displayName,
+      avatarUrl: updatedUser.avatarUrl
+    }
+  });
+});
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    return next(new ApiError(400, 'Please provide current password and new password'));
+  }
+
+  const user = await User.findById(req.user._id).select('+password');
+
+  if (!(await user.correctPassword(currentPassword, user.password))) {
+    return next(new ApiError(401, 'Your current password is incorrect'));
+  }
+
+  user.password = newPassword;
+  await user.save();
+
+  createSendToken(user, 200, res);
+});

@@ -22,7 +22,7 @@ export const AppProvider = ({ children }) => {
     'My Subscription': '/subscriptions',
     'Messages': '/messages',
     'Buy Coins': '/buy-coins',
-    'Account Setting': '/settings',
+    'Settings': '/settings',
     'More': '/more'
   };
 
@@ -36,7 +36,7 @@ export const AppProvider = ({ children }) => {
     '/subscriptions': 'My Subscription',
     '/messages': 'Messages',
     '/buy-coins': 'Buy Coins',
-    '/settings': 'Account Setting',
+    '/settings': 'Settings',
     '/more': 'More'
   };
 

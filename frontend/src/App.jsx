@@ -12,6 +12,10 @@ import { AllCreators } from './features/creators/AllCreators';
 import { AudioCallsPage } from './features/audio/AudioCallsPage';
 import { VideoCallsPage } from './features/video/VideoCallsPage';
 import { SubscriptionsPage } from './features/subscriptions/SubscriptionsPage';
+import { MessagesPage } from './features/messages/MessagesPage';
+import { BuyCoinsPage } from './features/coins/BuyCoinsPage';
+import { SettingsPage } from './features/settings/SettingsPage';
+import { MorePage } from './features/more/MorePage';
 import { Menu, X, Compass, Radio, Phone, MessageSquare, User } from 'lucide-react';
 import './App.css';
 
@@ -65,6 +69,30 @@ const AppContent = () => {
             <SubscriptionsPage />
           </div>
         );
+      case 'Messages':
+        return (
+          <div className="tabMessages">
+            <MessagesPage />
+          </div>
+        );
+      case 'Buy Coins':
+        return (
+          <div className="tabBuyCoins">
+            <BuyCoinsPage />
+          </div>
+        );
+      case 'Settings':
+        return (
+          <div className="tabSettings">
+            <SettingsPage />
+          </div>
+        );
+      case 'More':
+        return (
+          <div className="tabMore">
+            <MorePage />
+          </div>
+        );
       default:
         return (
           <div className="comingSoonContainer">
@@ -108,7 +136,7 @@ const AppContent = () => {
           <Header />
         </div>
 
-        <main className="scrollableContent">
+        <main className={`scrollableContent ${activeTab === 'Messages' ? 'noScroll' : ''}`}>
           {renderTabContent()}
         </main>
       </div>

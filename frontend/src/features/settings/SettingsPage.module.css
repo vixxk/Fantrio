@@ -1,0 +1,471 @@
+/* ================= SETTINGS PAGE ================= */
+.settingsContainer {
+  width: 100%;
+  min-height: 100%;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+.settingsShell {
+  display: grid;
+  grid-template-columns: 1fr 28%;
+  gap: 2%;
+  max-width: 100%;
+}
+
+/* --- Header --- */
+.feedHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.headerTitleBlock {
+  display: flex;
+  flex-direction: column;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+}
+
+.headerSettingsIcon {
+  flex-shrink: 0;
+}
+
+.pageTitle {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.pageSubtitle {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+/* --- Settings Rows --- */
+.settingsRows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 1.5rem;
+}
+
+.settingRow {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.settingRow:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 0, 127, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.settingRowLeft {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.settingIconWrap {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.settingIcon {
+  color: #e10075;
+}
+
+.settingIconImg {
+  width: 26px;
+  height: 26px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+  max-width: none;
+  filter: grayscale(1) brightness(1.8);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), filter 0.25s ease;
+}
+
+.settingRow:hover .settingIconImg {
+  transform: translate(-50%, -50%) scale(1.08);
+  filter: invert(19%) sepia(87%) saturate(6444%) hue-rotate(328deg) brightness(101%) contrast(107%);
+}
+
+.settingTextCol {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.settingTitle {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.settingDesc {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.chevron {
+  color: rgba(255, 255, 255, 0.35);
+  flex-shrink: 0;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.settingRow:hover .chevron {
+  color: #ff007f;
+  transform: translateX(3px);
+}
+
+/* --- Support Cards Row --- */
+.supportCardsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.supportCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem 1.25rem;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 1.15rem;
+}
+
+.supportCardContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.supportCardIconWrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(225, 0, 117, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.supportCardIcon {
+  stroke: url(#brand-gradient);
+}
+
+.supportCardText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.supportCardTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.supportCardDesc {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.supportBtn {
+  align-self: flex-start;
+  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%);
+  border: none;
+  color: #ffffff;
+  padding: 0.55rem 1.35rem;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+  margin-top: 0.25rem;
+}
+
+.supportBtn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+/* ================= RIGHT SIDEBAR ================= */
+.rightSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* --- Help Hero Card --- */
+.helpHeroCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 1.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.helpHeroIconWrap {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.helpHeroIcon {
+  color: #e10075;
+}
+
+.helpHeroIconImg {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.helpHeroTitle {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.45rem 0;
+}
+
+.helpHeroDesc {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* --- Help Links Card --- */
+.helpLinksCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 0.5rem 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.helpLinkRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.35rem;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+}
+
+.helpLinkRow:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.helpLinkRow:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.helpLinkLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.helpLinkIconWrap {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.helpLinkIcon {
+  stroke: url(#brand-gradient);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.helpLinkRow:hover .helpLinkIcon {
+  transform: scale(1.08);
+}
+
+.helpLinkTextCol {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.helpLinkTitle {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.helpLinkDesc {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.helpLinkChevron {
+  color: rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.helpLinkRow:hover .helpLinkChevron {
+  color: #ff007f;
+  transform: translateX(3px);
+}
+
+/* ================= LIGHT THEME OVERRIDES ================= */
+.light {
+  color: #1a1625;
+}
+
+.light .pageTitle,
+.light .settingTitle,
+.light .supportCardTitle,
+.light .helpHeroTitle,
+.light .helpLinkTitle {
+  color: #1a1625;
+}
+
+.light .pageSubtitle,
+.light .settingDesc,
+.light .supportCardDesc,
+.light .helpHeroDesc,
+.light .helpLinkDesc {
+  color: rgba(26, 22, 37, 0.65);
+}
+
+.light .settingRow,
+.light .supportCard,
+.light .helpHeroCard,
+.light .helpLinksCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.light .settingRow:hover {
+  border-color: rgba(225, 0, 117, 0.3);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.light .settingIconWrap {
+  background: none;
+  border: none;
+}
+
+.light .supportCardIconWrap {
+  background: rgba(225, 0, 117, 0.08);
+  border: none;
+}
+
+.light .helpHeroIconWrap {
+  background: none;
+  border: none;
+}
+
+.light .helpLinkIconWrap {
+  background: none;
+  border: none;
+}
+
+.light .chevron,
+.light .helpLinkChevron {
+  color: rgba(26, 22, 37, 0.3);
+}
+
+.light .helpLinkRow:not(:last-child) {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .helpLinkRow:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* ================= RESPONSIVE DESIGN ================= */
+@media (max-width: 1200px) {
+  .settingsShell {
+    grid-template-columns: 1fr;
+  }
+
+  .rightSidebar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .settingsContainer {
+    padding: 0;
+  }
+
+  .supportCardsRow {
+    grid-template-columns: 1fr;
+  }
+
+  .rightSidebar {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.35rem;
+  }
+
+  .settingRow {
+    padding: 1rem 1.15rem;
+  }
+
+  .settingIconWrap {
+    width: 36px;
+    height: 36px;
+  }
+}

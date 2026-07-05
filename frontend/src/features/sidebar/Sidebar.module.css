@@ -5,7 +5,7 @@
   flex-direction: column;
   padding: 0.6rem 1rem 1.5rem 1rem; /* reduced top padding to shift logo up */
   border-right: 1px solid rgba(255, 255, 255, 0.04);
-  background-color: #0d0b16;
+  background-color: #0a0a0a;
   color: #ffffff;
   overflow-y: auto;
   box-sizing: border-box;
@@ -84,14 +84,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #0d0b16;
+  color: #0a0a0a;
   box-shadow: 0 2px 6px rgba(255, 184, 0, 0.2);
   flex-shrink: 0;
   transition: transform 0.2s ease;
 }
 
 .goldIcon {
-  color: #0d0b16 !important;
+  color: #0a0a0a !important;
 }
 
 .navItem:hover {

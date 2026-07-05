@@ -4,9 +4,41 @@ import { api } from '../../services/api';
 import { 
   Search, Edit, BadgeCheck, Phone, Video, Heart, MoreVertical,
   Lock, Smile, Image as ImageIcon, Send, Plus, Archive, Star,
-  X, Check, DollarSign
+  X, Check, MessageSquare, User
 } from 'lucide-react';
 import styles from './MessagesPage.module.css';
+
+// Custom Gradient Verification Badge
+const GradientBadgeCheck = ({ size = 15 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, display: 'inline-block', verticalAlign: 'middle' }}>
+    <defs>
+      <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#e10075" />
+        <stop offset="100%" stopColor="#7e00f3" />
+      </linearGradient>
+    </defs>
+    <path 
+      d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76z" 
+      fill="url(#badgeGrad)" 
+    />
+    <path d="m9 12 2 2 4-4" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+// Custom Gradient Archive Icon
+const GradientArchiveIcon = ({ size = 16 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, display: 'inline-block', verticalAlign: 'middle' }}>
+    <defs>
+      <linearGradient id="archiveGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#e10075" />
+        <stop offset="100%" stopColor="#7e00f3" />
+      </linearGradient>
+    </defs>
+    <rect width="20" height="5" x="2" y="3" rx="1" stroke="url(#archiveGrad)" strokeWidth="2" />
+    <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" stroke="url(#archiveGrad)" strokeWidth="2" />
+    <path d="M10 12h4" stroke="url(#archiveGrad)" strokeWidth="2" strokeLinecap="round" />
+  </svg>
+);
 
 const INITIAL_CONVERSATIONS = [
   {
@@ -295,25 +327,27 @@ const INITIAL_MESSAGES = [
 export const MessagesPage = () => {
   const { darkMode, balance, addCoins, setActiveTab } = useApp();
   const [conversations, setConversations] = useState(INITIAL_CONVERSATIONS);
-  const [selectedConvId, setSelectedConvId] = useState('conv1');
-  const [filter, setFilter] = useState('all'); // 'all', 'unread', 'subscribed'
+  const [selectedConvId, setSelectedConvId] = useState(null); // Default: No message selected first
+  const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [messagesMap, setMessagesMap] = useState({ conv1: INITIAL_MESSAGES });
   const [inputText, setInputText] = useState('');
   const [showTipModal, setShowTipModal] = useState(false);
   const [tipAmount, setTipAmount] = useState(50);
-  const [mobileView, setMobileView] = useState('chat'); // 'list', 'chat', 'profile'
+  const [mobileView, setMobileView] = useState('list');
   const messagesEndRef = useRef(null);
 
-  const selectedConv = conversations.find(c => c.id === selectedConvId) || conversations[0];
-  const currentMessages = messagesMap[selectedConvId] || [
+  const selectedConv = conversations.find(c => c.id === selectedConvId) || null;
+  const currentMessages = selectedConvId ? (messagesMap[selectedConvId] || [
     { id: 'default1', sender: 'creator', text: `Hi! Welcome to my chat feed.`, time: 'Just now' }
-  ];
+  ]) : [];
 
-  // Auto scroll to bottom of messages
+  // Auto scroll to bottom of messages when selected conversation or messages change
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [currentMessages]);
+    if (selectedConvId) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [selectedConvId, currentMessages]);
 
   // Filter conversations
   const filteredConversations = conversations.filter(c => {
@@ -321,13 +355,13 @@ export const MessagesPage = () => {
                           c.lastMessage.toLowerCase().includes(searchQuery.toLowerCase());
     if (!matchesSearch) return false;
     if (filter === 'unread') return c.unreadCount > 0;
-    if (filter === 'subscribed') return true; // all mock creators are subscribed
+    if (filter === 'subscribed') return true;
     return true;
   });
 
   const handleSendMessage = (e) => {
     e?.preventDefault();
-    if (!inputText.trim()) return;
+    if (!inputText.trim() || !selectedConvId) return;
 
     const newMsg = {
       id: `msg_${Date.now()}`,
@@ -341,7 +375,6 @@ export const MessagesPage = () => {
       [selectedConvId]: [...(prev[selectedConvId] || []), newMsg]
     }));
 
-    // Update last message in conversation list
     setConversations(prev => prev.map(c => {
       if (c.id === selectedConvId) {
         return { ...c, lastMessage: inputText.trim(), time: 'Just now' };
@@ -359,10 +392,8 @@ export const MessagesPage = () => {
     }
 
     try {
-      // Deduct coins
       await addCoins(-price);
 
-      // Update message unlock status
       setMessagesMap(prev => ({
         ...prev,
         [selectedConvId]: (prev[selectedConvId] || []).map(m => {
@@ -378,6 +409,7 @@ export const MessagesPage = () => {
   };
 
   const handleSendTip = async () => {
+    if (!selectedConv) return;
     if (balance < tipAmount) {
       alert(`Insufficient balance! You have ${balance} Coins.`);
       return;
@@ -387,7 +419,6 @@ export const MessagesPage = () => {
       await addCoins(-tipAmount);
       setShowTipModal(false);
 
-      // Add a tip confirmation message
       const tipMsg = {
         id: `tip_${Date.now()}`,
         sender: 'user',
@@ -416,7 +447,7 @@ export const MessagesPage = () => {
           <div className={styles.chatsHeader}>
             <h2 className={styles.chatsTitle}>Messages</h2>
             <button className={styles.composeBtn} title="New Message">
-              <Edit size={18} />
+              <img src="/compose.png" alt="Compose" className={styles.composeIconImg} />
             </button>
           </div>
 
@@ -476,7 +507,7 @@ export const MessagesPage = () => {
                     <div className={styles.convNameRow}>
                       <span className={styles.convName}>
                         {conv.user.displayName}
-                        {conv.user.isVerified && <BadgeCheck size={14} className={styles.verifiedBadge} />}
+                        {conv.user.isVerified && <GradientBadgeCheck size={14} />}
                       </span>
                       <span className={styles.convTime}>{conv.time}</span>
                     </div>
@@ -496,8 +527,8 @@ export const MessagesPage = () => {
           {/* Footer Archived Link */}
           <div className={styles.archiveFooter}>
             <button className={styles.archiveBtn}>
-              <Archive size={16} />
-              <span>View Archived Chats</span>
+              <GradientArchiveIcon size={16} />
+              <span className={styles.archiveText}>View Archived Chats</span>
             </button>
           </div>
 
@@ -506,261 +537,282 @@ export const MessagesPage = () => {
         {/* ================= COLUMN 2: CENTER CHAT ROOM ================= */}
         <div className={`${styles.chatRoom} ${mobileView !== 'chat' ? styles.hideMobile : ''}`}>
           
-          {/* Header Bar */}
-          <div className={styles.roomHeader}>
-            <div className={styles.roomUserBlock}>
-              <div className={styles.roomAvatarWrapper}>
-                <img src={selectedConv.user.avatarUrl} alt={selectedConv.user.displayName} className={styles.roomAvatar} />
-                {selectedConv.user.isOnline && <span className={styles.onlineDot} />}
+          {selectedConv ? (
+            <>
+              {/* Header Bar */}
+              <div className={styles.roomHeader}>
+                <div className={styles.roomUserBlock}>
+                  <div className={styles.roomAvatarWrapper}>
+                    <img src={selectedConv.user.avatarUrl} alt={selectedConv.user.displayName} className={styles.roomAvatar} />
+                    {selectedConv.user.isOnline && <span className={styles.onlineDot} />}
+                  </div>
+                  <div className={styles.roomNameBlock}>
+                    <div className={styles.roomDisplayName}>
+                      {selectedConv.user.displayName}
+                      {selectedConv.user.isVerified && <GradientBadgeCheck size={15} />}
+                    </div>
+                    <div className={styles.roomUsername}>@{selectedConv.user.username}</div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className={styles.roomActions}>
+                  <button 
+                    className={styles.audioCallBtn}
+                    onClick={() => setActiveTab('1:1 Audio Calls')}
+                  >
+                    <Phone size={17} fill="#ffffff" />
+                    <div className={styles.btnTextCol}>
+                      <span className={styles.btnLabel}>Audio Call</span>
+                      <span className={styles.btnSub}>10 Coins/min</span>
+                    </div>
+                  </button>
+
+                  <button 
+                    className={styles.videoCallBtn}
+                    onClick={() => setActiveTab('1:1 Video Calls')}
+                  >
+                    <Video size={17} fill="#ffffff" />
+                    <div className={styles.btnTextCol}>
+                      <span className={styles.btnLabel}>Video Call</span>
+                      <span className={styles.btnSub}>10 Coins/min</span>
+                    </div>
+                  </button>
+
+                  <button 
+                    className={styles.sendTipBtn}
+                    onClick={() => setShowTipModal(true)}
+                  >
+                    <Heart size={18} fill="#ff003b" color="#ff003b" className={styles.tipHeartIcon} />
+                    <span>Send Tip</span>
+                  </button>
+
+                  <button className={styles.moreOptionsBtn}>
+                    <MoreVertical size={18} />
+                  </button>
+                </div>
               </div>
-              <div className={styles.roomNameBlock}>
-                <div className={styles.roomDisplayName}>
-                  {selectedConv.user.displayName}
-                  {selectedConv.user.isVerified && <BadgeCheck size={15} className={styles.verifiedBadge} />}
+
+              {/* Messages Body */}
+              <div className={styles.messagesBody}>
+                
+                {/* Date Separator */}
+                <div className={styles.dateSeparator}>
+                  <span>Nov 30, 2023, 9:41 AM</span>
                 </div>
-                <div className={styles.roomUsername}>@{selectedConv.user.username}</div>
-              </div>
-            </div>
 
-            {/* Action Buttons */}
-            <div className={styles.roomActions}>
-              <button 
-                className={styles.audioCallBtn}
-                onClick={() => setActiveTab('1:1 Audio Calls')}
-              >
-                <Phone size={15} />
-                <div className={styles.btnTextCol}>
-                  <span className={styles.btnLabel}>Audio Call</span>
-                  <span className={styles.btnSub}>10 Coins/min</span>
-                </div>
-              </button>
+                {currentMessages.map((msg) => {
+                  const isUser = msg.sender === 'user';
 
-              <button 
-                className={styles.videoCallBtn}
-                onClick={() => setActiveTab('1:1 Video Calls')}
-              >
-                <Video size={15} />
-                <div className={styles.btnTextCol}>
-                  <span className={styles.btnLabel}>Video Call</span>
-                  <span className={styles.btnSub}>10 Coins/min</span>
-                </div>
-              </button>
+                  if (msg.isPaywall) {
+                    return (
+                      <div key={msg.id} className={`${styles.msgRow} ${styles.msgRowLeft}`}>
+                        <div className={styles.paywallWrapper}>
+                          <span className={styles.paywallNoticeTitle}>{msg.title}</span>
+                          
+                          <div className={styles.paywallCard}>
+                            <div className={styles.paywallMediaFrame}>
+                              <img src={msg.previewUrl} alt="Locked" className={`${styles.paywallImg} ${msg.isLocked ? styles.blurred : ''}`} />
+                              {msg.isLocked && (
+                                <div className={styles.lockOverlay}>
+                                  <Lock size={20} className={styles.lockIcon} />
+                                </div>
+                              )}
+                            </div>
 
-              <button 
-                className={styles.sendTipBtn}
-                onClick={() => setShowTipModal(true)}
-              >
-                <Heart size={15} fill="#ffffff" />
-                <span>Send Tip</span>
-              </button>
+                            <div className={styles.paywallContentBlock}>
+                              <h4 className={styles.paywallMediaTitle}>{msg.mediaType}</h4>
+                              <p className={styles.paywallSubtext}>{msg.textSub}</p>
+                            </div>
+                          </div>
 
-              <button className={styles.moreOptionsBtn}>
-                <MoreVertical size={18} />
-              </button>
-            </div>
-          </div>
-
-          {/* Messages Body */}
-          <div className={styles.messagesBody}>
-            
-            {/* Date Separator */}
-            <div className={styles.dateSeparator}>
-              <span>Nov 30, 2023, 9:41 AM</span>
-            </div>
-
-            {currentMessages.map((msg) => {
-              const isUser = msg.sender === 'user';
-
-              if (msg.isPaywall) {
-                return (
-                  <div key={msg.id} className={`${styles.msgRow} ${styles.msgRowLeft}`}>
-                    <div className={styles.paywallWrapper}>
-                      <span className={styles.paywallNoticeTitle}>{msg.title}</span>
-                      
-                      <div className={styles.paywallCard}>
-                        <div className={styles.paywallMediaFrame}>
-                          <img src={msg.previewUrl} alt="Locked" className={`${styles.paywallImg} ${msg.isLocked ? styles.blurred : ''}`} />
-                          {msg.isLocked && (
-                            <div className={styles.lockOverlay}>
-                              <Lock size={20} className={styles.lockIcon} />
+                          {/* Unlock Action Row */}
+                          {msg.isLocked ? (
+                            <div className={styles.paywallUnlockBar}>
+                              <div className={styles.coinPriceTag}>
+                                <img src="/coin.png" alt="Coin" className={styles.coinIcon} />
+                                <span>{msg.coinPrice} Coins</span>
+                              </div>
+                              <button 
+                                className={styles.unlockBtn}
+                                onClick={() => handleUnlockMedia(msg.id, msg.coinPrice)}
+                              >
+                                Unlock
+                              </button>
+                            </div>
+                          ) : (
+                            <div className={styles.unlockedNotice}>
+                              <Check size={14} /> Unlocked
                             </div>
                           )}
                         </div>
-
-                        <div className={styles.paywallContentBlock}>
-                          <h4 className={styles.paywallMediaTitle}>{msg.mediaType}</h4>
-                          <p className={styles.paywallSubtext}>{msg.textSub}</p>
-                        </div>
                       </div>
+                    );
+                  }
 
-                      {/* Unlock Action Row */}
-                      {msg.isLocked ? (
-                        <div className={styles.paywallUnlockBar}>
-                          <div className={styles.coinPriceTag}>
-                            <img src="/coin.png" alt="Coin" className={styles.coinIcon} />
-                            <span>{msg.coinPrice} Coins</span>
-                          </div>
-                          <button 
-                            className={styles.unlockBtn}
-                            onClick={() => handleUnlockMedia(msg.id, msg.coinPrice)}
-                          >
-                            Unlock
-                          </button>
-                        </div>
-                      ) : (
-                        <div className={styles.unlockedNotice}>
-                          <Check size={14} /> Unlocked
-                        </div>
-                      )}
+                  return (
+                    <div key={msg.id} className={`${styles.msgRow} ${isUser ? styles.msgRowRight : styles.msgRowLeft}`}>
+                      <div className={`${styles.msgBubble} ${isUser ? styles.bubbleUser : styles.bubbleCreator} ${msg.isTip ? styles.bubbleTip : ''}`}>
+                        <p className={styles.msgText}>{msg.text}</p>
+                      </div>
                     </div>
-                  </div>
-                );
-              }
+                  );
+                })}
 
-              return (
-                <div key={msg.id} className={`${styles.msgRow} ${isUser ? styles.msgRowRight : styles.msgRowLeft}`}>
-                  <div className={`${styles.msgBubble} ${isUser ? styles.bubbleUser : styles.bubbleCreator} ${msg.isTip ? styles.bubbleTip : ''}`}>
-                    <p className={styles.msgText}>{msg.text}</p>
-                  </div>
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Input Bar */}
+              <form className={styles.chatInputBar} onSubmit={handleSendMessage}>
+                <button type="button" className={styles.inputAddBtn} title="Add Content">
+                  <Plus size={20} />
+                </button>
+
+                <input 
+                  type="text"
+                  placeholder="Enter your message..."
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  className={styles.chatInput}
+                />
+
+                <div className={styles.inputRightIcons}>
+                  <button type="button" className={styles.inputIconButton} title="Emoji">
+                    <Smile size={19} />
+                  </button>
+                  <button type="button" className={styles.inputIconButton} title="Attach Image">
+                    <ImageIcon size={19} />
+                  </button>
+                  <button type="submit" className={styles.sendSubmitBtn} title="Send Message">
+                    <Send size={16} />
+                  </button>
                 </div>
-              );
-            })}
-
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Input Bar */}
-          <form className={styles.chatInputBar} onSubmit={handleSendMessage}>
-            <button type="button" className={styles.inputAddBtn} title="Add Content">
-              <Plus size={20} />
-            </button>
-
-            <input 
-              type="text"
-              placeholder="Enter your message..."
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              className={styles.chatInput}
-            />
-
-            <div className={styles.inputRightIcons}>
-              <button type="button" className={styles.inputIconButton} title="Emoji">
-                <Smile size={19} />
-              </button>
-              <button type="button" className={styles.inputIconButton} title="Attach Image">
-                <ImageIcon size={19} />
-              </button>
-              <button type="submit" className={styles.sendSubmitBtn} title="Send Message">
-                <Send size={16} />
-              </button>
+              </form>
+            </>
+          ) : (
+            <div className={styles.emptyStateContainer}>
+              <div className={styles.emptyStateCard}>
+                <MessageSquare size={48} className={styles.emptyIcon} />
+                <h3 className={styles.emptyTitle}>Your Messages</h3>
+                <p className={styles.emptyText}>Select a conversation from the left sidebar to start chatting</p>
+              </div>
             </div>
-          </form>
+          )}
 
         </div>
 
         {/* ================= COLUMN 3: RIGHT PROFILE DETAILS SIDEBAR ================= */}
         <div className={`${styles.profileSidebar} ${mobileView !== 'profile' ? styles.hideMobile : ''}`}>
           
-          {/* Top Creator Header */}
-          <div className={styles.creatorProfileCard}>
-            <div className={styles.avatarRingWrapper}>
-              <img src={selectedConv.user.avatarUrl} alt={selectedConv.user.displayName} className={styles.profileAvatar} />
-              {selectedConv.user.isOnline && <span className={styles.profileOnlineDot} />}
-            </div>
-            
-            <h3 className={styles.profileName}>
-              {selectedConv.user.displayName}
-              {selectedConv.user.isVerified && <BadgeCheck size={16} className={styles.verifiedBadge} />}
-            </h3>
-            <span className={styles.profileUsername}>@{selectedConv.user.username}</span>
+          {selectedConv ? (
+            <>
+              {/* Top Creator Header */}
+              <div className={styles.creatorProfileCard}>
+                <div className={styles.avatarRingWrapper}>
+                  <img src={selectedConv.user.avatarUrl} alt={selectedConv.user.displayName} className={styles.profileAvatar} />
+                  {selectedConv.user.isOnline && <span className={styles.profileOnlineDot} />}
+                </div>
+                
+                <h3 className={styles.profileName}>
+                  {selectedConv.user.displayName}
+                  {selectedConv.user.isVerified && <BadgeCheck size={16} className={styles.feedVerifiedBadge} />}
+                </h3>
+                <span className={styles.profileUsername}>@{selectedConv.user.username}</span>
 
-            <div className={styles.ratingRow}>
-              <Star size={14} className={styles.starIcon} fill="#eab308" />
-              <span>{selectedConv.user.rating} ({selectedConv.user.ratingCount})</span>
-            </div>
-          </div>
-
-          {/* Subscription Info Card */}
-          <div className={styles.sidebarCard}>
-            <div className={styles.cardHeaderRow}>
-              <span className={styles.cardHeaderTitle}>Subscription</span>
-              <span className={styles.statusActiveTag}>Active</span>
-            </div>
-
-            <div className={styles.detailRow}>
-              <span className={styles.detailLabel}>Plan</span>
-              <span className={styles.detailValue}>{selectedConv.user.subscriptionPlan}</span>
-            </div>
-
-            <div className={styles.detailRow}>
-              <span className={styles.detailLabel}>Renewal Date</span>
-              <span className={styles.detailValue}>{selectedConv.user.renewalDate}</span>
-            </div>
-
-            <button className={styles.manageSubBtn}>
-              Manage Subscription
-            </button>
-          </div>
-
-          {/* Rates Card */}
-          <div className={styles.sidebarCard}>
-            <h4 className={styles.cardTitle}>Rates</h4>
-
-            <div className={styles.rateItem}>
-              <div className={styles.rateLeft}>
-                <Phone size={15} className={styles.rateIcon} />
-                <span>1:1 Audio Call</span>
+                <div className={styles.ratingRow}>
+                  <Star size={14} className={styles.starIcon} fill="#eab308" />
+                  <span>{selectedConv.user.rating} ({selectedConv.user.ratingCount})</span>
+                </div>
               </div>
-              <span className={styles.rateVal}>{selectedConv.user.audioRate} Coins / Min</span>
-            </div>
 
-            <div className={styles.rateItem}>
-              <div className={styles.rateLeft}>
-                <Video size={15} className={styles.rateIcon} />
-                <span>1:1 Video Call</span>
+              {/* Subscription Info Card */}
+              <div className={styles.sidebarCard}>
+                <div className={styles.cardHeaderRow}>
+                  <span className={styles.cardHeaderTitle}>Subscription</span>
+                  <span className={styles.statusActiveTag}>Active</span>
+                </div>
+
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Plan</span>
+                  <span className={styles.detailValue}>{selectedConv.user.subscriptionPlan}</span>
+                </div>
+
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Renewal Date</span>
+                  <span className={styles.detailValue}>{selectedConv.user.renewalDate}</span>
+                </div>
+
+                <button className={styles.manageSubBtn}>
+                  Manage Subscription
+                </button>
               </div>
-              <span className={styles.rateVal}>{selectedConv.user.videoRate} Coins / Min</span>
+
+              {/* Rates Card */}
+              <div className={styles.sidebarCard}>
+                <h4 className={styles.cardTitle}>Rates</h4>
+
+                <div className={styles.rateItem}>
+                  <div className={styles.rateLeft}>
+                    <Phone size={15} className={styles.rateIcon} />
+                    <span>1:1 Audio Call</span>
+                  </div>
+                  <span className={styles.rateVal}>{selectedConv.user.audioRate} Coins / Min</span>
+                </div>
+
+                <div className={styles.rateItem}>
+                  <div className={styles.rateLeft}>
+                    <Video size={15} className={styles.rateIcon} />
+                    <span>1:1 Video Call</span>
+                  </div>
+                  <span className={styles.rateVal}>{selectedConv.user.videoRate} Coins / Min</span>
+                </div>
+              </div>
+
+              {/* About Card */}
+              <div className={styles.sidebarCard}>
+                <h4 className={styles.cardTitle}>About</h4>
+
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Followers</span>
+                  <span className={styles.detailValue}>{selectedConv.user.followers}</span>
+                </div>
+
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Posts</span>
+                  <span className={styles.detailValue}>{selectedConv.user.posts}</span>
+                </div>
+
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Country</span>
+                  <span className={styles.detailValue}>{selectedConv.user.country}</span>
+                </div>
+
+                <div className={styles.detailRow}>
+                  <span className={styles.detailLabel}>Language</span>
+                  <span className={styles.detailValue}>{selectedConv.user.language}</span>
+                </div>
+
+                <button 
+                  className={styles.viewProfileBtn}
+                  onClick={() => setActiveTab('All Creators')}
+                >
+                  View Profile
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className={styles.emptyProfileState}>
+              <User size={40} className={styles.emptyIcon} />
+              <p>Select a creator to view details</p>
             </div>
-          </div>
-
-          {/* About Card */}
-          <div className={styles.sidebarCard}>
-            <h4 className={styles.cardTitle}>About</h4>
-
-            <div className={styles.detailRow}>
-              <span className={styles.detailLabel}>Followers</span>
-              <span className={styles.detailValue}>{selectedConv.user.followers}</span>
-            </div>
-
-            <div className={styles.detailRow}>
-              <span className={styles.detailLabel}>Posts</span>
-              <span className={styles.detailValue}>{selectedConv.user.posts}</span>
-            </div>
-
-            <div className={styles.detailRow}>
-              <span className={styles.detailLabel}>Country</span>
-              <span className={styles.detailValue}>{selectedConv.user.country}</span>
-            </div>
-
-            <div className={styles.detailRow}>
-              <span className={styles.detailLabel}>Language</span>
-              <span className={styles.detailValue}>{selectedConv.user.language}</span>
-            </div>
-
-            <button 
-              className={styles.viewProfileBtn}
-              onClick={() => setActiveTab('All Creators')}
-            >
-              View Profile
-            </button>
-          </div>
+          )}
 
         </div>
 
       </div>
 
       {/* Send Tip Modal */}
-      {showTipModal && (
+      {showTipModal && selectedConv && (
         <div className={styles.modalOverlay} onClick={() => setShowTipModal(false)}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>

@@ -1,0 +1,763 @@
+/* ==========================================================================
+   BUY COINS PAGE STYLES (Fantrio)
+   ========================================================================== */
+
+.buyCoinsContainer {
+  width: 100%;
+  min-height: calc(100vh - 80px);
+  padding: 0;
+  box-sizing: border-box;
+  color: #ffffff;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.buyCoinsShell {
+  display: grid;
+  grid-template-columns: 1fr 28%;
+  gap: 2.5%;
+  max-width: 100%;
+  width: 100%;
+  margin: 0;
+}
+
+/* ================= MAIN LEFT SECTION ================= */
+.mainSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.headerSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.headerCoinIcon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(255, 187, 0, 0.4));
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0;
+}
+
+/* --- Limited Time Offer Banner --- */
+.offerBanner {
+  background: linear-gradient(90deg, #3d002a 0%, #1c0038 50%, #0a0033 100%);
+  border-radius: 18px;
+  padding: 0.85rem 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  border: none;
+}
+
+.offerLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.offerIconImg {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.offerText {
+  font-size: 0.92rem;
+  color: #ffffff;
+}
+
+.offerText strong {
+  font-weight: 700;
+  color: #ffffff;
+  margin-right: 0.35rem;
+}
+
+.offerTimer {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.timerLabel {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.timerGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.timerBoxWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timerBox {
+  background: #0d0421;
+  border: 1px solid #ff5500;
+  border-radius: 10px;
+  padding: 0.3rem 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+}
+
+.timerNum {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.1;
+}
+
+.timerUnit {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+
+.timerColon {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+  margin-bottom: 1.1rem;
+}
+
+/* --- Coin Packs Grid --- */
+.coinGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.1rem;
+}
+
+.coinCard {
+  background: #0d0617;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem 1rem 1.1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+}
+
+.coinCard:hover {
+  transform: translateY(-4px);
+  border-color: rgba(126, 0, 243, 0.35);
+  box-shadow: 0 8px 25px rgba(126, 0, 243, 0.15);
+}
+
+.popularCard {
+  background: linear-gradient(135deg, #2b042c 0%, #150426 50%, #08031d 100%);
+  border: 1.5px solid transparent;
+  background-image: linear-gradient(#1e0527, #08031d), linear-gradient(135deg, #e10075 0%, #5d00e6 100%);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  border-radius: 18px;
+  box-shadow: 0 4px 25px rgba(225, 0, 117, 0.2);
+}
+
+.popularBadge {
+  position: absolute;
+  top: -14px;
+  left: 0;
+  background: linear-gradient(90deg, #e10075 0%, #5d00e6 100%);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.3rem 0.85rem;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 0;
+  text-transform: none;
+  box-shadow: 0 4px 12px rgba(225, 0, 117, 0.35);
+}
+
+.imgWrapper {
+  width: 105px;
+  height: 105px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.35rem;
+  margin-bottom: 0.6rem;
+}
+
+.packImg {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 15px rgba(0, 0, 0, 0.4));
+  transition: transform 0.25s;
+}
+
+.giftCoinsImg {
+  transform: scale(1.55);
+}
+
+.coinCard:hover .packImg {
+  transform: scale(1.06);
+}
+
+.coinCard:hover .giftCoinsImg {
+  transform: scale(1.65);
+}
+
+.packTitle {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.4rem 0;
+  text-align: center;
+}
+
+.priceRow {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.85rem;
+}
+
+.oldPrice {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-decoration: line-through;
+}
+
+.newPrice {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #e10075;
+}
+
+.buyBtn {
+  width: 85%;
+  background: transparent;
+  color: #ffffff;
+  padding: 0.55rem 0;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  background-image: linear-gradient(#0d0617, #0d0617), linear-gradient(90deg, #e10075 0%, #5d00e6 100%);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.buyBtn:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 15px rgba(225, 0, 117, 0.25);
+}
+
+.popularCard .buyBtn {
+  background: linear-gradient(90deg, #e10075 0%, #5d00e6 100%);
+  border: none;
+  border-radius: 12px;
+  width: 85%;
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(225, 0, 117, 0.4);
+}
+
+.buyBtn:hover {
+  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%);
+  border-color: transparent;
+  transform: scale(1.02);
+  box-shadow: 0 4px 15px rgba(225, 0, 117, 0.35);
+}
+
+/* --- Secure Payment Footer --- */
+.paymentFooter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1.25rem;
+}
+
+.paymentTitle {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.cardLogosRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.cardBadge {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.05em;
+}
+
+.paymentNotice {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.lockIcon {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ================= RIGHT SIDEBAR ================= */
+.rightSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.widgetCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.widgetTitle {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 1rem 0;
+}
+
+/* Wallet Widget */
+.walletBalanceRow {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 1.1rem;
+}
+
+.walletCoinImg {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.walletCoinsText {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.transHistoryBtn {
+  width: 100%;
+  background: linear-gradient(90deg, #370da0 0%, #220b75 100%);
+  border: none;
+  color: #ffffff;
+  padding: 0.7rem 0;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.transHistoryBtn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+/* Why Buy Coins Widget */
+.whyList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem;
+}
+
+.whyItem {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.3;
+}
+
+.whyIcon {
+  color: #e10075;
+  flex-shrink: 0;
+}
+
+/* Promo Code Widget */
+.promoInputRow {
+  display: flex;
+  align-items: center;
+  background: #06020c;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  padding: 3px 4px 3px 10px;
+  margin-bottom: 0.85rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.promoInput {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.4rem;
+  outline: none;
+}
+
+.promoInput::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.redeemBtn {
+  background: linear-gradient(90deg, #d30071 0%, #5d00e6 100%);
+  border: none;
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity 0.2s;
+}
+
+.redeemBtn:hover {
+  opacity: 0.9;
+}
+
+.yourCodesRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.65rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #ffffff;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.yourCodesRow:hover {
+  opacity: 0.85;
+}
+
+.whyIconImg {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* Safe & Secure Widget */
+.safeIconImg {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  margin-bottom: 0.85rem;
+}
+
+.safeTitle {
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.4rem 0;
+}
+
+.safeSubtext {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* Modal Purchase Overlay */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modalCard {
+  background: #130a24;
+  border: 1px solid rgba(225, 0, 117, 0.3);
+  border-radius: 20px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+.modalImg {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-bottom: 1rem;
+}
+
+.modalTitle {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.5rem 0;
+}
+
+.modalDesc {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0 0 1.5rem 0;
+}
+
+.modalBtnGroup {
+  display: flex;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.modalConfirmBtn {
+  flex: 1;
+  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%);
+  border: none;
+  color: #ffffff;
+  padding: 0.75rem 0;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.modalCancelBtn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  padding: 0.75rem 0;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+/* ================= LIGHT THEME OVERRIDES ================= */
+.light {
+  color: #1a1625;
+}
+
+.light .title, 
+.light .safeTitle, 
+.light .widgetTitle, 
+.light .packTitle, 
+.light .walletCoinsText, 
+.light .modalTitle,
+.light .timerLabel,
+.light .timerColon {
+  color: #1a1625;
+}
+
+.light .subtitle, 
+.light .offerText, 
+.light .whyItem, 
+.light .safeSubtext, 
+.light .paymentNotice, 
+.light .yourCodesRow, 
+.light .modalDesc {
+  color: rgba(26, 22, 37, 0.75);
+}
+
+.light .offerBanner {
+  background: linear-gradient(90deg, #fdf4ff 0%, #f4e8ff 50%, #eef0ff 100%);
+  border: 1px solid rgba(225, 0, 117, 0.2);
+  box-shadow: 0 4px 15px rgba(225, 0, 117, 0.08);
+}
+
+.light .offerText,
+.light .offerText strong {
+  color: #1a1625;
+}
+
+.light .timerBox {
+  background: #ffffff;
+  border: 1px solid #ff5500;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.light .timerNum {
+  color: #1a1625;
+}
+
+.light .timerUnit {
+  color: rgba(26, 22, 37, 0.65);
+}
+
+.light .coinCard, 
+.light .widgetCard {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+}
+
+.light .popularCard {
+  background: linear-gradient(135deg, #fff5fb 0%, #f7f0ff 100%);
+  border: 1.5px solid transparent;
+  background-image: linear-gradient(#fff5fb, #f7f0ff), linear-gradient(135deg, #e10075 0%, #5d00e6 100%);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  box-shadow: 0 8px 25px rgba(225, 0, 117, 0.12);
+}
+
+.light .buyBtn {
+  background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(90deg, #e10075 0%, #5d00e6 100%);
+  color: #1a1625;
+}
+
+.light .buyBtn:hover {
+  background: linear-gradient(90deg, #e10075 0%, #5d00e6 100%);
+  color: #ffffff;
+}
+
+.light .popularCard .buyBtn {
+  background: linear-gradient(90deg, #e10075 0%, #5d00e6 100%);
+  color: #ffffff;
+}
+
+.light .transHistoryBtn {
+  background: linear-gradient(90deg, #370da0 0%, #220b75 100%);
+  color: #ffffff;
+  border: none;
+}
+
+.light .oldPrice {
+  color: rgba(26, 22, 37, 0.45);
+}
+
+.light .promoInputRow {
+  background: #f7f3fd;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.light .promoInput {
+  background: transparent;
+  color: #1a1625;
+}
+
+.light .promoInput::placeholder {
+  color: rgba(26, 22, 37, 0.45);
+}
+
+.light .modalCard {
+  background: #ffffff;
+  border-color: rgba(225, 0, 117, 0.25);
+}
+
+.light .modalCancelBtn {
+  background: #f1edf7;
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #1a1625;
+}
+
+/* ================= RESPONSIVE DESIGN ================= */
+@media (max-width: 1200px) {
+  .buyCoinsShell {
+    grid-template-columns: 1fr;
+  }
+
+  .coinGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .rightSidebar {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .buyCoinsContainer {
+    padding: 0;
+  }
+
+  .offerBanner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+
+  .coinGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.85rem;
+  }
+
+  .rightSidebar {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .coinGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -37,7 +37,7 @@ export const Sidebar = () => {
     { name: 'My Subscription', icon: Star, badge: null },
     { name: 'Messages', icon: MessageCircle, badge: 12 },
     { name: 'Buy Coins', icon: Landmark, badge: null },
-    { name: 'Account Setting', icon: Settings, badge: null },
+    { name: 'Settings', icon: Settings, badge: null },
     { name: 'More', icon: LayoutGrid, badge: null }
   ];
 

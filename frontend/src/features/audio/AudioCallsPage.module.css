@@ -107,7 +107,7 @@
 }
 
 .creatorCard {
-  background: #0f0c16;
+  background: #121212;
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 20px;
   overflow: hidden;
@@ -196,7 +196,7 @@
   height: 100%;
   overflow: hidden;
   z-index: 1;
-  background: #06040a;
+  background: #000000;
 }
 
 .creatorAvatar {
@@ -331,7 +331,7 @@
 /* Filters Sidebar (Reusing AllCreators.module.css styles) */
 .filtersSidebar {
   width: 320px;
-  background: #0f0c16;
+  background: #121212;
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 20px;
   padding: 1.5rem;
@@ -519,7 +519,7 @@
   top: 110%;
   left: 0;
   width: 100%;
-  background: #0f0c16;
+  background: #121212;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   padding: 0.5rem;
@@ -569,7 +569,7 @@
 
 /* How Audio Calls Work Card */
 .howItWorksCard {
-  background: #0f0c16;
+  background: #121212;
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 20px;
   padding: 1.5rem;
