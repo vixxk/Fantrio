@@ -7,10 +7,13 @@ const router = express.Router();
 // Public routes
 router.get('/discover', creatorController.discoverCreators);
 router.get('/trending', creatorController.getTrending);
+router.get('/stories', creatorController.getStories);
+router.get('/live', creatorController.getLiveStreams);
 router.get('/profile/:username', creatorController.getPublicProfile);
 
 // Protected routes
 router.use(protect);
+router.get('/suggested', creatorController.getSuggested);
 router.put('/profile', restrictTo('creator'), creatorController.updateProfile);
 router.post('/follow/:creatorId', creatorController.followCreator);
 router.get('/following', creatorController.getFavourites);

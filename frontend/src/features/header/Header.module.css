@@ -1,0 +1,248 @@
+.header {
+  height: 70px;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
+  background-color: #0b0813;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-sizing: border-box;
+}
+
+.searchContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 40%;
+  max-width: 400px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 14px;
+  color: rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.65rem 1rem 0.65rem 2.8rem;
+  border-radius: 99px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: all 0.25s ease;
+}
+
+.searchInput:focus {
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.07);
+  border-color: #ff007f;
+  box-shadow: 0 0 10px rgba(255, 0, 127, 0.15);
+}
+
+.searchInput::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.rightActions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.iconButton {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.iconButton:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.iconWrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge {
+  position: absolute;
+  top: -4px;
+  right: -5px;
+  background: #ff3b30;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  min-width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #0b0813; /* match header background */
+  padding: 0px;
+  box-sizing: border-box;
+}
+
+.coinsIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.08); /* thin grey border */
+  padding: 0.3rem 0.4rem 0.3rem 0.6rem;
+  border-radius: 99px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.coinsIndicator:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.coinIcon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.coinsText {
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.plusButton {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px; /* rounded square */
+  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%); /* gradient button */
+  color: #ffffff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+  padding: 0;
+}
+
+.coinsIndicator:hover .plusButton {
+  transform: scale(1.08);
+}
+
+.profileDropdown {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.3rem 0.8rem 0.3rem 0.4rem;
+  border-radius: 99px;
+  border: 1px solid rgba(255, 255, 255, 0.08); /* thin grey border */
+  background-color: rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.profileDropdown:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e10075; /* pink outline border */
+}
+
+.username {
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.caret {
+  color: #ffffff; /* white arrow caret */
+}
+
+/* Light Mode Overrides */
+.light {
+  background-color: #f7f6fb;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.light .searchInput {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background-color: rgba(0, 0, 0, 0.03);
+  color: #1a1625;
+}
+
+.light .searchIcon {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.light .searchInput::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.light .iconButton {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .iconButton:hover {
+  color: #1a1625;
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.light .notificationDot {
+  border-color: #f7f6fb;
+}
+
+.light .coinsIndicator {
+  background-color: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.light .coinsIndicator:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .coinsText {
+  color: #1a1625;
+}
+
+.light .username {
+  color: #1a1625;
+}
+
+.light .caret {
+  color: rgba(26, 22, 37, 0.45);
+}
+
+.light .profileDropdown:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.light .badge {
+  border-color: #f7f6fb;
+}

@@ -1,0 +1,187 @@
+.storiesSection {
+  width: 100%;
+  margin-bottom: 2rem;
+  box-sizing: border-box;
+}
+
+.storiesHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.sectionTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.viewAllButton {
+  background: transparent;
+  border: none;
+  color: #ff007f;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  padding: 0;
+}
+
+.viewAllButton:hover {
+  opacity: 0.8;
+}
+
+.storiesListContainer {
+  width: 100%;
+  overflow: hidden; /* no horizontal scrolling */
+}
+
+.storiesScroll {
+  display: flex;
+  gap: 1.1rem;
+  padding: 0.25rem 0;
+  width: 100%; /* fit within container */
+}
+
+.storyBubble {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 68px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.storyBubble:hover {
+  transform: translateY(-2px);
+}
+
+.avatarRing {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  padding: 1.5px; /* thinner gradient border */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.liveRing {
+  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
+}
+
+.storyRing {
+  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
+}
+
+.storyAvatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid #0b0813; /* thinner separation border */
+}
+
+.liveBadge {
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ff3b30;
+  color: #ffffff;
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  border: 1.5px solid #0b0813;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.onlineDot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #4cd964; /* bright green */
+  border: 2px solid #0b0813;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  z-index: 3;
+}
+
+.storyName {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+  text-align: center;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.moreBubble {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  transition: background-color 0.2s;
+}
+
+.storyBubble:hover .moreBubble {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.moreText {
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+/* Light Mode Overrides */
+.light .sectionTitle {
+  color: #1a1625;
+}
+
+.light .storyAvatar {
+  border-color: #f7f6fb;
+}
+
+.light .liveBadge {
+  border-color: #f7f6fb;
+}
+
+.light .onlineDot {
+  border-color: #f7f6fb;
+}
+
+.light .storyName {
+  color: rgba(26, 22, 37, 0.75);
+}
+
+.light .moreBubble {
+  background-color: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .storyBubble:hover .moreBubble {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.light .moreText {
+  color: #1a1625;
+}

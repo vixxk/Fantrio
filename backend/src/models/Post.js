@@ -25,6 +25,10 @@ const postSchema = new mongoose.Schema(
         isLocked: {
           type: Boolean,
           default: false
+        },
+        thumbnailUrl: {
+          type: String,
+          default: null
         }
       }
     ],

@@ -25,7 +25,7 @@ const protect = catchAsync(async (req, res, next) => {
   // 2) Verification of token
   let decoded;
   try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret-key-123456');
+    decoded = jwt.verify(token, process.env.JWT_SECRET || '1a9c4b789d701e67e3a8r3cb721867c293c6fe10b42f6ab3ercB5a5dfb0c7931');
   } catch (err) {
     return next(new ApiError(401, 'Invalid or expired token. Please log in again.'));
   }

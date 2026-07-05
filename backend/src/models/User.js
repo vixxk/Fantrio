@@ -17,6 +17,22 @@ const userSchema = new mongoose.Schema(
       minlength: 8,
       select: false
     },
+    username: {
+      type: String,
+      unique: true,
+      sparse: true,
+      trim: true,
+      lowercase: true,
+      index: true
+    },
+    displayName: {
+      type: String,
+      trim: true
+    },
+    avatarUrl: {
+      type: String,
+      default: ''
+    },
     role: {
       type: String,
       enum: ['user', 'creator', 'admin'],

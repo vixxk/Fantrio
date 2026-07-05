@@ -10,6 +10,7 @@ router.use(protect);
 
 router.post('/', restrictTo('creator'), feedController.createPost);
 router.get('/', feedController.getFeed);
+router.get('/hashtags', feedController.getTrendingHashtags);
 router.get('/media/:mediaType', feedController.getMediaFeed);
 router.get('/:postId/media/:mediaId', feedController.getPostMedia);
 router.post('/:postId/unlock', monetizationController.unlockPost);

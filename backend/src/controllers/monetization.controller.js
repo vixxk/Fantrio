@@ -223,3 +223,62 @@ exports.requestWithdrawal = catchAsync(async (req, res, next) => {
     throw err;
   }
 });
+
+// Retrieve my subscriptions
+exports.getMySubscriptions = catchAsync(async (req, res, next) => {
+  const subscriptions = await Subscription.find({ userId: req.user._id }).sort({ createdAt: -1 });
+
+  const subData = await Promise.all(subscriptions.map(async (sub) => {
+    const profile = await CreatorProfile.findOne({ userId: sub.creatorId });
+    return {
+      _id: sub._id,
+      creatorId: sub.creatorId,
+      status: sub.status,
+      startDate: sub.startDate,
+      expiryDate: sub.expiryDate,
+      priceCoins: sub.priceCoins,
+      creator: profile ? {
+        displayName: profile.displayName,
+        username: profile.username,
+        avatarUrl: profile.avatarUrl,
+        isVerifiedBadge: profile.isVerifiedBadge,
+        rates: profile.rates
+      } : null
+    };
+  }));
+
+  res.status(200).json({
+    status: 'success',
+    subscriptions: subData
+  });
+});
+
+// Unsubscribe from a creator
+exports.unsubscribeFromCreator = catchAsync(async (req, res, next) => {
+  const { creatorId } = req.params;
+
+  const subscription = await Subscription.findOne({
+    userId: req.user._id,
+    creatorId,
+    status: 'active'
+  });
+
+  if (!subscription) {
+    return next(new ApiError(404, 'No active subscription found for this creator'));
+  }
+
+  subscription.status = 'cancelled';
+  await subscription.save();
+
+  const creatorProfile = await CreatorProfile.findOne({ userId: creatorId });
+  if (creatorProfile) {
+    creatorProfile.subscriberCount = Math.max(0, creatorProfile.subscriberCount - 1);
+    await creatorProfile.save();
+  }
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Successfully unsubscribed from creator',
+    subscription
+  });
+});

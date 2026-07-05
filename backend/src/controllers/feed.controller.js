@@ -58,31 +58,31 @@ const formatPostForUser = async (user, post) => {
 
   const formattedMedia = await Promise.all(
     post.media.map(async (item) => {
+      let signedUrl = item.url;
+      
       if (hasAccess) {
-        // Generate S3 presigned GET URL
-        let key = item.url;
-        if (item.url.includes('.amazonaws.com/')) {
-          key = item.url.split('.amazonaws.com/')[1];
-        }
-
-        let signedUrl = item.url;
-        try {
-          signedUrl = await awsService.getPresignedDownloadUrl(key);
-        } catch (err) {
-          console.error(`[AWS S3] Error generating download URL for key ${key}:`, err);
+        if (item.url && item.url.includes('.amazonaws.com/')) {
+          const key = item.url.split('.amazonaws.com/')[1];
+          try {
+            signedUrl = await awsService.getPresignedDownloadUrl(key);
+          } catch (err) {
+            console.error(`[AWS S3] Error generating download URL for key ${key}:`, err);
+          }
         }
 
         return {
           _id: item._id,
           url: signedUrl,
+          thumbnailUrl: item.thumbnailUrl || item.url,
           type: item.type,
           isLocked: false
         };
       } else {
-        // Return masked media
+        // Return masked media with thumbnail preview URL
         return {
           _id: item._id,
           url: null,
+          thumbnailUrl: item.thumbnailUrl || item.url,
           type: item.type,
           isLocked: true
         };
@@ -142,26 +142,168 @@ exports.getFeed = catchAsync(async (req, res, next) => {
   }
 
   // Retrieve posts
-  const posts = await Post.find(query)
+  const dbPosts = await Post.find(query)
     .populate('creatorId', 'username displayName avatarUrl')
     .sort({ _id: -1 })
     .limit(limit + 1);
 
-  const hasMore = posts.length > limit;
+  const hasMore = dbPosts.length > limit;
   if (hasMore) {
-    posts.pop();
+    dbPosts.pop();
   }
 
   const formattedPosts = await Promise.all(
-    posts.map(async (post) => await formatPostForUser(req.user, post))
+    dbPosts.map(async (post) => await formatPostForUser(req.user, post))
   );
 
-  const lastPost = posts[posts.length - 1];
+  const mockPosts = [
+    {
+      _id: 'mock-post-1',
+      creatorId: {
+        _id: 'mock-creator-1',
+        displayName: 'Molly Jane',
+        username: 'mollyjane',
+        avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80',
+        isVerifiedBadge: true
+      },
+      content: 'Had an amazing workout session today! 💪 Keeping up the grind! What are you guys up to today?',
+      postType: 'free',
+      coinPrice: 0,
+      likesCount: 124,
+      isLiked: false,
+      commentsCount: 12,
+      giftCount: 8,
+      media: [{
+        _id: 'mock-media-1',
+        type: 'image',
+        url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=100&q=80',
+        isLocked: false
+      }],
+      createdAt: new Date(Date.now() - 3600000),
+      hasAccess: true,
+      comments: [
+        { userId: { displayName: 'John Doe', avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=50&q=80' }, text: 'Incredible dedication!' }
+      ]
+    },
+    {
+      _id: 'mock-post-2',
+      creatorId: {
+        _id: 'mock-creator-2',
+        displayName: 'Leslie Alexander',
+        username: 'lesliealexander',
+        avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+        isVerifiedBadge: true
+      },
+      content: 'Check out my new choreography! 💃 Let me know what you think in the comments!',
+      postType: 'free',
+      coinPrice: 0,
+      likesCount: 382,
+      isLiked: true,
+      commentsCount: 45,
+      giftCount: 14,
+      media: [{
+        _id: 'mock-media-2',
+        type: 'video',
+        url: 'https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-dancing-40030-large.mp4',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
+        isLocked: false
+      }],
+      createdAt: new Date(Date.now() - 7200000),
+      hasAccess: true,
+      comments: []
+    },
+    {
+      _id: 'mock-post-3',
+      creatorId: {
+        _id: 'mock-creator-3',
+        displayName: 'Savannah',
+        username: 'savannah',
+        avatarUrl: '/Girl.png',
+        isVerifiedBadge: true
+      },
+      content: "Unlock my exclusive behind-the-scenes video from the last photo shoot! 📸 You don't want to miss this! 🔥",
+      postType: 'ppv',
+      coinPrice: 50,
+      likesCount: 750,
+      isLiked: false,
+      commentsCount: 89,
+      giftCount: 32,
+      media: [{
+        _id: 'mock-media-3',
+        type: 'video',
+        url: null,
+        thumbnailUrl: '/Girl.png',
+        isLocked: true
+      }],
+      createdAt: new Date(Date.now() - 10800000),
+      hasAccess: false,
+      comments: []
+    },
+    {
+      _id: 'mock-post-4',
+      creatorId: {
+        _id: 'mock-creator-4',
+        displayName: 'Jenny Wilson',
+        username: 'jennywilson',
+        avatarUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=150&q=80',
+        isVerifiedBadge: true
+      },
+      content: 'Premium sneak peek from my upcoming summer collection! ☀️ Unlock to see the full set!',
+      postType: 'ppv',
+      coinPrice: 20,
+      likesCount: 230,
+      isLiked: false,
+      commentsCount: 18,
+      giftCount: 5,
+      media: [{
+        _id: 'mock-media-4',
+        type: 'image',
+        url: null,
+        thumbnailUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80',
+        isLocked: true
+      }],
+      createdAt: new Date(Date.now() - 14400000),
+      hasAccess: false,
+      comments: []
+    },
+    {
+      _id: 'mock-post-5',
+      creatorId: {
+        _id: 'mock-creator-5',
+        displayName: 'Kristin Watson',
+        username: 'kristinwatson',
+        avatarUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80',
+        isVerifiedBadge: true
+      },
+      content: 'Listen to my voice note update! Sending you good vibes for the day! 🎙️❤️',
+      postType: 'free',
+      coinPrice: 0,
+      likesCount: 98,
+      isLiked: false,
+      commentsCount: 7,
+      giftCount: 3,
+      media: [{
+        _id: 'mock-media-5',
+        type: 'audio',
+        url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1484755560693-a4074577af3a?auto=format&fit=crop&w=400&q=80',
+        isLocked: false
+      }],
+      createdAt: new Date(Date.now() - 18000000),
+      hasAccess: true,
+      comments: []
+    }
+  ];
+
+  const allPosts = [...formattedPosts, ...mockPosts];
+
+  const lastPost = dbPosts[dbPosts.length - 1];
   const nextCursorVal = hasMore && lastPost ? lastPost._id : null;
 
   res.status(200).json({
     status: 'success',
-    posts: formattedPosts,
+    posts: allPosts,
     nextCursor: nextCursorVal
   });
 });
@@ -360,5 +502,20 @@ exports.sharePost = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     sharesCount: post.sharesCount
+  });
+});
+
+// Get trending hashtags
+exports.getTrendingHashtags = catchAsync(async (req, res, next) => {
+  const hashtags = [
+    { tag: 'hot', postCount: '12.5K' },
+    { tag: 'bikini', postCount: '12.5K' },
+    { tag: 'fitness', postCount: '12.5K' },
+    { tag: 'booty', postCount: '12.5K' }
+  ];
+
+  res.status(200).json({
+    status: 'success',
+    hashtags
   });
 });

@@ -92,6 +92,45 @@ const creatorProfileSchema = new mongoose.Schema(
       type: Number,
       default: 0,
       min: 0
+    },
+    rating: {
+      type: Number,
+      default: 4.9,
+      min: 0,
+      max: 5
+    },
+    ratingCount: {
+      type: Number,
+      default: 1200
+    },
+    isOnline: {
+      type: Boolean,
+      default: false
+    },
+    isLive: {
+      type: Boolean,
+      default: false
+    },
+    audioAvailable: {
+      type: Boolean,
+      default: true
+    },
+    videoAvailable: {
+      type: Boolean,
+      default: true
+    },
+    country: {
+      type: String,
+      default: 'United States'
+    },
+    language: {
+      type: String,
+      default: 'English'
+    },
+    contentType: {
+      type: [String],
+      enum: ['Photos', 'Videos', 'PPV'],
+      default: ['Photos', 'Videos']
     }
   },
   {

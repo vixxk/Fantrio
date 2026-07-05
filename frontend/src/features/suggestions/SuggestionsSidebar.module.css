@@ -1,0 +1,438 @@
+.sidebar {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  background-color: #0d0b16;
+  border-left: 1px solid rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+  overflow-y: auto;
+  gap: 1.5rem;
+  box-sizing: border-box;
+}
+
+/* Double Coins Promo Card */
+.doublePromoCard {
+  background: #0f0c16;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.promoHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.7rem;
+}
+
+.promoText {
+  flex: 1;
+}
+
+.promoTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  font-style: italic;
+  color: #ffcc00;
+  margin: 0 0 0.2rem;
+}
+
+.promoSubtitle {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.gradientText {
+  background: linear-gradient(90deg, #e10075, #7e00f3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+.promoImg {
+  width: 80px;
+  height: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.countdownContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 0.6rem 0.25rem;
+  margin-bottom: 0.7rem;
+}
+
+.countdownBox {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.countdownBox:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 10%;
+  height: 80%;
+  width: 1px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.countdownVal {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.countdownLabel {
+  font-size: 0.5rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 0.2rem;
+  letter-spacing: 0.5px;
+}
+
+.buyNowBtn {
+  width: 100%;
+  background: linear-gradient(90deg, #e10075 0%, #4a00e0 100%);
+  color: #ffffff;
+  border: none;
+  padding: 0.7rem 1rem;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.buyNowBtn:hover {
+  transform: scale(1.02);
+  opacity: 0.95;
+}
+
+/* Sections */
+.sectionContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sectionHeading {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.linkButton {
+  background: linear-gradient(90deg, #e10075, #7e00f3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  border: none;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.linkButton:hover {
+  opacity: 0.8;
+}
+
+/* Quick Actions */
+.quickActionsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+}
+
+.actionBtn {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 1rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.actionBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.actionIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.audioBg, .videoBg, .msgBg, .liveBg {
+  background: none;
+}
+
+.actionIcon {
+  color: inherit;
+}
+
+.actionIconImg {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.actionLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.actionBtn:hover .actionLabel {
+  color: #ffffff;
+}
+
+/* Creator List */
+.creatorList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.creatorRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.creatorDetails {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: 1;
+}
+
+.rankNum {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+  width: 14px;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+}
+
+.nameBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.nameLock {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.displayName {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.verifiedIcon {
+  color: #0d0b16; /* match dark sidebar background cutout */
+  fill: #ffffff;  /* match solid white badge shape */
+}
+
+.username {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.statVal {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Hashtag List */
+.hashtagList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.hashtagRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hashtagName {
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: linear-gradient(90deg, #e10075, #7e00f3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hashtagCount {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* Suggested For You */
+.suggestedList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.suggestedRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.suggestedCreator {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.subscribeBtn {
+  position: relative;
+  background: transparent;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.4rem 0.9rem;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-image: linear-gradient(#0f0c16, #0f0c16), linear-gradient(90deg, #e10075, #7e00f3);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  border: 1.5px solid transparent;
+}
+
+.subscribeBtnText {
+  background: linear-gradient(90deg, #e10075, #7e00f3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subscribeBtn:hover {
+  background-image: linear-gradient(rgba(225, 0, 117, 0.1), rgba(126, 0, 243, 0.1)), linear-gradient(90deg, #e10075, #7e00f3);
+}
+
+/* Animations */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Light Mode Overrides */
+.light {
+  background-color: #f7f6fb;
+  border-left: 1px solid rgba(0, 0, 0, 0.06);
+  color: #1a1625;
+}
+
+.light .sectionHeading {
+  color: #1a1625;
+}
+
+.light .actionBtn {
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.light .actionBtn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.light .actionLabel {
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .actionBtn:hover .actionLabel {
+  color: #1a1625;
+}
+
+.light .displayName {
+  color: #1a1625;
+}
+
+.light .username, .light .rankNum, .light .statVal, .light .hashtagCount {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+
+.light .countdownBox {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.light .countdownVal {
+  color: #1a1625;
+}
+
+.light .countdownLabel {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .doublePromoCard {
+  background: linear-gradient(135deg, rgba(225, 0, 117, 0.05) 0%, rgba(126, 0, 243, 0.05) 100%);
+  border: 1px solid rgba(255, 0, 127, 0.12);
+  box-shadow: none;
+}
+
+.light .promoSubtitle {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .verifiedIcon {
+  color: #f7f6fb;
+}
