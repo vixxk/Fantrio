@@ -660,6 +660,31 @@ export const MessagesPage = () => {
 
                 {/* Action Buttons */}
                 <div className={styles.roomActions}>
+                  {/* Desktop-only: Audio & Video Call buttons */}
+                  <button 
+                    className={styles.audioCallBtn}
+                    onClick={() => setActiveTab('1:1 Audio Calls')}
+                    type="button"
+                  >
+                    <Phone size={16} />
+                    <div className={styles.btnTextCol}>
+                      <span className={styles.btnLabel}>Audio Call</span>
+                      <span className={styles.btnSub}>10 Coins/min</span>
+                    </div>
+                  </button>
+
+                  <button 
+                    className={styles.videoCallBtn}
+                    onClick={() => setActiveTab('1:1 Video Calls')}
+                    type="button"
+                  >
+                    <Video size={16} />
+                    <div className={styles.btnTextCol}>
+                      <span className={styles.btnLabel}>Video Call</span>
+                      <span className={styles.btnSub}>10 Coins/min</span>
+                    </div>
+                  </button>
+
                   <button 
                     className={styles.sendTipBtn}
                     onClick={() => setShowTipModal(true)}
@@ -668,6 +693,7 @@ export const MessagesPage = () => {
                     <span>Send Tip</span>
                   </button>
 
+                  {/* Mobile-only: kebab menu with audio/video call options */}
                   <div className={styles.menuWrapper} ref={menuRef}>
                     <button 
                       className={styles.moreOptionsBtn}

@@ -1183,6 +1183,14 @@
   transition: color 0.2s;
 }
 
+/* Hide standalone call buttons on mobile — they remain in the kebab menu */
+@media (max-width: 768px) {
+  .audioCallBtn,
+  .videoCallBtn {
+    display: none !important;
+  }
+}
+
 .closeModalBtn:hover {
   color: #ffffff;
 }
@@ -1794,6 +1802,11 @@
     gap: 0.95rem !important;
     display: flex !important;
     align-items: center !important;
+  }
+
+  .audioCallBtn,
+  .videoCallBtn {
+    display: none !important;
   }
 
   .btnTextCol {
