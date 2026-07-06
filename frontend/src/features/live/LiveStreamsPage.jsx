@@ -544,7 +544,13 @@ export const LiveStreamsPage = () => {
                 }}
               >
                 <div className={styles.categoryIconWrapper}>
-                  <img src={cat.imageSrc} alt={cat.name} className={styles.categoryImgIcon} />
+                  <div 
+                    className={styles.categoryIcon} 
+                    style={{
+                      WebkitMaskImage: `url(${cat.imageSrc})`,
+                      maskImage: `url(${cat.imageSrc})`
+                    }}
+                  />
                 </div>
                 <h4 className={styles.categoryCardLabel}>{cat.name}</h4>
                 <p className={styles.categoryCardLiveCount}>{cat.liveCount}</p>

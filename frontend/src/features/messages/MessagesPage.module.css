@@ -2045,3 +2045,459 @@
     outline-color: rgba(225, 0, 117, 0.8);
   }
 }
+
+/* ==========================================================================
+   REDESIGNED MOBILE UI STYLES
+   ========================================================================== */
+
+.mobileContainer {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #000000;
+  color: #ffffff;
+  position: relative;
+}
+
+.lightMobile {
+  background: #faf8fc;
+  color: #1a1625;
+}
+
+.mobileListScreen {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mobileHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem 1rem 0.5rem 1rem;
+  background: transparent;
+  border-bottom: none;
+  height: auto;
+  box-sizing: border-box;
+}
+
+.lightMobile .mobileHeader {
+  background: transparent;
+  border-bottom: none;
+}
+
+.mobileHeaderBack {
+  background: transparent;
+  border: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  margin-left: -0.5rem;
+  cursor: pointer;
+}
+
+.mobileTitle {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: inherit;
+  margin: 0;
+  flex: 1;
+  margin-left: 0.5rem;
+}
+
+.mobileHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mobileArchiveBtn,
+.mobileComposeBtn {
+  background: transparent;
+  border: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.mobileArchiveBtn:hover,
+.mobileComposeBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.lightMobile .mobileArchiveBtn:hover,
+.lightMobile .mobileComposeBtn:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.archiveActive {
+  background: rgba(126, 0, 243, 0.15) !important;
+  border: 1px solid rgba(126, 0, 243, 0.3) !important;
+}
+
+.mobileSearchWrapper {
+  position: relative;
+  padding: 0.75rem 1rem;
+}
+
+.mobileSearchIcon {
+  position: absolute;
+  left: 1.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.lightMobile .mobileSearchIcon {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.mobileSearchInput {
+  width: 100%;
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
+  padding: 0.6rem 1rem 0.6rem 2.6rem;
+  color: inherit;
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.lightMobile .mobileSearchInput {
+  background: #f1edf7;
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #1a1625;
+}
+
+.mobileFilterPills {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 1rem 0.75rem 1rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.mobileFilterPill {
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.4rem 0.85rem;
+  border-radius: 99px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.lightMobile .mobileFilterPill {
+  background: #f1edf7;
+  border-color: rgba(0, 0, 0, 0.08);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.mobileFilterActive {
+  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 15px rgba(225, 0, 117, 0.2);
+}
+
+.mobileConvList {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem 100px 1rem;
+}
+
+.mobileConvItem {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.75rem;
+  border-radius: 16px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+.mobileConvItem:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.lightMobile .mobileConvItem:hover {
+  background: rgba(126, 0, 243, 0.04);
+}
+
+.mobileEmptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.lightMobile .mobileEmptyState {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.mobileChatScreen {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #000000;
+}
+
+.lightMobile .mobileChatScreen {
+  background: #faf8fc;
+}
+
+.mobileChatHeader {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0a0a0a;
+  z-index: 10;
+  box-sizing: border-box;
+}
+
+.lightMobile .mobileChatHeader {
+  background: #ffffff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.mobileChatBackBtn {
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0.5rem;
+  margin-left: -0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobileChatUserBlock {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.mobileChatAvatarWrapper {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+}
+
+.mobileChatAvatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.mobileChatNameBlock {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mobileChatDisplayName {
+  font-size: 0.9rem;
+  font-weight: 750;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobileChatStatus {
+  font-size: 0.72rem;
+  color: #22c55e;
+}
+
+.mobileChatActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mobileTipBtn,
+.mobileMoreBtn {
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobileChatBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: #000000;
+  box-sizing: border-box;
+}
+
+.lightMobile .mobileChatBody {
+  background: #faf8fc;
+}
+
+.mobileChatInputBar {
+  display: flex;
+  align-items: center;
+  width: 94% !important;
+  margin: 10px auto 20px auto !important;
+  padding: 6px 12px !important;
+  border-radius: 24px !important;
+  background: #0a0a0a !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-sizing: border-box !important;
+}
+
+.lightMobile .mobileChatInputBar {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* ================= PROFILE BOTTOM SHEET DRAWER ================= */
+
+.profileSheetBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  animation: fadeInSheet 0.3s ease;
+}
+
+.profileSheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-height: 82vh;
+  background: #0c0a12;
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  z-index: 1001;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
+  animation: slideUpSheet 0.35s cubic-bezier(0.1, 0.76, 0.55, 0.94);
+}
+
+.lightMobile .profileSheet {
+  background: #ffffff;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.06);
+}
+
+.profileDragHandle {
+  width: 40px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 99px;
+  margin: 0 auto 15px auto;
+  flex-shrink: 0;
+}
+
+.lightMobile .profileDragHandle {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.sheetHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-shrink: 0;
+}
+
+.sheetTitle {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: inherit;
+  margin: 0;
+}
+
+.sheetCloseBtn {
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sheetContent {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-bottom: 20px;
+}
+
+@keyframes fadeInSheet {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUpSheet {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.pageSubtitle {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.lightMobile .pageSubtitle {
+  color: rgba(26, 22, 37, 0.5);
+}

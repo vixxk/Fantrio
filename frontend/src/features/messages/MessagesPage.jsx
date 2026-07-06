@@ -389,6 +389,15 @@ const parseMessagesPath = (pathname) => {
 
 export const MessagesPage = () => {
   const { darkMode, balance, addCoins, setActiveTab, currentPath, navigateTo } = useApp();
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [showProfileSheet, setShowProfileSheet] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const [conversations, setConversations] = useState(INITIAL_CONVERSATIONS);
   
   const { convId: selectedConvId, msgId: selectedMsgId } = parseMessagesPath(currentPath);
@@ -432,12 +441,15 @@ export const MessagesPage = () => {
     { id: 'default1', sender: 'creator', text: `Hi! Welcome to my chat feed.`, time: 'Just now' }
   ]) : [];
 
-  // Auto scroll to bottom of messages when selected conversation or messages change
+  // Auto scroll to bottom of messages when selected conversation, messages, or mobileView change
   useEffect(() => {
     if (selectedConvId) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      const timer = setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 80);
+      return () => clearTimeout(timer);
     }
-  }, [selectedConvId, currentMessages]);
+  }, [selectedConvId, currentMessages, mobileView]);
 
   useEffect(() => {
     if (selectedConvId) {
@@ -559,6 +571,534 @@ export const MessagesPage = () => {
       console.error('Failed to send tip:', err);
     }
   };
+
+  if (isMobile) {
+    return (
+      <div className={`${styles.mobileContainer} ${!darkMode ? styles.lightMobile : ''}`}>
+        
+        {/* ================= VIEW 1: CHATS LIST ================= */}
+        {mobileView === 'list' && (
+          <div className={styles.mobileListScreen}>
+            {/* Header */}
+            <div className={styles.mobileHeader}>
+              <div className={styles.headerTitleBlock} style={{ flex: 1, minWidth: 0 }}>
+                <div className={styles.titleRow} style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.2rem' }}>
+                  {showArchived ? (
+                    <button 
+                      type="button" 
+                      className={styles.mobileHeaderBack} 
+                      onClick={() => setShowArchived(false)}
+                      style={{ background: 'transparent', border: 'none', color: 'inherit', padding: '0.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      <ChevronLeft size={24} />
+                    </button>
+                  ) : (
+                    <MessageSquare size={24} style={{ stroke: 'url(#activeGradient)', filter: 'drop-shadow(0 2px 6px rgba(225,0,117,0.3))' }} />
+                  )}
+                  <h1 className={styles.pageTitle} style={{ fontSize: '1.4rem', fontWeight: 800, margin: 0, color: 'inherit' }}>
+                    {showArchived ? 'Archived' : 'Chats'}
+                  </h1>
+                </div>
+                <p className={styles.pageSubtitle} style={{ fontSize: '0.8rem', margin: 0 }}>
+                  {showArchived ? 'View and manage archived conversations' : 'Connect and chat with your favorite creators'}
+                </p>
+              </div>
+              <div className={styles.mobileHeaderActions} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem' }}>
+                <button 
+                  type="button"
+                  className={`${styles.mobileArchiveBtn} ${showArchived ? styles.archiveActive : ''}`} 
+                  onClick={() => {
+                    setShowArchived(!showArchived);
+                    navigateTo('/messages');
+                  }}
+                  title={showArchived ? "Back to Messages" : "Archived Chats"}
+                >
+                  <GradientArchiveIcon size={20} />
+                </button>
+                <button className={styles.mobileComposeBtn} title="New Message">
+                  <img src="/compose.png" alt="Compose" className={styles.composeIconImg} />
+                </button>
+              </div>
+            </div>
+
+            {/* Search */}
+            <div className={styles.mobileSearchWrapper}>
+              <Search size={16} className={styles.mobileSearchIcon} />
+              <input 
+                type="text"
+                placeholder="Search chats..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={styles.mobileSearchInput}
+              />
+            </div>
+
+            {/* Filter Pills */}
+            <div className={styles.mobileFilterPills}>
+              <button 
+                className={`${styles.mobileFilterPill} ${filter === 'all' ? styles.mobileFilterActive : ''}`}
+                onClick={() => setFilter('all')}
+              >
+                All
+              </button>
+              <button 
+                className={`${styles.mobileFilterPill} ${filter === 'unread' ? styles.mobileFilterActive : ''}`}
+                onClick={() => setFilter('unread')}
+              >
+                Unread
+              </button>
+              <button 
+                className={`${styles.mobileFilterPill} ${filter === 'subscribed' ? styles.mobileFilterActive : ''}`}
+                onClick={() => setFilter('subscribed')}
+              >
+                Subscribed
+              </button>
+            </div>
+
+            {/* Chats List */}
+            <div className={styles.mobileConvList}>
+              {filteredConversations.length > 0 ? (
+                filteredConversations.map((conv) => {
+                  const isSelected = conv.id === selectedConvId;
+                  return (
+                    <div 
+                      key={conv.id}
+                      className={`${styles.mobileConvItem} ${isSelected ? styles.convSelected : ''}`}
+                      onClick={() => {
+                        navigateTo(`/messages/${conv.id}`);
+                        setMobileView('chat');
+                      }}
+                    >
+                      <div className={styles.convAvatarWrapper}>
+                        <img src={conv.user.avatarUrl} alt={conv.user.displayName} className={styles.convAvatar} />
+                        {conv.user.isOnline && <span className={styles.onlineDot} />}
+                      </div>
+
+                      <div className={styles.convInfo}>
+                        <div className={styles.convNameRow}>
+                          <span className={styles.convName}>
+                            {conv.user.displayName}
+                            {conv.user.isVerified && <GradientBadgeCheck size={14} />}
+                          </span>
+                          <span className={styles.convTime}>{conv.time}</span>
+                        </div>
+
+                        <div className={styles.convPreviewRow}>
+                          <span className={styles.convPreviewText}>{conv.lastMessage}</span>
+                          {conv.unreadCount > 0 && (
+                            <span className={styles.unreadBadge}>{conv.unreadCount}</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className={styles.mobileEmptyState}>
+                  <MessageSquare size={40} className={styles.emptyIcon} />
+                  <p>No conversations found</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ================= VIEW 2: CHAT ROOM ================= */}
+        {mobileView === 'chat' && selectedConv && (
+          <div className={styles.mobileChatScreen}>
+            {/* Header */}
+            <div className={styles.mobileChatHeader}>
+              <button 
+                type="button" 
+                className={styles.mobileChatBackBtn} 
+                onClick={() => {
+                  setMobileView('list');
+                  navigateTo('/messages');
+                }}
+              >
+                <ChevronLeft size={24} />
+              </button>
+              
+              <div 
+                className={styles.mobileChatUserBlock}
+                onClick={() => setShowProfileSheet(true)}
+              >
+                <div className={styles.mobileChatAvatarWrapper}>
+                  <img src={selectedConv.user.avatarUrl} alt={selectedConv.user.displayName} className={styles.mobileChatAvatar} />
+                  {selectedConv.user.isOnline && <span className={styles.onlineDot} />}
+                </div>
+                <div className={styles.mobileChatNameBlock}>
+                  <div className={styles.mobileChatDisplayName}>
+                    {selectedConv.user.displayName}
+                    {selectedConv.user.isVerified && <GradientBadgeCheck size={14} />}
+                  </div>
+                  <div className={styles.mobileChatStatus}>
+                    {selectedConv.user.isOnline ? 'Online' : 'Offline'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Header Actions */}
+              <div className={styles.mobileChatActions}>
+                <button 
+                  className={styles.mobileTipBtn}
+                  onClick={() => setShowTipModal(true)}
+                  type="button"
+                >
+                  <Heart size={18} fill="#ff003b" color="#ff003b" />
+                </button>
+
+                <div className={styles.menuWrapper} ref={menuRef}>
+                  <button 
+                    className={styles.mobileMoreBtn}
+                    onClick={() => setShowMenu(!showMenu)}
+                    type="button"
+                  >
+                    <MoreVertical size={20} />
+                  </button>
+                  
+                  {showMenu && (
+                    <div className={styles.dropdownMenu}>
+                      <button 
+                        className={styles.dropdownItem}
+                        onClick={() => {
+                          setActiveTab('1:1 Audio Calls');
+                          setShowMenu(false);
+                        }}
+                        type="button"
+                      >
+                        <Phone size={16} className={styles.dropdownIcon} />
+                        <div className={styles.dropdownItemText}>
+                          <span className={styles.dropdownItemLabel}>Audio Call</span>
+                          <span className={styles.dropdownItemSub}>{selectedConv.user.audioRate} Coins/min</span>
+                        </div>
+                      </button>
+                      
+                      <button 
+                        className={styles.dropdownItem}
+                        onClick={() => {
+                          setActiveTab('1:1 Video Calls');
+                          setShowMenu(false);
+                        }}
+                        type="button"
+                      >
+                        <Video size={16} className={styles.dropdownIcon} />
+                        <div className={styles.dropdownItemText}>
+                          <span className={styles.dropdownItemLabel}>Video Call</span>
+                          <span className={styles.dropdownItemSub}>{selectedConv.user.videoRate} Coins/min</span>
+                        </div>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Chat Messages Body */}
+            <div className={styles.mobileChatBody}>
+              <div className={styles.dateSeparator}>
+                <span>Nov 30, 2023, 9:41 AM</span>
+              </div>
+
+              {currentMessages.map((msg) => {
+                const isUser = msg.sender === 'user';
+
+                if (msg.isPaywall) {
+                  return (
+                    <div 
+                      key={msg.id} 
+                      id={msg.id}
+                      className={`${styles.msgRow} ${styles.msgRowLeft}`}
+                      onClick={() => selectMessage(msg.id)}
+                    >
+                      <div className={`${styles.paywallWrapper} ${selectedMsgId === msg.id ? styles.paywallSelected : ''}`}>
+                        <span className={styles.paywallNoticeTitle}>{msg.title}</span>
+                        
+                        <div className={styles.paywallCard}>
+                          <div className={styles.paywallMediaFrame}>
+                            <img src={msg.previewUrl} alt="Locked" className={`${styles.paywallImg} ${msg.isLocked ? styles.blurred : ''}`} />
+                            {msg.isLocked && (
+                              <div className={styles.lockOverlay}>
+                                <Lock size={18} className={styles.lockIcon} />
+                              </div>
+                            )}
+                          </div>
+
+                          <div className={styles.paywallContentBlock}>
+                            <h4 className={styles.paywallMediaTitle}>{msg.mediaType}</h4>
+                            <p className={styles.paywallSubtext}>{msg.textSub}</p>
+                          </div>
+                        </div>
+
+                        {/* Unlock Action Row */}
+                        {msg.isLocked ? (
+                          <div className={styles.paywallUnlockBar}>
+                            <div className={styles.coinPriceTag}>
+                              <img src="/coin.png" alt="Coin" className={styles.coinIcon} />
+                              <span>{msg.coinPrice} Coins</span>
+                            </div>
+                            <button 
+                              className={styles.unlockBtn}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleUnlockMedia(msg.id, msg.coinPrice);
+                              }}
+                            >
+                              Unlock
+                            </button>
+                          </div>
+                        ) : (
+                          <div className={styles.unlockedNotice}>
+                            <Check size={14} /> Unlocked
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div 
+                    key={msg.id} 
+                    id={msg.id}
+                    className={`${styles.msgRow} ${isUser ? styles.msgRowRight : styles.msgRowLeft}`}
+                    onClick={() => selectMessage(msg.id)}
+                  >
+                    <div className={`${styles.msgBubble} ${isUser ? styles.bubbleUser : styles.bubbleCreator} ${msg.isTip ? styles.bubbleTip : ''} ${selectedMsgId === msg.id ? styles.bubbleSelected : ''}`}>
+                      <p className={styles.msgText}>{msg.text}</p>
+                    </div>
+                  </div>
+                );
+              })}
+
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Chat Input Bar */}
+            <form className={styles.mobileChatInputBar} onSubmit={handleSendMessage}>
+              <button type="button" className={styles.inputAddBtn} title="Add Content">
+                <Plus size={20} />
+              </button>
+
+              <input 
+                type="text"
+                placeholder="Enter your message..."
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                className={styles.chatInput}
+              />
+
+              <div className={styles.inputRightIcons}>
+                <button type="button" className={styles.inputIconButton} title="Emoji">
+                  <Smile size={19} />
+                </button>
+                <button type="button" className={styles.inputIconButton} title="Attach Image">
+                  <ImageIcon size={19} />
+                </button>
+                <button type="submit" className={styles.sendSubmitBtn} title="Send Message">
+                  <Send size={16} />
+                </button>
+              </div>
+            </form>
+
+            {/* ================= PROFILE BOTTOM SHEET DRAWER ================= */}
+            {showProfileSheet && (
+              <>
+                <div 
+                  className={styles.profileSheetBackdrop} 
+                  onClick={() => setShowProfileSheet(false)}
+                />
+                <div className={styles.profileSheet}>
+                  <div className={styles.profileDragHandle} />
+                  
+                  <div className={styles.sheetHeader}>
+                    <h3 className={styles.sheetTitle}>Creator Info</h3>
+                    <button 
+                      type="button" 
+                      className={styles.sheetCloseBtn} 
+                      onClick={() => setShowProfileSheet(false)}
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+
+                  <div className={styles.sheetContent}>
+                    {/* Top Creator Info */}
+                    <div className={styles.creatorProfileCard}>
+                      <div className={styles.avatarRingWrapper}>
+                        <img src={selectedConv.user.avatarUrl} alt={selectedConv.user.displayName} className={styles.profileAvatar} />
+                        {selectedConv.user.isOnline && <span className={styles.profileOnlineDot} />}
+                      </div>
+                      
+                      <h3 className={styles.profileName}>
+                        {selectedConv.user.displayName}
+                        {selectedConv.user.isVerified && <BadgeCheck size={16} className={styles.feedVerifiedBadge} />}
+                      </h3>
+                      <span className={styles.profileUsername}>@{selectedConv.user.username}</span>
+
+                      <div className={styles.ratingRow}>
+                        <Star size={14} className={styles.starIcon} fill="#eab308" />
+                        <span>{selectedConv.user.rating} ({selectedConv.user.ratingCount})</span>
+                      </div>
+                    </div>
+
+                    {/* Subscription Info Card */}
+                    <div className={styles.sidebarCard}>
+                      <div className={styles.cardHeaderRow}>
+                        <span className={styles.cardHeaderTitle}>Subscription</span>
+                        <span className={styles.statusActiveTag}>Active</span>
+                      </div>
+
+                      <div className={styles.detailRow}>
+                        <span className={styles.detailLabel}>Plan</span>
+                        <span className={styles.detailValue}>{selectedConv.user.subscriptionPlan}</span>
+                      </div>
+
+                      <div className={styles.detailRow}>
+                        <span className={styles.detailLabel}>Renewal Date</span>
+                        <span className={styles.detailValue}>{selectedConv.user.renewalDate}</span>
+                      </div>
+
+                      <button className={styles.manageSubBtn}>
+                        Manage Subscription
+                      </button>
+                    </div>
+
+                    {/* Rates Card */}
+                    <div className={styles.sidebarCard}>
+                      <h4 className={styles.cardTitle}>Rates</h4>
+
+                      <div className={styles.rateItem}>
+                        <div className={styles.rateLeft}>
+                          <Phone size={15} className={styles.rateIcon} />
+                          <span>1:1 Audio Call</span>
+                        </div>
+                        <span className={styles.rateVal}>{selectedConv.user.audioRate} Coins / Min</span>
+                      </div>
+
+                      <div className={styles.rateItem}>
+                        <div className={styles.rateLeft}>
+                          <Video size={15} className={styles.rateIcon} />
+                          <span>1:1 Video Call</span>
+                        </div>
+                        <span className={styles.rateVal}>{selectedConv.user.videoRate} Coins / Min</span>
+                      </div>
+                    </div>
+
+                    {/* About Card */}
+                    <div className={styles.sidebarCard}>
+                      <h4 className={styles.cardTitle}>About</h4>
+
+                      <div className={styles.detailRow}>
+                        <span className={styles.detailLabel}>Followers</span>
+                        <span className={styles.detailValue}>{selectedConv.user.followers}</span>
+                      </div>
+
+                      <div className={styles.detailRow}>
+                        <span className={styles.detailLabel}>Posts</span>
+                        <span className={styles.detailValue}>{selectedConv.user.posts}</span>
+                      </div>
+
+                      <div className={styles.detailRow}>
+                        <span className={styles.detailLabel}>Country</span>
+                        <span className={styles.detailValue}>{selectedConv.user.country}</span>
+                      </div>
+
+                      <div className={styles.detailRow}>
+                        <span className={styles.detailLabel}>Language</span>
+                        <span className={styles.detailValue}>{selectedConv.user.language}</span>
+                      </div>
+
+                      <button 
+                        className={styles.viewProfileBtn}
+                        onClick={() => {
+                          setActiveTab('All Creators');
+                          setShowProfileSheet(false);
+                        }}
+                      >
+                        View Profile
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Send Tip Modal (reused in mobile view) */}
+        {showTipModal && selectedConv && (
+          <div className={styles.modalOverlay} onClick={() => setShowTipModal(false)}>
+            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+              <button className={styles.closeModalBtn} onClick={() => setShowTipModal(false)} aria-label="Close">
+                <X size={20} />
+              </button>
+
+              <div className={styles.modalCreatorHeader}>
+                <div className={styles.modalAvatarContainer}>
+                  <img src={selectedConv.user.avatarUrl} alt={selectedConv.user.displayName} className={styles.modalCreatorAvatar} />
+                  <div className={styles.modalHeartBadge}>
+                    <Heart size={14} fill="#ffffff" color="#ff007f" />
+                  </div>
+                </div>
+                <h3 className={styles.modalTitle}>
+                  Support {selectedConv.user.displayName}
+                  {selectedConv.user.isVerified && <BadgeCheck className={styles.verifiedIcon} size={16} />}
+                </h3>
+                <p className={styles.modalSubtext}>Tipping is a great way to support creators and get noticed!</p>
+              </div>
+
+              <div className={styles.balanceInfo}>
+                <span className={styles.balanceLabel}>Your Balance:</span>
+                <div className={styles.balanceValue}>
+                  <img src="/coin.png" alt="Coin" className={styles.coinIconSmall} />
+                  <span className={styles.balanceAmount}>{balance.toLocaleString()} Coins</span>
+                </div>
+              </div>
+
+              <div className={styles.tipPresets}>
+                {[20, 50, 100, 250].map((amt) => (
+                  <button 
+                    key={amt}
+                    className={`${styles.presetBtn} ${tipAmount === amt ? styles.presetActive : ''}`}
+                    onClick={() => setTipAmount(amt)}
+                    type="button"
+                  >
+                    <img src="/coin.png" alt="Coin" className={styles.coinIconSmall} />
+                    <span>{amt}</span>
+                  </button>
+                ))}
+              </div>
+
+              <div className={styles.customTipRow}>
+                <span className={styles.customTipLabel}>Custom Amount:</span>
+                <div className={styles.customInputWrapper}>
+                  <img src="/coin.png" alt="Coin" className={styles.customCoinIcon} />
+                  <input 
+                    type="number"
+                    value={tipAmount}
+                    onChange={(e) => setTipAmount(Math.max(1, Number(e.target.value)))}
+                    min="1"
+                    className={styles.customTipInput}
+                  />
+                </div>
+              </div>
+
+              <div className={styles.modalActions}>
+                <button className={styles.cancelBtn} onClick={() => setShowTipModal(false)} type="button">
+                  Cancel
+                </button>
+                <button className={styles.confirmTipBtn} onClick={handleSendTip} type="button">
+                  Send Tip ({tipAmount} Coins)
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </div>
+    );
+  }
 
   return (
     <div className={`${styles.messagesContainer} ${!darkMode ? styles.light : ''}`}>

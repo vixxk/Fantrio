@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Sidebar } from './features/sidebar/Sidebar';
 import { Header } from './features/header/Header';
@@ -20,8 +20,61 @@ import { Menu, X, Compass, Radio, Phone, MessageSquare, User } from 'lucide-reac
 import './App.css';
 
 const AppContent = () => {
-  const { darkMode, activeTab, setActiveTab } = useApp();
+  const { darkMode, activeTab, setActiveTab, currentPath } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showBottomNav, setShowBottomNav] = useState(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = (e) => {
+      const target = e.target;
+      if (!target || typeof target.scrollTop !== 'number') return;
+      
+      const currentScrollY = target.scrollTop;
+      
+      // Ignore tiny scroll changes
+      if (Math.abs(currentScrollY - lastScrollY.current) < 10) return;
+      
+      if (currentScrollY <= 10) {
+        setShowBottomNav(true);
+      } else if (currentScrollY > lastScrollY.current) {
+        setShowBottomNav(false);
+      } else {
+        setShowBottomNav(true);
+      }
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { capture: true, passive: true });
+    return () => window.removeEventListener('scroll', handleScroll, { capture: true });
+  }, []);
+
+  useEffect(() => {
+    lastScrollY.current = 0;
+    setShowBottomNav(true);
+  }, [activeTab, currentPath]);
+
+  useEffect(() => {
+    const handleFocus = (e) => {
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+        setShowBottomNav(false);
+      }
+    };
+    const handleBlur = (e) => {
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+        setShowBottomNav(true);
+      }
+    };
+
+    document.addEventListener('focusin', handleFocus);
+    document.addEventListener('focusout', handleBlur);
+    return () => {
+      document.removeEventListener('focusin', handleFocus);
+      document.removeEventListener('focusout', handleBlur);
+    };
+  }, []);
+
+  const isChatOpen = activeTab === 'Messages' && currentPath && currentPath.split('/').filter(Boolean).length > 1;
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -142,7 +195,7 @@ const AppContent = () => {
       </div>
 
       {/* Mobile Bottom Navigation Bar */}
-      <nav className="mobileBottomNav">
+      <nav className={`mobileBottomNav ${(!showBottomNav || isChatOpen) ? 'bottomNavHidden' : ''}`}>
         <button 
           className={`bottomNavItem ${activeTab === 'Discover Feed' ? 'bottomActive' : ''}`}
           onClick={() => setActiveTab('Discover Feed')}
