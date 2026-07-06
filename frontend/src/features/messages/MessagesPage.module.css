@@ -1723,6 +1723,7 @@
 
   .messagesContainer {
     height: 100% !important;
+    min-height: 0 !important;
     background: #000000 !important;
   }
 
