@@ -1646,7 +1646,7 @@
 
 @media (max-width: 768px) {
   .container {
-    padding: 0 0 90px 0 !important;
+    padding: 0 0 2rem 0 !important;
   }
 
   .feedHeader {

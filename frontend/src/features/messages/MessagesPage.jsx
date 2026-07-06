@@ -4,7 +4,7 @@ import { api } from '../../services/api';
 import { 
   Search, Edit, BadgeCheck, Phone, Video, Heart, MoreVertical,
   Lock, Smile, Image as ImageIcon, Send, Plus, Archive, Star,
-  X, Check, MessageSquare, User
+  X, Check, MessageSquare, User, ChevronLeft
 } from 'lucide-react';
 import styles from './MessagesPage.module.css';
 
@@ -243,6 +243,59 @@ const INITIAL_CONVERSATIONS = [
   }
 ];
 
+const ARCHIVED_CONVERSATIONS = [
+  {
+    id: 'conv_arch1',
+    user: {
+      id: 'usr_arch1',
+      displayName: 'Riya Singh',
+      username: 'riya_s',
+      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+      isVerified: false,
+      isOnline: false,
+      rating: 4.5,
+      ratingCount: 29,
+      subscriptionPlan: 'Monthly',
+      renewalDate: '02, Jul 2026',
+      audioRate: 8,
+      videoRate: 12,
+      followers: '3.4K',
+      posts: 45,
+      country: 'India 🇮🇳',
+      language: 'English'
+    },
+    lastMessage: "Let's catch up later! (Archived)",
+    time: '2 Weeks',
+    unreadCount: 0,
+    isNew: false
+  },
+  {
+    id: 'conv_arch2',
+    user: {
+      id: 'usr_arch2',
+      displayName: 'Sweta Singh',
+      username: 'sweta_s',
+      avatarUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=300&q=80',
+      isVerified: true,
+      isOnline: false,
+      rating: 4.8,
+      ratingCount: 145,
+      subscriptionPlan: 'Monthly',
+      renewalDate: '15, Aug 2026',
+      audioRate: 18,
+      videoRate: 25,
+      followers: '28.9K',
+      posts: 275,
+      country: 'India 🇮🇳',
+      language: 'English, Hindi'
+    },
+    lastMessage: 'This conversation is archived.',
+    time: '3 Weeks',
+    unreadCount: 0,
+    isNew: false
+  }
+];
+
 const INITIAL_MESSAGES = [
   { 
     id: 'm1', 
@@ -330,14 +383,36 @@ export const MessagesPage = () => {
   const [selectedConvId, setSelectedConvId] = useState(null); // Default: No message selected first
   const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [messagesMap, setMessagesMap] = useState({ conv1: INITIAL_MESSAGES });
+  const [showArchived, setShowArchived] = useState(false);
+  const [messagesMap, setMessagesMap] = useState({ 
+    conv1: INITIAL_MESSAGES,
+    conv_arch1: [
+      { id: 'archm1', sender: 'user', text: 'Hey Riya, did you see my message?', time: '2 weeks ago' },
+      { id: 'archm2', sender: 'creator', text: "Hey! Yes, let's catch up later!", time: '2 weeks ago' }
+    ],
+    conv_arch2: [
+      { id: 'archm3', sender: 'creator', text: 'This conversation has been archived.', time: '3 weeks ago' }
+    ]
+  });
   const [inputText, setInputText] = useState('');
   const [showTipModal, setShowTipModal] = useState(false);
   const [tipAmount, setTipAmount] = useState(50);
   const [mobileView, setMobileView] = useState('list');
+  const [showMenu, setShowMenu] = useState(false);
   const messagesEndRef = useRef(null);
+  const menuRef = useRef(null);
 
-  const selectedConv = conversations.find(c => c.id === selectedConvId) || null;
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setShowMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
+
+  const selectedConv = (showArchived ? ARCHIVED_CONVERSATIONS : conversations).find(c => c.id === selectedConvId) || null;
   const currentMessages = selectedConvId ? (messagesMap[selectedConvId] || [
     { id: 'default1', sender: 'creator', text: `Hi! Welcome to my chat feed.`, time: 'Just now' }
   ]) : [];
@@ -350,7 +425,8 @@ export const MessagesPage = () => {
   }, [selectedConvId, currentMessages]);
 
   // Filter conversations
-  const filteredConversations = conversations.filter(c => {
+  const conversationsToFilter = showArchived ? ARCHIVED_CONVERSATIONS : conversations;
+  const filteredConversations = conversationsToFilter.filter(c => {
     const matchesSearch = c.user.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           c.lastMessage.toLowerCase().includes(searchQuery.toLowerCase());
     if (!matchesSearch) return false;
@@ -445,10 +521,25 @@ export const MessagesPage = () => {
           
           {/* Header */}
           <div className={styles.chatsHeader}>
-            <h2 className={styles.chatsTitle}>Messages</h2>
-            <button className={styles.composeBtn} title="New Message">
-              <img src="/compose.png" alt="Compose" className={styles.composeIconImg} />
-            </button>
+            <h2 className={styles.chatsTitle}>
+              {showArchived ? 'Archived' : 'Messages'}
+            </h2>
+            <div className={styles.headerRightActions}>
+              <button 
+                type="button"
+                className={`${styles.archiveHeaderBtn} ${showArchived ? styles.archiveHeaderActive : ''}`} 
+                onClick={() => {
+                  setShowArchived(!showArchived);
+                  setSelectedConvId(null);
+                }}
+                title={showArchived ? "Back to Messages" : "Archived Chats"}
+              >
+                <GradientArchiveIcon size={22} />
+              </button>
+              <button className={styles.composeBtn} title="New Message">
+                <img src="/compose.png" alt="Compose" className={styles.composeIconImg} />
+              </button>
+            </div>
           </div>
 
           {/* Search Input */}
@@ -524,13 +615,7 @@ export const MessagesPage = () => {
             })}
           </div>
 
-          {/* Footer Archived Link */}
-          <div className={styles.archiveFooter}>
-            <button className={styles.archiveBtn}>
-              <GradientArchiveIcon size={16} />
-              <span className={styles.archiveText}>View Archived Chats</span>
-            </button>
-          </div>
+
 
         </div>
 
@@ -541,44 +626,40 @@ export const MessagesPage = () => {
             <>
               {/* Header Bar */}
               <div className={styles.roomHeader}>
-                <div className={styles.roomUserBlock}>
-                  <div className={styles.roomAvatarWrapper}>
-                    <img src={selectedConv.user.avatarUrl} alt={selectedConv.user.displayName} className={styles.roomAvatar} />
-                    {selectedConv.user.isOnline && <span className={styles.onlineDot} />}
-                  </div>
-                  <div className={styles.roomNameBlock}>
-                    <div className={styles.roomDisplayName}>
-                      {selectedConv.user.displayName}
-                      {selectedConv.user.isVerified && <GradientBadgeCheck size={15} />}
+                <div className={styles.roomHeaderLeft}>
+                  <button 
+                    type="button" 
+                    className={styles.mobileBackBtn} 
+                    onClick={() => setMobileView('list')}
+                  >
+                    <ChevronLeft size={24} />
+                  </button>
+                  
+                  <div 
+                    className={styles.roomUserBlock}
+                    onClick={() => {
+                      if (window.innerWidth <= 768) {
+                        setMobileView('profile');
+                      }
+                    }}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <div className={styles.roomAvatarWrapper}>
+                      <img src={selectedConv.user.avatarUrl} alt={selectedConv.user.displayName} className={styles.roomAvatar} />
+                      {selectedConv.user.isOnline && <span className={styles.onlineDot} />}
                     </div>
-                    <div className={styles.roomUsername}>@{selectedConv.user.username}</div>
+                    <div className={styles.roomNameBlock}>
+                      <div className={styles.roomDisplayName}>
+                        {selectedConv.user.displayName}
+                        {selectedConv.user.isVerified && <GradientBadgeCheck size={15} />}
+                      </div>
+                      <div className={styles.roomUsername}>@{selectedConv.user.username}</div>
+                    </div>
                   </div>
                 </div>
 
                 {/* Action Buttons */}
                 <div className={styles.roomActions}>
-                  <button 
-                    className={styles.audioCallBtn}
-                    onClick={() => setActiveTab('1:1 Audio Calls')}
-                  >
-                    <Phone size={17} fill="#ffffff" />
-                    <div className={styles.btnTextCol}>
-                      <span className={styles.btnLabel}>Audio Call</span>
-                      <span className={styles.btnSub}>10 Coins/min</span>
-                    </div>
-                  </button>
-
-                  <button 
-                    className={styles.videoCallBtn}
-                    onClick={() => setActiveTab('1:1 Video Calls')}
-                  >
-                    <Video size={17} fill="#ffffff" />
-                    <div className={styles.btnTextCol}>
-                      <span className={styles.btnLabel}>Video Call</span>
-                      <span className={styles.btnSub}>10 Coins/min</span>
-                    </div>
-                  </button>
-
                   <button 
                     className={styles.sendTipBtn}
                     onClick={() => setShowTipModal(true)}
@@ -587,9 +668,49 @@ export const MessagesPage = () => {
                     <span>Send Tip</span>
                   </button>
 
-                  <button className={styles.moreOptionsBtn}>
-                    <MoreVertical size={18} />
-                  </button>
+                  <div className={styles.menuWrapper} ref={menuRef}>
+                    <button 
+                      className={styles.moreOptionsBtn}
+                      onClick={() => setShowMenu(!showMenu)}
+                      type="button"
+                    >
+                      <MoreVertical size={18} />
+                    </button>
+                    
+                    {showMenu && (
+                      <div className={styles.dropdownMenu}>
+                        <button 
+                          className={styles.dropdownItem}
+                          onClick={() => {
+                            setActiveTab('1:1 Audio Calls');
+                            setShowMenu(false);
+                          }}
+                          type="button"
+                        >
+                          <Phone size={16} className={styles.dropdownIcon} />
+                          <div className={styles.dropdownItemText}>
+                            <span className={styles.dropdownItemLabel}>Audio Call</span>
+                            <span className={styles.dropdownItemSub}>10 Coins/min</span>
+                          </div>
+                        </button>
+                        
+                        <button 
+                          className={styles.dropdownItem}
+                          onClick={() => {
+                            setActiveTab('1:1 Video Calls');
+                            setShowMenu(false);
+                          }}
+                          type="button"
+                        >
+                          <Video size={16} className={styles.dropdownIcon} />
+                          <div className={styles.dropdownItemText}>
+                            <span className={styles.dropdownItemLabel}>Video Call</span>
+                            <span className={styles.dropdownItemSub}>10 Coins/min</span>
+                          </div>
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -704,6 +825,18 @@ export const MessagesPage = () => {
         {/* ================= COLUMN 3: RIGHT PROFILE DETAILS SIDEBAR ================= */}
         <div className={`${styles.profileSidebar} ${mobileView !== 'profile' ? styles.hideMobile : ''}`}>
           
+          {/* Mobile Profile Header */}
+          <div className={styles.mobileProfileHeader}>
+            <button 
+              type="button"
+              className={styles.mobileBackBtn} 
+              onClick={() => setMobileView('chat')}
+            >
+              <ChevronLeft size={24} />
+            </button>
+            <span className={styles.mobileProfileTitle}>Creator Info</span>
+          </div>
+
           {selectedConv ? (
             <>
               {/* Top Creator Header */}
@@ -815,21 +948,39 @@ export const MessagesPage = () => {
       {showTipModal && selectedConv && (
         <div className={styles.modalOverlay} onClick={() => setShowTipModal(false)}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h3>Send Tip to {selectedConv.user.displayName}</h3>
-              <button className={styles.closeModalBtn} onClick={() => setShowTipModal(false)}>
-                <X size={18} />
-              </button>
+            <button className={styles.closeModalBtn} onClick={() => setShowTipModal(false)} aria-label="Close">
+              <X size={20} />
+            </button>
+
+            <div className={styles.modalCreatorHeader}>
+              <div className={styles.modalAvatarContainer}>
+                <img src={selectedConv.user.avatarUrl} alt={selectedConv.user.displayName} className={styles.modalCreatorAvatar} />
+                <div className={styles.modalHeartBadge}>
+                  <Heart size={14} fill="#ffffff" color="#ff007f" />
+                </div>
+              </div>
+              <h3 className={styles.modalTitle}>
+                Support {selectedConv.user.displayName}
+                {selectedConv.user.isVerified && <BadgeCheck className={styles.verifiedIcon} size={16} />}
+              </h3>
+              <p className={styles.modalSubtext}>Tipping is a great way to support creators and get noticed!</p>
             </div>
 
-            <p className={styles.modalSubtext}>Show your love and support by tipping coins!</p>
+            <div className={styles.balanceInfo}>
+              <span className={styles.balanceLabel}>Your Balance:</span>
+              <div className={styles.balanceValue}>
+                <img src="/coin.png" alt="Coin" className={styles.coinIconSmall} />
+                <span className={styles.balanceAmount}>{balance.toLocaleString()} Coins</span>
+              </div>
+            </div>
 
             <div className={styles.tipPresets}>
-              {[20, 50, 100, 250, 500].map((amt) => (
+              {[20, 50, 100, 250].map((amt) => (
                 <button 
                   key={amt}
                   className={`${styles.presetBtn} ${tipAmount === amt ? styles.presetActive : ''}`}
                   onClick={() => setTipAmount(amt)}
+                  type="button"
                 >
                   <img src="/coin.png" alt="Coin" className={styles.coinIconSmall} />
                   <span>{amt}</span>
@@ -838,21 +989,24 @@ export const MessagesPage = () => {
             </div>
 
             <div className={styles.customTipRow}>
-              <label>Custom Amount:</label>
-              <input 
-                type="number"
-                value={tipAmount}
-                onChange={(e) => setTipAmount(Number(e.target.value))}
-                min="1"
-                className={styles.customTipInput}
-              />
+              <span className={styles.customTipLabel}>Custom Amount:</span>
+              <div className={styles.customInputWrapper}>
+                <img src="/coin.png" alt="Coin" className={styles.customCoinIcon} />
+                <input 
+                  type="number"
+                  value={tipAmount}
+                  onChange={(e) => setTipAmount(Math.max(1, Number(e.target.value)))}
+                  min="1"
+                  className={styles.customTipInput}
+                />
+              </div>
             </div>
 
             <div className={styles.modalActions}>
-              <button className={styles.cancelBtn} onClick={() => setShowTipModal(false)}>
+              <button className={styles.cancelBtn} onClick={() => setShowTipModal(false)} type="button">
                 Cancel
               </button>
-              <button className={styles.confirmTipBtn} onClick={handleSendTip}>
+              <button className={styles.confirmTipBtn} onClick={handleSendTip} type="button">
                 Send Tip ({tipAmount} Coins)
               </button>
             </div>

@@ -218,9 +218,19 @@ html, body, #root {
   
 
   
+  .mainArea {
+    height: calc(100vh - 60px - env(safe-area-inset-bottom));
+  }
+  
   .scrollableContent {
     padding: 1rem;
-    padding-bottom: 80px; /* Space for bottom nav */
+    padding-bottom: 2rem; /* Standard breathing room at bottom */
+  }
+
+  .scrollableContent.noScroll {
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
   }
   
   /* Mobile Bottom Navigation */

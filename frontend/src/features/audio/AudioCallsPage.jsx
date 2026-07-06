@@ -986,22 +986,19 @@ export const AudioCallsPage = () => {
               {/* Price Range */}
               <div className={styles.filterSection}>
                 <h4 className={styles.filterSectionLabel}>Price Per Minute</h4>
-                <div className={styles.sliderHeader}>
-                  <span className={styles.sliderMinText}>5 Coins</span>
-                  <span className={styles.sliderValText}>{priceRange} Coins</span>
+                <div className={styles.priceOptionGrid}>
+                  {[10, 15, 20, 30, 40, 50].map((amt) => (
+                    <button
+                      key={amt}
+                      type="button"
+                      className={`${styles.priceOptionBtn} ${priceRange === amt ? styles.priceOptionActive : ''}`}
+                      onClick={() => setPriceRange(amt)}
+                    >
+                      {amt !== 50 && <img src="/coin.png" alt="Coin" className={styles.coinIconSmall} />}
+                      <span>{amt === 50 ? 'Any' : `≤ ${amt}`}</span>
+                    </button>
+                  ))}
                 </div>
-                <input
-                  type="range"
-                  min="5"
-                  max="50"
-                  step="1"
-                  value={priceRange}
-                  onChange={(e) => setPriceRange(parseInt(e.target.value))}
-                  className={styles.filterSlider}
-                  style={{
-                    background: `linear-gradient(to right, #e10075 0%, #7e00f3 ${((priceRange - 5) / 45) * 100}%, ${darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'} ${((priceRange - 5) / 45) * 100}%)`
-                  }}
-                />
               </div>
 
               {/* Category */}

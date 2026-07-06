@@ -488,6 +488,41 @@
   transform: scale(1.15);
 }
 
+/* Price Option Grid styling instead of range slider */
+.priceOptionGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.priceOptionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  padding: 0.6rem 0.25rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.priceOptionBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.priceOptionActive {
+  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%) !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 12px rgba(225, 0, 117, 0.3);
+}
+
 /* Dropdowns (AllCreators styles) */
 .dropdownWrapper {
   position: relative;
@@ -906,6 +941,23 @@
 
 .light .sliderMinText {
   color: rgba(26, 22, 37, 0.5);
+}
+
+.light .priceOptionBtn {
+  background: #f7f6fb;
+  border-color: rgba(26, 22, 37, 0.08);
+  color: #1a1625;
+}
+
+.light .priceOptionBtn:hover {
+  background: #ededf5;
+  border-color: rgba(26, 22, 37, 0.15);
+}
+
+.light .priceOptionActive {
+  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%) !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
 }
 
 .light .dropdownButton {

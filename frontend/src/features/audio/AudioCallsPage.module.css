@@ -444,48 +444,39 @@
   background: #ffb800;
 }
 
-/* Slider (AllCreators styles) */
-.sliderHeader {
+/* Price Option Grid styling instead of range slider */
+.priceOptionGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.priceOptionBtn {
   display: flex;
-  justify-content: space-between;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.sliderMinText {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.sliderValText {
-  color: #ff007f;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  padding: 0.6rem 0.25rem;
+  border-radius: 12px;
   font-weight: 700;
-}
-
-.filterSlider {
-  width: 100%;
-  -webkit-appearance: none;
-  appearance: none;
-  height: 6px;
-  border-radius: 99px;
-  outline: none;
+  font-size: 0.8rem;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.filterSlider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #ffffff;
-  border: 2px solid #ff007f;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  cursor: pointer;
-  transition: transform 0.1s;
+.priceOptionBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
-.filterSlider::-webkit-slider-thumb:hover {
-  transform: scale(1.15);
+.priceOptionActive {
+  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%) !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 12px rgba(225, 0, 117, 0.3);
 }
 
 /* Dropdowns (AllCreators styles) */
@@ -899,8 +890,21 @@
   border-color: rgba(0, 0, 0, 0.2);
 }
 
-.light .sliderMinText {
-  color: rgba(26, 22, 37, 0.5);
+.light .priceOptionBtn {
+  background: #f7f6fb;
+  border-color: rgba(26, 22, 37, 0.08);
+  color: #1a1625;
+}
+
+.light .priceOptionBtn:hover {
+  background: #ededf5;
+  border-color: rgba(26, 22, 37, 0.15);
+}
+
+.light .priceOptionActive {
+  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%) !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
 }
 
 .light .dropdownButton {

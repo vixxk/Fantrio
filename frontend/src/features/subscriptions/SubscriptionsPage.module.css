@@ -1183,7 +1183,7 @@
 
 @media (max-width: 600px) {
   .pageContainer {
-    padding-bottom: 90px !important;
+    padding-bottom: 2rem !important;
   }
 
   .title {
