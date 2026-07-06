@@ -34,7 +34,7 @@ const FAQ_DATA = [
 ];
 
 export const MorePage = () => {
-  const { darkMode, balance, addCoins } = useApp();
+  const { darkMode, balance, addCoins, setActiveTab } = useApp();
   const [subView, setSubView] = useState(null); // 'tickets', 'contact', 'faq', 'referral', 'rewards', 'announcements', 'features', 'about', 'report-creator', 'report-content', 'transactions', 'terms', 'privacy'
 
   // Sub-view specific states
@@ -226,14 +226,7 @@ export const MorePage = () => {
     }
   };
 
-  const handleAddMockCoins = async () => {
-    try {
-      await addCoins(100);
-      setStatusMsg({ type: 'success', text: '100 mock coins successfully added to wallet!' });
-    } catch (e) {
-      setStatusMsg({ type: 'error', text: 'Failed to add coins: ' + e.message });
-    }
-  };
+
 
   // Render Sub-Views
   const renderSubViewContent = () => {
@@ -1043,7 +1036,7 @@ export const MorePage = () => {
             <div className={styles.promoImgWrapper}>
               <img src="/Gift & Coins.png" alt="Promo Coins" className={styles.promoImg} />
             </div>
-            <button className={styles.buyBtn} onClick={handleAddMockCoins}>
+            <button className={styles.buyBtn} onClick={() => setActiveTab('Buy Coins')}>
               Buy Coins
             </button>
           </div>

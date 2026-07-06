@@ -55,7 +55,7 @@ export const Sidebar = () => {
 
   return (
     <aside className={`${styles.sidebar} ${darkMode ? styles.dark : styles.light}`}>
-      <div className={styles.logoContainer}>
+      <div className={styles.logoContainer} onClick={() => setActiveTab('Discover Feed')}>
         <img src="/Fantrio Logo.png" alt="Fantrio Logo" className={styles.logoIcon} />
         <span className={styles.logoText}>
           Fant<span className={styles.logoTextPink}>rio</span>
@@ -100,7 +100,7 @@ export const Sidebar = () => {
         {/* Bonus box */}
         <div className={styles.promoCard}>
           <p className={styles.promoText}>
-            Get <span className={styles.highlight}>20% bonus</span> on Coin Packs!
+            Get <span className={styles.highlight}>20% bonus</span><br />on Coin Packs!
           </p>
           <img 
             src="/Gift & Coins.png" 
@@ -143,7 +143,7 @@ export const Sidebar = () => {
 
         <button className={styles.logoutButton} onClick={logout}>
           <span>Logout</span>
-          <LogOut size={18} />
+          <img src="/arrow.png" alt="Logout" className={styles.logoutIcon} />
         </button>
       </div>
     </aside>

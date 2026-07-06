@@ -518,11 +518,15 @@ export const LiveStreamsPage = () => {
         <h2 className={styles.categoriesTitle}>Live Categories</h2>
         <div className={styles.categoriesGrid}>
           {categoryMetadata.map((cat) => {
+            const isActive = category === cat.name;
             return (
               <div 
                 key={cat.name} 
-                className={styles.categoryCard}
-                onClick={() => setCategory(cat.name)}
+                className={`${styles.categoryCard} ${isActive ? styles.activeCategoryCard : ''}`}
+                onClick={() => {
+                  setCategory(isActive ? 'All Categories' : cat.name);
+                  document.querySelector('.scrollableContent')?.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
               >
                 <div className={styles.categoryIconWrapper}>
                   <img src={cat.imageSrc} alt={cat.name} className={styles.categoryImgIcon} />

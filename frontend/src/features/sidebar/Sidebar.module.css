@@ -16,6 +16,7 @@
   display: flex;
   align-items: center;
   gap: 2px; /* tightened gap */
+  cursor: pointer;
 }
 
 .logoIcon {
@@ -126,7 +127,7 @@
 }
 
 .countBadge {
-  background-color: #ff007f;
+  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
   color: #ffffff;
   font-size: 0.75rem;
   font-weight: bold;
@@ -151,7 +152,7 @@
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 24px; /* highly rounded corners */
-  padding: 1.25rem;
+  padding: 1rem;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -159,11 +160,11 @@
 }
 
 .promoText {
-  font-size: 1.05rem; /* larger font size */
+  font-size: 1.2rem; /* increased font size */
   color: #ffffff;
-  line-height: 1.4;
-  margin-bottom: 0.8rem;
-  font-weight: 500;
+  line-height: 1.3;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
 }
 
 .highlight {
@@ -176,8 +177,8 @@
 
 .promoImage {
   width: 90%;
-  max-width: 180px;
-  margin: 0 auto 0.8rem;
+  max-width: 150px; /* increased image size */
+  margin: 0.2rem auto 0.6rem;
   display: block;
   object-fit: contain;
   transition: transform 0.3s ease;
@@ -192,11 +193,11 @@
   background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
   color: #ffffff;
   border: none;
-  padding: 0.8rem; /* larger padding */
+  padding: 0.65rem 0.8rem; /* reduced padding */
   border-radius: 12px; /* rounded button */
   font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 0.95rem; /* slightly increased font size */
+  font-weight: 700;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -210,14 +211,14 @@
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 24px; /* highly rounded corners */
-  padding: 1.25rem; /* matching promoCard padding */
+  padding: 1rem; /* reduced padding */
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 0.6rem; /* reduced gap */
 }
 
 .balanceLabel {
-  font-size: 1.25rem; /* larger font size */
+  font-size: 1.15rem; /* adjusted size */
   color: #ffffff; /* white label */
   font-weight: 500;
   text-transform: none; /* sentence case */
@@ -243,15 +244,15 @@
 }
 
 .balanceAmount {
-  font-size: 1.05rem;
-  font-weight: 600;
+  font-size: 1.2rem; /* increased font size */
+  font-weight: 700;
   color: #ffffff;
 }
 
 .balanceUsd {
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.4);
-  margin-top: 2px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 1px;
 }
 
 .addCoinsButton {
@@ -259,11 +260,11 @@
   background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%); /* gradient button */
   color: #ffffff;
   border: none;
-  padding: 0.8rem; /* matching promoButton padding */
+  padding: 0.65rem 0.8rem; /* reduced padding */
   border-radius: 12px; /* matching promoButton border-radius */
   font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 0.95rem; /* increased font size */
+  font-weight: 700;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -313,6 +314,17 @@
 .logoutButton:hover {
   color: #ff3b30;
   background-color: transparent; /* no background hover color */
+}
+
+.logoutIcon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+.logoutButton:hover .logoutIcon {
+  transform: translateX(2px);
 }
 
 /* Switch Styles */
@@ -424,4 +436,8 @@
 
 .light .logoText {
   color: #1a1625;
+}
+
+.light .logoutIcon {
+  filter: invert(1);
 }

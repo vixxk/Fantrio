@@ -14,7 +14,7 @@ import {
 import styles from './SuggestionsSidebar.module.css';
 
 export const SuggestionsSidebar = () => {
-  const { darkMode, addCoins, refreshBalance } = useApp();
+  const { darkMode, setActiveTab, refreshBalance } = useApp();
   const [topCreators, setTopCreators] = useState([]);
   const [hashtags, setHashtags] = useState([]);
   const [suggestedCreators, setSuggestedCreators] = useState([]);
@@ -141,13 +141,8 @@ export const SuggestionsSidebar = () => {
     }
   };
 
-  const handleBuyPromo = async () => {
-    try {
-      await addCoins(500);
-      alert('Promotional 500 Coins added (with 20% bonus) to your wallet!');
-    } catch (err) {
-      alert(err.message);
-    }
+  const handleBuyPromo = () => {
+    setActiveTab('Buy Coins');
   };
 
   return (
@@ -189,28 +184,28 @@ export const SuggestionsSidebar = () => {
       <div className={styles.sectionContainer}>
         <h4 className={styles.sectionHeading}>Quick Actions</h4>
         <div className={styles.quickActionsGrid}>
-          <button className={styles.actionBtn}>
+          <button className={styles.actionBtn} onClick={() => setActiveTab('1:1 Audio Calls')}>
             <div className={`${styles.actionIconWrapper} ${styles.audioBg}`}>
               <img src="/audio.png" alt="Audio Call" className={styles.actionIconImg} />
             </div>
             <span className={styles.actionLabel}>Audio Call</span>
           </button>
 
-          <button className={styles.actionBtn}>
+          <button className={styles.actionBtn} onClick={() => setActiveTab('1:1 Video Calls')}>
             <div className={`${styles.actionIconWrapper} ${styles.videoBg}`}>
               <img src="/video.png" alt="Video Call" className={styles.actionIconImg} />
             </div>
             <span className={styles.actionLabel}>Video Call</span>
           </button>
 
-          <button className={styles.actionBtn}>
+          <button className={styles.actionBtn} onClick={() => setActiveTab('Messages')}>
             <div className={`${styles.actionIconWrapper} ${styles.msgBg}`}>
               <img src="/message.png" alt="Messages" className={styles.actionIconImg} />
             </div>
             <span className={styles.actionLabel}>Messages</span>
           </button>
 
-          <button className={styles.actionBtn}>
+          <button className={styles.actionBtn} onClick={() => setActiveTab('Live Streams')}>
             <div className={`${styles.actionIconWrapper} ${styles.liveBg}`}>
               <img src="/live.png" alt="Live Streams" className={styles.actionIconImg} />
             </div>
@@ -223,7 +218,7 @@ export const SuggestionsSidebar = () => {
       <div className={styles.sectionContainer}>
         <div className={styles.sectionHeader}>
           <h4 className={styles.sectionHeading}>Top Creators</h4>
-          <button className={styles.linkButton}>View All</button>
+          <button className={styles.linkButton} onClick={() => setActiveTab('All Creators')}>View All</button>
         </div>
         <div className={styles.creatorList}>
           {topCreators.map((creator, i) => (
@@ -265,7 +260,7 @@ export const SuggestionsSidebar = () => {
       <div className={styles.sectionContainer}>
         <div className={styles.sectionHeader}>
           <h4 className={styles.sectionHeading}>Suggested For You</h4>
-          <button className={styles.linkButton}>View All</button>
+          <button className={styles.linkButton} onClick={() => setActiveTab('All Creators')}>View All</button>
         </div>
         <div className={styles.suggestedList}>
           {suggestedCreators.map((c) => (

@@ -4,15 +4,10 @@ import { Search, Bell, MessageCircle, Landmark, ChevronDown, Plus } from 'lucide
 import styles from './Header.module.css';
 
 export const Header = () => {
-  const { user, balance, darkMode, addCoins } = useApp();
+  const { user, balance, darkMode, setActiveTab } = useApp();
 
-  const handleAddCoinsClick = async () => {
-    try {
-      await addCoins(250);
-      alert('250 mock coins successfully added!');
-    } catch (e) {
-      alert('Failed to add coins: ' + e.message);
-    }
+  const handleAddCoinsClick = () => {
+    setActiveTab('Buy Coins');
   };
 
   const formattedBalance = balance.toLocaleString();

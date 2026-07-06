@@ -3,7 +3,7 @@ import { useApp } from '../../context/AppContext';
 import styles from './Banner.module.css';
 
 export const Banner = () => {
-  const { darkMode } = useApp();
+  const { darkMode, setActiveTab } = useApp();
 
   return (
     <div className={`${styles.bannerCard} ${darkMode ? '' : styles.lightBanner}`}>
@@ -13,7 +13,12 @@ export const Banner = () => {
         <p className={styles.bannerText}>
           Live calls, streams, and premium content<br />from your favourite creators.
         </p>
-        <button className={styles.exploreBtn}>Explore Creators</button>
+        <button 
+          className={styles.exploreBtn} 
+          onClick={() => setActiveTab('All Creators')}
+        >
+          Explore Creators
+        </button>
       </div>
       <div className={styles.bannerImageWrapper}>
         <img 
