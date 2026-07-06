@@ -1939,6 +1939,56 @@
   .convPreviewText {
     font-size: 0.72rem;
   }
+
+  /* Light mode specific mobile overrides */
+  .light .messagesContainer {
+    background: #faf8fc !important;
+  }
+  
+  .light .messagesShell {
+    background: #ffffff !important;
+  }
+  
+  .light .chatsSidebar {
+    background: #ffffff !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+  }
+  
+  .light .chatRoom {
+    background: #faf8fc !important;
+  }
+  
+  .light .roomHeader {
+    background: #ffffff !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+  }
+  
+  .light .chatInputBar {
+    background: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04) !important;
+  }
+  
+  .light .profileSidebar {
+    background: #ffffff !important;
+  }
+  
+  .light .mobileProfileHeader {
+    background: #ffffff !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+  }
+
+  .light .mobileBackBtn {
+    color: #1a1625 !important;
+  }
+
+  .light .mobileProfileTitle {
+    color: #1a1625 !important;
+  }
+
+  .light .sendTipBtn {
+    color: #1a1625 !important;
+  }
 }
 
 .bubbleSelected, .paywallSelected {
@@ -1958,6 +2008,40 @@
   }
   100% {
     box-shadow: 0 0 20px rgba(126, 0, 243, 0.8), 0 0 30px rgba(225, 0, 117, 0.4);
+    outline-color: rgba(225, 0, 117, 0.8);
+  }
+}
+
+/* Desktop Light Theme Enhancements */
+.light .composeIconImg {
+  filter: invert(0.9) brightness(0.2) contrast(1.2);
+}
+
+.light .convItem:hover {
+  background: rgba(126, 0, 243, 0.04);
+}
+
+.light .moreOptionsBtn {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .moreOptionsBtn:hover {
+  color: #1a1625;
+}
+
+.light .bubbleSelected, .light .paywallSelected {
+  outline: 2px solid #7e00f3 !important;
+  box-shadow: 0 0 15px rgba(126, 0, 243, 0.4) !important;
+  animation: pulseHighlightLight 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulseHighlightLight {
+  0% {
+    box-shadow: 0 0 6px rgba(126, 0, 243, 0.3);
+    outline-color: rgba(126, 0, 243, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 16px rgba(126, 0, 243, 0.6), 0 0 25px rgba(225, 0, 117, 0.3);
     outline-color: rgba(225, 0, 117, 0.8);
   }
 }
