@@ -378,7 +378,7 @@ const INITIAL_MESSAGES = [
 ];
 
 export const MessagesPage = () => {
-  const { darkMode, balance, addCoins, setActiveTab } = useApp();
+  const { darkMode, balance, addCoins, setActiveTab, setIsBottomNavVisible } = useApp();
   const [conversations, setConversations] = useState(INITIAL_CONVERSATIONS);
   const [selectedConvId, setSelectedConvId] = useState(null); // Default: No message selected first
   const [filter, setFilter] = useState('all');
@@ -401,6 +401,36 @@ export const MessagesPage = () => {
   const [showMenu, setShowMenu] = useState(false);
   const messagesEndRef = useRef(null);
   const menuRef = useRef(null);
+  const conversationsScrollY = useRef(0);
+
+  useEffect(() => {
+    if (window.innerWidth <= 768) {
+      if (mobileView === 'chat' || mobileView === 'profile') {
+        setIsBottomNavVisible(false);
+      } else {
+        setIsBottomNavVisible(true);
+      }
+    }
+  }, [mobileView, setIsBottomNavVisible]);
+
+  useEffect(() => {
+    return () => {
+      setIsBottomNavVisible(true);
+    };
+  }, [setIsBottomNavVisible]);
+
+  const handleConversationsScroll = (e) => {
+    if (window.innerWidth > 768) return;
+    const currentScrollY = e.currentTarget.scrollTop;
+    if (currentScrollY <= 10) {
+      setIsBottomNavVisible(true);
+    } else if (currentScrollY > conversationsScrollY.current) {
+      setIsBottomNavVisible(false);
+    } else {
+      setIsBottomNavVisible(true);
+    }
+    conversationsScrollY.current = currentScrollY;
+  };
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
@@ -577,7 +607,7 @@ export const MessagesPage = () => {
           </div>
 
           {/* Conversations List */}
-          <div className={styles.conversationsList}>
+          <div className={styles.conversationsList} onScroll={handleConversationsScroll}>
             {filteredConversations.map((conv) => {
               const isSelected = conv.id === selectedConvId;
               return (

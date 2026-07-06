@@ -12,6 +12,7 @@ export const AppProvider = ({ children }) => {
     const saved = localStorage.getItem('darkMode');
     return saved !== null ? JSON.parse(saved) : true;
   });
+  const [isBottomNavVisible, setIsBottomNavVisible] = useState(true);
 
   const tabToPath = {
     'Discover Feed': '/discover',
@@ -209,7 +210,9 @@ export const AppProvider = ({ children }) => {
         login,
         logout,
         refreshBalance,
-        addCoins
+        addCoins,
+        isBottomNavVisible,
+        setIsBottomNavVisible
       }}
     >
       {children}
