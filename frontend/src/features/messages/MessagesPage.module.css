@@ -2053,6 +2053,7 @@
 .mobileContainer {
   width: 100%;
   height: 100%;
+  max-height: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -2069,6 +2070,7 @@
 .mobileListScreen {
   width: 100%;
   height: 100%;
+  max-height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -2262,6 +2264,7 @@
 .mobileChatScreen {
   width: 100%;
   height: 100%;
+  max-height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -2500,4 +2503,170 @@
 
 .lightMobile .pageSubtitle {
   color: rgba(26, 22, 37, 0.5);
+}
+
+/* ================= ONLINE BADGE ================= */
+.mobileOnlineBadge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 2px solid #000000;
+}
+
+.lightMobile .mobileOnlineBadge {
+  border-color: #ffffff;
+}
+
+/* ================= LIGHT MODE SPECIFIC OVERRIDES FOR CHAT ROOM ================= */
+
+.lightMobile .mobileChatHeader {
+  background: #ffffff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  color: #1a1625;
+}
+
+.lightMobile .mobileChatBody {
+  background: #faf8fc;
+}
+
+.lightMobile .mobileChatInputBar {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04) !important;
+}
+
+.lightMobile .chatInput {
+  color: #1a1625 !important;
+}
+
+.lightMobile .chatInput::placeholder {
+  color: rgba(26, 22, 37, 0.4) !important;
+}
+
+.lightMobile .inputAddBtn,
+.lightMobile .inputIconButton {
+  color: rgba(26, 22, 37, 0.6) !important;
+}
+
+.lightMobile .inputAddBtn:hover,
+.lightMobile .inputIconButton:hover {
+  color: #1a1625 !important;
+}
+
+.lightMobile .sendSubmitBtn {
+  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%) !important;
+  color: #ffffff !important;
+}
+
+.lightMobile .msgBubble {
+  color: #1a1625;
+}
+
+.lightMobile .bubbleCreator {
+  background: #f1edf7;
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #1a1625;
+}
+
+.lightMobile .bubbleUser {
+  background: linear-gradient(90deg, #5300c8 0%, #7e00f3 100%);
+  color: #ffffff;
+}
+
+.lightMobile .msgText {
+  color: inherit;
+}
+
+.lightMobile .dateSeparator span {
+  color: rgba(26, 22, 37, 0.5) !important;
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Paywalls */
+.lightMobile .paywallWrapper {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.lightMobile .paywallNoticeTitle {
+  color: #1a1625;
+}
+
+.lightMobile .paywallCard {
+  background: #faf8fc;
+}
+
+.lightMobile .paywallMediaTitle {
+  color: #1a1625;
+}
+
+.lightMobile .paywallSubtext {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.lightMobile .coinPriceTag {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: #1a1625;
+}
+
+.lightMobile .unlockedNotice {
+  color: #22c55e;
+}
+
+/* Dropdown Menu inside header */
+.lightMobile .dropdownMenu {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.lightMobile .dropdownItem {
+  color: #1a1625;
+}
+
+.lightMobile .dropdownItem:hover {
+  background: rgba(126, 0, 243, 0.04);
+}
+
+.lightMobile .dropdownItemLabel {
+  color: #1a1625;
+}
+
+.lightMobile .dropdownItemSub {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.lightMobile .dropdownIcon {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+/* ================= LIGHT MOBILE CHATS LIST OVERRIDES ================= */
+.lightMobile .convName {
+  color: #1a1625 !important;
+}
+
+.lightMobile .convTime {
+  color: rgba(26, 22, 37, 0.5) !important;
+}
+
+.lightMobile .convPreviewText {
+  color: rgba(26, 22, 37, 0.6) !important;
+}
+
+.lightMobile .convSelected {
+  background: #f1edf7 !important;
+  border-color: rgba(126, 0, 243, 0.2) !important;
+}
+
+.lightMobile .onlineDot {
+  border-color: #ffffff !important;
+}
+
+.lightMobile .composeIconImg {
+  filter: invert(0.9) brightness(0.2) contrast(1.2) !important;
 }
