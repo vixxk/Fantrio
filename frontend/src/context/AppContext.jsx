@@ -12,7 +12,6 @@ export const AppProvider = ({ children }) => {
     const saved = localStorage.getItem('darkMode');
     return saved !== null ? JSON.parse(saved) : true;
   });
-  const [isBottomNavVisible, setIsBottomNavVisible] = useState(true);
 
   const tabToPath = {
     'Discover Feed': '/discover',
@@ -41,9 +40,16 @@ export const AppProvider = ({ children }) => {
     '/more': 'More'
   };
 
+  const getTabFromPath = (path) => {
+    if (path.startsWith('/messages')) return 'Messages';
+    return pathToTab[path] || 'Discover Feed';
+  };
+
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+
   // Determine initial tab from current pathname
   const initialPath = window.location.pathname;
-  const [activeTab, setActiveTabState] = useState(pathToTab[initialPath] || 'Discover Feed');
+  const [activeTab, setActiveTabState] = useState(getTabFromPath(initialPath));
 
   // Wrapper function to update state and push history
   const setActiveTab = (tab) => {
@@ -51,6 +57,16 @@ export const AppProvider = ({ children }) => {
     const path = tabToPath[tab] || '/discover';
     if (window.location.pathname !== path) {
       window.history.pushState(null, '', path);
+      setCurrentPath(path);
+    }
+  };
+
+  const navigateTo = (path) => {
+    if (window.location.pathname !== path) {
+      window.history.pushState(null, '', path);
+      setCurrentPath(path);
+      const matchingTab = getTabFromPath(path);
+      setActiveTabState(matchingTab);
     }
   };
 
@@ -58,8 +74,9 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     const handlePopState = () => {
       const currentPath = window.location.pathname;
-      const matchingTab = pathToTab[currentPath] || 'Discover Feed';
+      const matchingTab = getTabFromPath(currentPath);
       setActiveTabState(matchingTab);
+      setCurrentPath(currentPath);
     };
 
     window.addEventListener('popstate', handlePopState);
@@ -207,12 +224,12 @@ export const AppProvider = ({ children }) => {
         setDarkMode,
         activeTab,
         setActiveTab,
+        currentPath,
+        navigateTo,
         login,
         logout,
         refreshBalance,
-        addCoins,
-        isBottomNavVisible,
-        setIsBottomNavVisible
+        addCoins
       }}
     >
       {children}

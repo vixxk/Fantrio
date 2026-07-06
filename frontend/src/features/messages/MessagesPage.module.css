@@ -1906,7 +1906,6 @@
     background: #000000 !important;
     border: none !important;
     padding: 1.25rem 1rem !important;
-    padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important;
   }
 
   .chatsTitle {
@@ -1939,5 +1938,26 @@
 
   .convPreviewText {
     font-size: 0.72rem;
+  }
+}
+
+.bubbleSelected, .paywallSelected {
+  position: relative;
+  outline: 2px solid #7e00f3 !important;
+  outline-offset: 2px;
+  box-shadow: 0 0 15px rgba(126, 0, 243, 0.6) !important;
+  animation: pulseHighlight 1.5s ease-in-out infinite alternate;
+  transform: scale(1.02);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+@keyframes pulseHighlight {
+  0% {
+    box-shadow: 0 0 8px rgba(126, 0, 243, 0.4);
+    outline-color: rgba(126, 0, 243, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(126, 0, 243, 0.8), 0 0 30px rgba(225, 0, 117, 0.4);
+    outline-color: rgba(225, 0, 117, 0.8);
   }
 }

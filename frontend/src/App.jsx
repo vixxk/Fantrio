@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Sidebar } from './features/sidebar/Sidebar';
 import { Header } from './features/header/Header';
@@ -20,32 +20,8 @@ import { Menu, X, Compass, Radio, Phone, MessageSquare, User } from 'lucide-reac
 import './App.css';
 
 const AppContent = () => {
-  const { darkMode, activeTab, setActiveTab, isBottomNavVisible, setIsBottomNavVisible } = useApp();
+  const { darkMode, activeTab, setActiveTab } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const lastScrollY = useRef(0);
-  const mainRef = useRef(null);
-
-  const handleScroll = (e) => {
-    if (window.innerWidth > 768) return;
-    const currentScrollY = e.currentTarget.scrollTop;
-    
-    if (currentScrollY <= 10) {
-      setIsBottomNavVisible(true);
-    } else if (currentScrollY > lastScrollY.current) {
-      setIsBottomNavVisible(false);
-    } else {
-      setIsBottomNavVisible(true);
-    }
-    lastScrollY.current = currentScrollY;
-  };
-
-  useEffect(() => {
-    if (mainRef.current) {
-      mainRef.current.scrollTop = 0;
-    }
-    setIsBottomNavVisible(true);
-    lastScrollY.current = 0;
-  }, [activeTab, setIsBottomNavVisible]);
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -160,17 +136,13 @@ const AppContent = () => {
           <Header onMenuToggle={() => setMobileMenuOpen(true)} />
         </div>
 
-        <main 
-          ref={mainRef}
-          onScroll={handleScroll}
-          className={`scrollableContent ${activeTab === 'Messages' ? 'noScroll' : ''}`}
-        >
+        <main className={`scrollableContent ${activeTab === 'Messages' ? 'noScroll' : ''}`}>
           {renderTabContent()}
         </main>
       </div>
 
       {/* Mobile Bottom Navigation Bar */}
-      <nav className={`mobileBottomNav ${!isBottomNavVisible ? 'mobileBottomNavHidden' : ''}`}>
+      <nav className="mobileBottomNav">
         <button 
           className={`bottomNavItem ${activeTab === 'Discover Feed' ? 'bottomActive' : ''}`}
           onClick={() => setActiveTab('Discover Feed')}

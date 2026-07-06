@@ -377,10 +377,22 @@ const INITIAL_MESSAGES = [
   }
 ];
 
+const parseMessagesPath = (pathname) => {
+  if (!pathname.startsWith('/messages')) {
+    return { convId: null, msgId: null };
+  }
+  const parts = pathname.split('/').filter(Boolean);
+  const convId = parts[1] || null;
+  const msgId = parts[2] || null;
+  return { convId, msgId };
+};
+
 export const MessagesPage = () => {
-  const { darkMode, balance, addCoins, setActiveTab, setIsBottomNavVisible } = useApp();
+  const { darkMode, balance, addCoins, setActiveTab, currentPath, navigateTo } = useApp();
   const [conversations, setConversations] = useState(INITIAL_CONVERSATIONS);
-  const [selectedConvId, setSelectedConvId] = useState(null); // Default: No message selected first
+  
+  const { convId: selectedConvId, msgId: selectedMsgId } = parseMessagesPath(currentPath);
+
   const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showArchived, setShowArchived] = useState(false);
@@ -397,40 +409,13 @@ export const MessagesPage = () => {
   const [inputText, setInputText] = useState('');
   const [showTipModal, setShowTipModal] = useState(false);
   const [tipAmount, setTipAmount] = useState(50);
-  const [mobileView, setMobileView] = useState('list');
+  const [mobileView, setMobileView] = useState(() => {
+    const { convId } = parseMessagesPath(window.location.pathname);
+    return convId ? 'chat' : 'list';
+  });
   const [showMenu, setShowMenu] = useState(false);
   const messagesEndRef = useRef(null);
   const menuRef = useRef(null);
-  const conversationsScrollY = useRef(0);
-
-  useEffect(() => {
-    if (window.innerWidth <= 768) {
-      if (mobileView === 'chat' || mobileView === 'profile') {
-        setIsBottomNavVisible(false);
-      } else {
-        setIsBottomNavVisible(true);
-      }
-    }
-  }, [mobileView, setIsBottomNavVisible]);
-
-  useEffect(() => {
-    return () => {
-      setIsBottomNavVisible(true);
-    };
-  }, [setIsBottomNavVisible]);
-
-  const handleConversationsScroll = (e) => {
-    if (window.innerWidth > 768) return;
-    const currentScrollY = e.currentTarget.scrollTop;
-    if (currentScrollY <= 10) {
-      setIsBottomNavVisible(true);
-    } else if (currentScrollY > conversationsScrollY.current) {
-      setIsBottomNavVisible(false);
-    } else {
-      setIsBottomNavVisible(true);
-    }
-    conversationsScrollY.current = currentScrollY;
-  };
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
@@ -453,6 +438,39 @@ export const MessagesPage = () => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [selectedConvId, currentMessages]);
+
+  useEffect(() => {
+    if (selectedConvId) {
+      if (mobileView === 'list') {
+        setMobileView('chat');
+      }
+    } else {
+      setMobileView('list');
+    }
+  }, [selectedConvId]);
+
+  const selectMessage = (msgId) => {
+    if (selectedConvId) {
+      if (selectedMsgId === msgId) {
+        navigateTo(`/messages/${selectedConvId}`);
+      } else {
+        navigateTo(`/messages/${selectedConvId}/${msgId}`);
+      }
+    }
+  };
+
+  // Scroll selected message into view when it is set or changes
+  useEffect(() => {
+    if (selectedMsgId) {
+      const timer = setTimeout(() => {
+        const msgElement = document.getElementById(selectedMsgId);
+        if (msgElement) {
+          msgElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [selectedMsgId]);
 
   // Filter conversations
   const conversationsToFilter = showArchived ? ARCHIVED_CONVERSATIONS : conversations;
@@ -560,7 +578,7 @@ export const MessagesPage = () => {
                 className={`${styles.archiveHeaderBtn} ${showArchived ? styles.archiveHeaderActive : ''}`} 
                 onClick={() => {
                   setShowArchived(!showArchived);
-                  setSelectedConvId(null);
+                  navigateTo('/messages');
                 }}
                 title={showArchived ? "Back to Messages" : "Archived Chats"}
               >
@@ -607,7 +625,7 @@ export const MessagesPage = () => {
           </div>
 
           {/* Conversations List */}
-          <div className={styles.conversationsList} onScroll={handleConversationsScroll}>
+          <div className={styles.conversationsList}>
             {filteredConversations.map((conv) => {
               const isSelected = conv.id === selectedConvId;
               return (
@@ -615,7 +633,7 @@ export const MessagesPage = () => {
                   key={conv.id}
                   className={`${styles.convItem} ${isSelected ? styles.convSelected : ''}`}
                   onClick={() => {
-                    setSelectedConvId(conv.id);
+                    navigateTo(`/messages/${conv.id}`);
                     setMobileView('chat');
                   }}
                 >
@@ -660,7 +678,10 @@ export const MessagesPage = () => {
                   <button 
                     type="button" 
                     className={styles.mobileBackBtn} 
-                    onClick={() => setMobileView('list')}
+                    onClick={() => {
+                      setMobileView('list');
+                      navigateTo('/messages');
+                    }}
                   >
                     <ChevronLeft size={24} />
                   </button>
@@ -783,8 +804,14 @@ export const MessagesPage = () => {
 
                   if (msg.isPaywall) {
                     return (
-                      <div key={msg.id} className={`${styles.msgRow} ${styles.msgRowLeft}`}>
-                        <div className={styles.paywallWrapper}>
+                      <div 
+                        key={msg.id} 
+                        id={msg.id}
+                        className={`${styles.msgRow} ${styles.msgRowLeft}`}
+                        onClick={() => selectMessage(msg.id)}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <div className={`${styles.paywallWrapper} ${selectedMsgId === msg.id ? styles.paywallSelected : ''}`}>
                           <span className={styles.paywallNoticeTitle}>{msg.title}</span>
                           
                           <div className={styles.paywallCard}>
@@ -812,7 +839,10 @@ export const MessagesPage = () => {
                               </div>
                               <button 
                                 className={styles.unlockBtn}
-                                onClick={() => handleUnlockMedia(msg.id, msg.coinPrice)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleUnlockMedia(msg.id, msg.coinPrice);
+                                }}
                               >
                                 Unlock
                               </button>
@@ -828,8 +858,14 @@ export const MessagesPage = () => {
                   }
 
                   return (
-                    <div key={msg.id} className={`${styles.msgRow} ${isUser ? styles.msgRowRight : styles.msgRowLeft}`}>
-                      <div className={`${styles.msgBubble} ${isUser ? styles.bubbleUser : styles.bubbleCreator} ${msg.isTip ? styles.bubbleTip : ''}`}>
+                    <div 
+                      key={msg.id} 
+                      id={msg.id}
+                      className={`${styles.msgRow} ${isUser ? styles.msgRowRight : styles.msgRowLeft}`}
+                      onClick={() => selectMessage(msg.id)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className={`${styles.msgBubble} ${isUser ? styles.bubbleUser : styles.bubbleCreator} ${msg.isTip ? styles.bubbleTip : ''} ${selectedMsgId === msg.id ? styles.bubbleSelected : ''}`}>
                         <p className={styles.msgText}>{msg.text}</p>
                       </div>
                     </div>
