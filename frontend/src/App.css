@@ -71,14 +71,15 @@ html, body, #root {
 }
 
 .centerContent {
-  width: 72%;
+  flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .rightSidebarContainer {
-  width: 28%;
-  min-width: 290px;
+  width: 24%;
+  min-width: 250px;
   position: sticky;
   top: 0;
   height: calc(100vh - 120px);

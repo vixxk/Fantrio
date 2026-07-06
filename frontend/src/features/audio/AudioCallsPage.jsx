@@ -498,9 +498,15 @@ export const AudioCallsPage = () => {
 
           {/* Creators Grid */}
           {loading ? (
-            <div className={styles.loaderContainer}>
-              <div className={styles.spinner}></div>
-              <p>Finding available creators...</p>
+            <div className={styles.creatorsGrid}>
+              {Array.from({ length: 8 }).map((_, idx) => (
+                <div key={idx} className="skeleton-card" style={{ height: '350px' }}>
+                  <div className="skeleton-box skeleton-media" style={{ height: '180px', marginTop: 0, borderRadius: '8px' }} />
+                  <div className="skeleton-box skeleton-title" style={{ width: '120px' }} />
+                  <div className="skeleton-box skeleton-subtitle" style={{ width: '80px' }} />
+                  <div className="skeleton-box skeleton-content-line" style={{ height: '35px', marginTop: 'auto' }} />
+                </div>
+              ))}
             </div>
           ) : creators.length === 0 ? (
             <div className={styles.emptyContainer}>

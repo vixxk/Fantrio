@@ -19,7 +19,7 @@ const MOCK_POSTS = [
   {
     _id: 'mock-post-1',
     creatorId: {
-      _id: '64b1f3c30a84e24cf8f83001',
+      _id: 'creator-savannah',
       avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80',
       displayName: 'Savannah Nguyen',
       isVerifiedBadge: true,
@@ -56,7 +56,7 @@ const MOCK_POSTS = [
   {
     _id: 'mock-post-2',
     creatorId: {
-      _id: '64b1f3c30a84e24cf8f83002',
+      _id: 'creator-leslie',
       avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
       displayName: 'Leslie Alexander',
       isVerifiedBadge: true,
@@ -89,7 +89,7 @@ const MOCK_POSTS = [
   {
     _id: 'mock-post-3',
     creatorId: {
-      _id: '64b1f3c30a84e24cf8f83003',
+      _id: 'creator-kristin',
       avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80',
       displayName: 'Kristin Watson',
       isVerifiedBadge: true,
@@ -115,11 +115,11 @@ const MOCK_POSTS = [
   {
     _id: 'mock-post-4',
     creatorId: {
-      _id: '64b1f3c30a84e24cf8f83004',
+      _id: 'creator-jenny',
       avatarUrl: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=150&q=80',
       displayName: 'Jenny Wilson',
       isVerifiedBadge: false,
-      username: 'jenny_wilson'
+      username: 'jenny_wil_mock'
     },
     postType: 'ppv',
     hasAccess: false,
@@ -142,7 +142,7 @@ const MOCK_POSTS = [
   {
     _id: 'mock-post-5',
     creatorId: {
-      _id: '64b1f3c30a84e24cf8f83005',
+      _id: 'creator-dianne',
       avatarUrl: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=150&q=80',
       displayName: 'Dianne Russell',
       isVerifiedBadge: true,
@@ -163,6 +163,149 @@ const MOCK_POSTS = [
       }
     ],
     sharesCount: 45
+  },
+  {
+    _id: 'mock-post-6',
+    creatorId: {
+      _id: 'creator-savannah',
+      avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80',
+      displayName: 'Savannah Nguyen',
+      isVerifiedBadge: true,
+      username: 'savannah_n'
+    },
+    postType: 'free',
+    hasAccess: true,
+    content: 'Just dropped a brand new vlog behind-the-scenes of the summer collection shoot! Check it out below! 🌴✨',
+    media: [
+      {
+        _id: 'media-6',
+        type: 'video',
+        url: 'https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-sign-smiling-and-dancing-34360-large.mp4',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=800&q=80'
+      }
+    ],
+    likesCount: 512,
+    isLiked: false,
+    commentsCount: 3,
+    comments: [
+      {
+        _id: 'comment-6-1',
+        text: 'Love the aesthetic of this! 💖',
+        userId: { displayName: 'Emily Watson', avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=100&q=80' }
+      }
+    ],
+    sharesCount: 89
+  },
+  {
+    _id: 'mock-post-7',
+    creatorId: {
+      _id: 'creator-leslie',
+      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+      displayName: 'Leslie Alexander',
+      isVerifiedBadge: true,
+      username: 'leslie_alex'
+    },
+    postType: 'ppv',
+    hasAccess: false,
+    coinPrice: 40,
+    content: 'My favorite photo from the sunset rooftop shoot yesterday. Unlock to see the full high-res unblurred image! 🌅🍷',
+    media: [
+      {
+        _id: 'media-7',
+        type: 'image',
+        url: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80'
+      }
+    ],
+    likesCount: 198,
+    isLiked: false,
+    commentsCount: 2,
+    comments: [],
+    sharesCount: 15
+  },
+  {
+    _id: 'mock-post-8',
+    creatorId: {
+      _id: 'creator-kristin',
+      avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80',
+      displayName: 'Kristin Watson',
+      isVerifiedBadge: true,
+      username: 'kristin_w'
+    },
+    postType: 'free',
+    hasAccess: true,
+    content: 'Writing some acoustic melodies today. Here is a sneak peek at the new song lyrics: "Under the starlight, we found our way back home..." 💫🎵 Let me know what you think!',
+    media: [],
+    likesCount: 88,
+    isLiked: false,
+    commentsCount: 1,
+    comments: [
+      {
+        _id: 'comment-8-1',
+        text: 'Can\'t wait for the album release! 😭',
+        userId: { displayName: 'Cody Fisher', avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80' }
+      }
+    ],
+    sharesCount: 8
+  },
+  {
+    _id: 'mock-post-9',
+    creatorId: {
+      _id: 'creator-jenny',
+      avatarUrl: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=150&q=80',
+      displayName: 'Jenny Wilson',
+      isVerifiedBadge: false,
+      username: 'jenny_wilson'
+    },
+    postType: 'ppv',
+    hasAccess: false,
+    coinPrice: 20,
+    content: 'Unlock to hear my exclusive voice note check-in where I answer questions from my VIP subscribers! 🎙️💬',
+    media: [
+      {
+        _id: 'media-9',
+        type: 'audio',
+        url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=300&q=80'
+      }
+    ],
+    likesCount: 125,
+    isLiked: false,
+    commentsCount: 0,
+    comments: [],
+    sharesCount: 11
+  },
+  {
+    _id: 'mock-post-10',
+    creatorId: {
+      _id: 'creator-dianne',
+      avatarUrl: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=150&q=80',
+      displayName: 'Dianne Russell',
+      isVerifiedBadge: true,
+      username: 'dianne_r'
+    },
+    postType: 'free',
+    hasAccess: true,
+    content: 'Taking a quick coffee break between photoshoot sets! ☕✨ What are you all up to today?',
+    media: [
+      {
+        _id: 'media-10',
+        type: 'image',
+        url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80'
+      }
+    ],
+    likesCount: 242,
+    isLiked: false,
+    commentsCount: 4,
+    comments: [
+      {
+        _id: 'comment-10-1',
+        text: 'So beautiful, wish I was there!',
+        userId: { displayName: 'Guy Hawkins', avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80' }
+      }
+    ],
+    sharesCount: 30
   }
 ];
 
@@ -182,12 +325,21 @@ export const Feed = () => {
   const fetchPosts = () => {
     setLoading(true);
     const stored = localStorage.getItem('fantrio_mock_posts');
+    let loadedPosts = MOCK_POSTS;
     if (stored) {
-      setPosts(JSON.parse(stored));
+      const parsed = JSON.parse(stored);
+      const merged = [...parsed];
+      MOCK_POSTS.forEach(mp => {
+        if (!merged.find(p => p._id === mp._id)) {
+          merged.push(mp);
+        }
+      });
+      loadedPosts = merged;
+      localStorage.setItem('fantrio_mock_posts', JSON.stringify(merged));
     } else {
-      setPosts(MOCK_POSTS);
       localStorage.setItem('fantrio_mock_posts', JSON.stringify(MOCK_POSTS));
     }
+    setPosts(loadedPosts);
     setLoading(false);
   };
 
@@ -329,9 +481,23 @@ export const Feed = () => {
 
   if (loading) {
     return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.spinner}></div>
-        <p>Loading your discover feed...</p>
+      <div className={`${styles.feedContainer} ${darkMode ? styles.dark : styles.light}`} style={{ padding: '2rem 0' }}>
+        <div className={styles.postsList}>
+          {Array.from({ length: 3 }).map((_, idx) => (
+            <div key={idx} className="skeleton-card">
+              <div className="skeleton-header">
+                <div className="skeleton-box skeleton-avatar" />
+                <div>
+                  <div className="skeleton-box skeleton-title" />
+                  <div className="skeleton-box skeleton-subtitle" />
+                </div>
+              </div>
+              <div className="skeleton-box skeleton-content-line" />
+              <div className="skeleton-box skeleton-content-line short" />
+              <div className="skeleton-box skeleton-media" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

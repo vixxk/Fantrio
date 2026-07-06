@@ -239,9 +239,17 @@ export const MorePage = () => {
   const renderSubViewContent = () => {
     if (loading && subView !== 'features') {
       return (
-        <div className={styles.loadingWrapper}>
-          <div className={styles.spinner}></div>
-          <p>Loading section details...</p>
+        <div className={styles.subPageContainer} style={{ width: '100%' }}>
+          <div className="skeleton-card" style={{ height: '60px', padding: '1rem', marginBottom: '1.5rem' }}>
+            <div className="skeleton-box skeleton-title" style={{ width: '200px', height: '100%' }} />
+          </div>
+          {Array.from({ length: 3 }).map((_, idx) => (
+            <div key={idx} className="skeleton-card" style={{ padding: '1.2rem', marginBottom: '1rem', gap: '0.8rem' }}>
+              <div className="skeleton-box skeleton-title" style={{ width: '150px' }} />
+              <div className="skeleton-box skeleton-content-line" />
+              <div className="skeleton-box skeleton-content-line short" />
+            </div>
+          ))}
         </div>
       );
     }

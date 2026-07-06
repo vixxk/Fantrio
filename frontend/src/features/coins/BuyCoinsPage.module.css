@@ -12,19 +12,18 @@
 }
 
 .buyCoinsShell {
-  display: grid;
-  grid-template-columns: 1fr 28%;
-  gap: 2.5%;
-  max-width: 100%;
+  display: flex;
+  gap: 2rem;
   width: 100%;
-  margin: 0;
 }
 
 /* ================= MAIN LEFT SECTION ================= */
 .mainSection {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  min-width: 0;
 }
 
 .headerSection {
@@ -352,6 +351,8 @@
 
 /* ================= RIGHT SIDEBAR ================= */
 .rightSidebar {
+  width: 24%;
+  min-width: 250px;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -722,7 +723,7 @@
 /* ================= RESPONSIVE DESIGN ================= */
 @media (max-width: 1200px) {
   .buyCoinsShell {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 
   .coinGrid {
@@ -730,6 +731,7 @@
   }
 
   .rightSidebar {
+    width: 100%;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
   }

@@ -71,7 +71,7 @@ export const SettingsPage = () => {
     },
     {
       id: 'report',
-      Icon: AlertOctagon,
+      iconUrl: '/report.png',
       title: 'Report Problem',
       desc: 'Report content and behaviour',
     },
@@ -202,7 +202,11 @@ export const SettingsPage = () => {
                 >
                   <div className={styles.helpLinkLeft}>
                     <div className={styles.helpLinkIconWrap}>
-                      <link.Icon className={styles.helpLinkIcon} size={18} />
+                      {link.iconUrl ? (
+                        <img src={link.iconUrl} alt={link.title} style={{ width: '18px', height: '18px', objectFit: 'contain' }} />
+                      ) : (
+                        <link.Icon className={styles.helpLinkIcon} size={18} />
+                      )}
                     </div>
                     <div className={styles.helpLinkTextCol}>
                       <h4 className={styles.helpLinkTitle}>{link.title}</h4>

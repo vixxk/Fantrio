@@ -334,9 +334,21 @@ export const SubscriptionsPage = () => {
 
         {/* Subscriptions Display Grid/List */}
         {loading ? (
-          <div className={styles.loaderContainer}>
-            <div className={styles.spinner} />
-            <p>Loading your subscriptions...</p>
+          <div className={styles.subscriptionsGrid}>
+            {Array.from({ length: 4 }).map((_, idx) => (
+              <div key={idx} className="skeleton-card" style={{ height: '350px' }}>
+                <div className="skeleton-header" style={{ justifyContent: 'center' }}>
+                  <div className="skeleton-box skeleton-avatar" style={{ width: '80px', height: '80px' }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                  <div className="skeleton-box skeleton-title" style={{ width: '120px' }} />
+                  <div className="skeleton-box skeleton-subtitle" style={{ width: '80px' }} />
+                </div>
+                <div className="skeleton-box skeleton-content-line" style={{ height: '20px' }} />
+                <div className="skeleton-box skeleton-content-line" style={{ height: '20px' }} />
+                <div className="skeleton-box skeleton-media" style={{ height: '40px', marginTop: 'auto' }} />
+              </div>
+            ))}
           </div>
         ) : paginatedList.length === 0 ? (
           <div className={styles.emptyContainer}>

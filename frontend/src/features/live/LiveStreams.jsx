@@ -13,7 +13,7 @@ export const LiveStreams = () => {
       try {
         const res = await api.get('/creators/live');
         if (res.status === 'success') {
-          setStreams(res.liveStreams);
+          setStreams(res.liveStreams || []);
         }
       } catch (err) {
         console.error('Failed to fetch streams from backend:', err);
@@ -105,7 +105,7 @@ export const LiveStreams = () => {
     fetchStreams();
   }, []);
 
-  const dataList = streams.length > 0 ? streams : [];
+  const dataList = (streams && streams.length > 0) ? streams : [];
 
   return (
     <section className={`${styles.liveSection} ${darkMode ? styles.dark : styles.light}`}>

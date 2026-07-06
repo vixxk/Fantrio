@@ -677,7 +677,8 @@
 
 /* Sidebar Section Styling */
 .sidebarSection {
-  width: 320px;
+  width: 24%;
+  min-width: 250px;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;

@@ -568,9 +568,21 @@ export const AllCreators = () => {
 
           {/* Creators display container */}
           {loading ? (
-            <div className={styles.loadingContainer}>
-              <RefreshCw className={styles.spinner} size={32} />
-              <p>Loading amazing creators...</p>
+            <div className={viewMode === 'grid' ? styles.creatorsGrid : styles.creatorsList}>
+              {Array.from({ length: 8 }).map((_, idx) => (
+                <div key={idx} className="skeleton-card" style={{ height: '320px' }}>
+                  <div className="skeleton-box skeleton-media" style={{ height: '140px', marginTop: 0 }} />
+                  <div className="skeleton-header">
+                    <div className="skeleton-box skeleton-avatar" style={{ width: '40px', height: '40px' }} />
+                    <div>
+                      <div className="skeleton-box skeleton-title" style={{ width: '120px' }} />
+                      <div className="skeleton-box skeleton-subtitle" style={{ width: '80px' }} />
+                    </div>
+                  </div>
+                  <div className="skeleton-box skeleton-content-line" />
+                  <div className="skeleton-box skeleton-content-line short" />
+                </div>
+              ))}
             </div>
           ) : creators.length === 0 ? (
             <div className={styles.emptyContainer}>

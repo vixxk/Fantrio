@@ -79,7 +79,13 @@ export const LiveStreamsPage = () => {
       const res = await api.get(`/creators/live?${queryParams.toString()}`);
       if (res.status === 'success') {
         setAllStreams(res.liveStreams || []);
-        setLeaderboard(res.leaderboard || []);
+        const mappedLeaderboard = (res.leaderboard || []).slice(0, 5).map((c, idx) => ({
+          rank: idx + 1,
+          name: c.displayName || c.name || 'User',
+          avatarUrl: c.avatarUrl,
+          spentCoins: c.coinsEarned || c.spentCoins || '1,000'
+        }));
+        setLeaderboard(mappedLeaderboard);
       }
     } catch (err) {
       console.error('Failed to load live streams:', err);
@@ -148,7 +154,8 @@ export const LiveStreamsPage = () => {
         { rank: 1, name: 'Alex King', avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80', spentCoins: '132.67' },
         { rank: 2, name: 'Jane Cooper', avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80', spentCoins: '132.67' },
         { rank: 3, name: 'Robert Fox', avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80', spentCoins: '132.67' },
-        { rank: 4, name: 'Jacob Jones', avatarUrl: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=100&q=80', spentCoins: '132.67' }
+        { rank: 4, name: 'Jacob Jones', avatarUrl: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=100&q=80', spentCoins: '132.67' },
+        { rank: 5, name: 'Emily Smith', avatarUrl: 'https://images.unsplash.com/photo-1554151228-14d9def656e4?auto=format&fit=crop&w=100&q=80', spentCoins: '132.67' }
       ]);
     } finally {
       setLoading(false);
@@ -257,9 +264,12 @@ export const LiveStreamsPage = () => {
 
           {/* Main Grid */}
           {loading ? (
-            <div className={styles.loadingContainer}>
-              <div className={styles.spinner}></div>
-              <p>Loading active streams...</p>
+            <div className={styles.streamsGrid}>
+              {Array.from({ length: 6 }).map((_, idx) => (
+                <div key={idx} className="skeleton-card" style={{ height: '300px', padding: 0 }}>
+                  <div className="skeleton-box skeleton-media" style={{ height: '100%', marginTop: 0, borderRadius: '12px' }} />
+                </div>
+              ))}
             </div>
           ) : streams.length === 0 ? (
             <div className={styles.emptyContainer}>
