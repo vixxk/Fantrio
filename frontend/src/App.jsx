@@ -195,7 +195,7 @@ const AppContent = () => {
       </div>
 
       {/* Mobile Bottom Navigation Bar */}
-      <nav className={`mobileBottomNav ${(!showBottomNav || isChatOpen) ? 'bottomNavHidden' : ''}`}>
+      <nav className={`mobileBottomNav ${(!showBottomNav || isChatOpen || mobileMenuOpen) ? 'bottomNavHidden' : ''}`}>
         <button 
           className={`bottomNavItem ${activeTab === 'Discover Feed' ? 'bottomActive' : ''}`}
           onClick={() => setActiveTab('Discover Feed')}
