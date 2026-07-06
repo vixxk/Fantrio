@@ -5,7 +5,7 @@ import { Eye, BadgeCheck } from 'lucide-react';
 import styles from './LiveStreams.module.css';
 
 export const LiveStreams = () => {
-  const { darkMode } = useApp();
+  const { darkMode, setActiveTab } = useApp();
   const [streams, setStreams] = useState([]);
 
   useEffect(() => {
@@ -111,7 +111,7 @@ export const LiveStreams = () => {
     <section className={`${styles.liveSection} ${darkMode ? styles.dark : styles.light}`}>
       <div className={styles.liveHeader}>
         <h2 className={styles.sectionTitle}>Live Now</h2>
-        <button className={styles.viewAllButton}>View All Live</button>
+        <button className={styles.viewAllButton} onClick={() => setActiveTab('Live Streams')}>View All Live</button>
       </div>
 
       <div className={styles.streamsScrollContainer}>

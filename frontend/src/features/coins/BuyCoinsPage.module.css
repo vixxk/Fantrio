@@ -739,7 +739,20 @@
 
 @media (max-width: 768px) {
   .buyCoinsContainer {
-    padding: 0;
+    padding: 0 0 90px 0 !important;
+  }
+  
+  .title {
+    font-size: 1.25rem !important;
+  }
+  
+  .subtitle {
+    font-size: 0.75rem !important;
+  }
+  
+  .headerCoinIcon {
+    width: 20px !important;
+    height: 20px !important;
   }
 
   .offerBanner {
@@ -749,17 +762,146 @@
   }
 
   .coinGrid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.85rem;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+  
+  .coinCard {
+    padding: 0.5rem !important;
+    border-radius: 12px !important;
+  }
+  
+  .imgWrapper {
+    width: 60px !important;
+    height: 60px !important;
+    margin-top: 0.15rem !important;
+    margin-bottom: 0.35rem !important;
+  }
+  
+  .packTitle {
+    font-size: 0.78rem !important;
+  }
+  
+  .priceRow {
+    gap: 0.3rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .oldPrice {
+    font-size: 0.65rem !important;
+  }
+  
+  .newPrice {
+    font-size: 0.75rem !important;
+  }
+  
+  .buyBtn, .popularCard .buyBtn {
+    width: 100% !important;
+    font-size: 0.7rem !important;
+    padding: 0.35rem 0 !important;
+    border-radius: 6px !important;
+    margin-top: auto !important;
+  }
+  
+  .popularBadge {
+    top: -10px !important;
+    font-size: 0.55rem !important;
+    padding: 0.15rem 0.4rem !important;
   }
 
   .rightSidebar {
     grid-template-columns: 1fr;
+    gap: 0.75rem !important;
   }
-}
-
-@media (max-width: 480px) {
-  .coinGrid {
-    grid-template-columns: 1fr;
+  
+  .rightSidebar .widgetCard:nth-child(1),
+  .rightSidebar .widgetCard:nth-child(2) {
+    display: none !important;
+  }
+  
+  .widgetCard {
+    padding: 0.85rem !important;
+    border-radius: 12px !important;
+  }
+  
+  .widgetTitle {
+    font-size: 0.9rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .walletCoinsText {
+    font-size: 1.05rem !important;
+  }
+  
+  .transHistoryBtn {
+    font-size: 0.78rem !important;
+    padding: 0.5rem 0 !important;
+    border-radius: 8px !important;
+  }
+  
+  .whyList {
+    gap: 0.65rem !important;
+  }
+  
+  .whyItem {
+    font-size: 0.75rem !important;
+    gap: 0.5rem !important;
+  }
+  
+  .whyIconImg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  
+  .promoInput {
+    font-size: 0.75rem !important;
+  }
+  
+  .redeemBtn {
+    font-size: 0.75rem !important;
+    padding: 0.4rem 0.8rem !important;
+  }
+  
+  .yourCodesRow {
+    font-size: 0.75rem !important;
+  }
+  
+  .safeSecureCard {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+    text-align: left !important;
+  }
+  
+  .safeTextCol {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+  
+  .safeIconImg {
+    width: 32px !important;
+    height: 32px !important;
+    margin-bottom: 0 !important;
+    margin-top: 0.15rem !important;
+    flex-shrink: 0 !important;
+  }
+  
+  .safeTitle {
+    font-size: 0.9rem !important;
+  }
+  
+  .safeSubtext {
+    font-size: 0.75rem !important;
+  }
+  
+  .paymentFooter {
+    display: none !important;
+  }
+  
+  .paymentNotice {
+    display: none !important;
   }
 }

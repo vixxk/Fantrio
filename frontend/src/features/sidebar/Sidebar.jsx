@@ -13,11 +13,12 @@ import {
   LayoutGrid, 
   LogOut, 
   Moon, 
-  Sun 
+  Sun,
+  Menu
 } from 'lucide-react';
 import styles from './Sidebar.module.css';
 
-export const Sidebar = () => {
+export const Sidebar = ({ onClose }) => {
   const { 
     balance, 
     activeTab, 
@@ -55,11 +56,18 @@ export const Sidebar = () => {
 
   return (
     <aside className={`${styles.sidebar} ${darkMode ? styles.dark : styles.light}`}>
-      <div className={styles.logoContainer} onClick={() => setActiveTab('Discover Feed')}>
-        <img src="/Fantrio Logo.png" alt="Fantrio Logo" className={styles.logoIcon} />
-        <span className={styles.logoText}>
-          Fant<span className={styles.logoTextPink}>rio</span>
-        </span>
+      <div className={styles.logoContainer}>
+        <div className={styles.logoInfo} onClick={() => { setActiveTab('Discover Feed'); if (onClose) onClose(); }}>
+          <img src="/Fantrio Logo.png" alt="Fantrio Logo" className={styles.logoIcon} />
+          <span className={styles.logoText}>
+            Fant<span className={styles.logoTextPink}>rio</span>
+          </span>
+        </div>
+        {onClose && (
+          <button className={styles.closeMenuBtn} onClick={onClose}>
+            <Menu size={20} />
+          </button>
+        )}
       </div>
 
       <nav className={styles.navMenu}>

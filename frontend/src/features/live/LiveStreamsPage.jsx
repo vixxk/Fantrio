@@ -41,6 +41,7 @@ export const LiveStreamsPage = () => {
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [sidebarSortOpen, setSidebarSortOpen] = useState(false);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const toggleDropdown = (name) => {
     setSortOpen(name === 'sort' ? !sortOpen : false);
@@ -200,31 +201,42 @@ export const LiveStreamsPage = () => {
               <p className={styles.pageSubtitle}>Join live now and chat with your favourite creators in real time.</p>
             </div>
 
-            {/* Sort Dropdown */}
-            <div className={styles.sortWrapper}>
+            {/* Sort & Filter Controls Row */}
+            <div className={styles.controlsRow}>
+              {/* Sort Dropdown */}
+              <div className={styles.sortWrapper}>
+                <button 
+                  className={styles.sortButton}
+                  onClick={() => toggleDropdown('sort')}
+                >
+                  Sort By: {sortBy === 'Viewers High To Low' ? 'High to Low' : 'Low to High'}
+                  <ChevronDown size={14} />
+                </button>
+                {sortOpen && (
+                  <div className={styles.sortDropdown}>
+                    {sortOptions.map((opt) => (
+                      <button
+                        key={opt}
+                        onClick={() => {
+                          setSortBy(opt);
+                          setSortOpen(false);
+                        }}
+                        className={sortBy === opt ? styles.activeSortOption : ''}
+                      >
+                        {opt === 'Viewers High To Low' ? 'Viewers: High to Low' : 'Viewers: Low to High'}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Mobile Filter Button */}
               <button 
-                className={styles.sortButton}
-                onClick={() => toggleDropdown('sort')}
+                className={styles.mobileFilterToggleBtn}
+                onClick={() => setMobileFiltersOpen(true)}
               >
-                Sort By Viewers: {sortBy === 'Viewers High To Low' ? 'High to Low' : 'Low to High'}
-                <ChevronDown size={14} />
+                Filters
               </button>
-              {sortOpen && (
-                <div className={styles.sortDropdown}>
-                  {sortOptions.map((opt) => (
-                    <button
-                      key={opt}
-                      onClick={() => {
-                        setSortBy(opt);
-                        setSortOpen(false);
-                      }}
-                      className={sortBy === opt ? styles.activeSortOption : ''}
-                    >
-                      {opt === 'Viewers High To Low' ? 'Viewers: High to Low' : 'Viewers: Low to High'}
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
 
@@ -249,13 +261,13 @@ export const LiveStreamsPage = () => {
               <span role="img" aria-label="green dot">🟢</span> Live Now (242)
             </button>
             <button 
-              className={`${styles.pill} ${tab === 'topRated' ? styles.activePill : ''}`}
+              className={`${styles.pill} ${tab === 'topRated' ? styles.activePill : ''} ${styles.desktopOnlyPill}`}
               onClick={() => setTab('topRated')}
             >
               <span role="img" aria-label="star">⭐</span> Top Rated
             </button>
             <button 
-              className={`${styles.pill} ${tab === 'new' ? styles.activePill : ''}`}
+              className={`${styles.pill} ${tab === 'new' ? styles.activePill : ''} ${styles.desktopOnlyPill}`}
               onClick={() => setTab('new')}
             >
               New
@@ -312,7 +324,10 @@ export const LiveStreamsPage = () => {
                         <div className={styles.cardFooterBottom}>
                           <div className={styles.rateContainer}>
                             <img src="/coin.png" alt="Coin" className={styles.rateCoin} />
-                            <span>{stream.rate} Coin <span className={styles.rateLabel}>/ Min</span></span>
+                            <div className={styles.rateTextWrapper}>
+                              <span className={styles.rateValue}>{stream.rate} Coin</span>
+                              <span className={styles.rateLabel}>/ Min</span>
+                            </div>
                           </div>
                           <button className={styles.joinBtn}>Join Stream</button>
                         </div>
@@ -367,7 +382,7 @@ export const LiveStreamsPage = () => {
         {/* Right Filters & Stats Sidebar */}
         <div className={styles.rightSidebar}>
           {/* Filters Card */}
-          <div className={styles.filtersSidebar}>
+          <div className={`${styles.filtersSidebar} ${styles.desktopFiltersSidebar}`}>
             <div className={styles.filtersHeader}>
               <h3 className={styles.filtersTitle}>Filters</h3>
               <button className={styles.resetBtn} onClick={handleResetFilters}>Reset</button>
@@ -538,6 +553,146 @@ export const LiveStreamsPage = () => {
           })}
         </div>
       </div>
+
+      {/* Mobile Filters Popup Modal */}
+      {mobileFiltersOpen && (
+        <div className={styles.mobileFiltersBackdrop} onClick={() => setMobileFiltersOpen(false)}>
+          <div className={styles.mobileFiltersModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.mobileFiltersModalHeader}>
+              <h3 className={styles.mobileFiltersModalTitle}>Filters</h3>
+              <button className={styles.closeFiltersModalBtn} onClick={() => setMobileFiltersOpen(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className={styles.mobileFiltersModalBody}>
+              {/* Availability */}
+              <div className={styles.filterSection}>
+                <div className={styles.filterSectionHeader}>
+                  <h4 className={styles.filterSectionLabel}>Availability</h4>
+                  <button onClick={handleResetFilters} className={styles.mobileResetBtn}>Reset</button>
+                </div>
+                <div className={styles.checkboxesList}>
+                  <div className={styles.checkboxWrapper} onClick={() => setAvailability('all')}>
+                    <div className={`${styles.customCheckbox} ${availability === 'all' ? styles.checkboxChecked : ''}`}>
+                      <Check size={12} strokeWidth={3} />
+                    </div>
+                    <span className={styles.checkboxLabel}>All Live Streams</span>
+                  </div>
+                  <div className={styles.checkboxWrapper} onClick={() => setAvailability('live')}>
+                    <div className={`${styles.customCheckbox} ${availability === 'live' ? styles.checkboxChecked : ''}`}>
+                      <Check size={12} strokeWidth={3} />
+                    </div>
+                    <span className={styles.checkboxLabel}>
+                      <span className={styles.checkboxLabelGreenDot}></span>
+                      Live Now
+                    </span>
+                  </div>
+                  <div className={styles.checkboxWrapper} onClick={() => setAvailability('upcoming')}>
+                    <div className={`${styles.customCheckbox} ${availability === 'upcoming' ? styles.checkboxChecked : ''}`}>
+                      <Check size={12} strokeWidth={3} />
+                    </div>
+                    <span className={styles.checkboxLabel}>
+                      <span className={styles.checkboxLabelYellowDot}></span>
+                      Upcoming
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Category Dropdown */}
+              <div className={styles.filterSection}>
+                <h4 className={styles.filterSectionLabel}>Category</h4>
+                <div className={styles.dropdownWrapper}>
+                  <button className={styles.dropdownButton} onClick={() => toggleDropdown('category')}>
+                    {category}
+                    <ChevronDown size={14} />
+                  </button>
+                  {categoryOpen && (
+                    <div className={styles.dropdownMenu}>
+                      {categoriesList.map((cat) => (
+                        <button 
+                          key={cat} 
+                          onClick={() => {
+                            setCategory(cat);
+                            setCategoryOpen(false);
+                          }}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Languages Dropdown */}
+              <div className={styles.filterSection}>
+                <h4 className={styles.filterSectionLabel}>Languages</h4>
+                <div className={styles.dropdownWrapper}>
+                  <button className={styles.dropdownButton} onClick={() => toggleDropdown('language')}>
+                    {language}
+                    <ChevronDown size={14} />
+                  </button>
+                  {languageOpen && (
+                    <div className={styles.dropdownMenu}>
+                      {languagesList.map((lang) => (
+                        <button 
+                          key={lang} 
+                          onClick={() => {
+                            setLanguage(lang);
+                            setLanguageOpen(false);
+                          }}
+                        >
+                          {lang}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Sort By Dropdown */}
+              <div className={styles.filterSection}>
+                <h4 className={styles.filterSectionLabel}>Sort By</h4>
+                <div className={styles.dropdownWrapper}>
+                  <button className={styles.dropdownButton} onClick={() => toggleDropdown('sidebarSort')}>
+                    {sortBy === 'Viewers High To Low' ? 'Viewers High To Low' : 'Viewers Low To High'}
+                    <ChevronDown size={14} />
+                  </button>
+                  {sidebarSortOpen && (
+                    <div className={styles.dropdownMenu}>
+                      {sortOptions.map((opt) => (
+                        <button 
+                          key={opt} 
+                          onClick={() => {
+                            setSortBy(opt);
+                            setSidebarSortOpen(false);
+                          }}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.mobileFiltersModalFooter}>
+              <button 
+                className={styles.mobileApplyFiltersBtn} 
+                onClick={() => {
+                  loadStreams();
+                  setMobileFiltersOpen(false);
+                }}
+              >
+                Apply Filters
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

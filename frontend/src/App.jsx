@@ -107,6 +107,15 @@ const AppContent = () => {
 
   return (
     <div className={`appShell ${darkMode ? 'darkTheme' : 'lightTheme'}`}>
+      <svg width="0" height="0" style={{ position: 'absolute', pointerEvents: 'none' }}>
+        <defs>
+          <linearGradient id="activeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#e10075" />
+            <stop offset="100%" stopColor="#7e00f3" />
+          </linearGradient>
+        </defs>
+      </svg>
+
       {/* Desktop Left Sidebar */}
       <div className="desktopSidebar">
         <Sidebar />
@@ -116,12 +125,7 @@ const AppContent = () => {
       {mobileMenuOpen && (
         <div className="mobileSidebarOverlay" onClick={() => setMobileMenuOpen(false)}>
           <div className="mobileSidebarDrawer" onClick={(e) => e.stopPropagation()}>
-            <div className="mobileSidebarCloseRow">
-              <button className="closeMenuBtn" onClick={() => setMobileMenuOpen(false)}>
-                <X size={24} />
-              </button>
-            </div>
-            <Sidebar />
+            <Sidebar onClose={() => setMobileMenuOpen(false)} />
           </div>
         </div>
       )}
@@ -129,11 +133,7 @@ const AppContent = () => {
       {/* Main Content Area */}
       <div className="mainArea">
         <div className="headerWrapper">
-          {/* Mobile hamburger menu */}
-          <button className="mobileMenuToggle" onClick={() => setMobileMenuOpen(true)}>
-            <Menu size={24} />
-          </button>
-          <Header />
+          <Header onMenuToggle={() => setMobileMenuOpen(true)} />
         </div>
 
         <main className={`scrollableContent ${activeTab === 'Messages' ? 'noScroll' : ''}`}>

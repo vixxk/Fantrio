@@ -633,8 +633,10 @@ export const SubscriptionsPage = () => {
           </div>
         </div>
 
+
+
         {/* Need Help? Card */}
-        <div className={styles.sidebarCard}>
+        <div className={`${styles.sidebarCard} ${styles.safeHelpCard}`}>
           <h3 className={styles.cardTitle}>Need Help?</h3>
           <p className={styles.helpText}>We are here to help you with your subscription.</p>
           <button className={styles.contactSupportBtn}>

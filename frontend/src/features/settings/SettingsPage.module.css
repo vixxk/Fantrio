@@ -155,6 +155,14 @@
 }
 
 /* --- Support Cards Row --- */
+.desktopOnly {
+  display: grid !important;
+}
+
+.mobileOnly {
+  display: none !important;
+}
+
 .supportCardsRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -453,29 +461,105 @@
 
 @media (max-width: 768px) {
   .settingsContainer {
-    padding: 0;
+    padding: 0 0 90px 0 !important;
+  }
+
+  .feedHeader {
+    margin-bottom: 1.25rem !important;
+  }
+
+  .pageTitle {
+    font-size: 1.25rem !important;
+  }
+
+  .pageSubtitle {
+    font-size: 0.75rem !important;
+  }
+
+  .settingRow {
+    padding: 0.75rem 1rem !important;
+    border-radius: 12px !important;
+  }
+
+  .settingRowLeft {
+    gap: 0.75rem !important;
+  }
+
+  .settingTitle {
+    font-size: 0.88rem !important;
+  }
+
+  .settingDesc {
+    font-size: 0.72rem !important;
   }
 
   .supportCardsRow {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  .desktopOnly {
+    display: none !important;
+  }
+
+  .mobileOnly {
+    display: grid !important;
+  }
+
+  .supportCard {
+    padding: 0.85rem !important;
+    border-radius: 12px !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 0.45rem !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  }
+
+  .supportCardIconWrap {
+    width: 28px !important;
+    height: 28px !important;
+    background: rgba(255, 0, 127, 0.08) !important;
+  }
+
+  .supportCardTitle {
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+  }
+
+  .supportCardDesc {
+    display: none !important;
+  }
+
+  .supportBtn {
+    display: none !important;
   }
 
   .rightSidebar {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 480px) {
-  .title {
-    font-size: 1.35rem;
+    gap: 0.75rem !important;
   }
 
-  .settingRow {
-    padding: 1rem 1.15rem;
+  .helpHeroCard {
+    display: none !important;
   }
 
-  .settingIconWrap {
-    width: 36px;
-    height: 36px;
+  .helpLinksCard {
+    border-radius: 12px !important;
+    padding: 0.25rem 0 !important;
+  }
+
+  .helpLinkRow {
+    padding: 0.75rem 1rem !important;
+  }
+
+  .helpLinkTitle {
+    font-size: 0.85rem !important;
+  }
+
+  .helpLinkDesc {
+    font-size: 0.72rem !important;
   }
 }

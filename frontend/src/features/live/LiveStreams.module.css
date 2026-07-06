@@ -173,6 +173,7 @@
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
 }
 
 .joinButton:hover {
@@ -183,4 +184,66 @@
 /* Light Mode Overrides */
 .light .sectionTitle {
   color: #1a1625;
+}
+
+@media (max-width: 768px) {
+  .liveSection {
+    margin-bottom: 1.25rem;
+  }
+  
+  .sectionTitle {
+    font-size: 0.95rem;
+  }
+  
+  .viewAllButton {
+    font-size: 0.75rem;
+  }
+  
+  .streamsScroll {
+    gap: 0.6rem;
+  }
+  
+  .streamCard {
+    width: 125px;
+    height: 185px;
+    border-radius: 12px;
+  }
+  
+  .cardBackground {
+    padding: 0.4rem;
+  }
+  
+  .liveTag, .viewerBadge {
+    font-size: 0.52rem;
+    padding: 0.12rem 0.3rem;
+    border-radius: 4px;
+  }
+  
+  .viewerBadge {
+    gap: 0.15rem;
+  }
+  
+  .cardFooter {
+    gap: 0.35rem;
+  }
+  
+  .displayName {
+    font-size: 0.7rem;
+  }
+  
+  .verifiedIcon {
+    width: 9px;
+    height: 9px;
+  }
+  
+  .username {
+    font-size: 0.6rem;
+  }
+  
+  .joinButton {
+    padding: 0.35rem;
+    font-size: 0.68rem;
+    border-radius: 6px;
+    white-space: nowrap !important;
+  }
 }

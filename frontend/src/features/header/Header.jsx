@@ -1,9 +1,9 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { Search, Bell, MessageCircle, Landmark, ChevronDown, Plus } from 'lucide-react';
+import { Search, Bell, MessageCircle, Landmark, ChevronDown, Plus, Menu } from 'lucide-react';
 import styles from './Header.module.css';
 
-export const Header = () => {
+export const Header = ({ onMenuToggle }) => {
   const { user, balance, darkMode, setActiveTab } = useApp();
 
   const handleAddCoinsClick = () => {
@@ -14,6 +14,12 @@ export const Header = () => {
 
   return (
     <header className={`${styles.header} ${darkMode ? styles.dark : styles.light}`}>
+      {onMenuToggle && (
+        <button className={styles.mobileMenuToggle} onClick={onMenuToggle}>
+          <Menu size={24} />
+        </button>
+      )}
+
       <div className={styles.searchContainer}>
         <Search size={18} className={styles.searchIcon} />
         <input 

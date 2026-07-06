@@ -180,7 +180,7 @@ export const BuyCoinsPage = () => {
                   className={styles.buyBtn}
                   onClick={() => setSelectedPack(pack)}
                 >
-                  Buy Now
+                  Buy
                 </button>
               </div>
             ))}
@@ -267,12 +267,14 @@ export const BuyCoinsPage = () => {
           </div>
 
           {/* Widget 4: Safe & Secure */}
-          <div className={styles.widgetCard}>
+          <div className={`${styles.widgetCard} ${styles.safeSecureCard}`}>
             <img src="/safe.png" alt="Safe & Secure" className={styles.safeIconImg} />
-            <h3 className={styles.safeTitle}>Safe & Secure</h3>
-            <p className={styles.safeSubtext}>
-              Your payment information is 100% secure with industry standard encryption.
-            </p>
+            <div className={styles.safeTextCol}>
+              <h3 className={styles.safeTitle}>Safe & Secure</h3>
+              <p className={styles.safeSubtext}>
+                Your payment information is 100% secure with industry standard encryption.
+              </p>
+            </div>
           </div>
 
         </div>

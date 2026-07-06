@@ -1645,13 +1645,73 @@
 }
 
 @media (max-width: 768px) {
+  .container {
+    padding: 0 0 90px 0 !important;
+  }
+
+  .feedHeader {
+    margin-bottom: 1.25rem !important;
+    padding-bottom: 0.75rem !important;
+  }
+
+  .pageTitle {
+    font-size: 1.25rem !important;
+  }
+
+  .pageSubtitle {
+    font-size: 0.75rem !important;
+  }
+
   .dashboardGrid {
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  .categorySection {
+    padding: 0.85rem !important;
+    border-radius: 12px !important;
+    gap: 0.75rem !important;
+  }
+
+  .sectionHeader {
+    padding-bottom: 0.45rem !important;
+    gap: 0.5rem !important;
+  }
+
+  .sectionHeader h3 {
+    font-size: 0.88rem !important;
+  }
+
+  .sectionCards {
+    gap: 0.5rem !important;
+  }
+
+  .menuCard {
+    padding: 0.65rem 0.85rem !important;
+    border-radius: 10px !important;
+  }
+
+  .cardText {
+    margin: 0 0.75rem !important;
+    gap: 0.15rem !important;
+  }
+
+  .cardTitle {
+    font-size: 0.85rem !important;
+  }
+
+  .cardDesc {
+    font-size: 0.72rem !important;
   }
 
   .rightSidebar {
     flex-direction: column;
+    gap: 1rem !important;
+  }
+
+  .promoCard,
+  .helpCard {
+    display: none !important;
   }
 
   .referralGrid {
@@ -1661,9 +1721,5 @@
 
   .subPageContainer {
     padding: 1.25rem;
-  }
-
-  .pageTitle {
-    font-size: 1.5rem;
   }
 }

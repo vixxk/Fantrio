@@ -877,3 +877,116 @@
 .light .audioArtist {
   color: rgba(26, 22, 37, 0.55);
 }
+
+@media (max-width: 768px) {
+  .bannerCard {
+    padding: 1.2rem !important;
+    border-radius: 16px !important;
+  }
+  
+  .bannerTitle {
+    font-size: 1.2rem !important;
+  }
+  
+  .bannerSubtitle {
+    font-size: 1.2rem !important;
+  }
+  
+  .bannerText {
+    font-size: 0.8rem !important;
+    max-width: 200px !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .exploreBtn {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.8rem !important;
+    border-radius: 8px !important;
+  }
+  
+  .bannerImg {
+    max-width: 100px !important;
+  }
+  
+  .postCard {
+    padding: 1rem !important;
+    border-radius: 16px !important;
+    gap: 0.75rem !important;
+  }
+  
+  .avatar {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  
+  .displayName {
+    font-size: 0.85rem !important;
+  }
+  
+  .verifiedIcon {
+    width: 10px !important;
+    height: 10px !important;
+  }
+  
+  .username, .timestamp {
+    font-size: 0.72rem !important;
+  }
+  
+  .postCaption {
+    font-size: 0.85rem !important;
+  }
+  
+  .lockedOverlay {
+    height: 260px !important;
+  }
+  
+  .lockBox {
+    padding: 1.25rem 1rem !important;
+    border-radius: 16px !important;
+    width: 180px !important;
+  }
+  
+  .lockMsg {
+    font-size: 0.8rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .unlockBtn {
+    padding: 0.6rem 0.8rem !important;
+    font-size: 0.85rem !important;
+    border-radius: 10px !important;
+  }
+  
+  .footerActionBtn, .shareActionBtn {
+    font-size: 0.78rem !important;
+    padding: 0.3rem 0.45rem !important;
+    gap: 0.35rem !important;
+  }
+  
+  .commentAvatar {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  
+  .commentBubble {
+    padding: 0.4rem 0.65rem !important;
+  }
+  
+  .commenterName {
+    font-size: 0.7rem !important;
+  }
+  
+  .commentText {
+    font-size: 0.75rem !important;
+  }
+  
+  .commentInput {
+    padding: 0.5rem 0.85rem !important;
+    font-size: 0.8rem !important;
+  }
+  
+  .sendCommentBtn {
+    width: 30px !important;
+    height: 30px !important;
+  }
+}

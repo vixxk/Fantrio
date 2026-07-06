@@ -329,10 +329,22 @@
   object-fit: contain;
 }
 
+.rateTextWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.1;
+}
+
+.rateValue {
+  white-space: nowrap;
+}
+
 .rateLabel {
   font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.5);
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .joinBtn {
@@ -343,6 +355,7 @@
   padding: 0.45rem 0.95rem;
   font-family: inherit;
   font-size: 0.75rem;
+  white-space: nowrap;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
@@ -692,18 +705,46 @@
   object-fit: contain;
 }
 
-.categoryImgIcon[src*="asmr"] {
+.categoryImgIcon[src*="mic"],
+.categoryImgIcon[src*="music"],
+.categoryImgIcon[src*="dance"],
+.categoryImgIcon[src*="asmr"],
+.categoryImgIcon[src*="gaming"],
+.categoryImgIcon[src*="others"] {
   content: "";
   display: inline-block;
-  background: linear-gradient(135deg, #ff007f 0%, #7e00f3 100%);
-  -webkit-mask-image: url('/asmr.png');
-  mask-image: url('/asmr.png');
+  background: #ff007f !important;
   -webkit-mask-size: contain;
   mask-size: contain;
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   -webkit-mask-position: center;
   mask-position: center;
+}
+
+.categoryImgIcon[src*="mic"] {
+  -webkit-mask-image: url('/mic.png');
+  mask-image: url('/mic.png');
+}
+.categoryImgIcon[src*="music"] {
+  -webkit-mask-image: url('/music.png');
+  mask-image: url('/music.png');
+}
+.categoryImgIcon[src*="dance"] {
+  -webkit-mask-image: url('/dance.png');
+  mask-image: url('/dance.png');
+}
+.categoryImgIcon[src*="asmr"] {
+  -webkit-mask-image: url('/asmr.png');
+  mask-image: url('/asmr.png');
+}
+.categoryImgIcon[src*="gaming"] {
+  -webkit-mask-image: url('/gaming.png');
+  mask-image: url('/gaming.png');
+}
+.categoryImgIcon[src*="others"] {
+  -webkit-mask-image: url('/others.png');
+  mask-image: url('/others.png');
 }
 
 .categoryCardLabel {
@@ -1031,4 +1072,309 @@
   background: rgba(225, 0, 117, 0.04) !important;
   border-color: #ff007f !important;
   box-shadow: 0 0 12px rgba(225, 0, 117, 0.1);
+}
+
+.controlsRow {
+  display: block;
+}
+.mobileFilterToggleBtn {
+  display: none;
+}
+.desktopOnlyPill {
+  display: flex;
+}
+.mobileResetBtn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0;
+    gap: 1rem;
+  }
+  
+  .feedHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .pageTitle {
+    font-size: 1.25rem;
+  }
+  
+  .pillsRow {
+    gap: 0.4rem;
+    margin-top: 0.25rem;
+  }
+  
+  .pill {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.72rem;
+  }
+  
+  .streamsGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+  
+  .streamCard {
+    border-radius: 12px !important;
+  }
+  
+  .cardBackground {
+    padding: 0.5rem !important;
+  }
+  
+  .liveBadge, .upcomingBadge {
+    font-size: 0.55rem !important;
+    padding: 0.15rem 0.3rem !important;
+    border-radius: 4px !important;
+  }
+  
+  .viewerBadge {
+    font-size: 0.55rem !important;
+    padding: 0.15rem 0.3rem !important;
+    border-radius: 4px !important;
+    gap: 0.2rem !important;
+  }
+  
+  .cardFooter {
+    gap: 0.25rem !important;
+  }
+  
+  .displayName {
+    font-size: 0.75rem !important;
+  }
+  
+  .verifiedIcon {
+    width: 10px !important;
+    height: 10px !important;
+  }
+  
+  .bioText {
+    font-size: 0.6rem !important;
+  }
+  
+  .categoryStatus {
+    font-size: 0.6rem !important;
+    gap: 0.2rem !important;
+  }
+  
+  .statusDot {
+    width: 4px !important;
+    height: 4px !important;
+  }
+  
+  .rateContainer {
+    font-size: 0.6rem !important;
+    gap: 0.15rem !important;
+  }
+  
+  .rateCoin {
+    width: 10px !important;
+    height: 10px !important;
+  }
+  
+  .rateTextWrapper {
+    line-height: 1.0 !important;
+  }
+  
+  .rateLabel {
+    font-size: 0.55rem !important;
+  }
+  
+  .joinBtn {
+    font-size: 0.6rem !important;
+    padding: 0.3rem 0.5rem !important;
+    border-radius: 6px !important;
+    white-space: nowrap !important;
+  }
+  
+  .categoriesGrid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+  
+  .categoryCard {
+    padding: 0.6rem 0.4rem !important;
+    border-radius: 12px !important;
+    gap: 0.3rem !important;
+  }
+  
+  .categoryImgIcon {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  
+  .categoryCardLabel {
+    font-size: 0.75rem !important;
+  }
+  
+  .categoryCardLiveCount {
+    font-size: 0.62rem !important;
+  }
+  
+  .filtersSidebar, .leaderboardCard {
+    border-radius: 16px !important;
+    padding: 1rem !important;
+    gap: 1rem !important;
+  }
+  
+  .filtersTitle, .leaderboardTitle {
+    font-size: 1rem !important;
+  }
+
+  .desktopFiltersSidebar {
+    display: none !important;
+  }
+  .desktopOnlyPill {
+    display: none !important;
+  }
+  .controlsRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+  }
+  .sortWrapper {
+    flex: 1;
+  }
+  .sortButton {
+    width: 100% !important;
+    justify-content: space-between;
+  }
+  .mobileFilterToggleBtn {
+    display: block !important;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    padding: 0.6rem 1rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .light .mobileFilterToggleBtn {
+    background: rgba(26, 22, 37, 0.04);
+    border-color: rgba(26, 22, 37, 0.1);
+    color: #1a1625;
+  }
+  
+  /* Modal backdrop & container */
+  .mobileFiltersBackdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: flex-end;
+  }
+  .mobileFiltersModal {
+    background-color: #0d0c12;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    width: 100%;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s ease-out;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .light .mobileFiltersModal {
+    background-color: #ffffff;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .mobileFiltersModalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .light .mobileFiltersModalHeader {
+    border-bottom-color: rgba(0, 0, 0, 0.06);
+  }
+  .mobileFiltersModalTitle {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .light .mobileFiltersModalTitle {
+    color: #1a1625;
+  }
+  .closeFiltersModalBtn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .light .closeFiltersModalBtn {
+    color: rgba(26, 22, 37, 0.6);
+  }
+  .mobileFiltersModalBody {
+    padding: 1rem 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .filterSectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  .mobileResetBtn {
+    display: block !important;
+    background: transparent;
+    border: none;
+    background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.2s;
+  }
+  .mobileResetBtn:hover {
+    opacity: 0.8;
+  }
+  .mobileFiltersModalFooter {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    justify-content: stretch;
+  }
+  .light .mobileFiltersModalFooter {
+    border-top-color: rgba(0, 0, 0, 0.06);
+  }
+  .mobileApplyFiltersBtn {
+    width: 100%;
+    background: linear-gradient(90deg, #e10075, #7e00f3);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    padding: 0.85rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-align: center;
+  }
 }

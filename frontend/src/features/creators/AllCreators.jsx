@@ -256,6 +256,7 @@ export const AllCreators = () => {
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [countryOpen, setCountryOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const toggleDropdown = (name) => {
     setSortOpen(name === 'sort' ? !sortOpen : false);
@@ -469,22 +470,33 @@ export const AllCreators = () => {
               <p className={styles.pageSubtitle}>Discover and connect with amazing creators.</p>
             </div>
             
-            {/* Sort Dropdown */}
-            <div className={styles.sortWrapper}>
+            {/* Sort & Filter Controls Row */}
+            <div className={styles.controlsRow}>
+              {/* Sort Dropdown */}
+              <div className={styles.sortWrapper}>
+                <button 
+                  className={styles.sortButton}
+                  onClick={() => toggleDropdown('sort')}
+                >
+                  Sort By: {sortBy === 'popularity' ? 'Popularity' : sortBy === 'newest' ? 'Newest' : 'Rating'}
+                  <ChevronDown size={16} />
+                </button>
+                {sortOpen && (
+                  <div className={styles.sortDropdown}>
+                    <button onClick={() => { setSortBy('popularity'); setSortOpen(false); setPage(1); }}>Popularity</button>
+                    <button onClick={() => { setSortBy('newest'); setSortOpen(false); setPage(1); }}>Newest</button>
+                    <button onClick={() => { setSortBy('rating'); setSortOpen(false); setPage(1); }}>Rating</button>
+                  </div>
+                )}
+              </div>
+
+              {/* Mobile Filter Button */}
               <button 
-                className={styles.sortButton}
-                onClick={() => toggleDropdown('sort')}
+                className={styles.mobileFilterToggleBtn}
+                onClick={() => setMobileFiltersOpen(true)}
               >
-                Sort By: {sortBy === 'popularity' ? 'Popularity' : sortBy === 'newest' ? 'Newest' : 'Rating'}
-                <ChevronDown size={16} />
+                Filters
               </button>
-              {sortOpen && (
-                <div className={styles.sortDropdown}>
-                  <button onClick={() => { setSortBy('popularity'); setSortOpen(false); setPage(1); }}>Popularity</button>
-                  <button onClick={() => { setSortBy('newest'); setSortOpen(false); setPage(1); }}>Newest</button>
-                  <button onClick={() => { setSortBy('rating'); setSortOpen(false); setPage(1); }}>Rating</button>
-                </div>
-              )}
             </div>
           </div>
 
@@ -504,21 +516,21 @@ export const AllCreators = () => {
               Online Now
             </button>
             <button 
-              className={`${styles.pill} ${statusFilter === 'audio' ? styles.activePill : ''}`}
+              className={`${styles.pill} ${statusFilter === 'audio' ? styles.activePill : ''} ${styles.desktopOnlyPill}`}
               onClick={() => { setStatusFilter('audio'); setPage(1); }}
             >
               <Phone size={14} />
               Audio Available
             </button>
             <button 
-              className={`${styles.pill} ${statusFilter === 'video' ? styles.activePill : ''}`}
+              className={`${styles.pill} ${statusFilter === 'video' ? styles.activePill : ''} ${styles.desktopOnlyPill}`}
               onClick={() => { setStatusFilter('video'); setPage(1); }}
             >
               <Video size={14} />
               Video Available
             </button>
             <button 
-              className={`${styles.pill} ${statusFilter === 'live' ? styles.activePill : ''}`}
+              className={`${styles.pill} ${statusFilter === 'live' ? styles.activePill : ''} ${styles.desktopOnlyPill}`}
               onClick={() => { setStatusFilter('live'); setPage(1); }}
             >
               <Radio size={14} />
@@ -529,7 +541,7 @@ export const AllCreators = () => {
               onClick={() => { setStatusFilter('new'); setPage(1); }}
             >
               <span className={styles.newBadge}>NEW</span>
-              New Creators
+              New
             </button>
           </div>
 
@@ -722,7 +734,7 @@ export const AllCreators = () => {
         </div>
 
         {/* Right Sidebar Filters */}
-        <div className={styles.filtersSidebar}>
+        <div className={`${styles.filtersSidebar} ${styles.desktopFiltersSidebar}`}>
           <div className={styles.filtersHeader}>
             <h3 className={styles.filtersTitle}>Filters</h3>
             <button onClick={handleResetFilters} className={styles.resetBtn}>Reset</button>
@@ -803,34 +815,19 @@ export const AllCreators = () => {
             </div>
           </div>
 
-          {/* Content Type Checkbox / Radios */}
+          {/* Content Type Selector */}
           <div className={styles.filterSection}>
             <h4 className={styles.filterSectionLabel}>Content Type</h4>
-            <div className={styles.checkboxList}>
-              <div className={styles.checkboxWrapper} onClick={() => setContentType('All')}>
-                <div className={`${styles.customCheckbox} ${contentType === 'All' ? styles.checkboxChecked : ''}`}>
-                  <Check size={12} strokeWidth={3} />
-                </div>
-                <span className={styles.checkboxLabel}>All</span>
-              </div>
-              <div className={styles.checkboxWrapper} onClick={() => setContentType(contentType === 'Photos' ? 'All' : 'Photos')}>
-                <div className={`${styles.customCheckbox} ${contentType === 'Photos' ? styles.checkboxChecked : ''}`}>
-                  <Check size={12} strokeWidth={3} />
-                </div>
-                <span className={styles.checkboxLabel}>Photos</span>
-              </div>
-              <div className={styles.checkboxWrapper} onClick={() => setContentType(contentType === 'Videos' ? 'All' : 'Videos')}>
-                <div className={`${styles.customCheckbox} ${contentType === 'Videos' ? styles.checkboxChecked : ''}`}>
-                  <Check size={12} strokeWidth={3} />
-                </div>
-                <span className={styles.checkboxLabel}>Videos</span>
-              </div>
-              <div className={styles.checkboxWrapper} onClick={() => setContentType(contentType === 'PPV' ? 'All' : 'PPV')}>
-                <div className={`${styles.customCheckbox} ${contentType === 'PPV' ? styles.checkboxChecked : ''}`}>
-                  <Check size={12} strokeWidth={3} />
-                </div>
-                <span className={styles.checkboxLabel}>PPV</span>
-              </div>
+            <div className={styles.pillSelectorRow}>
+              {['All', 'Photos', 'Videos', 'PPV'].map((type) => (
+                <button
+                  key={type}
+                  className={`${styles.pillSelectOpt} ${contentType === type ? styles.pillSelectActive : ''}`}
+                  onClick={() => setContentType(type)}
+                >
+                  {type}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -860,9 +857,9 @@ export const AllCreators = () => {
             </div>
           </div>
 
-          {/* Languages Dropdown */}
+          {/* Language Dropdown */}
           <div className={styles.filterSection}>
-            <h4 className={styles.filterSectionLabel}>Languages</h4>
+            <h4 className={styles.filterSectionLabel}>Language</h4>
             <div className={styles.dropdownWrapper}>
               <button className={styles.dropdownButton} onClick={() => toggleDropdown('language')}>
                 {language}
@@ -917,6 +914,203 @@ export const AllCreators = () => {
             Apply Filters
           </button>
         </div>
+
+        {/* Mobile Filters Popup Modal */}
+        {mobileFiltersOpen && (
+          <div className={styles.mobileFiltersBackdrop} onClick={() => setMobileFiltersOpen(false)}>
+            <div className={styles.mobileFiltersModal} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.mobileFiltersModalHeader}>
+                <h3 className={styles.mobileFiltersModalTitle}>Filters</h3>
+                <button className={styles.closeFiltersModalBtn} onClick={() => setMobileFiltersOpen(false)}>
+                  <X size={20} />
+                </button>
+              </div>
+              
+              <div className={styles.mobileFiltersModalBody}>
+                {/* Availability Checkboxes */}
+                <div className={styles.filterSection}>
+                  <div className={styles.filterSectionHeader}>
+                    <h4 className={styles.filterSectionLabel}>Availability</h4>
+                    <button onClick={handleResetFilters} className={styles.mobileResetBtn}>Reset</button>
+                  </div>
+                  <div className={styles.checkboxList}>
+                    <div className={styles.checkboxWrapper} onClick={() => setStatusFilter('all')}>
+                      <div className={`${styles.customCheckbox} ${statusFilter === 'all' ? styles.checkboxChecked : ''}`}>
+                        <Check size={12} strokeWidth={3} />
+                      </div>
+                      <span className={styles.checkboxLabel}>All Creators</span>
+                    </div>
+                    <div className={styles.checkboxWrapper} onClick={() => setStatusFilter(statusFilter === 'online' ? 'all' : 'online')}>
+                      <div className={`${styles.customCheckbox} ${statusFilter === 'online' ? styles.checkboxChecked : ''}`}>
+                        <Check size={12} strokeWidth={3} />
+                      </div>
+                      <span className={styles.checkboxLabel}>
+                        <span className={styles.sidebarOnlineDot}></span>
+                        Online Now
+                      </span>
+                    </div>
+                    <div className={styles.checkboxWrapper} onClick={() => setStatusFilter(statusFilter === 'audio' ? 'all' : 'audio')}>
+                      <div className={`${styles.customCheckbox} ${statusFilter === 'audio' ? styles.checkboxChecked : ''}`}>
+                        <Check size={12} strokeWidth={3} />
+                      </div>
+                      <span className={styles.checkboxLabel}>
+                        <Phone size={13} className={styles.sidebarIconAudio} />
+                        Audio Available
+                      </span>
+                    </div>
+                    <div className={styles.checkboxWrapper} onClick={() => setStatusFilter(statusFilter === 'video' ? 'all' : 'video')}>
+                      <div className={`${styles.customCheckbox} ${statusFilter === 'video' ? styles.checkboxChecked : ''}`}>
+                        <Check size={12} strokeWidth={3} />
+                      </div>
+                      <span className={styles.checkboxLabel}>
+                        <Video size={13} className={styles.sidebarIconVideo} />
+                        Video Available
+                      </span>
+                    </div>
+                    <div className={styles.checkboxWrapper} onClick={() => setStatusFilter(statusFilter === 'live' ? 'all' : 'live')}>
+                      <div className={`${styles.customCheckbox} ${statusFilter === 'live' ? styles.checkboxChecked : ''}`}>
+                        <Check size={12} strokeWidth={3} />
+                      </div>
+                      <span className={styles.checkboxLabel}>
+                        <span className={styles.sidebarLiveDot}></span>
+                        Live Now
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Category Dropdown */}
+                <div className={styles.filterSection}>
+                  <h4 className={styles.filterSectionLabel}>Category</h4>
+                  <div className={styles.dropdownWrapper}>
+                    <button className={styles.dropdownButton} onClick={() => toggleDropdown('category')}>
+                      {category}
+                      <ChevronDown size={14} />
+                    </button>
+                    {categoryOpen && (
+                      <div className={styles.dropdownMenu}>
+                        {categories.map((c) => (
+                          <button 
+                            key={c} 
+                            onClick={() => {
+                              setCategory(c);
+                              setCategoryOpen(false);
+                            }}
+                          >
+                            {c}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Content Type Selector */}
+                <div className={styles.filterSection}>
+                  <h4 className={styles.filterSectionLabel}>Content Type</h4>
+                  <div className={styles.pillSelectorRow}>
+                    {['All', 'Photos', 'Videos', 'PPV'].map((type) => (
+                      <button
+                        key={type}
+                        className={`${styles.pillSelectOpt} ${contentType === type ? styles.pillSelectActive : ''}`}
+                        onClick={() => setContentType(type)}
+                      >
+                        {type}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Country Dropdown */}
+                <div className={styles.filterSection}>
+                  <h4 className={styles.filterSectionLabel}>Country</h4>
+                  <div className={styles.dropdownWrapper}>
+                    <button className={styles.dropdownButton} onClick={() => toggleDropdown('country')}>
+                      {country}
+                      <ChevronDown size={14} />
+                    </button>
+                    {countryOpen && (
+                      <div className={styles.dropdownMenu}>
+                        {countries.map((c) => (
+                          <button 
+                            key={c} 
+                            onClick={() => {
+                              setCountry(c);
+                              setCountryOpen(false);
+                            }}
+                          >
+                            {c}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Language Dropdown */}
+                <div className={styles.filterSection}>
+                  <h4 className={styles.filterSectionLabel}>Language</h4>
+                  <div className={styles.dropdownWrapper}>
+                    <button className={styles.dropdownButton} onClick={() => toggleDropdown('language')}>
+                      {language}
+                      <ChevronDown size={14} />
+                    </button>
+                    {languageOpen && (
+                      <div className={styles.dropdownMenu}>
+                        {languages.map((l) => (
+                          <button 
+                            key={l} 
+                            onClick={() => {
+                              setLanguage(l);
+                              setLanguageOpen(false);
+                            }}
+                          >
+                            {l}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Followers Slider */}
+                <div className={styles.filterSection}>
+                  <h4 className={styles.filterSectionLabel}>Followers</h4>
+                  <div className={styles.sliderHeader}>
+                    <span className={styles.sliderMinText}>Any</span>
+                    <span className={styles.sliderValText}>
+                      {sliderValue === 1000000 ? '1M' : `${(sliderValue/1000).toFixed(0)}K`}
+                    </span>
+                  </div>
+                  <input 
+                    type="range" 
+                    min="1000" 
+                    max="1000000" 
+                    step="5000"
+                    value={sliderValue} 
+                    onChange={(e) => setSliderValue(Number(e.target.value))}
+                    className={styles.filterSlider}
+                    style={{
+                      background: `linear-gradient(to right, #e10075 0%, #7e00f3 ${((sliderValue - 1000) / 999000) * 100}%, ${darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'} ${((sliderValue - 1000) / 999000) * 100}%)`
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div className={styles.mobileFiltersModalFooter}>
+                <button 
+                  className={styles.mobileApplyFiltersBtn} 
+                  onClick={() => {
+                    fetchCreators();
+                    setMobileFiltersOpen(false);
+                  }}
+                >
+                  Apply Filters
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>

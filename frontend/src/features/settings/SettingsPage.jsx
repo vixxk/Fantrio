@@ -134,22 +134,22 @@ export const SettingsPage = () => {
             })}
           </div>
 
-          {/* Contact & FAQ Cards */}
-          <div className={styles.supportCardsRow}>
-            <div className={styles.supportCard}>
+          {/* Contact & FAQ Cards (Desktop Only) */}
+          <div className={`${styles.supportCardsRow} ${styles.desktopOnly}`}>
+            <div className={styles.supportCard} onClick={() => alert('Opening support...')}>
               <div className={styles.supportCardIconWrap}>
                 <Headphones className={styles.supportCardIcon} size={22} />
               </div>
               <div className={styles.supportCardContent}>
                 <h3 className={styles.supportCardTitle}>Contact Support</h3>
                 <p className={styles.supportCardDesc}>Get help from our support team.</p>
-                <button className={styles.supportBtn} onClick={() => alert('Opening support...')}>
+                <button className={styles.supportBtn}>
                   Contact Support
                 </button>
               </div>
             </div>
 
-            <div className={styles.supportCard}>
+            <div className={styles.supportCard} onClick={() => alert('Opening FAQ...')}>
               <div className={styles.supportCardIconWrap}>
                 <svg 
                   width="26" 
@@ -168,7 +168,7 @@ export const SettingsPage = () => {
               <div className={styles.supportCardContent}>
                 <h3 className={styles.supportCardTitle}>FAQ</h3>
                 <p className={styles.supportCardDesc}>Find answers to common questions.</p>
-                <button className={styles.supportBtn} onClick={() => alert('Opening FAQ...')}>
+                <button className={styles.supportBtn}>
                   View FAQ
                 </button>
               </div>
@@ -217,6 +217,47 @@ export const SettingsPage = () => {
                 </div>
               );
             })}
+          </div>
+
+          {/* Contact & FAQ Cards (Mobile Only - Bottom of DOM) */}
+          <div className={`${styles.supportCardsRow} ${styles.mobileOnly}`}>
+            <div className={styles.supportCard} onClick={() => alert('Opening support...')}>
+              <div className={styles.supportCardIconWrap}>
+                <Headphones className={styles.supportCardIcon} size={22} />
+              </div>
+              <div className={styles.supportCardContent}>
+                <h3 className={styles.supportCardTitle}>Contact Support</h3>
+                <p className={styles.supportCardDesc}>Get help from our support team.</p>
+                <button className={styles.supportBtn}>
+                  Contact Support
+                </button>
+              </div>
+            </div>
+
+            <div className={styles.supportCard} onClick={() => alert('Opening FAQ...')}>
+              <div className={styles.supportCardIconWrap}>
+                <svg 
+                  width="26" 
+                  height="26" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  strokeWidth="2.2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                  className={styles.supportCardIcon}
+                >
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                  <circle cx="12" cy="17" r="1.4" fill="url(#brand-gradient)" style={{ stroke: 'none' }} />
+                </svg>
+              </div>
+              <div className={styles.supportCardContent}>
+                <h3 className={styles.supportCardTitle}>FAQ</h3>
+                <p className={styles.supportCardDesc}>Find answers to common questions.</p>
+                <button className={styles.supportBtn}>
+                  View FAQ
+                </button>
+              </div>
+            </div>
           </div>
 
         </div>

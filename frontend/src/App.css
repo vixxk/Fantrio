@@ -40,15 +40,7 @@ html, body, #root {
   width: 100%;
 }
 
-.mobileMenuToggle {
-  display: none;
-  background: transparent;
-  border: none;
-  color: #ffffff;
-  padding: 0.5rem;
-  margin-left: 1rem;
-  cursor: pointer;
-}
+
 
 .scrollableContent {
   flex: 1;
@@ -144,7 +136,7 @@ html, body, #root {
 }
 
 .mobileSidebarDrawer {
-  width: 280px;
+  width: 240px;
   height: 100%;
   background-color: #0a0a0a;
   display: flex;
@@ -153,20 +145,7 @@ html, body, #root {
   box-shadow: 5px 0 25px rgba(0, 0, 0, 0.5);
 }
 
-.mobileSidebarCloseRow {
-  display: flex;
-  justify-content: flex-end;
-  padding: 1rem;
-  background-color: #0a0a0a;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
 
-.closeMenuBtn {
-  background: transparent;
-  border: none;
-  color: #ffffff;
-  cursor: pointer;
-}
 
 .mobileBottomNav {
   display: none;
@@ -181,17 +160,13 @@ html, body, #root {
   background-color: #f7f6fb;
 }
 
-.lightTheme .mobileMenuToggle {
-  color: #1a1625;
-}
+
 
 .lightTheme .mobileSidebarDrawer {
   background-color: #f7f6fb;
 }
 
-.lightTheme .closeMenuBtn {
-  color: #1a1625;
-}
+
 
 .lightTheme .tabTitle {
   color: #1a1625;
@@ -241,10 +216,7 @@ html, body, #root {
     display: none;
   }
   
-  /* Show hamburger button */
-  .mobileMenuToggle {
-    display: block;
-  }
+
   
   .scrollableContent {
     padding: 1rem;
@@ -254,7 +226,7 @@ html, body, #root {
   /* Mobile Bottom Navigation */
   .mobileBottomNav {
     display: flex;
-    justify-content: space-around;
+    justify-content: stretch;
     align-items: center;
     position: fixed;
     bottom: 0;
@@ -271,6 +243,9 @@ html, body, #root {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    flex: 1;
+    height: 100%;
     gap: 0.25rem;
     background: transparent;
     border: none;
@@ -282,8 +257,15 @@ html, body, #root {
     transition: color 0.2s;
   }
   
-  .bottomActive {
-    color: #ff007f !important;
+  .bottomActive span {
+    background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    display: inline-block;
+  }
+  
+  .bottomActive svg {
+    stroke: url(#activeGradient) !important;
   }
   
   .mobileLiveNavIcon {

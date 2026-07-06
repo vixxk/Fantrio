@@ -110,7 +110,7 @@
 @media (max-width: 768px) {
   .bannerCard {
     height: auto;
-    padding: 1.5rem;
+    padding: 1.25rem;
     flex-direction: column;
     align-items: flex-start;
   }
@@ -119,7 +119,23 @@
     display: none;
   }
   
+  .bannerTitle {
+    font-size: 1.3rem;
+  }
+  
+  .bannerSubtitle {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+  }
+  
   .bannerText {
+    font-size: 0.75rem;
     max-width: 100%;
+  }
+  
+  .exploreBtn {
+    font-size: 0.8rem;
+    padding: 0.55rem 1.2rem;
+    border-radius: 8px;
   }
 }

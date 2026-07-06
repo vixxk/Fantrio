@@ -1182,18 +1182,218 @@
 }
 
 @media (max-width: 600px) {
+  .pageContainer {
+    padding-bottom: 90px !important;
+  }
+
+  .title {
+    font-size: 1.25rem !important;
+  }
+  
+  .subtitle {
+    font-size: 0.75rem !important;
+  }
+  
+  .headerStarIcon {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
   .subscriptionsGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+  
+  .subCard {
+    height: auto !important;
+    border-radius: 12px !important;
+  }
+  
+  .cardImageWrapper {
+    height: 130px !important;
+    width: 100% !important;
+  }
+  
+  .threeDotsBtn {
+    width: 20px !important;
+    height: 20px !important;
+    top: 0.4rem !important;
+    right: 0.4rem !important;
+  }
+  
+  .cardBody {
+    padding: 0.5rem !important;
+    gap: 0.35rem !important;
+  }
+  
+  .displayName {
+    font-size: 0.78rem !important;
+  }
+  
+  .verifiedIcon {
+    width: 10px !important;
+    height: 10px !important;
+  }
+  
+  .username {
+    font-size: 0.65rem !important;
+  }
+  
+  .cardStatusRow {
+    display: none !important;
+  }
+  
+  .detailsBlock {
+    gap: 0.25rem !important;
+  }
+  
+  .detailRow {
+    font-size: 0.65rem !important;
+  }
+  
+  .viewProfileBtn {
+    padding: 0.45rem !important;
+    font-size: 0.72rem !important;
+    border-radius: 8px !important;
+  }
+  
+  .cardActionsFooter {
+    padding-top: 0.35rem !important;
+    margin-top: 0.25rem !important;
+  }
+  
+  .msgBtn, .unsubBtn {
+    font-size: 0.7rem !important;
+    gap: 0.2rem !important;
   }
   
   .filterRow {
-    flex-direction: column;
-    align-items: flex-start;
+    display: flex !important;
+    flex-direction: column-reverse !important;
+    align-items: flex-start !important;
+    gap: 0.75rem !important;
+  }
+  
+  .tabsList {
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    gap: 0.75rem !important;
+    padding-bottom: 0.4rem;
+  }
+  
+  .tabBtn {
+    font-size: 0.75rem !important;
+    padding: 0.25rem 0.15rem 0.4rem !important;
   }
   
   .controlsRight {
     width: 100%;
-    justify-content: space-between;
+    gap: 0.5rem !important;
+  }
+  
+  .viewToggle {
+    display: none !important;
+  }
+  
+  .sortWrapper {
+    width: 100% !important;
+  }
+  
+  .sortButton {
+    width: 100% !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px !important;
+    padding: 0.6rem 0.85rem !important;
+    font-size: 0.78rem !important;
+  }
+  .light .sortButton {
+    background: rgba(26, 22, 37, 0.04) !important;
+    border-color: rgba(26, 22, 37, 0.1) !important;
+    color: #1a1625 !important;
+  }
+  
+  .sectionBlock {
+    display: none !important;
+  }
+  
+  .sidebarCard {
+    padding: 1rem !important;
+    gap: 0.75rem !important;
+    border-radius: 12px !important;
+  }
+  
+  .cardTitleRow {
+    gap: 0.4rem !important;
+  }
+  
+  .cardTitle {
+    font-size: 0.95rem !important;
+  }
+  
+  .overviewList {
+    gap: 0.5rem !important;
+  }
+  
+  .overviewItem {
+    font-size: 0.75rem !important;
+  }
+  
+  .boldText {
+    font-size: 0.75rem !important;
+  }
+  
+  .totalSpentVal {
+    font-size: 0.75rem !important;
+    gap: 2px !important;
+  }
+  
+  .coinIconSmall {
+    width: 10px !important;
+    height: 10px !important;
+  }
+  
+  .spendingHistoryBtn {
+    font-size: 0.78rem !important;
+    padding: 0.6rem !important;
+    border-radius: 8px !important;
+  }
+  
+  .perksList {
+    gap: 0.75rem !important;
+  }
+  
+  .perkItem {
+    gap: 0.75rem !important;
+  }
+  
+  .perkIcon {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  
+  .perkName {
+    font-size: 0.8rem !important;
+  }
+  
+  .perkDesc {
+    font-size: 0.68rem !important;
+  }
+  
+  .helpText {
+    font-size: 0.75rem !important;
+  }
+  
+  .contactSupportBtn {
+    font-size: 0.78rem !important;
+    padding: 0.6rem !important;
+    border-radius: 8px !important;
+    gap: 0.35rem !important;
+  }
+  
+  .safeHelpCard {
+    display: none !important;
   }
   
   .horizontalRow {

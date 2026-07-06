@@ -282,6 +282,9 @@ export const VideoCallsPage = () => {
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [countryOpen, setCountryOpen] = useState(false);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [sortOpen, setSortOpen] = useState(false);
+  const [sortBy, setSortBy] = useState('Popularity');
 
   // Active call states
   const [activeCall, setActiveCall] = useState(null); // { creator, callLogId, roomId, status: 'connecting'|'ringing'|'active' }
@@ -298,19 +301,10 @@ export const VideoCallsPage = () => {
   const countries = ['All Countries', 'United States', 'Canada', 'United Kingdom', 'Spain', 'Australia', 'France', 'Italy', 'Russia', 'Japan'];
 
   const toggleDropdown = (type) => {
-    if (type === 'category') {
-      setCategoryOpen(!categoryOpen);
-      setLanguageOpen(false);
-      setCountryOpen(false);
-    } else if (type === 'language') {
-      setLanguageOpen(!languageOpen);
-      setCategoryOpen(false);
-      setCountryOpen(false);
-    } else if (type === 'country') {
-      setCountryOpen(!countryOpen);
-      setCategoryOpen(false);
-      setLanguageOpen(false);
-    }
+    setSortOpen(type === 'sort' ? !sortOpen : false);
+    setCategoryOpen(type === 'category' ? !categoryOpen : false);
+    setLanguageOpen(type === 'language' ? !languageOpen : false);
+    setCountryOpen(type === 'country' ? !countryOpen : false);
   };
 
   // Close dropdowns on outside click
@@ -319,6 +313,7 @@ export const VideoCallsPage = () => {
       setCategoryOpen(false);
       setLanguageOpen(false);
       setCountryOpen(false);
+      setSortOpen(false);
     };
     window.addEventListener('click', handleOutsideClick);
     return () => window.removeEventListener('click', handleOutsideClick);
@@ -479,18 +474,68 @@ export const VideoCallsPage = () => {
           </p>
         </div>
 
+        {/* Sort & Filter Controls Row (Mobile Only via CSS) */}
+        <div className={styles.controlsRow}>
+          {/* Sort Dropdown */}
+          <div className={styles.sortWrapper}>
+            <button 
+              className={styles.sortButton}
+              onClick={(e) => { e.stopPropagation(); toggleDropdown('sort'); }}
+            >
+              Sort By: {sortBy === 'Popularity' ? 'Popularity' : sortBy === 'Price: Low to High' ? 'Low to High' : 'High to Low'}
+              <ChevronDown size={16} />
+            </button>
+            {sortOpen && (
+              <div className={styles.sortDropdown} onClick={(e) => e.stopPropagation()}>
+                {[
+                  { value: 'Popularity', label: 'Popularity' },
+                  { value: 'Price: Low to High', label: 'Price: Low to High' },
+                  { value: 'Price: High to Low', label: 'Price: High to Low' }
+                ].map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => {
+                      setSortBy(opt.value);
+                      setActivePill(opt.value === 'Popularity' ? 'Popular' : opt.value);
+                      setSortOpen(false);
+                    }}
+                    className={sortBy === opt.value ? styles.activeSortOption : ''}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <button 
+            className={styles.mobileFilterToggleBtn}
+            onClick={() => setMobileFiltersOpen(true)}
+          >
+            Filters
+          </button>
+        </div>
+
         {/* Filters pills bar */}
         <div className={styles.pillsRow}>
-          {['All', 'Online Now', 'Popular', 'New', 'Price: Low to High', 'Price: High to Low'].map((pill) => (
-            <button
-              key={pill}
-              className={`${styles.pillBtn} ${activePill === pill ? styles.pillActive : ''}`}
-              onClick={() => setActivePill(pill)}
-            >
-              {pill === 'Online Now' && <span className={styles.pillGreenDot} />}
-              {pill}
-            </button>
-          ))}
+          {['All', 'Online Now', 'Popular', 'New', 'Price: Low to High', 'Price: High to Low'].map((pill) => {
+            const isDesktopOnly = ['Popular', 'Price: Low to High', 'Price: High to Low'].includes(pill);
+            return (
+              <button
+                key={pill}
+                className={`${styles.pillBtn} ${activePill === pill ? styles.pillActive : ''} ${isDesktopOnly ? styles.desktopOnlyPill : ''}`}
+                onClick={() => {
+                  setActivePill(pill);
+                  if (pill === 'Popular') setSortBy('Popularity');
+                  else if (pill === 'Price: Low to High') setSortBy('Price: Low to High');
+                  else if (pill === 'Price: High to Low') setSortBy('Price: High to Low');
+                }}
+              >
+                {pill === 'Online Now' && <span className={styles.pillGreenDot} />}
+                {pill}
+              </button>
+            );
+          })}
         </div>
 
         {/* Content counter info */}
@@ -867,6 +912,163 @@ export const VideoCallsPage = () => {
                 onClick={() => setIsSpeakerOn(!isSpeakerOn)}
               >
                 {isSpeakerOn ? <Volume2 size={22} /> : <VolumeX size={22} />}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Mobile Filters Drawer Modal */}
+      {mobileFiltersOpen && (
+        <div className={styles.mobileFiltersModalOverlay}>
+          <div className={styles.mobileFiltersModal}>
+            <div className={styles.mobileFiltersModalHeader}>
+              <h3>Filters</h3>
+              <button className={styles.closeFiltersModalBtn} onClick={() => setMobileFiltersOpen(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className={styles.mobileFiltersModalBody}>
+              {/* Availability */}
+              <div className={styles.filterSection}>
+                <div className={styles.filterSectionHeader}>
+                  <h4 className={styles.filterSectionLabel}>Availability</h4>
+                  <button onClick={handleResetFilters} className={styles.mobileResetBtn}>Reset</button>
+                </div>
+                
+                <div className={styles.checkboxList}>
+                  <div className={styles.checkboxWrapper} onClick={() => setAvailability('all')}>
+                    <div className={`${styles.customCheckbox} ${availability === 'all' ? styles.checkboxChecked : ''}`}>
+                      <Check size={12} strokeWidth={3} />
+                    </div>
+                    <span className={styles.checkboxLabel}>All Creators</span>
+                  </div>
+
+                  <div className={styles.checkboxWrapper} onClick={() => setAvailability('online')}>
+                    <div className={`${styles.customCheckbox} ${availability === 'online' ? styles.checkboxChecked : ''}`}>
+                      <Check size={12} strokeWidth={3} />
+                    </div>
+                    <span className={styles.checkboxLabel}>
+                      <span className={styles.sidebarOnlineDot}></span>
+                      Online Now
+                    </span>
+                  </div>
+
+                  <div className={styles.checkboxWrapper} onClick={() => setAvailability('busy')}>
+                    <div className={`${styles.customCheckbox} ${availability === 'busy' ? styles.checkboxChecked : ''}`}>
+                      <Check size={12} strokeWidth={3} />
+                    </div>
+                    <span className={styles.checkboxLabel}>
+                      <span className={styles.sidebarBusyDot}></span>
+                      Busy
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Price Range */}
+              <div className={styles.filterSection}>
+                <h4 className={styles.filterSectionLabel}>Price Per Minute</h4>
+                <div className={styles.sliderHeader}>
+                  <span className={styles.sliderMinText}>5 Coins</span>
+                  <span className={styles.sliderValText}>{priceRange} Coins</span>
+                </div>
+                <input
+                  type="range"
+                  min="5"
+                  max="50"
+                  step="1"
+                  value={priceRange}
+                  onChange={(e) => setPriceRange(parseInt(e.target.value))}
+                  className={styles.filterSlider}
+                  style={{
+                    background: `linear-gradient(to right, #e10075 0%, #7e00f3 ${((priceRange - 5) / 45) * 100}%, ${darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'} ${((priceRange - 5) / 45) * 100}%)`
+                  }}
+                />
+              </div>
+
+              {/* Category */}
+              <div className={styles.filterSection}>
+                <h4 className={styles.filterSectionLabel}>Category</h4>
+                <div className={styles.dropdownWrapper}>
+                  <button className={styles.dropdownButton} onClick={(e) => { e.stopPropagation(); toggleDropdown('category'); }}>
+                    <span>{category}</span>
+                    <ChevronDown size={14} />
+                  </button>
+                  {categoryOpen && (
+                    <div className={styles.dropdownMenu} onClick={(e) => e.stopPropagation()}>
+                      {categories.map((c) => (
+                        <button 
+                          key={c} 
+                          onClick={() => {
+                            setCategory(c);
+                            setCategoryOpen(false);
+                          }}
+                        >
+                          {c}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Country */}
+              <div className={styles.filterSection}>
+                <h4 className={styles.filterSectionLabel}>Country</h4>
+                <div className={styles.dropdownWrapper}>
+                  <button className={styles.dropdownButton} onClick={(e) => { e.stopPropagation(); toggleDropdown('country'); }}>
+                    <span>{country}</span>
+                    <ChevronDown size={14} />
+                  </button>
+                  {countryOpen && (
+                    <div className={styles.dropdownMenu} onClick={(e) => e.stopPropagation()}>
+                      {countries.map((c) => (
+                        <button 
+                          key={c} 
+                          onClick={() => {
+                            setCountry(c);
+                            setCountryOpen(false);
+                          }}
+                        >
+                          {c}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Languages */}
+              <div className={styles.filterSection}>
+                <h4 className={styles.filterSectionLabel}>Languages</h4>
+                <div className={styles.dropdownWrapper}>
+                  <button className={styles.dropdownButton} onClick={(e) => { e.stopPropagation(); toggleDropdown('language'); }}>
+                    <span>{language}</span>
+                    <ChevronDown size={14} />
+                  </button>
+                  {languageOpen && (
+                    <div className={styles.dropdownMenu} onClick={(e) => e.stopPropagation()}>
+                      {languages.map((l) => (
+                        <button 
+                          key={l} 
+                          onClick={() => {
+                            setLanguage(l);
+                            setLanguageOpen(false);
+                          }}
+                        >
+                          {l}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            <div className={styles.mobileFiltersModalFooter}>
+              <button className={styles.mobileApplyFiltersBtn} onClick={() => { loadCreators(); setMobileFiltersOpen(false); }}>
+                Apply Filters
               </button>
             </div>
           </div>
