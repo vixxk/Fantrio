@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Search, Bell, MessageCircle, Landmark, ChevronDown, Plus, Menu } from 'lucide-react';
+import { Search, Bell, MessageCircle, Plus, Menu, ChevronDown } from 'lucide-react';
+import { ProfileDropdown } from './ProfileDropdown';
 import styles from './Header.module.css';
 
 export const Header = ({ onMenuToggle }) => {
   const { user, balance, darkMode, setActiveTab } = useApp();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const handleAddCoinsClick = () => {
+  const handleAddCoinsClick = (e) => {
+    e.stopPropagation();
     setActiveTab('Buy Coins');
   };
 
@@ -54,14 +57,22 @@ export const Header = ({ onMenuToggle }) => {
         </div>
 
         {/* User Profile dropdown */}
-        <div className={styles.profileDropdown}>
+        <div 
+          className={styles.profileDropdown} 
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+        >
           <img 
             src={user?.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'} 
             alt="User profile" 
             className={styles.avatar} 
           />
           <span className={styles.username}>{user?.displayName || 'Johnn'}</span>
-          <ChevronDown size={16} className={styles.caret} />
+          <ChevronDown 
+            size={16} 
+            className={`${styles.caret} ${dropdownOpen ? styles.rotated : ''}`} 
+          />
+          
+          <ProfileDropdown isOpen={dropdownOpen} onClose={() => setDropdownOpen(false)} />
         </div>
       </div>
     </header>

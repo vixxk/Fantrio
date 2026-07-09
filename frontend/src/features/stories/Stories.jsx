@@ -7,7 +7,6 @@ export const Stories = () => {
   const { darkMode } = useApp();
   const [stories, setStories] = useState([]);
   const containerRef = React.useRef(null);
-  const [visibleCount, setVisibleCount] = useState(8);
 
   useEffect(() => {
     const fetchStories = async () => {
@@ -47,46 +46,15 @@ export const Stories = () => {
     fetchStories();
   }, []);
 
-  useEffect(() => {
-    if (!containerRef.current || stories.length === 0) return;
-
-    const handleResize = () => {
-      if (!containerRef.current) return;
-      const containerWidth = containerRef.current.getBoundingClientRect().width;
-      // Bubble width is 68px, gap is 1.1rem (17.6px).
-      // Total formula for N items: N * 68 + (N-1) * 17.6 <= containerWidth
-      // N * 85.6 - 17.6 <= containerWidth => N <= (containerWidth + 17.6) / 85.6
-      const calculatedCount = Math.floor((containerWidth + 17.6) / 85.6);
-      setVisibleCount(calculatedCount > 0 ? calculatedCount : 1);
-    };
-
-    handleResize();
-    const resizeObserver = new ResizeObserver(() => {
-      handleResize();
-    });
-    resizeObserver.observe(containerRef.current);
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, [stories]);
-
-  const showMore = stories.length > visibleCount;
-  const itemsToRender = showMore 
-    ? stories.slice(0, visibleCount - 1) 
-    : stories;
-  const remainingCount = stories.length - itemsToRender.length;
-
   return (
     <div className={`${styles.storiesSection} ${darkMode ? styles.dark : styles.light}`}>
       <div className={styles.storiesHeader}>
         <h2 className={styles.sectionTitle}>Stories</h2>
-        <button className={styles.viewAllButton}>View All</button>
       </div>
 
       <div className={styles.storiesListContainer} ref={containerRef}>
         <div className={styles.storiesScroll}>
-          {itemsToRender.map((story) => (
+          {stories.map((story) => (
             <div key={story._id} className={styles.storyBubble}>
               <div className={`${styles.avatarRing} ${story.isLive ? styles.liveRing : styles.storyRing}`}>
                 <img src={story.avatarUrl} alt={story.displayName} className={styles.storyAvatar} />
@@ -96,14 +64,6 @@ export const Stories = () => {
               <span className={styles.storyName}>{story.displayName}</span>
             </div>
           ))}
-          {showMore && (
-            <div className={styles.storyBubble}>
-              <div className={styles.moreBubble}>
-                <span className={styles.moreText}>+{remainingCount}</span>
-              </div>
-              <span className={styles.storyName}>More</span>
-            </div>
-          )}
         </div>
       </div>
     </div>

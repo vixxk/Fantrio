@@ -151,6 +151,7 @@
 }
 
 .profileDropdown {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -183,6 +184,11 @@
 
 .caret {
   color: #ffffff; /* white arrow caret */
+  transition: transform 0.2s ease;
+}
+
+.rotated {
+  transform: rotate(180deg);
 }
 
 /* Light Mode Overrides */

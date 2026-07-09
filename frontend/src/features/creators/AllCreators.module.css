@@ -1472,3 +1472,86 @@
     text-align: center;
   }
 }
+
+.kebabWrapper {
+  position: absolute;
+  top: 0.8rem;
+  right: 0.8rem;
+  z-index: 10;
+}
+
+@media (max-width: 768px) {
+  .kebabWrapper {
+    top: 0.4rem;
+    right: 0.4rem;
+  }
+}
+
+.kebabDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #1e1b29;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.5rem 0;
+  width: 170px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  margin-top: 4px;
+}
+
+.kebabOption {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: inherit;
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.kebabOption:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.kebabDivider {
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.08);
+  margin: 0.3rem 0;
+}
+
+.kebabDanger {
+  color: #ff4a5a;
+}
+
+.kebabDanger:hover {
+  background-color: rgba(255, 74, 90, 0.1);
+  color: #ff4a5a;
+}
+
+/* Light mode overrides */
+.light .kebabDropdown {
+  background-color: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.light .kebabOption {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .kebabOption:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+  color: #1a1625;
+}
+
+.light .kebabDivider {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+

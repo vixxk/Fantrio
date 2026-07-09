@@ -257,6 +257,15 @@ export const AllCreators = () => {
   const [countryOpen, setCountryOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [activeKebabCreatorId, setActiveKebabCreatorId] = useState(null);
+
+  useEffect(() => {
+    const handleWindowClick = () => {
+      setActiveKebabCreatorId(null);
+    };
+    window.addEventListener('click', handleWindowClick);
+    return () => window.removeEventListener('click', handleWindowClick);
+  }, []);
 
   const toggleDropdown = (name) => {
     setSortOpen(name === 'sort' ? !sortOpen : false);
@@ -617,9 +626,61 @@ export const AllCreators = () => {
                   </div>
                   
                   {/* Option menu top right */}
-                  <button className={styles.threeDotsBtn}>
-                    <MoreVertical size={16} />
-                  </button>
+                  <div className={styles.kebabWrapper}>
+                    <button 
+                      className={styles.threeDotsBtn}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveKebabCreatorId(activeKebabCreatorId === creator._id ? null : creator._id);
+                      }}
+                    >
+                      <MoreVertical size={16} />
+                    </button>
+                    {activeKebabCreatorId === creator._id && (
+                      <div className={styles.kebabDropdown} onClick={(e) => e.stopPropagation()}>
+                        <button 
+                          className={styles.kebabOption} 
+                          onClick={() => {
+                            navigator.clipboard.writeText(`${window.location.origin}/creator/${creator.username}`);
+                            alert('Creator profile link copied to clipboard!');
+                            setActiveKebabCreatorId(null);
+                          }}
+                        >
+                          Copy creator link
+                        </button>
+                        <div className={styles.kebabDivider} />
+                        <button 
+                          className={styles.kebabOption} 
+                          onClick={() => {
+                            alert(`Unfollowed creator @${creator.username}`);
+                            setActiveKebabCreatorId(null);
+                          }}
+                        >
+                          Unfollow
+                        </button>
+                        <div className={styles.kebabDivider} />
+                        <button 
+                          className={styles.kebabOption} 
+                          onClick={() => {
+                            alert(`Blocked creator @${creator.username}`);
+                            setActiveKebabCreatorId(null);
+                          }}
+                        >
+                          Block
+                        </button>
+                        <div className={styles.kebabDivider} />
+                        <button 
+                          className={`${styles.kebabOption} ${styles.kebabDanger}`} 
+                          onClick={() => {
+                            alert(`Reported creator @${creator.username}`);
+                            setActiveKebabCreatorId(null);
+                          }}
+                        >
+                          Report
+                        </button>
+                      </div>
+                    )}
+                  </div>
 
                   {/* Profile Picture / Photo Cover */}
                   <div className={styles.cardImageWrapper}>

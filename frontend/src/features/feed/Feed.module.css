@@ -375,25 +375,43 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: transparent;
-  border: none;
-  color: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  padding: 0.4rem 0.6rem;
-  border-radius: 10px;
-  transition: all 0.2s;
+  padding: 0.45rem 0.85rem;
+  border-radius: 99px; /* rounded pill style */
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .footerActionBtn:hover {
   color: #ffffff;
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.footerActionBtn svg {
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.footerActionBtn:hover svg {
+  transform: scale(1.18);
 }
 
 .liked {
   color: #ff007f !important;
+  background-color: rgba(255, 0, 127, 0.08) !important;
+  border-color: rgba(255, 0, 127, 0.25) !important;
+  box-shadow: 0 4px 12px rgba(255, 0, 127, 0.15) !important;
+}
+
+.liked:hover {
+  background-color: rgba(255, 0, 127, 0.12) !important;
 }
 
 .filledHeart {
@@ -401,34 +419,60 @@
 }
 
 .activeComments {
-  color: #7e00f3;
+  color: #7e00f3 !important;
   background-color: rgba(126, 0, 243, 0.08) !important;
+  border-color: rgba(126, 0, 243, 0.25) !important;
+  box-shadow: 0 4px 12px rgba(126, 0, 243, 0.15) !important;
+}
+
+.activeComments:hover {
+  background-color: rgba(126, 0, 243, 0.12) !important;
+}
+
+.giftBtn:hover {
+  color: #ffb800 !important;
+  background-color: rgba(255, 184, 0, 0.08) !important;
+  border-color: rgba(255, 184, 0, 0.25) !important;
+  box-shadow: 0 4px 12px rgba(255, 184, 0, 0.15) !important;
 }
 
 .shareActionBtn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: transparent;
-  border: none;
-  color: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  padding: 0.4rem 0.6rem;
-  border-radius: 10px;
-  transition: all 0.2s;
+  padding: 0.45rem 0.85rem;
+  border-radius: 99px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .shareActionBtn:hover {
   color: #ffffff;
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.shareActionBtn svg {
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.shareActionBtn:hover svg {
+  transform: scale(1.18);
 }
 
 .shareActionBtn.copied {
   color: #ff007f !important;
   background-color: rgba(255, 0, 127, 0.08) !important;
+  border-color: rgba(255, 0, 127, 0.25) !important;
+  box-shadow: 0 4px 12px rgba(255, 0, 127, 0.15) !important;
 }
 
 .copiedIcon {
@@ -784,12 +828,15 @@
 }
 
 .light .footerActionBtn, .light .shareActionBtn {
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   color: rgba(26, 22, 37, 0.65);
 }
 
 .light .footerActionBtn:hover, .light .shareActionBtn:hover {
   color: #1a1625;
-  background-color: rgba(0, 0, 0, 0.03);
+  background-color: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.12);
 }
 
 .light .commentsSection, .light .postFooter {
@@ -990,3 +1037,77 @@
     height: 30px !important;
   }
 }
+
+.kebabWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.kebabDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #1e1b29;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.5rem 0;
+  width: 170px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  margin-top: 4px;
+}
+
+.kebabOption {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: inherit;
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.kebabOption:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.kebabDivider {
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.08);
+  margin: 0.3rem 0;
+}
+
+.kebabDanger {
+  color: #ff4a5a;
+}
+
+.kebabDanger:hover {
+  background-color: rgba(255, 74, 90, 0.1);
+  color: #ff4a5a;
+}
+
+/* Light mode overrides */
+.light .kebabDropdown {
+  background-color: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.light .kebabOption {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .kebabOption:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+  color: #1a1625;
+}
+
+.light .kebabDivider {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+

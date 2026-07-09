@@ -244,7 +244,6 @@ export const SuggestionsSidebar = () => {
       <div className={styles.sectionContainer}>
         <div className={styles.sectionHeader}>
           <h4 className={styles.sectionHeading}>Trending Hastags</h4>
-          <button className={styles.linkButton}>View All</button>
         </div>
         <div className={styles.hashtagList}>
           {hashtags.map((h, i) => (

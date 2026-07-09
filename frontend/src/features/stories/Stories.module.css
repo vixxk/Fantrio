@@ -36,14 +36,19 @@
 
 .storiesListContainer {
   width: 100%;
-  overflow: hidden; /* no horizontal scrolling */
+  overflow-x: auto; /* allow horizontal scrolling */
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
+.storiesListContainer::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome/Safari/Opera */
 }
 
 .storiesScroll {
   display: flex;
   gap: 1.1rem;
   padding: 0.25rem 0;
-  width: 100%; /* fit within container */
+  width: max-content; /* don't shrink, expand to fit all items */
 }
 
 .storyBubble {

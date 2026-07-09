@@ -176,6 +176,15 @@ export const SubscriptionsPage = () => {
   const [sortBy, setSortBy] = useState('newest');
   const [sortOpen, setSortOpen] = useState(false);
   const [page, setPage] = useState(1);
+  const [activeKebabSubId, setActiveKebabSubId] = useState(null);
+
+  useEffect(() => {
+    const handleWindowClick = () => {
+      setActiveKebabSubId(null);
+    };
+    window.addEventListener('click', handleWindowClick);
+    return () => window.removeEventListener('click', handleWindowClick);
+  }, []);
 
   useEffect(() => {
     const fetchSubscriptions = async () => {
@@ -360,9 +369,55 @@ export const SubscriptionsPage = () => {
               {paginatedList.map((sub) => (
                 <div key={sub._id} className={styles.subCard}>
                   
-                  <button className={styles.threeDotsBtn}>
-                    <MoreVertical size={16} />
-                  </button>
+                  <div className={styles.kebabWrapper}>
+                    <button 
+                      className={styles.threeDotsBtn}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveKebabSubId(activeKebabSubId === sub._id ? null : sub._id);
+                      }}
+                    >
+                      <MoreVertical size={16} />
+                    </button>
+                    {activeKebabSubId === sub._id && (
+                      <div className={styles.kebabDropdown} onClick={(e) => e.stopPropagation()}>
+                        <button 
+                          className={styles.kebabOption} 
+                          onClick={() => {
+                            navigator.clipboard.writeText(`${window.location.origin}/creator/${sub.creator.username}`);
+                            alert('Creator profile link copied to clipboard!');
+                            setActiveKebabSubId(null);
+                          }}
+                        >
+                          Copy creator link
+                        </button>
+                        <div className={styles.kebabDivider} />
+                        {sub.status === 'active' && (
+                          <>
+                            <button 
+                              className={styles.kebabOption} 
+                              onClick={() => {
+                                handleUnsubscribe(sub.creatorId);
+                                setActiveKebabSubId(null);
+                              }}
+                            >
+                              Cancel Subscription
+                            </button>
+                            <div className={styles.kebabDivider} />
+                          </>
+                        )}
+                        <button 
+                          className={`${styles.kebabOption} ${styles.kebabDanger}`} 
+                          onClick={() => {
+                            alert(`Reported creator @${sub.creator.username}`);
+                            setActiveKebabSubId(null);
+                          }}
+                        >
+                          Report Creator
+                        </button>
+                      </div>
+                    )}
+                  </div>
 
                   <div className={styles.cardImageWrapper}>
                     <img src={sub.creator.avatarUrl} alt={sub.creator.displayName} className={styles.creatorAvatar} />

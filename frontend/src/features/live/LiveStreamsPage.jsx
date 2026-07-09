@@ -499,32 +499,6 @@ export const LiveStreamsPage = () => {
 
             <button className={styles.applyBtn} onClick={loadStreams}>Apply Filters</button>
           </div>
-
-          {/* Leaderboard Card */}
-          <div className={styles.leaderboardCard}>
-            <h3 className={styles.leaderboardTitle}>Top Viewers This Week</h3>
-            
-            <div className={styles.leaderboardList}>
-              {leaderboard.map((item) => (
-                <div key={item.rank} className={styles.leaderboardItem}>
-                  <div className={styles.leaderboardLeft}>
-                    <span className={styles.rankNumber}>{item.rank}</span>
-                    <img src={item.avatarUrl} alt={item.name} className={styles.viewerAvatar} />
-                    <span className={styles.viewerName}>{item.name}</span>
-                  </div>
-                  <div className={styles.leaderboardRight}>
-                    <img src="/coin.png" alt="Coin" className={styles.leaderboardCoin} />
-                    <span>{item.spentCoins}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <a className={styles.viewLeaderboardLink} href="#leaderboard">
-              View Leaderboard
-              <ChevronRight size={14} />
-            </a>
-          </div>
         </div>
       </div>
 

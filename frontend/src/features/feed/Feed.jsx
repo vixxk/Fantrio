@@ -321,6 +321,15 @@ export const Feed = () => {
   const [activeTipCreator, setActiveTipCreator] = useState(null);
   const [tipAmount, setTipAmount] = useState('10');
   const [copiedPostId, setCopiedPostId] = useState(null);
+  const [activeKebabPostId, setActiveKebabPostId] = useState(null);
+
+  useEffect(() => {
+    const handleWindowClick = () => {
+      setActiveKebabPostId(null);
+    };
+    window.addEventListener('click', handleWindowClick);
+    return () => window.removeEventListener('click', handleWindowClick);
+  }, []);
 
   const fetchPosts = () => {
     setLoading(true);
@@ -533,9 +542,61 @@ export const Feed = () => {
 
                 <div className={styles.headerRight}>
                   <span className={styles.timestamp}>2h ago</span>
-                  <button className={styles.moreBtn}>
-                    <MoreVertical size={18} />
-                  </button>
+                  <div className={styles.kebabWrapper}>
+                    <button 
+                      className={styles.moreBtn}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveKebabPostId(activeKebabPostId === post._id ? null : post._id);
+                      }}
+                    >
+                      <MoreVertical size={18} />
+                    </button>
+                    {activeKebabPostId === post._id && (
+                      <div className={styles.kebabDropdown} onClick={(e) => e.stopPropagation()}>
+                        <button 
+                          className={styles.kebabOption} 
+                          onClick={() => {
+                            navigator.clipboard.writeText(`${window.location.origin}/post/${post._id}`);
+                            alert('Post link copied to clipboard!');
+                            setActiveKebabPostId(null);
+                          }}
+                        >
+                          Copy post link
+                        </button>
+                        <div className={styles.kebabDivider} />
+                        <button 
+                          className={styles.kebabOption} 
+                          onClick={() => {
+                            alert(`Unfollowed creator @${creator.username}`);
+                            setActiveKebabPostId(null);
+                          }}
+                        >
+                          Unfollow
+                        </button>
+                        <div className={styles.kebabDivider} />
+                        <button 
+                          className={styles.kebabOption} 
+                          onClick={() => {
+                            alert(`Blocked creator @${creator.username}`);
+                            setActiveKebabPostId(null);
+                          }}
+                        >
+                          Block
+                        </button>
+                        <div className={styles.kebabDivider} />
+                        <button 
+                          className={`${styles.kebabOption} ${styles.kebabDanger}`} 
+                          onClick={() => {
+                            alert(`Reported post: ${post.content.slice(0, 20)}...`);
+                            setActiveKebabPostId(null);
+                          }}
+                        >
+                          Report
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -645,7 +706,7 @@ export const Feed = () => {
                   </button>
 
                   <button 
-                    className={styles.footerActionBtn}
+                    className={`${styles.footerActionBtn} ${styles.giftBtn}`}
                     onClick={() => setActiveTipCreator(creator._id)}
                   >
                     <Gift size={20} />
