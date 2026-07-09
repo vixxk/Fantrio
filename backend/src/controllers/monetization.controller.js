@@ -282,3 +282,16 @@ exports.unsubscribeFromCreator = catchAsync(async (req, res, next) => {
     subscription
   });
 });
+
+// Retrieve withdrawal history for a creator
+exports.getWithdrawalHistory = catchAsync(async (req, res, next) => {
+  const withdrawals = await Transaction.find({
+    senderId: req.user._id,
+    type: 'withdrawal'
+  }).sort({ createdAt: -1 });
+
+  res.status(200).json({
+    status: 'success',
+    withdrawals
+  });
+});

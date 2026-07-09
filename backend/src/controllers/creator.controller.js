@@ -3,6 +3,9 @@ const User = require('../models/User');
 const Subscription = require('../models/Subscription');
 const Transaction = require('../models/Transaction');
 const SystemSetting = require('../models/SystemSetting');
+const Story = require('../models/Story');
+const LiveStream = require('../models/LiveStream');
+const zegoService = require('../services/zegocloud.service');
 const ApiError = require('../utils/apiError');
 const catchAsync = require('../utils/catchAsync');
 
@@ -385,6 +388,44 @@ exports.getCreatorDashboard = catchAsync(async (req, res, next) => {
 
 // Fetch Active Stories
 exports.getStories = catchAsync(async (req, res, next) => {
+  // Find active stories (not expired)
+  const activeStories = await Story.find({ expiresAt: { $gt: new Date() } })
+    .sort({ createdAt: -1 });
+
+  // Group stories by creatorId
+  const storiesByCreator = {};
+  for (const story of activeStories) {
+    const cid = story.creatorId.toString();
+    if (!storiesByCreator[cid]) {
+      storiesByCreator[cid] = [];
+    }
+    storiesByCreator[cid].push(story);
+  }
+
+  // Fetch creator profiles for these active stories
+  const dbStories = [];
+  for (const [creatorId, items] of Object.entries(storiesByCreator)) {
+    const profile = await CreatorProfile.findOne({ userId: creatorId });
+    if (profile) {
+      dbStories.push({
+        _id: creatorId,
+        username: profile.username,
+        displayName: profile.displayName || profile.username,
+        avatarUrl: profile.avatarUrl || '',
+        isVerified: profile.isVerifiedBadge || false,
+        isLive: profile.isLive || false,
+        isOnline: profile.isOnline || false,
+        hasStory: true,
+        items: items.map(item => ({
+          _id: item._id,
+          mediaUrl: item.mediaUrl,
+          mediaType: item.mediaType,
+          createdAt: item.createdAt
+        }))
+      });
+    }
+  }
+
   const dbCreators = await CreatorProfile.find();
   
   const mockAvatars = [
@@ -417,7 +458,7 @@ exports.getStories = catchAsync(async (req, res, next) => {
     'Camila', 'Scarlett', 'Victoria', 'Madison', 'Grace'
   ];
 
-  const stories = Array.from({ length: 20 }).map((_, i) => {
+  const mockStories = Array.from({ length: 20 }).map((_, i) => {
     const dbCreator = dbCreators && dbCreators.length > 0 ? dbCreators[i % dbCreators.length] : null;
     return {
       _id: dbCreator?.userId || `story-mock-${i}`,
@@ -425,22 +466,55 @@ exports.getStories = catchAsync(async (req, res, next) => {
       displayName: dbCreator?.displayName || mockNames[i],
       avatarUrl: dbCreator?.avatarUrl || mockAvatars[i],
       isVerified: dbCreator?.isVerifiedBadge || true,
-      isLive: i % 4 === 0,
-      isOnline: i % 2 === 0,
+      isLive: dbCreator?.isLive || (i % 4 === 0),
+      isOnline: dbCreator?.isOnline || (i % 2 === 0),
       hasStory: true
     };
   });
 
+  const seenCreators = new Set(dbStories.map(s => s._id.toString()));
+  const filteredMocks = mockStories.filter(s => !seenCreators.has(s._id.toString()));
+  const allStories = [...dbStories, ...filteredMocks];
+
   res.status(200).json({
     status: 'success',
-    stories
+    stories: allStories
   });
 });
 
 // Fetch Active Live Streams
-// Fetch Active Live Streams
 exports.getLiveStreams = catchAsync(async (req, res, next) => {
   const { category, language, sortBy, availability, tab } = req.query;
+
+  // Query database live streams
+  const dbStreams = await LiveStream.find()
+    .populate('creatorId')
+    .sort({ startedAt: -1 });
+
+  // Map DB streams to the expected frontend format
+  const mappedDbStreams = [];
+  for (const stream of dbStreams) {
+    const profile = await CreatorProfile.findOne({ userId: stream.creatorId });
+    if (profile) {
+      mappedDbStreams.push({
+        _id: stream._id,
+        creatorId: stream.creatorId._id,
+        username: profile.username,
+        displayName: profile.displayName || profile.username,
+        isVerified: profile.isVerifiedBadge || false,
+        viewerCount: stream.viewerCount,
+        streamTitle: stream.streamTitle,
+        coverUrl: stream.coverUrl || profile.coverBannerUrl || '/Girl.png',
+        category: stream.category,
+        rate: profile.rates.videoCallPerMin || 18,
+        language: stream.language,
+        isLive: stream.isLive,
+        isUpcoming: !stream.isLive,
+        rating: profile.rating || 4.9,
+        zegoRoomId: stream.zegoRoomId
+      });
+    }
+  }
 
   // Query database creators
   const dbCreators = await CreatorProfile.find();
@@ -471,7 +545,7 @@ exports.getLiveStreams = catchAsync(async (req, res, next) => {
     'aria_live', 'chloe_stream', 'emma_xo', 'sophia_chat', 'olivia_star', 'isabella_d', 'ava_game'
   ];
 
-  let streams = [];
+  const mockStreams = [];
   for (let i = 0; i < 12; i++) {
     // Try to associate with a DB creator if available
     const dbCreator = dbCreators && dbCreators.length > 0 ? dbCreators[i % dbCreators.length] : null;
@@ -480,7 +554,7 @@ exports.getLiveStreams = catchAsync(async (req, res, next) => {
     const streamCategory = dbCreator?.categories?.[0] || mockCategories[i % mockCategories.length];
     const isLiveStatus = i % 10 !== 9; // 90% are live, 10% are upcoming
     
-    streams.push({
+    mockStreams.push({
       _id: dbCreator?.userId || `mock-stream-${i}`,
       username: dbCreator?.username || mockUsernames[i],
       displayName: dbCreator?.displayName || mockNames[i],
@@ -496,6 +570,11 @@ exports.getLiveStreams = catchAsync(async (req, res, next) => {
       rating: dbCreator?.rating || (4.5 + (i % 5) * 0.1)
     });
   }
+
+  // Combine DB streams and mock streams, filtering out duplicates
+  const seenCreators = new Set(mappedDbStreams.map(s => s.username));
+  const filteredMocks = mockStreams.filter(s => !seenCreators.has(s.username));
+  let streams = [...mappedDbStreams, ...filteredMocks];
 
   // Filter logic
   if (category && category !== 'All Categories') {
@@ -529,18 +608,55 @@ exports.getLiveStreams = catchAsync(async (req, res, next) => {
     streams.sort((a, b) => a.viewerCount - b.viewerCount);
   }
 
-  // Leaderboard data
-  const leaderboard = [
+  // Leaderboard data - aggregate total tips/ppv/subscription earnings per creator
+  const dynamicLeaderboard = await Transaction.aggregate([
+    {
+      $match: {
+        status: 'completed',
+        type: { $in: ['subscription', 'tip', 'ppv_unlock', 'call_billing'] }
+      }
+    },
+    {
+      $group: {
+        _id: '$receiverId',
+        totalEarned: { $sum: '$amountCoins' }
+      }
+    },
+    {
+      $sort: { totalEarned: -1 }
+    },
+    {
+      $limit: 5
+    }
+  ]);
+
+  const populatedLeaderboard = [];
+  for (const item of dynamicLeaderboard) {
+    if (item._id) {
+      const profile = await CreatorProfile.findOne({ userId: item._id });
+      if (profile) {
+        populatedLeaderboard.push({
+          name: profile.displayName || profile.username,
+          avatarUrl: profile.avatarUrl || '',
+          coinsEarned: item.totalEarned.toLocaleString()
+        });
+      }
+    }
+  }
+
+  const defaultLeaderboard = [
     { rank: 1, name: 'Alex King', avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80', spentCoins: '132,67' },
     { rank: 2, name: 'Jane Cooper', avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80', spentCoins: '132,67' },
     { rank: 3, name: 'Robert Fox', avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80', spentCoins: '132,67' },
     { rank: 4, name: 'Jacob Jones', avatarUrl: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=100&q=80', spentCoins: '132,67' }
   ];
 
+  const finalLeaderboard = populatedLeaderboard.length > 0 ? populatedLeaderboard : defaultLeaderboard;
+
   res.status(200).json({
     status: 'success',
     liveStreams: streams,
-    leaderboard
+    leaderboard: finalLeaderboard
   });
 });
 
@@ -558,4 +674,160 @@ exports.getSuggested = catchAsync(async (req, res, next) => {
     creators
   });
 });
+
+// Creator uploads a story
+exports.createStory = catchAsync(async (req, res, next) => {
+  const { mediaUrl, mediaType, durationHours } = req.body;
+
+  if (!mediaUrl || !mediaType) {
+    return next(new ApiError(400, 'Please provide mediaUrl and mediaType'));
+  }
+
+  const hours = durationHours ? parseInt(durationHours, 10) : 24;
+  const expiresAt = new Date(Date.now() + hours * 60 * 60 * 1000);
+
+  const story = await Story.create({
+    creatorId: req.user._id,
+    mediaUrl,
+    mediaType,
+    expiresAt
+  });
+
+  res.status(201).json({
+    status: 'success',
+    story
+  });
+});
+
+// Creator deletes a story
+exports.deleteStory = catchAsync(async (req, res, next) => {
+  const { storyId } = req.params;
+
+  const story = await Story.findById(storyId);
+  if (!story) {
+    return next(new ApiError(404, 'Story not found'));
+  }
+
+  // Authorize: creator can only delete their own story
+  if (story.creatorId.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+    return next(new ApiError(403, 'You do not have permission to delete this story'));
+  }
+
+  await Story.findByIdAndDelete(storyId);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Story successfully deleted'
+  });
+});
+
+// Creator starts a live stream
+exports.startLiveStream = catchAsync(async (req, res, next) => {
+  const { streamTitle, category, coverUrl, language } = req.body;
+
+  if (!streamTitle || !category) {
+    return next(new ApiError(400, 'Please provide streamTitle and category'));
+  }
+
+  // End any existing active live stream for this creator
+  await LiveStream.updateMany(
+    { creatorId: req.user._id, isLive: true },
+    { $set: { isLive: false, endedAt: Date.now() } }
+  );
+
+  const roomId = `live_${Date.now()}_${Math.floor(100 + Math.random() * 900)}`;
+  
+  // Generate token for creator to stream (privilege 2 = publisher)
+  const zegoToken = zegoService.generateZegoToken(req.user._id, roomId, 2);
+
+  const newStream = await LiveStream.create({
+    creatorId: req.user._id,
+    streamTitle,
+    category,
+    coverUrl: coverUrl || '',
+    language: language || 'English',
+    isLive: true,
+    zegoRoomId: roomId
+  });
+
+  // Update profile status
+  await CreatorProfile.findOneAndUpdate(
+    { userId: req.user._id },
+    { $set: { isLive: true } }
+  );
+
+  res.status(201).json({
+    status: 'success',
+    zegoRoomId: roomId,
+    zegoToken,
+    stream: newStream
+  });
+});
+
+// Creator ends a live stream
+exports.endLiveStream = catchAsync(async (req, res, next) => {
+  const { zegoRoomId } = req.body;
+
+  const stream = await LiveStream.findOne({ creatorId: req.user._id, isLive: true, zegoRoomId });
+  if (!stream) {
+    return next(new ApiError(404, 'No active live stream session found for this room'));
+  }
+
+  stream.isLive = false;
+  stream.endedAt = Date.now();
+  await stream.save();
+
+  // Update profile status
+  await CreatorProfile.findOneAndUpdate(
+    { userId: req.user._id },
+    { $set: { isLive: false } }
+  );
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Live stream ended successfully',
+    stream
+  });
+});
+
+// Creator toggles call availability
+exports.toggleCallAvailability = catchAsync(async (req, res, next) => {
+  const { type, available } = req.body; // type: 'audio' or 'video'
+
+  if (!['audio', 'video'].includes(type) || available === undefined) {
+    return next(new ApiError(400, 'Please provide valid type (audio/video) and available state (boolean)'));
+  }
+
+  const updateField = type === 'audio' ? 'audioAvailable' : 'videoAvailable';
+  
+  const profile = await CreatorProfile.findOneAndUpdate(
+    { userId: req.user._id },
+    { $set: { [updateField]: !!available } },
+    { new: true }
+  );
+
+  if (!profile) {
+    return next(new ApiError(404, 'Creator profile not found'));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    profile
+  });
+});
+
+// Retrieve creator's subscribers list
+exports.getCreatorSubscribers = catchAsync(async (req, res, next) => {
+  const subscriptions = await Subscription.find({
+    creatorId: req.user._id,
+    status: 'active',
+    expiryDate: { $gt: new Date() }
+  }).populate('userId', 'username displayName avatarUrl email');
+
+  res.status(200).json({
+    status: 'success',
+    subscribers: subscriptions
+  });
+});
+
 

@@ -16,11 +16,13 @@ import { MessagesPage } from './features/messages/MessagesPage';
 import { BuyCoinsPage } from './features/coins/BuyCoinsPage';
 import { SettingsPage } from './features/settings/SettingsPage';
 import { MorePage } from './features/more/MorePage';
+import { AdminPage } from './features/admin/AdminPage';
+import { AdminLogin } from './features/admin/AdminLogin';
 import { Menu, X, Compass, Radio, Phone, MessageSquare, User } from 'lucide-react';
 import './App.css';
 
 const AppContent = () => {
-  const { darkMode, activeTab, setActiveTab, currentPath } = useApp();
+  const { darkMode, activeTab, setActiveTab, currentPath, user } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showBottomNav, setShowBottomNav] = useState(true);
   const lastScrollY = useRef(0);
@@ -146,6 +148,12 @@ const AppContent = () => {
             <MorePage />
           </div>
         );
+      case 'Admin Panel':
+        return (
+          <div className="tabAdmin">
+            <AdminPage />
+          </div>
+        );
       default:
         return (
           <div className="comingSoonContainer">
@@ -157,6 +165,13 @@ const AppContent = () => {
         );
     }
   };
+
+  if (activeTab === 'Admin Panel') {
+    if (!user || user.role !== 'admin') {
+      return <AdminLogin />;
+    }
+    return <AdminPage />;
+  }
 
   return (
     <div className={`appShell ${darkMode ? 'darkTheme' : 'lightTheme'}`}>

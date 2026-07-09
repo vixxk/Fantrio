@@ -20,4 +20,12 @@ router.get('/following', creatorController.getFavourites);
 router.get('/subscribed', creatorController.getSubscribed);
 router.get('/dashboard', restrictTo('creator'), creatorController.getCreatorDashboard);
 
+// Creator-specific new endpoints
+router.post('/stories', restrictTo('creator'), creatorController.createStory);
+router.delete('/stories/:storyId', restrictTo('creator'), creatorController.deleteStory);
+router.post('/live/start', restrictTo('creator'), creatorController.startLiveStream);
+router.post('/live/end', restrictTo('creator'), creatorController.endLiveStream);
+router.post('/profile/toggle-calls', restrictTo('creator'), creatorController.toggleCallAvailability);
+router.get('/subscribers', restrictTo('creator'), creatorController.getCreatorSubscribers);
+
 module.exports = router;

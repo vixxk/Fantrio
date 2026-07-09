@@ -11,5 +11,6 @@ router.post('/subscribe/:creatorId', monetizationController.subscribeToCreator);
 router.post('/unsubscribe/:creatorId', monetizationController.unsubscribeFromCreator);
 router.post('/tip/:creatorId', monetizationController.tipCreator);
 router.post('/withdraw', restrictTo('creator'), monetizationController.requestWithdrawal);
+router.get('/withdrawals', restrictTo('creator'), monetizationController.getWithdrawalHistory);
 
 module.exports = router;

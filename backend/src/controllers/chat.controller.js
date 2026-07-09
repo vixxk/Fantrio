@@ -255,3 +255,49 @@ exports.sendMassMessage = catchAsync(async (req, res, next) => {
     count: subscriptions.length
   });
 });
+
+// Delete a single message
+exports.deleteMessage = catchAsync(async (req, res, next) => {
+  const { messageId } = req.params;
+
+  const msg = await Message.findById(messageId);
+  if (!msg) {
+    return next(new ApiError(404, 'Message not found'));
+  }
+
+  // Authorize: sender of message or admin
+  if (msg.senderId.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+    return next(new ApiError(403, 'You do not have permission to delete this message'));
+  }
+
+  await Message.findByIdAndDelete(messageId);
+
+  // Notify other party
+  const io = req.app.get('io');
+  if (io) {
+    io.to(msg.receiverId.toString()).emit('message_deleted', { messageId });
+  }
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Message successfully deleted'
+  });
+});
+
+// Delete a complete conversation thread
+exports.deleteConversation = catchAsync(async (req, res, next) => {
+  const { userId } = req.params;
+
+  // Delete all messages between req.user._id and userId
+  await Message.deleteMany({
+    $or: [
+      { senderId: req.user._id, receiverId: userId },
+      { senderId: userId, receiverId: req.user._id }
+    ]
+  });
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Conversation successfully cleared'
+  });
+});

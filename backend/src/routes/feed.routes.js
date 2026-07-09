@@ -16,8 +16,11 @@ router.get('/:postId/media/:mediaId', feedController.getPostMedia);
 router.post('/:postId/unlock', monetizationController.unlockPost);
 router.post('/:postId/like', feedController.likePost);
 router.post('/:postId/comment', feedController.commentPost);
+router.delete('/:postId/comment/:commentId', feedController.deleteComment);
 router.post('/:postId/share', feedController.sharePost);
 router.post('/:postId/report', feedController.reportPost);
 router.post('/upload-url', restrictTo('creator'), feedController.getPresignedUpload);
+router.put('/:postId', restrictTo('creator'), feedController.updatePost);
+router.delete('/:postId', restrictTo('creator'), feedController.deletePost);
 
 module.exports = router;

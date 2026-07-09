@@ -11,5 +11,7 @@ router.get('/messages/:receiverId', chatController.getMessages);
 router.post('/message', chatController.sendMessage);
 router.post('/message/:messageId/unlock', chatController.unlockMessage);
 router.post('/mass-message', restrictTo('creator'), chatController.sendMassMessage);
+router.delete('/message/:messageId', chatController.deleteMessage);
+router.delete('/conversation/:userId', chatController.deleteConversation);
 
 module.exports = router;

@@ -519,3 +519,93 @@ exports.getTrendingHashtags = catchAsync(async (req, res, next) => {
     hashtags
   });
 });
+
+// Update an existing post
+exports.updatePost = catchAsync(async (req, res, next) => {
+  const { postId } = req.params;
+  const { content, media, postType, coinPrice, scheduledFor } = req.body;
+
+  const post = await Post.findById(postId);
+  if (!post) {
+    return next(new ApiError(404, 'Post not found'));
+  }
+
+  // Check ownership
+  if (post.creatorId.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+    return next(new ApiError(403, 'You do not have permission to update this post'));
+  }
+
+  if (postType === 'ppv' && (!coinPrice || coinPrice <= 0)) {
+    return next(new ApiError(400, 'PPV posts must have a coin price greater than 0'));
+  }
+
+  if (content !== undefined) post.content = content;
+  if (media !== undefined) post.media = media;
+  if (postType !== undefined) post.postType = postType;
+  if (coinPrice !== undefined) post.coinPrice = postType === 'ppv' ? coinPrice : 0;
+  if (scheduledFor !== undefined) post.scheduledFor = scheduledFor ? new Date(scheduledFor) : null;
+
+  await post.save();
+
+  res.status(200).json({
+    status: 'success',
+    post
+  });
+});
+
+// Delete an existing post
+exports.deletePost = catchAsync(async (req, res, next) => {
+  const { postId } = req.params;
+
+  const post = await Post.findById(postId);
+  if (!post) {
+    return next(new ApiError(404, 'Post not found'));
+  }
+
+  // Check ownership
+  if (post.creatorId.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+    return next(new ApiError(403, 'You do not have permission to delete this post'));
+  }
+
+  await Post.findByIdAndDelete(postId);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Post successfully deleted'
+  });
+});
+
+// Delete a comment on a post
+exports.deleteComment = catchAsync(async (req, res, next) => {
+  const { postId, commentId } = req.params;
+
+  const post = await Post.findById(postId);
+  if (!post) {
+    return next(new ApiError(404, 'Post not found'));
+  }
+
+  const comment = post.comments.id(commentId);
+  if (!comment) {
+    return next(new ApiError(404, 'Comment not found'));
+  }
+
+  // Authorize: post owner or comment author
+  const isPostOwner = post.creatorId.toString() === req.user._id.toString();
+  const isCommentAuthor = comment.userId.toString() === req.user._id.toString();
+  const isAdmin = req.user.role === 'admin';
+
+  if (!isPostOwner && !isCommentAuthor && !isAdmin) {
+    return next(new ApiError(403, 'You do not have permission to delete this comment'));
+  }
+
+  post.comments.pull(commentId);
+  await post.save({ validateBeforeSave: false });
+
+  const updatedPost = await Post.findById(postId)
+    .populate('comments.userId', 'username displayName avatarUrl');
+
+  res.status(200).json({
+    status: 'success',
+    comments: updatedPost.comments
+  });
+});

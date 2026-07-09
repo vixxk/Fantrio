@@ -23,7 +23,8 @@ export const AppProvider = ({ children }) => {
     'Messages': '/messages',
     'Buy Coins': '/buy-coins',
     'Settings': '/settings',
-    'More': '/more'
+    'More': '/more',
+    'Admin Panel': '/admin'
   };
 
   const pathToTab = {
@@ -37,10 +38,12 @@ export const AppProvider = ({ children }) => {
     '/messages': 'Messages',
     '/buy-coins': 'Buy Coins',
     '/settings': 'Settings',
-    '/more': 'More'
+    '/more': 'More',
+    '/admin': 'Admin Panel'
   };
 
   const getTabFromPath = (path) => {
+    if (path.startsWith('/admin')) return 'Admin Panel';
     if (path.startsWith('/messages')) return 'Messages';
     return pathToTab[path] || 'Discover Feed';
   };

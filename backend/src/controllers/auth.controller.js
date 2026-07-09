@@ -318,3 +318,53 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
   createSendToken(user, 200, res);
 });
+
+// Delete user account and associated data
+exports.deleteMe = catchAsync(async (req, res, next) => {
+  const userId = req.user._id;
+
+  // Local imports for cleanup
+  const Story = require('../models/Story');
+  const LiveStream = require('../models/LiveStream');
+  const Wallet = require('../models/Wallet');
+  const Post = require('../models/Post');
+  const Subscription = require('../models/Subscription');
+  const Message = require('../models/Message');
+  const CallLog = require('../models/CallLog');
+
+  // Perform cleanups
+  await CreatorProfile.findOneAndDelete({ userId });
+  await Story.deleteMany({ creatorId: userId });
+  await LiveStream.deleteMany({ creatorId: userId });
+  await Wallet.findOneAndDelete({ userId });
+  await Post.deleteMany({ creatorId: userId });
+  
+  // Clean up subscriptions where user is subscriber or creator
+  await Subscription.deleteMany({
+    $or: [{ userId }, { creatorId: userId }]
+  });
+
+  // Clean up messages
+  await Message.deleteMany({
+    $or: [{ senderId: userId }, { receiverId: userId }]
+  });
+
+  // Clean up call logs
+  await CallLog.deleteMany({
+    $or: [{ callerId: userId }, { receiverId: userId }]
+  });
+
+  // Finally delete user
+  await User.findByIdAndDelete(userId);
+
+  // Clear cookie if present
+  res.cookie('token', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true
+  });
+
+  res.status(200).json({
+    status: 'success',
+    message: 'User account and all associated data deleted successfully'
+  });
+});

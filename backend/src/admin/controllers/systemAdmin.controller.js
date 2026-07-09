@@ -1,0 +1,120 @@
+const mongoose = require('mongoose');
+const User = require('../../models/User');
+const Wallet = require('../../models/Wallet');
+const Transaction = require('../../models/Transaction');
+const Post = require('../../models/Post');
+const CallLog = require('../../models/CallLog');
+const SystemSetting = require('../../models/SystemSetting');
+const catchAsync = require('../../utils/catchAsync');
+
+// Aggregate and return dashboard metrics
+exports.getDashboardStats = catchAsync(async (req, res, next) => {
+  const totalUsers = await User.countDocuments();
+  const totalCreators = await User.countDocuments({ role: 'creator' });
+  const totalAdmins = await User.countDocuments({ role: 'admin' });
+
+  const coinCirculation = await Wallet.aggregate([
+    {
+      $group: {
+        _id: null,
+        totalCoins: { $sum: '$balanceCoins' }
+      }
+    }
+  ]);
+  const totalCoinsCirculating = coinCirculation[0] ? coinCirculation[0].totalCoins : 0;
+
+  const transactionBreakdown = await Transaction.aggregate([
+    {
+      $group: {
+        _id: '$type',
+        totalCoins: { $sum: '$amountCoins' },
+        count: { $sum: 1 }
+      }
+    }
+  ]);
+
+  const reportsStats = await Post.aggregate([
+    {
+      $match: { 'reports.0': { $exists: true } }
+    },
+    {
+      $project: {
+        reportsCount: { $size: '$reports' }
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        totalReportedPosts: { $sum: 1 },
+        totalReportsCount: { $sum: '$reportsCount' }
+      }
+    }
+  ]);
+
+  const reportedPostsStats = reportsStats[0] || { totalReportedPosts: 0, totalReportsCount: 0 };
+  const activeCallsCount = await CallLog.countDocuments({ status: 'active' });
+
+  res.status(200).json({
+    status: 'success',
+    stats: {
+      users: {
+        totalUsers,
+        totalCreators,
+        totalAdmins
+      },
+      wallet: {
+        totalCoinsCirculating
+      },
+      transactions: transactionBreakdown,
+      moderation: reportedPostsStats,
+      calls: {
+        activeCallsCount
+      }
+    }
+  });
+});
+
+// Retrieve system configurations
+exports.getSystemSettings = catchAsync(async (req, res, next) => {
+  let settings = await SystemSetting.findOne();
+  if (!settings) {
+    settings = await SystemSetting.create({
+      commissionRate: 0.20,
+      coinPackages: [
+        { coins: 100, priceUSD: 9.99 },
+        { coins: 500, priceUSD: 44.99 },
+        { coins: 1000, priceUSD: 79.99 }
+      ]
+    });
+  }
+
+  res.status(200).json({
+    status: 'success',
+    settings
+  });
+});
+
+// Update system configurations
+exports.updateSystemSettings = catchAsync(async (req, res, next) => {
+  const { commissionRate, coinPackages } = req.body;
+
+  let settings = await SystemSetting.findOne();
+  if (!settings) {
+    settings = new SystemSetting();
+  }
+
+  if (commissionRate !== undefined) {
+    settings.commissionRate = commissionRate;
+  }
+
+  if (coinPackages !== undefined) {
+    settings.coinPackages = coinPackages;
+  }
+
+  await settings.save();
+
+  res.status(200).json({
+    status: 'success',
+    settings
+  });
+});

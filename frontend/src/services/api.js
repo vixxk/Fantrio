@@ -16,11 +16,44 @@ class ApiService {
   }
 
   async request(endpoint, options = {}) {
+    const method = options.method || 'GET';
+    const body = options.body ? JSON.parse(options.body) : {};
+
+    // 1. Try real backend API first
+    try {
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      if (this.token) {
+        headers['Authorization'] = `Bearer ${this.token}`;
+      }
+      
+      const fetchOptions = {
+        method,
+        headers,
+      };
+      if (options.body) {
+        fetchOptions.body = options.body;
+      }
+      
+      const res = await fetch(`${BASE_URL}${endpoint}`, fetchOptions);
+      const data = await res.json();
+      if (res.ok) {
+        return data;
+      } else {
+        if (res.status !== 404 && res.status !== 500) {
+          throw new Error(data.message || 'API request failed');
+        }
+      }
+    } catch (err) {
+      console.log('Real API failed or 404, falling back to mock handler:', err.message);
+    }
+
     // Normalise endpoint (e.g. remove query strings)
     const urlObj = new URL(`http://dummy.com${endpoint}`);
     const pathname = urlObj.pathname;
-    const method = options.method || 'GET';
-    const body = options.body ? JSON.parse(options.body) : {};
+    const _q = (urlObj.searchParams.get('search') || '').trim().toLowerCase();
+    const _match = (...fields) => !_q || fields.some((f) => f && String(f).toLowerCase().includes(_q));
 
     // Helper functions to get/set local storage states
     const getBalance = () => {
@@ -443,36 +476,229 @@ class ApiService {
 
     // ROUTING
     if (pathname === '/auth/login') {
+      const isAdmin = body.email === 'admin@fantrio.com';
+      if (isAdmin) {
+        localStorage.setItem('isAdmin', 'true');
+      } else {
+        localStorage.removeItem('isAdmin');
+      }
       return {
         status: 'success',
-        token: 'demo-token-xyz',
+        token: isAdmin ? 'admin-token' : 'demo-token-xyz',
         user: {
-          id: 'usr-demo',
-          username: 'demo_user',
-          displayName: 'Demo User',
+          id: isAdmin ? 'usr-admin' : 'usr-demo',
+          username: isAdmin ? 'admin' : 'demo_user',
+          displayName: isAdmin ? 'System Admin' : 'Demo User',
           email: body.email || 'demo@fantrio.com',
-          role: 'user',
-          avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'
+          role: isAdmin ? 'admin' : 'user',
+          avatarUrl: isAdmin 
+            ? 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80'
+            : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'
         }
       };
     }
 
     if (pathname === '/auth/logout') {
+      localStorage.removeItem('isAdmin');
       return { status: 'success' };
     }
 
     if (pathname === '/auth/me') {
+      const isAdmin = localStorage.getItem('isAdmin') === 'true';
       return {
         status: 'success',
         user: {
-          id: 'usr-demo',
-          username: 'demo_user',
-          displayName: 'Demo User',
-          email: 'johnn@example.com',
-          role: 'user',
-          avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'
+          id: isAdmin ? 'usr-admin' : 'usr-demo',
+          username: isAdmin ? 'admin' : 'demo_user',
+          displayName: isAdmin ? 'System Admin' : 'Demo User',
+          email: isAdmin ? 'admin@fantrio.com' : 'johnn@example.com',
+          role: isAdmin ? 'admin' : 'user',
+          avatarUrl: isAdmin 
+            ? 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80'
+            : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'
         }
       };
+    }
+
+    // Admin Panel Mock Endpoints
+    if (pathname === '/admin/stats') {
+      return {
+        status: 'success',
+        stats: {
+          users: { totalUsers: 15, totalCreators: 5, totalAdmins: 1 },
+          wallet: { totalCoinsCirculating: getBalance() + 25000 },
+          transactions: [
+            { _id: 'purchase', totalCoins: 12000, count: 24 },
+            { _id: 'tip', totalCoins: 8500, count: 12 },
+            { _id: 'subscription', totalCoins: 4500, count: 8 }
+          ],
+          moderation: { totalReportedPosts: 1, totalReportsCount: 2 },
+          calls: { activeCallsCount: 1 }
+        }
+      };
+    }
+
+    if (pathname === '/admin/settings') {
+      const stored = localStorage.getItem('fantrio_admin_settings');
+      const settings = stored ? JSON.parse(stored) : {
+        commissionRate: 0.20,
+        coinPackages: [
+          { coins: 100, priceUSD: 9.99 },
+          { coins: 500, priceUSD: 44.99 },
+          { coins: 1000, priceUSD: 79.99 }
+        ]
+      };
+      return { status: 'success', settings };
+    }
+
+    if (pathname === '/admin/users') {
+      let users = [
+        { _id: 'usr-demo', email: 'johnn@example.com', username: 'johnn', displayName: 'Johnn', role: 'user', isVerified: true, isSuspended: false, createdAt: '2026-07-01' },
+        { _id: 'usr-admin', email: 'admin@fantrio.com', username: 'admin', displayName: 'System Admin', role: 'admin', isVerified: true, isSuspended: false, createdAt: '2026-07-02' },
+        { _id: 'creator-savannah', email: 'savannah@example.com', username: 'savannah_n', displayName: 'Savannah Nguyen', role: 'creator', isVerified: true, isSuspended: false, createdAt: '2026-07-03' },
+        { _id: 'creator-leslie', email: 'leslie@example.com', username: 'leslie_alex', displayName: 'Leslie Alexander', role: 'creator', isVerified: true, isSuspended: false, createdAt: '2026-07-04' }
+      ];
+      if (_q) users = users.filter((u) => _match(u.email, u.username, u.displayName, u.role));
+      return { status: 'success', total: users.length, users };
+    }
+
+    if (pathname.startsWith('/admin/users/')) {
+      const parts = pathname.split('/');
+      const userId = parts[3];
+      if (parts[4] === 'toggle-suspension') {
+        return { status: 'success', message: 'User suspension toggled', isSuspended: true };
+      }
+      if (method === 'PUT') {
+        return { status: 'success', user: { _id: userId, ...body } };
+      }
+      if (method === 'DELETE') {
+        return { status: 'success', message: 'User deleted' };
+      }
+    }
+
+    if (pathname === '/admin/creators') {
+      let profiles = MOCK_CREATORS_DB.map(c => ({
+        _id: c._id,
+        userId: { _id: c._id, username: c.username, email: `${c.username}@example.com`, role: 'creator', displayName: c.displayName },
+        bio: c.bio || 'Professional creator and entertainer',
+        categories: c.categories,
+        rates: c.rates,
+        followerCount: c.followerCount,
+        subscriberCount: Math.floor(c.followerCount / 100),
+        rating: c.rating,
+        verificationStatus: c.isVerifiedBadge ? 'approved' : 'pending',
+        isVerifiedBadge: c.isVerifiedBadge
+      }));
+      if (_q) profiles = profiles.filter((p) => _match(p.userId.username, p.userId.email, p.userId.displayName));
+      return { status: 'success', profiles };
+    }
+
+    if (pathname.startsWith('/admin/creators/')) {
+      const parts = pathname.split('/');
+      const creatorId = parts[3];
+      const action = parts[4];
+      if (action === 'approve') {
+        return { status: 'success', message: 'Creator approved' };
+      }
+      if (action === 'reject') {
+        return { status: 'success', message: 'Creator rejected' };
+      }
+      if (action === 'verify') {
+        return { status: 'success', message: 'Creator verification status toggled' };
+      }
+      if (method === 'PUT') {
+        return { status: 'success', profile: { userId: creatorId, ...body } };
+      }
+    }
+
+    if (pathname === '/admin/posts') {
+      let posts = [
+        { _id: 'post-1', creatorId: { _id: 'creator-savannah', username: 'savannah_n', displayName: 'Savannah Nguyen', avatarUrl: MOCK_CREATORS_DB[0].avatarUrl }, content: 'Exclusive shoot previews for my premium subscribers!', likes: ['user-1'], comments: [], createdAt: '2026-07-05' },
+        { _id: 'post-2', creatorId: { _id: 'creator-leslie', username: 'leslie_alex', displayName: 'Leslie Alexander', avatarUrl: MOCK_CREATORS_DB[1].avatarUrl }, content: 'Going live in 10 minutes, get ready!', likes: [], comments: [], createdAt: '2026-07-06' }
+      ];
+      if (_q) posts = posts.filter((p) => _match(p.content, p.creatorId.displayName, p.creatorId.username));
+      return { status: 'success', posts };
+    }
+
+    if (pathname === '/admin/reports') {
+      let posts = [
+        { 
+          _id: 'post-1', 
+          creatorId: { _id: 'creator-savannah', username: 'savannah_n', displayName: 'Savannah Nguyen', avatarUrl: MOCK_CREATORS_DB[0].avatarUrl }, 
+          content: 'Reported post content.', 
+          reports: [{ userId: { username: 'reporter1', displayName: 'Reporter 1' }, reason: 'Inappropriate content', date: '2026-07-08' }] 
+        }
+      ];
+      if (_q) posts = posts.filter((p) => _match(p.content, p.creatorId.displayName, p.creatorId.username));
+      return { status: 'success', posts };
+    }
+
+    if (pathname.startsWith('/admin/reports/')) {
+      return { status: 'success', message: 'Moderation action successful' };
+    }
+
+    if (pathname === '/admin/transactions') {
+      let transactions = [
+        { _id: 'tx-1', senderId: { username: 'johnn', displayName: 'Johnn', email: 'johnn@example.com' }, receiverId: { username: 'savannah_n', displayName: 'Savannah Nguyen', email: 'savannah@example.com' }, type: 'subscription', amountCoins: 18, status: 'completed', createdAt: '2026-07-07' },
+        { _id: 'tx-2', senderId: { username: 'johnn', displayName: 'Johnn', email: 'johnn@example.com' }, receiverId: null, type: 'deposit', amountCoins: 500, status: 'completed', createdAt: '2026-07-06' }
+      ];
+      if (_q) transactions = transactions.filter((t) => _match(t.type, t.senderId && t.senderId.displayName, t.receiverId && t.receiverId.displayName));
+      return { status: 'success', transactions };
+    }
+
+    if (pathname === '/admin/withdrawals') {
+      let withdrawals = [
+        { _id: 'w-1', senderId: { username: 'savannah_n', displayName: 'Savannah Nguyen', email: 'savannah@example.com' }, type: 'withdrawal', amountCoins: 1000, status: 'pending', createdAt: '2026-07-08' }
+      ];
+      if (_q) withdrawals = withdrawals.filter((w) => _match(w.senderId.displayName, w.senderId.username, w.status));
+      return { status: 'success', withdrawals };
+    }
+
+    if (pathname.startsWith('/admin/withdrawals/')) {
+      return { status: 'success', message: 'Withdrawal cleared' };
+    }
+
+    if (pathname.startsWith('/admin/refund/')) {
+      return { status: 'success', message: 'Transaction refunded' };
+    }
+
+    if (pathname === '/admin/announcements') {
+      const announcements = [
+        { _id: 'a-1', title: 'V2 Platform Upgrade complete!', content: 'We successfully rolled out new call protocols for clearer audio/video calls.', category: 'news', createdAt: '2026-07-02' }
+      ];
+      return { status: 'success', announcements };
+    }
+
+    if (pathname.startsWith('/admin/announcements')) {
+      if (method === 'POST') return { status: 'success', announcement: { _id: 'a-' + Date.now(), ...body } };
+      if (method === 'PUT') return { status: 'success', announcement: { _id: pathname.split('/').pop(), ...body } };
+      if (method === 'DELETE') return { status: 'success', message: 'Announcement deleted' };
+    }
+
+    if (pathname === '/admin/tickets') {
+      let tickets = [
+        { _id: 't-1', userId: { username: 'johnn', displayName: 'Johnn', email: 'johnn@example.com' }, subject: 'Coin Purchase Issue', message: 'I bought 500 coins but did not receive them.', status: 'pending', createdAt: '2026-07-08' },
+        { _id: 't-2', userId: { username: 'savannah_n', displayName: 'Savannah Nguyen', email: 'savannah@example.com' }, subject: 'Payout delayed', message: 'My withdrawal is taking too long.', status: 'resolved', createdAt: '2026-07-09' }
+      ];
+      if (_q) tickets = tickets.filter((t) => _match(t.subject, t.message, t.userId.displayName, t.userId.username, t.status));
+      return { status: 'success', tickets };
+    }
+
+    if (pathname.startsWith('/admin/tickets')) {
+      if (method === 'PUT') return { status: 'success', ticket: { _id: pathname.split('/').pop(), ...body } };
+      if (method === 'DELETE') return { status: 'success', message: 'Ticket deleted' };
+    }
+
+    if (pathname === '/admin/features') {
+      const features = [
+        { _id: 'f-1', userId: { username: 'johnn', displayName: 'Johnn', email: 'johnn@example.com' }, title: 'Group Video Streams', description: 'Host streams with multiple co-hosts.', votes: ['user-1'], status: 'planned', createdAt: '2026-07-07' }
+      ];
+      return { status: 'success', features };
+    }
+
+    if (pathname.startsWith('/admin/features')) {
+      if (method === 'PUT') return { status: 'success', feature: { _id: pathname.split('/').pop(), ...body } };
+      if (method === 'DELETE') return { status: 'success', message: 'Feature request deleted' };
     }
 
     if (pathname === '/wallet/balance') {

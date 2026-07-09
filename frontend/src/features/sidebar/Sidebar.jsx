@@ -14,12 +14,14 @@ import {
   LogOut, 
   Moon, 
   Sun,
-  Menu
+  Menu,
+  LayoutDashboard
 } from 'lucide-react';
 import styles from './Sidebar.module.css';
 
 export const Sidebar = ({ onClose }) => {
   const { 
+    user,
     balance, 
     activeTab, 
     setActiveTab, 
@@ -41,6 +43,10 @@ export const Sidebar = ({ onClose }) => {
     { name: 'Settings', icon: Settings, badge: null },
     { name: 'More', icon: LayoutGrid, badge: null }
   ];
+
+  if (user && user.role === 'admin') {
+    menuItems.push({ name: 'Admin Panel', icon: LayoutDashboard, badge: 'Admin' });
+  }
 
   const handleAddCoins = async () => {
     try {

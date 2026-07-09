@@ -27,6 +27,21 @@ const seed = async () => {
     // Default password (will be hashed once by User pre-save hook)
     const hashedPassword = 'password123';
 
+    // 0. Create Admin User from environment variables
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@fantrio.com';
+    const adminUsername = process.env.ADMIN_USERNAME || 'admin';
+    const adminPassword = process.env.ADMIN_PASSWORD || 'adminpassword123';
+
+    await User.create({
+      email: adminEmail,
+      password: adminPassword,
+      role: 'admin',
+      isVerified: true,
+      username: adminUsername,
+      displayName: 'System Admin',
+      avatarUrl: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80'
+    });
+
     // 1. Create Logged-In User (Johnn)
     const johnn = await User.create({
       email: 'johnn@example.com',
