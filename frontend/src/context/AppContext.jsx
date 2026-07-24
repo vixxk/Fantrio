@@ -16,6 +16,11 @@ export const AppProvider = ({ children }) => {
   const tabToPath = {
     'Discover Feed': '/discover',
     'All Creators': '/creators',
+    'Creator Analytics': '/creators/analytics',
+    'Creator Audio Calls': '/creators/audio-calls',
+    'Creator Video Calls': '/creators/video-calls',
+    'Creator Profile': '/creators/profile',
+    'Creator Content': '/creators/content',
     'Live Streams': '/live',
     '1:1 Audio Calls': '/audio-calls',
     '1:1 Video Calls': '/video-calls',
@@ -31,6 +36,11 @@ export const AppProvider = ({ children }) => {
     '/': 'Discover Feed',
     '/discover': 'Discover Feed',
     '/creators': 'All Creators',
+    '/creators/analytics': 'Creator Analytics',
+    '/creators/audio-calls': 'Creator Audio Calls',
+    '/creators/video-calls': 'Creator Video Calls',
+    '/creators/profile': 'Creator Profile',
+    '/creators/content': 'Creator Content',
     '/live': 'Live Streams',
     '/audio-calls': '1:1 Audio Calls',
     '/video-calls': '1:1 Video Calls',
@@ -45,6 +55,11 @@ export const AppProvider = ({ children }) => {
   const getTabFromPath = (path) => {
     if (path.startsWith('/admin')) return 'Admin Panel';
     if (path.startsWith('/messages')) return 'Messages';
+    if (path.startsWith('/creators/profile')) return 'Creator Profile';
+    if (path.startsWith('/creators/audio-calls')) return 'Creator Audio Calls';
+    if (path.startsWith('/creators/video-calls')) return 'Creator Video Calls';
+    if (path.startsWith('/creators/analytics')) return 'Creator Analytics';
+    if (path.startsWith('/creators/content')) return 'Creator Content';
     return pathToTab[path] || 'Discover Feed';
   };
 

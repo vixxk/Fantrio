@@ -15,7 +15,8 @@ import {
   Moon, 
   Sun,
   Menu,
-  LayoutDashboard
+  LayoutDashboard,
+  Briefcase
 } from 'lucide-react';
 import styles from './Sidebar.module.css';
 
@@ -41,7 +42,8 @@ export const Sidebar = ({ onClose }) => {
     { name: 'Messages', icon: MessageCircle, badge: 12 },
     { name: 'Buy Coins', icon: Landmark, badge: null },
     { name: 'Settings', icon: Settings, badge: null },
-    { name: 'More', icon: LayoutGrid, badge: null }
+    { name: 'More', icon: LayoutGrid, badge: null },
+    { name: 'Creator', icon: Briefcase, badge: 'New', href: '/creators/analytics' }
   ];
 
   if (user && user.role === 'admin') {
@@ -80,6 +82,35 @@ export const Sidebar = ({ onClose }) => {
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.name;
+          
+          if (item.href) {
+            return (
+              <a
+                key={item.name}
+                href={item.href}
+                className={`${styles.navItem} ${isActive ? styles.active : ''} ${styles.creatorLink}`}
+              >
+                <div className={styles.navItemLeft}>
+                  <Icon size={20} className={styles.navIcon} />
+                  <span className={styles.navLabel}>{item.name}</span>
+                </div>
+                {item.badge && (
+                  <span 
+                    className={
+                      item.badge === 'Live' 
+                        ? styles.liveBadge 
+                        : item.badge === 'New'
+                        ? styles.newBadge
+                        : styles.countBadge
+                    }
+                  >
+                    {item.badge}
+                  </span>
+                )}
+              </a>
+            );
+          }
+          
           return (
             <button
               key={item.name}

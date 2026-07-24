@@ -169,6 +169,27 @@
   padding: 0.1rem;
 }
 
+.newBadge {
+  background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  animation: pulse 2s infinite;
+}
+
+.creatorLink {
+  text-decoration: none;
+  color: inherit;
+}
+
+.creatorLink:hover {
+  color: inherit;
+}
+
 .promotions {
   display: flex;
   flex-direction: column;
@@ -461,6 +482,14 @@
 
 .light .logoutButton:hover {
   background-color: rgba(255, 59, 48, 0.08);
+}
+
+.light .newBadge {
+  background: linear-gradient(135deg, #2563eb 0%, #0891b2 100%);
+}
+
+.light .creatorLink {
+  color: inherit;
 }
 
 .light .logoText {

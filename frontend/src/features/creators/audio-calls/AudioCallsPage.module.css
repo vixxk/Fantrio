@@ -1,0 +1,1599 @@
+/* ================= AUDIO CALLS PAGE ================= */
+.callsContainer {
+  width: 100%;
+  min-height: 100%;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ================= PAGE HEADER ================= */
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.pageTitle {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.pageSubtitle {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+/* ================= MAIN GRID ================= */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.5rem;
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.rightSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ================= HERO CARD ================= */
+.heroCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.heroContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.heroIconWrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.heroIcon {
+  color: #10b981;
+}
+
+.heroInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.heroTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.heroDesc {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+.rateInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.rateLabel {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.rateValue {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #10b981;
+}
+
+.rateUnit {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.onlineStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: #ffffff;
+  margin-top: 0.25rem;
+}
+
+.onlineDot {
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.heroWaveform {
+  width: 280px;
+  height: 80px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.waveformSvg {
+  width: 100%;
+  height: 100%;
+}
+
+.heroActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.goLiveBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #047857 0%, #047857 90%, #ffffff 100%);
+  border: none;
+  color: #ffffff;
+  padding: 0.85rem 1.5rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.goLiveBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
+
+.editRateBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  color: #10b981;
+  padding: 0.85rem 1.5rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.editRateBtn:hover {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: #10b981;
+}
+
+/* ================= STATS GRID ================= */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.75rem;
+}
+
+.statCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  justify-content: center;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.statCard:hover {
+  border-color: rgba(225, 0, 117, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.statLabelRow {
+  margin-bottom: 0.15rem;
+}
+
+.statValueRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.15rem;
+}
+
+.statIconWrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.statLabel {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+  display: block;
+}
+
+.statValue {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.statValueCol {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.statChangeInline {
+  margin-left: auto;
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.statChangeInline.positive {
+  color: #10b981;
+}
+
+.statChangeInline.negative {
+  color: #ef4444;
+}
+
+.statPeriod {
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.4);
+  display: block;
+}
+
+.statLink {
+  font-size: 0.7rem;
+  color: #f59e0b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.statLink:hover {
+  color: #fbbf24;
+}
+
+/* ================= CALLS TABLE ================= */
+.callsTableCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.tableHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.tableTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.tableTabs {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.tab {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 0.65rem 1.1rem;
+  border-radius: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.tab:hover {
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.activeTab {
+  background: transparent !important;
+  color: #e10075 !important;
+  position: relative;
+}
+
+.activeTab::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #e10075;
+  border-radius: 1px;
+}
+
+.tableContainer {
+  overflow-x: auto;
+}
+
+.callsTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.th {
+  text-align: left;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  padding: 0 1rem 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.tableRow {
+  transition: background 0.2s ease;
+}
+
+.tableRow:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.td {
+  padding: 1rem 1rem 1rem 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+  vertical-align: middle;
+}
+
+.fanInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.fanAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.fanDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.fanName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.verifiedBadge {
+  color: #3b82f6;
+  font-size: 0.75rem;
+}
+
+.dateTime {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: pre-line;
+}
+
+.earned {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.statusBadge {
+  padding: 0.3rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.statusCompleted {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.statusMissed {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.statusPending {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.moreBtn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.moreBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.loadMore {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.loadMoreBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: none;
+  color: #e10075;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.loadMoreBtn:hover {
+  opacity: 0.8;
+}
+
+/* ================= RIGHT SIDEBAR CARDS ================= */
+.earningsCard,
+.peakCard,
+.tipsCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+/* ================= EARNINGS CARD ================= */
+.earningsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.earningsTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.earningsIconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.earningsIcon {
+  color: #9b51e0;
+  font-size: 14px;
+}
+
+.earningsTitle {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.periodBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.periodBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.earningsAmount {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #10b981;
+  margin-bottom: 0.25rem;
+  letter-spacing: -0.02em;
+}
+
+.earningsChange {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.earningsChange .positive {
+  color: #10b981;
+  font-weight: 600;
+  font-size: 0.82rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.changeLabel {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.earningsStats {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.earningsStat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.earningsStat:last-child {
+  border-bottom: none;
+}
+
+.earningsStatLabel {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.earningsStatValue {
+  font-size: 0.85rem;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.viewEarningsBtn {
+  width: 100%;
+  background: linear-gradient(135deg, #9b51e0 0%, #e10075 50%, #ff4d6a 80%, #3b82f6 100%);
+  border: none;
+  color: #ffffff;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 1.25rem;
+}
+
+.viewEarningsBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+/* ================= PEAK HOURS ================= */
+.peakHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.peakTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.peakTitle {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.peakChartWrapper {
+  display: flex;
+  gap: 0;
+  margin-bottom: 0.75rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.peakYAxis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0 0.5rem 0 0;
+  height: 120px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.peakYLabel {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.45);
+  text-align: right;
+  min-width: 20px;
+  font-weight: 500;
+}
+
+.peakChart {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 120px;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  padding-left: 6px;
+  position: relative;
+  min-width: 280px;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent calc(25% - 1px),
+    rgba(255, 255, 255, 0.06) calc(25% - 1px),
+    rgba(255, 255, 255, 0.06) 25%
+  );
+}
+
+.peakBar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.peakBarFill {
+  width: 80%;
+  max-width: 12px;
+  background: linear-gradient(180deg, #e10075 0%, #9b51e0 50%, #7c3aed 100%);
+  border-radius: 3px 3px 0 0;
+  transition: all 0.3s ease;
+  min-height: 2px;
+}
+
+.peakBarFill:hover {
+  filter: brightness(1.2);
+  transform: scaleY(1.02);
+}
+
+.peakBarLabel {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 6px;
+  white-space: nowrap;
+}
+
+.peakLegend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.peakLegendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #9b51e0;
+}
+
+.peakLegendText {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.peakInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.peakTime {
+  font-size: 0.82rem;
+  color: #10b981;
+  font-weight: 500;
+}
+
+.peakBoost {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ================= TIPS CARD ================= */
+.tipsHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tipsIconWrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tipsIcon {
+  color: #3b82f6;
+}
+
+.tipsTitle {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.tipsList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.tipItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+}
+
+.tipCheck {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.tipCheckIcon {
+  color: #3b82f6;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.viewAllTipsBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: none;
+  color: #e10075;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  padding: 0;
+}
+
+.viewAllTipsBtn:hover {
+  opacity: 0.8;
+}
+
+/* ================= CREATOR SIDEBAR ================= */
+.creatorSidebar {
+  position: fixed;
+  bottom: 2rem;
+  left: calc(240px + 2rem);
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 200px;
+  z-index: 10;
+}
+
+.creatorProfile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.75rem;
+}
+
+.creatorAvatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(225, 0, 117, 0.3);
+}
+
+.creatorInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.creatorNameRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.creatorName {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.verifiedIcon {
+  color: #3b82f6;
+  font-size: 0.75rem;
+}
+
+.creatorHandle {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.onlineStatusLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: #10b981;
+  margin-top: 0.25rem;
+}
+
+.viewProfileBtn {
+  width: 100%;
+  background: rgba(225, 0, 117, 0.1);
+  border: 1px solid rgba(225, 0, 117, 0.3);
+  color: #e10075;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.viewProfileBtn:hover {
+  background: rgba(225, 0, 117, 0.2);
+}
+
+/* ================= LIGHT THEME OVERRIDES ================= */
+.light {
+  color: #1a1625;
+}
+
+.light .pageTitle,
+.light .heroTitle,
+.light .tableTitle,
+.light .creatorName {
+  color: #1a1625;
+}
+
+.light .pageSubtitle {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .heroCard,
+.light .statCard,
+.light .callsTableCard,
+.light .earningsCard,
+.light .peakCard,
+.light .tipsCard,
+.light .creatorSidebar {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.light .heroCard:hover,
+.light .statCard:hover,
+.light .callsTableCard:hover,
+.light .earningsCard:hover,
+.light .peakCard:hover {
+  border-color: rgba(225, 0, 117, 0.2);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+.light .heroIconWrap {
+  background: rgba(16, 185, 129, 0.15);
+}
+
+.light .heroDesc,
+.light .rateLabel,
+.light .statLabel,
+.light .statPeriod,
+.light .dateTime,
+.light .earningsStatLabel,
+.light .changeLabel,
+.light .creatorHandle,
+.light .earningsTitle,
+.light .peakTitle,
+.light .tipsTitle {
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .rateUnit {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .statValue,
+.light .fanName,
+.light .earningsStatValue,
+.light .earningsAmount {
+  color: #1a1625;
+}
+
+.light .earningsAmount {
+  color: #059669;
+}
+
+.light .periodBtn {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .periodBtn:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.light .tab {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .tab:hover {
+  color: rgba(26, 22, 37, 0.8);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.light .activeTab {
+  color: #e10075 !important;
+}
+
+.light .activeTab::after {
+  background: #e10075;
+}
+
+.light .th {
+  color: rgba(26, 22, 37, 0.4);
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .tableRow:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.light .td {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .tipItem {
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .moreBtn {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .moreBtn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .earningsStat {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .peakYLabel,
+.light .peakBarLabel,
+.light .peakLegendText {
+  color: rgba(26, 22, 37, 0.35);
+}
+
+.light .peakChart {
+  border-left-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .statIconWrap {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.light .statChangeInline.positive {
+  color: #059669;
+}
+
+.light .statChangeInline.negative {
+  color: #dc2626;
+}
+
+.light .heroIcon {
+  color: #059669;
+}
+
+.light .rateValue {
+  color: #059669;
+}
+
+.light .onlineStatus {
+  color: #1a1625;
+}
+
+.light .onlineDot {
+  background: #059669;
+}
+
+.light .goLiveBtn {
+  background: linear-gradient(135deg, #047857 0%, #059669 90%, #d1fae5 100%);
+  color: #ffffff;
+}
+
+.light .editRateBtn {
+  border-color: rgba(5, 150, 105, 0.5);
+  color: #059669;
+}
+
+.light .editRateBtn:hover {
+  background: rgba(5, 150, 105, 0.1);
+  border-color: #059669;
+}
+
+.light .earningsIconWrap {
+  background: transparent;
+}
+
+.light .earningsIcon {
+  color: #7e00f3;
+}
+
+.light .tipsIconWrap {
+  background: rgba(37, 99, 235, 0.12);
+}
+
+.light .tipsIcon {
+  color: #2563eb;
+}
+
+.light .tipCheckIcon {
+  color: #2563eb;
+}
+
+.light .viewEarningsBtn {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.light .viewEarningsBtn:hover {
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+}
+
+.light .peakTime {
+  color: #059669;
+}
+
+.light .peakBoost {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .loadMoreBtn {
+  color: #e10075;
+}
+
+.light .statusCompleted {
+  background: rgba(5, 150, 105, 0.12);
+  color: #059669;
+}
+
+.light .statusMissed {
+  background: rgba(220, 38, 38, 0.12);
+  color: #dc2626;
+}
+
+.light .statusPending {
+  background: rgba(217, 119, 6, 0.12);
+  color: #d97706;
+}
+
+.light .earned {
+  color: #059669;
+}
+
+/* ================= RESPONSIVE DESIGN ================= */
+@media (max-width: 1200px) {
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .rightSidebar {
+    flex-direction: row;
+    gap: 1.5rem;
+  }
+
+  .earningsCard,
+  .peakCard,
+  .tipsCard {
+    flex: 1;
+  }
+
+  .creatorSidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .callsContainer {
+    padding: 0 0 2rem 0 !important;
+  }
+
+  .pageHeader {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 1rem !important;
+  }
+
+  .pageTitle {
+    font-size: 1.15rem !important;
+  }
+
+  .pageSubtitle {
+    font-size: 0.7rem !important;
+  }
+
+  .hideMobile {
+    display: none !important;
+  }
+
+  .mainGrid {
+    gap: 0.75rem !important;
+  }
+
+  .rightSidebar {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+  }
+
+  .heroCard,
+  .statCard,
+  .callsTableCard,
+  .earningsCard,
+  .peakCard,
+  .tipsCard {
+    padding: 0.75rem !important;
+    border-radius: 10px !important;
+  }
+
+  .heroContent {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .heroIconWrap {
+    width: 40px;
+    height: 40px;
+  }
+
+  .heroIcon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .heroWaveform {
+    display: none;
+  }
+
+  .heroActions {
+    grid-template-columns: 1fr;
+  }
+
+  .goLiveBtn,
+  .editRateBtn {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.78rem !important;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  .statCard {
+    padding: 0.7rem !important;
+  }
+
+  .statIconWrap {
+    width: 30px !important;
+    height: 30px !important;
+  }
+
+  .statIconWrap svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .statLabel {
+    font-size: 0.62rem !important;
+  }
+
+  .statValue {
+    font-size: 1.1rem !important;
+  }
+
+  .statChangeInline {
+    font-size: 0.65rem !important;
+  }
+
+  .statPeriod {
+    font-size: 0.5rem !important;
+  }
+
+  .tableHeader {
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .tableTitle {
+    font-size: 0.82rem !important;
+  }
+
+  .tableTabs {
+    overflow-x: auto;
+    gap: 0.1rem !important;
+  }
+
+  .tab {
+    padding: 0.3rem 0.5rem !important;
+    font-size: 0.68rem !important;
+    white-space: nowrap;
+  }
+
+  .fanAvatar {
+    width: 28px;
+    height: 28px;
+  }
+
+  .fanName {
+    font-size: 0.75rem !important;
+  }
+
+  .dateTime {
+    font-size: 0.65rem !important;
+  }
+
+  .td {
+    padding: 0.5rem 0.35rem 0.5rem 0 !important;
+    font-size: 0.68rem !important;
+  }
+
+  .th {
+    padding: 0 0.35rem 0.4rem 0 !important;
+    font-size: 0.58rem !important;
+  }
+
+  .earningsAmount {
+    font-size: 1.2rem !important;
+  }
+
+  .earningsTitle {
+    font-size: 0.65rem !important;
+  }
+
+  .peakTitle {
+    font-size: 0.65rem !important;
+  }
+
+  .peakChart {
+    height: 65px !important;
+  }
+
+  .peakYAxis {
+    height: 65px !important;
+  }
+
+  .peakYLabel {
+    font-size: 0.52rem !important;
+  }
+
+  .peakBarLabel {
+    font-size: 0.48rem !important;
+  }
+
+  .peakTime,
+  .peakBoost {
+    font-size: 0.62rem !important;
+  }
+
+  .tipsTitle {
+    font-size: 0.65rem !important;
+  }
+
+  .tipItem {
+    font-size: 0.65rem !important;
+  }
+
+  .viewEarningsBtn {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  .loadMoreBtn {
+    font-size: 0.7rem !important;
+  }
+
+  .periodTextBtn {
+    font-size: 0.62rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .callsContainer {
+    padding: 0 0 1.25rem 0 !important;
+  }
+
+  .pageTitle {
+    font-size: 1rem !important;
+  }
+
+  .pageHeader {
+    margin-bottom: 0.65rem !important;
+    gap: 0.4rem;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.4rem !important;
+  }
+
+  .statCard {
+    padding: 0.5rem !important;
+  }
+
+  .statIconWrap {
+    width: 26px !important;
+    height: 26px !important;
+  }
+
+  .statIconWrap svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .statLabel {
+    font-size: 0.58rem !important;
+  }
+
+  .statValue {
+    font-size: 0.95rem !important;
+  }
+
+  .statChangeInline {
+    font-size: 0.6rem !important;
+  }
+
+  .statPeriod {
+    font-size: 0.45rem !important;
+  }
+
+  .heroCard,
+  .statCard,
+  .callsTableCard,
+  .earningsCard,
+  .peakCard,
+  .tipsCard {
+    padding: 0.55rem !important;
+    border-radius: 8px !important;
+  }
+
+  .heroIconWrap {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .heroIcon {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .heroTitle {
+    font-size: 0.9rem !important;
+  }
+
+  .heroDesc {
+    font-size: 0.65rem !important;
+  }
+
+  .rateInfo {
+    gap: 0.25rem;
+  }
+
+  .rateValue {
+    font-size: 0.85rem !important;
+  }
+
+  .goLiveBtn,
+  .editRateBtn {
+    padding: 0.4rem 0.6rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  .heroActions {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .tableHeader {
+    gap: 0.75rem;
+  }
+
+  .tab {
+    padding: 0.25rem 0.4rem !important;
+    font-size: 0.62rem !important;
+  }
+
+  .hideMobile {
+    display: none !important;
+  }
+
+  .tableTitle {
+    font-size: 0.72rem !important;
+  }
+
+  .fanAvatar {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  .fanName {
+    font-size: 0.68rem !important;
+  }
+
+  .dateTime {
+    font-size: 0.58rem !important;
+  }
+
+  .td {
+    padding: 0.35rem 0.25rem 0.35rem 0 !important;
+    font-size: 0.6rem !important;
+  }
+
+  .th {
+    padding: 0 0.25rem 0.35rem 0 !important;
+    font-size: 0.52rem !important;
+  }
+
+  .callsTableCard {
+    padding: 0.5rem !important;
+  }
+
+  .earningsAmount {
+    font-size: 1rem !important;
+  }
+
+  .earningsTitle,
+  .peakTitle,
+  .tipsTitle {
+    font-size: 0.6rem !important;
+  }
+
+  .earningsStatLabel,
+  .earningsStatValue {
+    font-size: 0.62rem !important;
+  }
+
+  .viewEarningsBtn {
+    padding: 0.4rem 0.6rem !important;
+    font-size: 0.68rem !important;
+  }
+
+  .tipItem {
+    font-size: 0.62rem !important;
+    gap: 0.3rem !important;
+  }
+
+  .loadMoreBtn {
+    font-size: 0.62rem !important;
+  }
+
+  .periodTextBtn {
+    font-size: 0.55rem !important;
+  }
+}

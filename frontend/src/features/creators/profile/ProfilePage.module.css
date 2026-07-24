@@ -1,0 +1,1248 @@
+/* ================= PROFILE PAGE ================= */
+.profileContainer {
+  width: 100%;
+  min-height: 100%;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ================= PAGE HEADER ================= */
+.pageHeader {
+  margin-bottom: 1rem;
+}
+
+.welcomeTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.welcomeSubtitle {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+/* ================= PREVIEW SECTION ================= */
+.previewSection {
+  margin-bottom: 1.5rem;
+}
+
+.previewTitle {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.25rem 0;
+  letter-spacing: -0.02em;
+}
+
+.previewSubtitle {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+/* ================= MAIN GRID ================= */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.5rem;
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.rightSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ================= HERO CARD ================= */
+.heroCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.coverImage {
+  position: relative;
+  height: 200px;
+}
+
+.coverImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.coverOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(18, 18, 18, 0.9) 100%);
+}
+
+.heroContent {
+  padding: 0 1.5rem 1.5rem;
+  margin-top: -60px;
+  position: relative;
+}
+
+.profilePicWrap {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 1rem;
+}
+
+.profilePic {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #121212;
+}
+
+.onlineIndicator {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 16px;
+  height: 16px;
+  background: #10b981;
+  border-radius: 50%;
+  border: 3px solid #121212;
+}
+
+.profileInfo {
+  margin-bottom: 1.25rem;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.profileName {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+
+.verifiedBadge {
+  color: #3b82f6;
+}
+
+.handleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.handle {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.onlineStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  color: #10b981;
+}
+
+.onlineDot {
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.role {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.bio {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+  margin: 0;
+  white-space: pre-line;
+}
+
+/* ================= STATS ROW ================= */
+.statsRow {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 1.25rem;
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.statIcon {
+  color: #e10075;
+}
+
+.statContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.statValue {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.statLabel {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ================= ACTION BUTTONS ================= */
+.actionButtons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btnContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+}
+
+.btnLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.btnSublabel {
+  font-size: 0.72rem;
+  opacity: 0.7;
+}
+
+.actionBtn.primary {
+  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
+  border: none;
+  color: #ffffff;
+}
+
+.actionBtn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(225, 0, 117, 0.3);
+}
+
+.actionBtn.secondary {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border: none;
+  color: #ffffff;
+}
+
+.actionBtn.secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+}
+
+.actionBtn.outline {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.actionBtn.outline:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* ================= BOTTOM GRID ================= */
+.bottomGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+/* ================= PLANS CARD ================= */
+.plansCard,
+.callRatesCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.plansHeader,
+.callRatesHeader {
+  margin-bottom: 1rem;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.25rem 0;
+}
+
+.sectionSubtitle {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.planCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.planHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.planName {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.planPrice {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.priceValue {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.pricePeriod {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.planFeatures {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.planFeature {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.checkIcon {
+  color: #10b981;
+  flex-shrink: 0;
+}
+
+.subscribeBtn {
+  width: 100%;
+  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
+  border: none;
+  color: #ffffff;
+  padding: 0.75rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.subscribeBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(225, 0, 117, 0.3);
+}
+
+/* ================= CALL RATES ================= */
+.callRatesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.callRateCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+}
+
+.callRateIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.callRateInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.callRateType {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.callRatePrice {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.callRateValue {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #10b981;
+}
+
+.callRateUnit {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.callRateDesc {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.callNowBtn {
+  width: 100%;
+  border: none;
+  color: #ffffff;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.callNowBtn:hover {
+  transform: translateY(-1px);
+  opacity: 0.9;
+}
+
+/* ================= CONTENT CARD ================= */
+.contentCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.contentHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.contentTabs {
+  display: flex;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.contentTab {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.contentTab:hover {
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.activeContentTab {
+  background: rgba(225, 0, 117, 0.15) !important;
+  color: #e10075 !important;
+}
+
+.viewAllLink {
+  background: transparent;
+  border: none;
+  color: #e10075;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.viewAllLink:hover {
+  opacity: 0.8;
+}
+
+.contentGrid {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  position: relative;
+}
+
+.contentItem {
+  min-width: 180px;
+  flex-shrink: 0;
+}
+
+.contentThumb {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.thumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.contentBadge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.playOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.contentStats {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.contentStats .statItem {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.contentInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.contentTitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.contentTime {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.carouselNext {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.carouselNext:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ================= RIGHT SIDEBAR CARDS ================= */
+.aboutCard,
+.insightsCard,
+.fanCard,
+.subscribeCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.cardTitle {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 1rem 0;
+}
+
+/* ================= ABOUT ME ================= */
+.aboutBio {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+  margin: 0 0 1.25rem 0;
+}
+
+.aboutDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.aboutItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.aboutIcon {
+  color: #e10075;
+  flex-shrink: 0;
+}
+
+.aboutLabel {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.5);
+  min-width: 100px;
+}
+
+.aboutValue {
+  font-size: 0.82rem;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+/* ================= INSIGHTS ================= */
+.insightsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.insightsHeader .cardTitle {
+  margin: 0;
+}
+
+.periodBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.periodBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.insightsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.insightRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.insightLabel {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.insightRight {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.insightValue {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.insightChange {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.insightChange.positive {
+  color: #10b981;
+}
+
+.insightChange.negative {
+  color: #ef4444;
+}
+
+/* ================= FAN SPOTLIGHT ================= */
+.fanHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.fanHeader .cardTitle {
+  margin: 0;
+}
+
+.viewAllBtn {
+  background: transparent;
+  border: none;
+  color: #e10075;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fanContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fanInfo {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+}
+
+.fanAvatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.fanDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.fanLabel {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.fanNameRow {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.fanName {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.fanVerified {
+  color: #3b82f6;
+}
+
+.fanSpent {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.fanMessage {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+  margin: 0;
+}
+
+.fanDots {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.activeDot {
+  background: #e10075;
+}
+
+/* ================= SUBSCRIBE & SAVE ================= */
+.subscribeCard {
+  background: linear-gradient(135deg, rgba(225, 0, 117, 0.1) 0%, rgba(126, 0, 243, 0.1) 100%);
+  border-color: rgba(225, 0, 117, 0.2);
+}
+
+.subscribeTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.5rem 0;
+}
+
+.subscribeSubtitle {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 0 1rem 0;
+}
+
+.subscribeNowBtn {
+  width: 100%;
+  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
+  border: none;
+  color: #ffffff;
+  padding: 0.85rem;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.subscribeNowBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(225, 0, 117, 0.3);
+}
+
+.subscribePrice {
+  font-size: 0.78rem;
+  opacity: 0.8;
+}
+
+/* ================= CREATOR SIDEBAR ================= */
+.creatorSidebar {
+  position: fixed;
+  bottom: 2rem;
+  left: calc(240px + 2rem);
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 200px;
+  z-index: 10;
+}
+
+.creatorProfile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.75rem;
+}
+
+.sidebarAvatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(225, 0, 117, 0.3);
+}
+
+.sidebarInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.sidebarNameRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.sidebarName {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.verifiedIcon {
+  color: #3b82f6;
+  font-size: 0.75rem;
+}
+
+.sidebarHandle {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.sidebarOnline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: #10b981;
+  margin-top: 0.25rem;
+}
+
+.viewProfileBtn {
+  width: 100%;
+  background: rgba(225, 0, 117, 0.1);
+  border: 1px solid rgba(225, 0, 117, 0.3);
+  color: #e10075;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.viewProfileBtn:hover {
+  background: rgba(225, 0, 117, 0.2);
+}
+
+/* ================= LIGHT THEME OVERRIDES ================= */
+.light {
+  color: #1a1625;
+}
+
+.light .welcomeTitle,
+.light .previewTitle,
+.light .profileName,
+.light .cardTitle,
+.light .sectionTitle,
+.light .planName,
+.light .callRateType,
+.light .contentTitle,
+.light .subscribeTitle,
+.light .sidebarName,
+.light .fanName {
+  color: #1a1625;
+}
+
+.light .welcomeSubtitle,
+.light .previewSubtitle,
+.light .handle,
+.light .role,
+.light .statLabel,
+.light .sectionSubtitle,
+.light .pricePeriod,
+.light .callRateDesc,
+.light .callRateUnit,
+.light .contentTime,
+.light .aboutLabel,
+.light .fanLabel,
+.light .fanSpent,
+.light .sidebarHandle {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .bio,
+.light .aboutBio,
+.light .fanMessage,
+.light .subscribeSubtitle {
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .statValue,
+.light .priceValue,
+.light .callRateValue,
+.light .insightValue,
+.light .aboutValue {
+  color: #1a1625;
+}
+
+.light .heroCard,
+.light .plansCard,
+.light .callRatesCard,
+.light .contentCard,
+.light .aboutCard,
+.light .insightsCard,
+.light .fanCard,
+.light .subscribeCard,
+.light .creatorSidebar {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.light .subscribeCard {
+  background: linear-gradient(135deg, rgba(225, 0, 117, 0.05) 0%, rgba(126, 0, 243, 0.05) 100%);
+}
+
+.light .planCard,
+.light .callRateCard {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .periodBtn {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .periodBtn:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.light .contentTab {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .contentTab:hover {
+  color: rgba(26, 22, 37, 0.8);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.light .activeContentTab {
+  background: rgba(225, 0, 117, 0.1) !important;
+  color: #e10075 !important;
+}
+
+.light .aboutItem {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .insightRow {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .dot {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.light .activeDot {
+  background: #e10075;
+}
+
+/* ================= RESPONSIVE DESIGN ================= */
+@media (max-width: 1200px) {
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .rightSidebar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  .aboutCard,
+  .insightsCard,
+  .fanCard,
+  .subscribeCard {
+    flex: 1;
+    min-width: 280px;
+  }
+
+  .creatorSidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .profileContainer {
+    padding: 0 0 2rem 0 !important;
+  }
+
+  .previewTitle {
+    font-size: 1.35rem !important;
+  }
+
+  .mainGrid {
+    gap: 1rem !important;
+  }
+
+  .rightSidebar {
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+
+  .heroCard,
+  .plansCard,
+  .callRatesCard,
+  .contentCard,
+  .aboutCard,
+  .insightsCard,
+  .fanCard,
+  .subscribeCard {
+    padding: 1rem !important;
+    border-radius: 12px !important;
+  }
+
+  .coverImage {
+    height: 140px !important;
+  }
+
+  .profilePicWrap {
+    width: 80px !important;
+    height: 80px !important;
+  }
+
+  .profileName {
+    font-size: 1.25rem !important;
+  }
+
+  .statsRow {
+    flex-wrap: wrap;
+    gap: 0.75rem !important;
+  }
+
+  .statItem {
+    min-width: calc(50% - 0.5rem);
+  }
+
+  .actionButtons {
+    flex-direction: column;
+  }
+
+  .actionBtn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .bottomGrid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .callRatesGrid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .contentHeader {
+    flex-wrap: wrap;
+  }
+
+  .contentTabs {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .contentItem {
+    min-width: 150px !important;
+  }
+
+  .contentThumb {
+    height: 160px !important;
+  }
+
+  .aboutItem {
+    flex-wrap: wrap;
+  }
+
+  .aboutLabel {
+    min-width: auto !important;
+    width: 100%;
+  }
+}

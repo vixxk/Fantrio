@@ -1,21 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Sidebar } from './features/sidebar/Sidebar';
+import { CreatorSidebar } from './features/sidebar/CreatorSidebar';
 import { Header } from './features/header/Header';
-import { Stories } from './features/stories/Stories';
-import { LiveStreams } from './features/live/LiveStreams';
-import { LiveStreamsPage } from './features/live/LiveStreamsPage';
-import { Feed } from './features/feed/Feed';
-import { SuggestionsSidebar } from './features/suggestions/SuggestionsSidebar';
-import { Banner } from './features/banner/Banner';
+import { Stories } from './features/users/stories/Stories';
+import { LiveStreams } from './features/users/live/LiveStreams';
+import { LiveStreamsPage } from './features/users/live/LiveStreamsPage';
+import { Feed } from './features/users/feed/Feed';
+import { SuggestionsSidebar } from './features/users/suggestions/SuggestionsSidebar';
+import { Banner } from './features/users/banner/Banner';
 import { AllCreators } from './features/creators/AllCreators';
-import { AudioCallsPage } from './features/audio/AudioCallsPage';
-import { VideoCallsPage } from './features/video/VideoCallsPage';
-import { SubscriptionsPage } from './features/subscriptions/SubscriptionsPage';
-import { MessagesPage } from './features/messages/MessagesPage';
-import { BuyCoinsPage } from './features/coins/BuyCoinsPage';
-import { SettingsPage } from './features/settings/SettingsPage';
-import { MorePage } from './features/more/MorePage';
+import { AnalyticsPage } from './features/creators/analytics/AnalyticsPage';
+import { AudioCallsPage as CreatorAudioCallsPage } from './features/creators/audio-calls/AudioCallsPage';
+import { VideoCallsPage as CreatorVideoCallsPage } from './features/creators/video-calls/VideoCallsPage';
+import { ProfilePage } from './features/creators/profile/ProfilePage';
+import { ContentPage } from './features/creators/content/ContentPage';
+import { AudioCallsPage } from './features/users/audio/AudioCallsPage';
+import { VideoCallsPage } from './features/users/video/VideoCallsPage';
+import { SubscriptionsPage } from './features/users/subscriptions/SubscriptionsPage';
+import { MessagesPage } from './features/users/messages/MessagesPage';
+import { BuyCoinsPage } from './features/users/coins/BuyCoinsPage';
+import { SettingsPage } from './features/users/settings/SettingsPage';
+import { MorePage } from './features/users/more/MorePage';
 import { AdminPage } from './features/admin/AdminPage';
 import { AdminLogin } from './features/admin/AdminLogin';
 import { Menu, X, Compass, Radio, Phone, MessageSquare, User } from 'lucide-react';
@@ -23,6 +29,7 @@ import './App.css';
 
 const AppContent = () => {
   const { darkMode, activeTab, setActiveTab, currentPath, user } = useApp();
+  const isCreatorPage = activeTab.startsWith('Creator');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showBottomNav, setShowBottomNav] = useState(true);
   const lastScrollY = useRef(0);
@@ -106,6 +113,36 @@ const AppContent = () => {
             <AllCreators />
           </div>
         );
+      case 'Creator Analytics':
+        return (
+          <div className="tabAnalytics">
+            <AnalyticsPage />
+          </div>
+        );
+      case 'Creator Audio Calls':
+        return (
+          <div className="tabAnalytics">
+            <CreatorAudioCallsPage />
+          </div>
+        );
+      case 'Creator Video Calls':
+        return (
+          <div className="tabAnalytics">
+            <CreatorVideoCallsPage />
+          </div>
+        );
+      case 'Creator Profile':
+        return (
+          <div className="tabAnalytics">
+            <ProfilePage />
+          </div>
+        );
+      case 'Creator Content':
+        return (
+          <div className="tabAnalytics">
+            <ContentPage />
+          </div>
+        );
       case '1:1 Audio Calls':
         return (
           <div className="tabAudioCalls">
@@ -186,14 +223,18 @@ const AppContent = () => {
 
       {/* Desktop Left Sidebar */}
       <div className="desktopSidebar">
-        <Sidebar />
+        {isCreatorPage ? <CreatorSidebar /> : <Sidebar />}
       </div>
 
       {/* Mobile Drawer Sidebar */}
       {mobileMenuOpen && (
         <div className="mobileSidebarOverlay" onClick={() => setMobileMenuOpen(false)}>
           <div className="mobileSidebarDrawer" onClick={(e) => e.stopPropagation()}>
-            <Sidebar onClose={() => setMobileMenuOpen(false)} />
+            {isCreatorPage ? (
+              <CreatorSidebar onClose={() => setMobileMenuOpen(false)} />
+            ) : (
+              <Sidebar onClose={() => setMobileMenuOpen(false)} />
+            )}
           </div>
         </div>
       )}

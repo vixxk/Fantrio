@@ -250,7 +250,7 @@
 }
 
 .light .badge {
-  border-color: #f7f6fb;
+  border-color: #f6f6f9;
 }
 
 .mobileMenuToggle {
@@ -278,9 +278,129 @@
   background-color: rgba(0, 0, 0, 0.03);
 }
 
+/* Creator Header Custom Styles */
+.creatorHeader {
+  height: 80px;
+  background-color: #08080c;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.creatorHeaderTitleArea {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.creatorHeaderTitle {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.creatorHeaderSubtitle {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0;
+}
+
+.helpCenterBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 99px;
+  padding: 0.45rem 1rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.helpCenterBtn:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+.creatorProfileDropdown {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  padding: 0.25rem 0.5rem;
+}
+
+.creatorProfileDropdown:hover {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border-radius: 12px;
+}
+
+.profileMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.25;
+}
+
+.profileName {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.profileRole {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.light.creatorHeader {
+  background-color: #f6f6f9;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.light .creatorHeaderTitle {
+  color: #1a1625;
+}
+
+.light .creatorHeaderSubtitle {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .helpCenterBtn {
+  border-color: rgba(0, 0, 0, 0.15);
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .helpCenterBtn:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.25);
+  color: #1a1625;
+}
+
+.light .profileName {
+  color: #1a1625;
+}
+
+.light .profileRole {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .creatorProfileDropdown:hover {
+  background-color: rgba(0, 0, 0, 0.03) !important;
+}
+
 @media (max-width: 768px) {
   .mobileMenuToggle {
     display: flex;
+    padding: 0.3rem;
+  }
+
+  .mobileMenuToggle svg {
+    width: 20px;
+    height: 20px;
   }
   
   .header {
@@ -311,28 +431,28 @@
   }
   
   .rightActions {
-    gap: 0.75rem;
+    gap: 0.35rem;
     margin-left: 0;
   }
   
   .coinsIndicator {
-    padding: 0.2rem 0.3rem 0.2rem 0.45rem;
-    gap: 0.35rem;
+    padding: 0.1rem 0.2rem 0.1rem 0.25rem;
+    gap: 0.2rem;
   }
   
   .coinIcon {
-    width: 14px;
-    height: 14px;
+    width: 10px;
+    height: 10px;
   }
   
   .coinsText {
-    font-size: 0.75rem;
+    font-size: 0.55rem;
   }
   
   .plusButton {
-    width: 16px;
-    height: 16px;
-    border-radius: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
   }
   
   .profileDropdown {
@@ -350,8 +470,54 @@
   }
   
   .avatar {
-    width: 30px;
-    height: 30px;
+    width: 22px;
+    height: 22px;
     border-width: 1.5px;
   }
+
+  .creatorHeader {
+    height: 56px;
+  }
+
+  .creatorHeaderTitleArea {
+    flex: 1;
+    min-width: 0;
+    margin-right: auto;
+  }
+
+  .creatorHeaderTitle {
+    display: none;
+  }
+
+  .creatorHeaderSubtitle {
+    display: none;
+  }
+
+  .helpCenterBtn {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.6rem;
+    gap: 0.3rem;
+  }
+
+  .helpCenterBtn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .profileMeta {
+    gap: 0.1rem;
+  }
+
+  .profileName {
+    font-size: 0.75rem;
+  }
+
+  .profileRole {
+    font-size: 0.62rem;
+  }
+
+  .creatorProfileDropdown {
+    padding: 0 !important;
+  }
 }
+
