@@ -55,7 +55,7 @@
 }
 
 .rightSidebar > div:first-child {
-  padding-top: 0;
+  padding-top: 1.25rem;
 }
 
 /* ================= TABS ================= */

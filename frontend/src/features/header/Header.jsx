@@ -39,6 +39,11 @@ export const Header = ({ onMenuToggle }) => {
           title: "Video Call Management",
           subtitle: "Manage your video calls and grow your earnings."
         };
+      case 'Creator Content':
+        return {
+          title: "Content",
+          subtitle: "Manage your posts, videos, and stories. Track performance and engage with your audience."
+        };
       case 'Creator Profile':
         return {
           title: "Profile Settings",

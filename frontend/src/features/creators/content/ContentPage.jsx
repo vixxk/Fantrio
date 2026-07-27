@@ -46,7 +46,6 @@ export const ContentPage = () => {
           {/* Page Header */}
           <div className={styles.pageHeader}>
             <div className={styles.headerLeft}>
-              <h1 className={styles.pageTitle}>Content</h1>
               <div className={styles.tabsRow}>
                 {contentTabs.map((tab) => (
                   <button
