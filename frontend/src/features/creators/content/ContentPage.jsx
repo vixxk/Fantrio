@@ -8,6 +8,7 @@ import {
   contentTabs, contentTypes, sortOptions, contentOverview,
   contentBreakdown, topPerformingContent, recentContent, pagination
 } from './mockData';
+import { PeriodDropdown } from '../analytics/PeriodDropdown';
 import styles from './ContentPage.module.css';
 
 export const ContentPage = () => {
@@ -18,8 +19,6 @@ export const ContentPage = () => {
   const [selectedSort, setSelectedSort] = useState('Newest First');
   const [typeDropdownOpen, setTypeDropdownOpen] = useState(false);
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
-  const [periodDropdownOpen, setPeriodDropdownOpen] = useState(false);
-  const [selectedPeriod, setSelectedPeriod] = useState(contentOverview.period);
   const [currentPage, setCurrentPage] = useState(1);
   const [visibleContent, setVisibleContent] = useState(8);
 
@@ -79,7 +78,7 @@ export const ContentPage = () => {
               <div className={styles.dropdownWrapper}>
                 <button
                   className={styles.dropdownBtn}
-                  onClick={() => { setTypeDropdownOpen(!typeDropdownOpen); setSortDropdownOpen(false); setPeriodDropdownOpen(false); }}
+                  onClick={() => { setTypeDropdownOpen(!typeDropdownOpen); setSortDropdownOpen(false); }}
                 >
                   {selectedType} <ChevronDown size={14} />
                 </button>
@@ -102,7 +101,7 @@ export const ContentPage = () => {
               <div className={styles.dropdownWrapper}>
                 <button
                   className={styles.dropdownBtn}
-                  onClick={() => { setSortDropdownOpen(!sortDropdownOpen); setTypeDropdownOpen(false); setPeriodDropdownOpen(false); }}
+                  onClick={() => { setSortDropdownOpen(!sortDropdownOpen); setTypeDropdownOpen(false); }}
                 >
                   {selectedSort} <ChevronDown size={14} />
                 </button>
@@ -195,21 +194,21 @@ export const ContentPage = () => {
 
             {/* Mobile Card View */}
                     <div className={`${styles.mobileCards} ${styles.showMobile}`}>
-              {displayedContent.map((item) => (
-                <div key={item.id} className={styles.mobileCard}>
+              {displayedContent.map((item) => (                    <div key={item.id} className={styles.mobileCard}>
                   <div className={styles.mobileCardTop}>
                     <div className={styles.mobileCardThumbCol}>
                       <img src={item.thumbnail} alt={item.title} className={styles.mobileCardThumb} />
-                      <div className={styles.mobileCardStatusRow}>
-                        <span className={`${styles.statusBadge} ${item.status === 'Open' ? styles.statusOpen : styles.statusLocked}`}>
-                          {item.status.toUpperCase()}
-                        </span>
-                      </div>
+                      <span className={`${styles.statusBadge} ${item.status === 'Open' ? styles.statusOpen : styles.statusLocked}`}>
+                        {item.status.toUpperCase()}
+                      </span>
                     </div>
                     <div className={styles.mobileCardContent}>
                       <div className={styles.mobileCardTitleRow}>
                         <span className={styles.mobileCardTitle}>{item.title}</span>
                         <div className={styles.mobileCardActions}>
+                          {item.price && (
+                            <span className={styles.priceValue}>{item.price}</span>
+                          )}
                           <button className={styles.actionBtn}><Edit2 size={13} /></button>
                           <button className={styles.actionBtn}><MoreVertical size={13} /></button>
                         </div>
@@ -217,25 +216,20 @@ export const ContentPage = () => {
                       <span className={styles.mobileCardMeta}>
                         {item.type}{item.duration ? ` • ${item.duration}` : ''}
                       </span>
-                    </div>
-                  </div>
-                  <div className={styles.mobileCardStats}>
-                    <div className={styles.mobileStatItem}>
-                      <Eye size={12} />
-                      <span>{item.views}</span>
-                    </div>
-                    <div className={styles.mobileStatItem}>
-                      <Heart size={12} />
-                      <span>{item.likes}</span>
-                    </div>
-                    <div className={styles.mobileStatItem}>
-                        <span className={styles.mobileStatDate}>{item.date}</span>
-                    </div>
-                    {item.price && (
-                      <div className={styles.mobileStatItem}>
-                        <span className={styles.priceValue}>{item.price}</span>
+                      <div className={styles.mobileCardStatsRow}>
+                        <div className={styles.mobileStatsRight}>
+                          <div className={styles.mobileStatItem}>
+                            <Eye size={11} />
+                            <span>{item.views}</span>
+                          </div>
+                          <div className={styles.mobileStatItem}>
+                            <Heart size={11} />
+                            <span>{item.likes}</span>
+                          </div>
+                          <span className={styles.mobileStatDate}>{item.date}</span>
+                        </div>
                       </div>
-                    )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -292,27 +286,7 @@ export const ContentPage = () => {
           <div className={styles.overviewCard}>
             <div className={styles.overviewHeader}>
               <h3 className={styles.overviewTitle}>Content Overview</h3>
-              <div className={styles.dropdownWrapper}>
-                <button
-                  className={styles.dropdownBtn}
-                  onClick={() => { setPeriodDropdownOpen(!periodDropdownOpen); setTypeDropdownOpen(false); setSortDropdownOpen(false); }}
-                >
-                  {selectedPeriod} <ChevronDown size={14} />
-                </button>
-                {periodDropdownOpen && (
-                  <div className={styles.dropdownMenu}>
-                    {contentOverview.periodOptions.map((opt) => (
-                      <button
-                        key={opt}
-                        className={`${styles.dropdownItem} ${selectedPeriod === opt ? styles.dropdownItemActive : ''}`}
-                        onClick={() => { setSelectedPeriod(opt); setPeriodDropdownOpen(false); }}
-                      >
-                        {opt}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <PeriodDropdown variant="text" />
             </div>
             <div className={styles.overviewGrid}>
               {contentOverview.stats.map((stat, idx) => (

@@ -896,10 +896,15 @@
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
-  padding: 0.9rem;
-  border-radius: 14px;
-  background: #0a0a0f;
+  padding: 0.6rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background 0.2s ease;
+}
+
+.mobileActivityCard:hover {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .mobileActivityTop,
@@ -910,9 +915,24 @@
   gap: 0.75rem;
 }
 
+.mobileTopActions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.mobileTypeIcon {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.light .mobileTypeIcon {
+  color: rgba(26, 22, 37, 0.4);
+}
+
 .mobileActivityMeta {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
   gap: 0.4rem;
 }
 
@@ -1151,7 +1171,8 @@
 
 .light .mobileActivityCard {
   background: #ffffff;
-  border-color: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .light .mobileActivityFooter {

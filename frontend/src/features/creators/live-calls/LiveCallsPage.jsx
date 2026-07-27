@@ -19,23 +19,16 @@ import { PeriodDropdown } from '../analytics/PeriodDropdown';
 import styles from './LiveCallsPage.module.css';
 
 const GradientBadgeCheck = ({ size = 14 }) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    style={{ flexShrink: 0, display: 'inline-block', verticalAlign: 'middle' }}
-  >
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, display: 'inline-block', verticalAlign: 'middle' }}>
     <defs>
-      <linearGradient id="badgeGradLiveCalls" x1="0%" y1="0%" x2="100%" y2="100%">
+      <linearGradient id="badgeGradLive" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="#e10075" />
         <stop offset="100%" stopColor="#7e00f3" />
       </linearGradient>
     </defs>
-    <path
-      d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76z"
-      fill="url(#badgeGradLiveCalls)"
+    <path 
+      d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76z" 
+      fill="url(#badgeGradLive)" 
     />
     <path d="m9 12 2 2 4-4" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
@@ -52,7 +45,7 @@ const iconMap = {
 const callRows = [
   {
     id: 1,
-    fan: 'Bella Rose',
+    fan: { name: 'Bella Rose', isVerified: true },
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
     type: 'Video Call',
     typeIcon: Video,
@@ -64,7 +57,7 @@ const callRows = [
   },
   {
     id: 2,
-    fan: 'Michael_23',
+    fan: { name: 'Michael_23', isVerified: false },
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80',
     type: 'Audio Call',
     typeIcon: Phone,
@@ -76,7 +69,7 @@ const callRows = [
   },
   {
     id: 3,
-    fan: 'ChrisFit',
+    fan: { name: 'ChrisFit', isVerified: true },
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80',
     type: 'Video Call',
     typeIcon: Video,
@@ -88,7 +81,7 @@ const callRows = [
   },
   {
     id: 4,
-    fan: 'Alex_World',
+    fan: { name: 'Alex_World', isVerified: false },
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80',
     type: 'Audio Call',
     typeIcon: Phone,
@@ -100,7 +93,7 @@ const callRows = [
   },
   {
     id: 5,
-    fan: 'DannyBoy',
+    fan: { name: 'DannyBoy', isVerified: true },
     avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80',
     type: 'Video Call',
     typeIcon: Video,
@@ -112,7 +105,7 @@ const callRows = [
   },
   {
     id: 6,
-    fan: 'Jake_88',
+    fan: { name: 'Jake_88', isVerified: false },
     avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=120&q=80',
     type: 'Audio Call',
     typeIcon: Phone,
@@ -124,7 +117,7 @@ const callRows = [
   },
   {
     id: 7,
-    fan: 'NickVibes',
+    fan: { name: 'NickVibes', isVerified: true },
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80',
     type: 'Video Call',
     typeIcon: Video,
@@ -136,7 +129,7 @@ const callRows = [
   },
   {
     id: 8,
-    fan: 'FitLover',
+    fan: { name: 'FitLover', isVerified: false },
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80',
     type: 'Audio Call',
     typeIcon: Phone,
@@ -148,7 +141,7 @@ const callRows = [
   },
   {
     id: 9,
-    fan: 'SunsetKing',
+    fan: { name: 'SunsetKing', isVerified: true },
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80',
     type: 'Video Call',
     typeIcon: Video,
@@ -160,7 +153,7 @@ const callRows = [
   },
   {
     id: 10,
-    fan: 'DeepConvo',
+    fan: { name: 'DeepConvo', isVerified: false },
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
     type: 'Audio Call',
     typeIcon: Phone,
@@ -172,7 +165,7 @@ const callRows = [
   },
   {
     id: 11,
-    fan: 'QuietStorm',
+    fan: { name: 'QuietStorm', isVerified: true },
     avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80',
     type: 'Video Call',
     typeIcon: Video,
@@ -184,7 +177,7 @@ const callRows = [
   },
   {
     id: 12,
-    fan: 'StarGazer',
+    fan: { name: 'StarGazer', isVerified: false },
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80',
     type: 'Audio Call',
     typeIcon: Phone,
@@ -410,11 +403,11 @@ export const LiveCallsPage = () => {
                       <tr key={row.id}>
                         <td>
                           <div className={styles.fanInfo}>
-                            <img src={row.avatar} alt={row.fan} className={styles.fanAvatar} />
+                            <img src={row.avatar} alt={row.fan.name} className={styles.fanAvatar} />
                             <div className={styles.fanDetails}>
                               <span className={styles.fanName}>
-                                {row.fan}
-                                <GradientBadgeCheck size={18} />
+                                {row.fan.name}
+                                {row.fan.isVerified && <GradientBadgeCheck size={18} />}
                               </span>
                             </div>
                           </div>
@@ -449,26 +442,24 @@ export const LiveCallsPage = () => {
                 <article key={row.id} className={styles.mobileActivityCard}>
                   <div className={styles.mobileActivityTop}>
                     <div className={styles.fanInfo}>
-                      <img src={row.avatar} alt={row.fan} className={styles.fanAvatar} />
+                      <img src={row.avatar} alt={row.fan.name} className={styles.fanAvatar} />
                       <div className={styles.fanDetails}>
                         <span className={styles.fanName}>
-                          {row.fan}
-                          <GradientBadgeCheck size={18} />
+                          {row.fan.name}
                         </span>
                       </div>
                     </div>
-                    <button className={styles.moreBtn} type="button" aria-label="More actions">
-                      <MoreVertical size={16} />
-                    </button>
+                    <div className={styles.mobileTopActions}>
+                      <row.typeIcon size={16} className={styles.mobileTypeIcon} style={{ color: row.type === 'Video Call' ? '#3b82f6' : '#22c55e' }} />
+                      <button className={styles.moreBtn} type="button" aria-label="More actions">
+                        <MoreVertical size={16} />
+                      </button>
+                    </div>
                   </div>
 
                   <div className={styles.mobileActivityMeta}>
                     <span className={styles.mobileMetaLine}>{row.date} · {row.time}</span>
-                    <span className={styles.mobileMetaLine}>Duration {row.duration}</span>
-                    <span className={styles.mobileMetaLine}>
-                      <row.typeIcon size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />
-                      {row.type}
-                    </span>
+                    <span className={styles.mobileMetaLine}>{row.duration}</span>
                   </div>
 
                   <div className={styles.mobileActivityFooter}>

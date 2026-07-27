@@ -101,10 +101,7 @@ export const CreatorSidebar = ({ onClose }) => {
               <div key={item.label} className={styles.groupContainer}>
                 <button
                   className={`${styles.navItem} ${isLiveCallsActive ? styles.groupActive : ''}`}
-                  onClick={() => {
-                    handleItemClick('Creator Live Calls');
-                    setLiveCallsExpanded(!liveCallsExpanded);
-                  }}
+                  onClick={() => setLiveCallsExpanded(!liveCallsExpanded)}
                 >
                   <div className={styles.navItemLeft}>
                     <GroupIcon size={20} className={styles.navIcon} />

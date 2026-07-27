@@ -5,14 +5,6 @@ import { audioCallStats, todayEarnings, peakHours, recentCalls, tips, callTabs }
 import { PeriodDropdown } from '../analytics/PeriodDropdown';
 import styles from './AudioCallsPage.module.css';
 
-const iconMap = {
-  phone: Phone,
-  clock: Clock,
-  dollar: Wallet,
-  phoneMissed: PhoneOff,
-  users: Users,
-};
-
 const GradientBadgeCheck = ({ size = 14 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, display: 'inline-block', verticalAlign: 'middle' }}>
     <defs>
@@ -28,6 +20,14 @@ const GradientBadgeCheck = ({ size = 14 }) => (
     <path d="m9 12 2 2 4-4" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
+
+const iconMap = {
+  phone: Phone,
+  clock: Clock,
+  dollar: Wallet,
+  phoneMissed: PhoneOff,
+  users: Users,
+};
 
 export const AudioCallsPage = () => {
   const { darkMode } = useApp();
