@@ -11,10 +11,12 @@ import { SuggestionsSidebar } from './features/users/suggestions/SuggestionsSide
 import { Banner } from './features/users/banner/Banner';
 import { AllCreators } from './features/creators/AllCreators';
 import { AnalyticsPage } from './features/creators/analytics/AnalyticsPage';
+import { LiveCallsPage as CreatorLiveCallsPage } from './features/creators/live-calls/LiveCallsPage';
 import { AudioCallsPage as CreatorAudioCallsPage } from './features/creators/audio-calls/AudioCallsPage';
 import { VideoCallsPage as CreatorVideoCallsPage } from './features/creators/video-calls/VideoCallsPage';
 import { ProfilePage } from './features/creators/profile/ProfilePage';
 import { ContentPage } from './features/creators/content/ContentPage';
+import { DashboardPage } from './features/creators/dashboard/DashboardPage';
 import { AudioCallsPage } from './features/users/audio/AudioCallsPage';
 import { VideoCallsPage } from './features/users/video/VideoCallsPage';
 import { SubscriptionsPage } from './features/users/subscriptions/SubscriptionsPage';
@@ -119,6 +121,12 @@ const AppContent = () => {
             <AnalyticsPage />
           </div>
         );
+      case 'Creator Live Calls':
+        return (
+          <div className="tabAnalytics">
+            <CreatorLiveCallsPage />
+          </div>
+        );
       case 'Creator Audio Calls':
         return (
           <div className="tabAnalytics">
@@ -135,6 +143,12 @@ const AppContent = () => {
         return (
           <div className="tabAnalytics">
             <ProfilePage />
+          </div>
+        );
+      case 'Creator Dashboard':
+        return (
+          <div className="tabAnalytics">
+            <DashboardPage />
           </div>
         );
       case 'Creator Content':

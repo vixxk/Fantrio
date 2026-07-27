@@ -30,34 +30,37 @@ export const ProfileHero = ({ isDark }) => {
 
       {/* Profile Content */}
       <div className={styles.heroContent}>
-        {/* Profile Picture */}
-        <div className={styles.profilePicWrap}>
-          <img
-            src={creatorProfile.avatar}
-            alt={creatorProfile.name}
-            className={styles.profilePic}
-          />
-          {creatorProfile.isOnline && <span className={styles.onlineIndicator} />}
-        </div>
+        {/* Top Creator Info Row */}
+        <div className={styles.creatorInfoRow}>
+          {/* Profile Picture */}
+          <div className={styles.profilePicWrap}>
+            <img
+              src={creatorProfile.avatar}
+              alt={creatorProfile.name}
+              className={styles.profilePic}
+            />
+            {creatorProfile.isOnline && <span className={styles.onlineIndicator} />}
+          </div>
 
-        {/* Profile Info */}
-        <div className={styles.profileInfo}>
-          <div className={styles.nameRow}>
-            <h1 className={styles.profileName}>{creatorProfile.name}</h1>
-            {creatorProfile.isVerified && (
-              <BadgeCheck size={22} className={styles.verifiedBadge} />
-            )}
+          {/* Profile Info */}
+          <div className={styles.profileInfo}>
+            <div className={styles.nameRow}>
+              <h1 className={styles.profileName}>{creatorProfile.name}</h1>
+              {creatorProfile.isVerified && (
+                <BadgeCheck size={22} className={styles.verifiedBadge} />
+              )}
+            </div>
+            <div className={styles.handleRow}>
+              <span className={styles.handle}>{creatorProfile.handle}</span>
+              {creatorProfile.isOnline && (
+                <span className={styles.onlineStatus}>
+                  <span className={styles.onlineDot} /> Online
+                </span>
+              )}
+            </div>
+            <span className={styles.role}>{creatorProfile.role}</span>
+            <p className={styles.bio}>{creatorProfile.bio}</p>
           </div>
-          <div className={styles.handleRow}>
-            <span className={styles.handle}>{creatorProfile.handle}</span>
-            {creatorProfile.isOnline && (
-              <span className={styles.onlineStatus}>
-                <span className={styles.onlineDot} /> Online
-              </span>
-            )}
-          </div>
-          <span className={styles.role}>{creatorProfile.role}</span>
-          <p className={styles.bio}>{creatorProfile.bio}</p>
         </div>
 
         {/* Stats Row */}

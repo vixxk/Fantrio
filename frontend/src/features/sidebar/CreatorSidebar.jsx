@@ -17,7 +17,7 @@ import {
   BadgeCheck,
   Menu,
   Mic,
-  Camera
+  Camera,
 } from 'lucide-react';
 import styles from './CreatorSidebar.module.css';
 
@@ -31,9 +31,13 @@ export const CreatorSidebar = ({ onClose }) => {
 
   const [liveCallsExpanded, setLiveCallsExpanded] = useState(true);
 
-  // Automatically expand Live Calls if we are on an audio or video call page
+  // Automatically expand Live Calls if we are on the overview or call pages
   useEffect(() => {
-    if (activeTab === 'Creator Audio Calls' || activeTab === 'Creator Video Calls') {
+    if (
+      activeTab === 'Creator Live Calls' ||
+      activeTab === 'Creator Audio Calls' ||
+      activeTab === 'Creator Video Calls'
+    ) {
       setLiveCallsExpanded(true);
     }
   }, [activeTab]);
@@ -66,7 +70,10 @@ export const CreatorSidebar = ({ onClose }) => {
     if (onClose) onClose();
   };
 
-  const isLiveCallsActive = activeTab === 'Creator Audio Calls' || activeTab === 'Creator Video Calls';
+  const isLiveCallsActive =
+    activeTab === 'Creator Live Calls' ||
+    activeTab === 'Creator Audio Calls' ||
+    activeTab === 'Creator Video Calls';
 
   return (
     <aside className={`${styles.sidebar} ${darkMode ? styles.dark : styles.light}`}>
@@ -94,7 +101,10 @@ export const CreatorSidebar = ({ onClose }) => {
               <div key={item.label} className={styles.groupContainer}>
                 <button
                   className={`${styles.navItem} ${isLiveCallsActive ? styles.groupActive : ''}`}
-                  onClick={() => setLiveCallsExpanded(!liveCallsExpanded)}
+                  onClick={() => {
+                    handleItemClick('Creator Live Calls');
+                    setLiveCallsExpanded(!liveCallsExpanded);
+                  }}
                 >
                   <div className={styles.navItemLeft}>
                     <GroupIcon size={20} className={styles.navIcon} />

@@ -1,0 +1,1684 @@
+/* ================= LIVE CALLS OVERVIEW ================= */
+.liveCallsContainer {
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #ffffff;
+}
+
+.mainGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 1.5rem;
+}
+
+.leftColumn,
+.rightSidebar {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.activityCard,
+.sidebarCard,
+.callCard,
+.statCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.01) inset;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #f7f8ff;
+}
+
+.sectionSubtitle {
+  margin: 0.45rem 0 0;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.periodButton,
+.periodButtonSmall {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 0.75rem 0.95rem;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.periodButton:hover,
+.periodButtonSmall:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.callCardsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.callCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+}
+
+.sidebarCard:hover,
+.activityCard:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.callCardTop {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.callIconWrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.callIcon {
+  width: 32px;
+  height: 32px;
+}
+
+.callCopy {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.callTitle {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.callDesc {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+.rateLine {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.rateLabel {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.rateValue {
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.rateUnit {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.onlineLine {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: #ffffff;
+  margin-top: 0.25rem;
+}
+
+.onlineDot {
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.callActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.primaryAction,
+.secondaryAction,
+.viewEarningsBtn,
+.loadMoreBtn,
+.viewAllTipsBtn,
+.statLink {
+  font: inherit;
+  cursor: pointer;
+}
+
+.primaryAction {
+  height: 44px;
+  border-radius: 12px;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  color: #ffffff;
+}
+
+.primaryAction:hover {
+  transform: translateY(-2px);
+}
+
+.secondaryAction {
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.secondaryAction:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.75rem;
+}
+
+.statCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  justify-content: center;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.statCard:hover {
+  border-color: rgba(225, 0, 117, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.statLabelRow {
+  margin-bottom: 0.15rem;
+}
+
+.statValueRow {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.15rem;
+}
+
+.statLabel {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+  display: block;
+}
+
+.statValue {
+  font-size: 1.35rem;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.statValueCol {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.statChange {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.statPeriod {
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.4);
+  display: block;
+}
+
+.statSub {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.42);
+  margin-left: 0.2rem;
+}
+
+.statPeriod {
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.4);
+  display: block;
+}
+
+.statLink {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0;
+  border: none;
+  color: #f6a51a;
+  background: transparent;
+  font-size: 0.7rem;
+}
+
+.positive {
+  color: #63ff00;
+}
+
+.negative {
+  color: #ff2c7d;
+}
+
+.activityCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.activityHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.activityTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.activityTabs {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.activityTab {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 0.65rem 1.1rem;
+  border-radius: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.activityTab:hover {
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.activityTabActive {
+  background: transparent !important;
+  color: #e10075 !important;
+  position: relative;
+}
+
+.activityTabActive::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #e10075;
+  border-radius: 1px;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.activityTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.activityTable th {
+  text-align: left;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  padding: 0 1rem 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.activityTable td {
+  padding: 1rem 1rem 1rem 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+  vertical-align: middle;
+}
+
+.activityTable tbody tr {
+  transition: background 0.2s ease;
+}
+
+.activityTable tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.fanInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.fanDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.fanAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.fanName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.dateTime {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: pre-line;
+}
+
+.typeCell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.earnedCell {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.statusBadge {
+  padding: 0.3rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.statusCompleted {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.statusMissed {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.moreBtn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.moreBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.loadMoreBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: none;
+  color: #e10075;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.loadMoreBtn:hover {
+  opacity: 0.8;
+}
+
+.sidebarCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.sidebarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.75rem;
+}
+
+.sidebarTitle,
+.tipsTitle {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.earningsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.earningsTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.earningsIconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.earningsIcon {
+  color: #9b51e0;
+  font-size: 14px;
+}
+
+.earningsTitle {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.earningsAmount {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #10b981;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.25rem;
+}
+
+.earningsChange {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 0.75rem;
+}
+
+.earningsUp {
+  color: #10b981;
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+.earningsLabel {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.78rem;
+}
+
+.changeLabel {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.earningsStats {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.earningsStat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.earningsStat:last-child {
+  border-bottom: none;
+}
+
+.earningsStatLabel {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.earningsStatValue {
+  font-size: 0.85rem;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.viewEarningsBtn {
+  width: 100%;
+  background: linear-gradient(135deg, #9b51e0 0%, #e10075 50%, #ff4d6a 80%, #3b82f6 100%);
+  border: none;
+  color: #ffffff;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 1.25rem;
+}
+
+.viewEarningsBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(155, 81, 224, 0.4);
+}
+
+.performanceBody {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.donutContainer {
+  flex: 0 0 130px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.donutChart {
+  width: 130px;
+  height: 130px;
+}
+
+.donutSvg {
+  width: 100%;
+  height: 100%;
+}
+
+.donutValue {
+  fill: #ffffff;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.donutLabel {
+  fill: rgba(255, 255, 255, 0.5);
+  font-size: 7px;
+}
+
+.donutLegend {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.legendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legendText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+
+.legendLabel {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+}
+
+.legendValue {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.3;
+}
+
+.hoursChartWrapper {
+  display: flex;
+  gap: 0;
+  margin-bottom: 0.75rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.hoursYAxis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 3px;
+  padding: 0 0.5rem 0 0;
+  height: 180px;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.hoursYLabel {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.45);
+  text-align: right;
+  min-width: 20px;
+  font-weight: 500;
+}
+
+.hoursChart {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 180px;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  padding-left: 6px;
+  position: relative;
+  min-width: 280px;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent calc(25% - 1px),
+    rgba(255, 255, 255, 0.06) calc(25% - 1px),
+    rgba(255, 255, 255, 0.06) 25%
+  );
+}
+
+.hoursBar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.hoursBarFill {
+  width: 80%;
+  max-width: 12px;
+  background: linear-gradient(180deg, #e10075 0%, #9b51e0 50%, #7c3aed 100%);
+  border-radius: 3px 3px 0 0;
+  transition: all 0.3s ease;
+  min-height: 2px;
+}
+
+.hoursBarFill:hover {
+  filter: brightness(1.2);
+  transform: scaleY(1.02);
+}
+
+.hoursBarLabel {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 6px;
+  white-space: nowrap;
+}
+
+.tipItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+}
+
+.tipCheck {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.tipCheckIcon {
+  color: #3b82f6;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.tipsHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tipsIconWrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tipsIcon {
+  color: #3b82f6;
+  font-size: 14px;
+}
+
+.tipsList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.viewAllTipsBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: none;
+  color: #e10075;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  padding: 0;
+}
+
+.viewAllTipsBtn:hover {
+  opacity: 0.8;
+}
+
+.mobileActivityList {
+  display: none;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mobileActivityCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 0.9rem;
+  border-radius: 14px;
+  background: #0a0a0f;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mobileActivityTop,
+.mobileActivityFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.mobileActivityMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.mobileMetaLine {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.mobileActivityFooter {
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.light {
+  color: #1a1625;
+}
+
+
+
+.light .activityCard,
+.light .sidebarCard,
+.light .callCard,
+.light .statCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.light .callIconWrap {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.light .callIcon {
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .sectionTitle,
+.light .callTitle,
+.light .activityTitle,
+.light .sidebarTitle,
+.light .earningsTitle,
+.light .tipsTitle,
+.light .statValue {
+  color: #1a1625;
+}
+
+.light .sectionSubtitle,
+.light .callDesc,
+.light .rateLabel,
+.light .statLabel,
+.light .statSub,
+.light .statPeriod,
+.light .dateTime,
+.light .earningsStatLabel,
+.light .legendLabel,
+.light .legendValue,
+.light .changeLabel {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .rateUnit {
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .periodButton,
+.light .periodButtonSmall {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: rgba(26, 22, 37, 0.75);
+}
+
+.light .periodButton:hover,
+.light .periodButtonSmall:hover {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+.light .callCard:hover,
+.light .statCard:hover,
+.light .sidebarCard:hover,
+.light .activityCard:hover {
+  border-color: rgba(225, 0, 117, 0.2);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+.light .earningsStat {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .rateValue,
+.light .earnedCell,
+.light .earningsAmount {
+  color: #059669;
+}
+
+.light .onlineLine {
+  color: rgba(26, 22, 37, 0.72);
+}
+
+.light .onlineDot {
+  background: #059669;
+}
+
+.light .primaryAction {
+  color: #ffffff;
+}
+
+.light .secondaryAction {
+  color: rgba(26, 22, 37, 0.82) !important;
+  border-color: rgba(0, 0, 0, 0.14) !important;
+}
+
+.light .secondaryAction:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.light .activityTab {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .activityTab:hover {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .activityTabActive {
+  color: #e10075;
+}
+
+.light .activityTabActive::after {
+  background: #e10075;
+}
+
+.light .activityTable th {
+  color: rgba(26, 22, 37, 0.4);
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .activityTable td {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .activityTable tbody tr:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.light .statusCompleted {
+  background: rgba(5, 150, 105, 0.12);
+  color: #059669;
+}
+
+.light .statusMissed {
+  background: rgba(220, 38, 38, 0.12);
+  color: #dc2626;
+}
+
+.light .moreBtn {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .moreBtn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .loadMoreBtn,
+.light .statLink,
+.light .viewAllTipsBtn {
+  color: #e10075;
+}
+
+.light .fanName {
+  color: #1a1625;
+}
+
+.light .viewEarningsBtn {
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.light .viewEarningsBtn:hover {
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+}
+
+.light .donutValue {
+  fill: #1a1625;
+  color: #1a1625;
+}
+
+.light .donutLabel {
+  fill: rgba(26, 22, 37, 0.5);
+}
+
+.light .earningsStatValue {
+  color: #1a1625;
+}
+
+.light .hoursYLabel {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .hoursBarLabel {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .hoursChart {
+  border-left-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .earningsIconWrap {
+  background: transparent;
+}
+
+.light .earningsIcon {
+  color: #7e00f3;
+}
+
+.light .tipsIconWrap {
+  background: rgba(37, 99, 235, 0.12);
+}
+
+.light .tipsIcon {
+  color: #2563eb;
+}
+
+.light .tipCheckIcon {
+  color: #2563eb;
+}
+
+.light .tipItem {
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .mobileMetaLine {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .mobileActivityCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .mobileActivityFooter {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+@media (max-width: 1200px) {
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .rightSidebar {
+    flex-direction: row;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .rightSidebar > .sidebarCard {
+    flex: 1;
+    min-width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .liveCallsContainer {
+    padding: 0 0 2rem 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  .leftColumn,
+  .rightSidebar {
+    gap: 0.75rem;
+  }
+
+  .rightSidebar {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 0.75rem !important;
+  }
+
+  .rightSidebar > .sidebarCard {
+    flex: 1 1 100%;
+  }
+
+  .callCard,
+  .statCard,
+  .activityCard,
+  .sidebarCard {
+    padding: 0.75rem !important;
+    border-radius: 10px !important;
+  }
+
+  .callCardTop {
+    gap: 0.85rem;
+  }
+
+  .callIconWrap {
+    width: 40px;
+    height: 40px;
+  }
+
+  .callIcon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .callTitle {
+    font-size: 1.05rem;
+  }
+
+  .callDesc {
+    max-width: none;
+    font-size: 0.78rem;
+  }
+
+  .rateLine {
+    margin-top: 0.35rem;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  .rateValue {
+    font-size: 1.05rem;
+  }
+
+  .rateLabel,
+  .rateUnit {
+    font-size: 0.75rem;
+  }
+
+  .onlineLine {
+    font-size: 0.75rem;
+  }
+
+  .callActions {
+    grid-template-columns: 1fr;
+  }
+
+  .primaryAction,
+  .secondaryAction {
+    height: auto;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.78rem;
+  }
+
+  .sectionTitle {
+    font-size: 1.25rem;
+  }
+
+  .sectionSubtitle {
+    font-size: 0.7rem;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+
+  .statCard {
+    padding: 0.75rem !important;
+  }
+
+  .statLabel {
+    font-size: 0.55rem !important;
+  }
+
+  .statValue {
+    font-size: 1.1rem !important;
+  }
+
+  .statChange {
+    font-size: 0.58rem !important;
+  }
+
+  .statPeriod {
+    font-size: 0.5rem !important;
+  }
+
+  .activityHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .activityTabs {
+    flex-wrap: wrap;
+  }
+
+  .activityTitle {
+    font-size: 0.85rem !important;
+  }
+
+  .activityTab {
+    padding: 0.3rem 0.5rem !important;
+    font-size: 0.68rem !important;
+    white-space: nowrap;
+  }
+
+  .activityTable,
+  .tableWrap {
+    display: none;
+  }
+
+  .mobileActivityList {
+    display: flex;
+  }
+
+  .fanAvatar {
+    width: 28px;
+    height: 28px;
+  }
+
+  .fanName {
+    font-size: 0.72rem !important;
+  }
+
+  .dateTime {
+    font-size: 0.72rem !important;
+  }
+
+  .activityTable td {
+    padding: 0.5rem 0.35rem 0.5rem 0 !important;
+    font-size: 0.68rem !important;
+  }
+
+  .activityTable th {
+    padding: 0 0.35rem 0.4rem 0 !important;
+    font-size: 0.58rem !important;
+  }
+
+  .sidebarCard {
+    padding: 0.75rem !important;
+    border-radius: 10px !important;
+  }
+
+  .sidebarTitle {
+    font-size: 0.72rem !important;
+  }
+
+  .earningsAmount {
+    font-size: 1.5rem !important;
+  }
+
+  .earningsStat {
+    padding: 0.6rem 0;
+  }
+
+  .donutContainer {
+    flex: 0 0 80px;
+  }
+
+  .donutChart {
+    width: 80px !important;
+    height: 80px !important;
+  }
+
+  .performanceBody {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+  }
+
+  .donutLegend {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    flex-wrap: wrap !important;
+  }
+
+  .legendItem {
+    gap: 0.3rem !important;
+  }
+
+  .legendLabel {
+    font-size: 0.65rem !important;
+  }
+
+  .legendValue {
+    font-size: 0.6rem !important;
+  }
+
+  .hoursChart {
+    height: 180px !important;
+    border-left: none !important;
+    padding-left: 0 !important;
+  }
+
+  .hoursYAxis {
+    height: 180px !important;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+  }
+
+  .hoursChartWrapper {
+    display: flex !important;
+  }
+
+  .tipsHeader {
+    margin-bottom: 0.75rem;
+  }
+
+  .tipItem {
+    font-size: 0.6rem !important;
+    padding: 0.3rem 0 !important;
+    gap: 0.5rem;
+  }
+
+  .loadMoreBtn {
+    font-size: 0.62rem !important;
+  }
+
+  .periodButton {
+    align-self: flex-start;
+  }
+
+  .periodTextBtn {
+    font-size: 0.62rem !important;
+  }
+
+  .rightSidebar {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+
+  .rightSidebar > * {
+    flex: 1 1 calc(50% - 0.25rem) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .liveCallsContainer {
+    padding: 0 0 1.25rem 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  .leftColumn,
+  .rightSidebar {
+    gap: 0.5rem;
+  }
+
+  .callActions {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.4rem !important;
+  }
+
+  .callCardsGrid {
+    gap: 0.5rem;
+    grid-template-columns: 1fr;
+  }
+
+  .callCard,
+  .statCard,
+  .activityCard,
+  .sidebarCard {
+    padding: 0.55rem !important;
+    border-radius: 8px !important;
+  }
+
+  .callIconWrap {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .callCardTop {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  .callIcon {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .callTitle {
+    font-size: 0.9rem !important;
+  }
+
+  .callDesc {
+    font-size: 0.65rem !important;
+  }
+
+  .rateLine {
+    margin-top: 0.25rem;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .rateValue {
+    font-size: 0.85rem !important;
+  }
+
+  .rateLabel,
+  .rateUnit {
+    font-size: 0.68rem !important;
+  }
+
+  .onlineLine {
+    font-size: 0.68rem !important;
+  }
+
+  .primaryAction,
+  .secondaryAction {
+    padding: 0.4rem 0.6rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  .sectionTitle {
+    font-size: 1rem !important;
+  }
+
+  .sectionSubtitle {
+    font-size: 0.62rem !important;
+  }
+
+  .statCard {
+    padding: 0.5rem !important;
+  }
+
+  .statLabel {
+    font-size: 0.58rem !important;
+  }
+
+  .statValue {
+    font-size: 0.95rem !important;
+  }
+
+  .statChange {
+    font-size: 0.6rem !important;
+  }
+
+  .statPeriod {
+    font-size: 0.45rem !important;
+  }
+
+  .activityHeader {
+    gap: 0.75rem;
+  }
+
+  .activityTitle {
+    font-size: 0.72rem !important;
+  }
+
+  .activityTab {
+    padding: 0.25rem 0.4rem !important;
+    font-size: 0.62rem !important;
+  }
+
+  .fanAvatar {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  .fanName {
+    font-size: 0.68rem !important;
+  }
+
+  .dateTime {
+    font-size: 0.58rem !important;
+  }
+
+  .activityTable td {
+    padding: 0.35rem 0.25rem 0.35rem 0 !important;
+    font-size: 0.6rem !important;
+  }
+
+  .activityTable th {
+    padding: 0 0.25rem 0.35rem 0 !important;
+    font-size: 0.52rem !important;
+  }
+
+  .sidebarCard {
+    padding: 0.55rem !important;
+    border-radius: 8px !important;
+  }
+
+  .sidebarTitle {
+    font-size: 0.6rem !important;
+  }
+
+  .earningsAmount {
+    font-size: 1rem !important;
+  }
+
+  .earningsStat {
+    padding: 0.5rem 0;
+  }
+
+  .earningsStatLabel,
+  .earningsStatValue {
+    font-size: 0.62rem !important;
+  }
+
+  .viewEarningsBtn {
+    padding: 0.4rem 0.6rem !important;
+    font-size: 0.68rem !important;
+  }
+
+  .donutContainer {
+    flex: 0 0 70px;
+  }
+
+  .donutChart {
+    width: 70px !important;
+    height: 70px !important;
+  }
+
+  .performanceBody {
+    gap: 0.5rem !important;
+  }
+
+  .legendLabel {
+    font-size: 0.6rem !important;
+  }
+
+  .legendValue {
+    font-size: 0.55rem !important;
+  }
+
+  .hoursChart {
+    height: 90px !important;
+    border-left: none !important;
+    padding-left: 0 !important;
+  }
+
+  .hoursYAxis {
+    height: 90px !important;
+    justify-content: space-between !important;
+    gap: 4px !important;
+  }
+
+  .hoursYLabel {
+    font-size: 0.55rem !important;
+  }
+
+  .tipsHeader {
+    margin-bottom: 0.5rem;
+  }
+
+  .tipsTitle {
+    font-size: 0.6rem !important;
+  }
+
+  .tipItem {
+    font-size: 0.62rem !important;
+    gap: 0.3rem !important;
+  }
+
+  .loadMoreBtn {
+    font-size: 0.62rem !important;
+  }
+
+  .mobileActivityCard {
+    padding: 0.65rem;
+  }
+
+  .periodTextBtn {
+    font-size: 0.55rem !important;
+  }
+}

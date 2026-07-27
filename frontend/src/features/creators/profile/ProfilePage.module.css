@@ -94,11 +94,16 @@
   position: relative;
 }
 
+.creatorInfoRow {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
 .profilePicWrap {
   position: relative;
   width: 120px;
   height: 120px;
-  margin-bottom: 1rem;
 }
 
 .profilePic {
@@ -121,7 +126,7 @@
 }
 
 .profileInfo {
-  margin-bottom: 1.25rem;
+  flex: 1;
 }
 
 .nameRow {
@@ -1011,6 +1016,33 @@
   background: rgba(225, 0, 117, 0.2);
 }
 
+/* Light theme styles for CreatorPanel */
+.light .creatorSidebar {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.light .sidebarName,
+.light .sidebarHandle,
+.light .sidebarOnline {
+  color: #1a1625;
+}
+
+.light .verifiedIcon {
+  color: #2563eb;
+}
+
+.light .viewProfileBtn {
+  background: rgba(225, 0, 117, 0.05);
+  border-color: rgba(225, 0, 117, 0.2);
+  color: #e10075;
+}
+
+.light .viewProfileBtn:hover {
+  background: rgba(225, 0, 117, 0.1);
+}
+
 /* ================= LIGHT THEME OVERRIDES ================= */
 .light {
   color: #1a1625;
@@ -1124,6 +1156,14 @@
 
 .light .activeDot {
   background: #e10075;
+}
+
+.light .heroContent {
+  color: #1a1625;
+}
+
+.light .statsRow {
+  border-color: rgba(0, 0, 0, 0.06);
 }
 
 /* ================= RESPONSIVE DESIGN ================= */
@@ -1244,5 +1284,381 @@
   .aboutLabel {
     min-width: auto !important;
     width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .profileContainer {
+    padding: 0 0 1.5rem 0 !important;
+  }
+
+  .previewTitle {
+    font-size: 1.15rem !important;
+    margin-bottom: 0.15rem !important;
+  }
+
+  .previewSubtitle {
+    font-size: 0.72rem !important;
+  }
+
+  .previewSection {
+    margin-bottom: 1rem !important;
+  }
+
+  .mainGrid {
+    gap: 0.75rem !important;
+  }
+
+  .leftColumn {
+    gap: 0.75rem !important;
+  }
+
+  .rightSidebar {
+    gap: 0.75rem !important;
+  }
+
+  .heroCard,
+  .plansCard,
+  .callRatesCard,
+  .contentCard,
+  .aboutCard,
+  .insightsCard,
+  .fanCard,
+  .subscribeCard {
+    padding: 0.75rem !important;
+    border-radius: 10px !important;
+  }
+
+  .coverImage {
+    height: 110px !important;
+  }
+
+  .heroContent {
+    padding: 0 0.75rem 0.75rem !important;
+    margin-top: -50px !important;
+  }
+
+  .creatorInfoRow {
+    gap: 1rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .profilePicWrap {
+    width: 72px !important;
+    height: 72px !important;
+  }
+
+  .profilePic {
+    border-width: 3px !important;
+  }
+
+  .onlineIndicator {
+    width: 14px !important;
+    height: 14px !important;
+    bottom: 6px !important;
+    right: 6px !important;
+    border-width: 2px !important;
+  }
+
+  .profileInfo {
+    min-width: 0;
+  }
+
+  .profileName {
+    font-size: 1.1rem !important;
+  }
+
+  .verifiedBadge {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .handle {
+    font-size: 0.75rem !important;
+  }
+
+  .onlineStatus {
+    font-size: 0.7rem !important;
+  }
+
+  .role {
+    font-size: 0.72rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .bio {
+    font-size: 0.78rem !important;
+  }
+
+  .statsRow {
+    gap: 0.4rem !important;
+    padding: 0.65rem 0 !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .statItem {
+    min-width: calc(33% - 0.4rem);
+    gap: 0.35rem !important;
+  }
+
+  .statIcon {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  .statValue {
+    font-size: 0.85rem !important;
+  }
+
+  .statLabel {
+    font-size: 0.6rem !important;
+  }
+
+  .actionButtons {
+    flex-direction: column;
+    gap: 0.5rem !important;
+  }
+
+  .actionBtn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.55rem 1rem !important;
+    font-size: 0.78rem !important;
+    border-radius: 10px !important;
+  }
+
+  .btnLabel {
+    font-size: 0.78rem !important;
+  }
+
+  .btnSublabel {
+    font-size: 0.65rem !important;
+  }
+
+  .bottomGrid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  .plansHeader,
+  .callRatesHeader {
+    margin-bottom: 0.65rem !important;
+  }
+
+  .sectionTitle {
+    font-size: 0.82rem !important;
+  }
+
+  .sectionSubtitle {
+    font-size: 0.72rem !important;
+  }
+
+  .planCard {
+    padding: 0.85rem !important;
+  }
+
+  .planName {
+    font-size: 0.85rem !important;
+  }
+
+  .priceValue {
+    font-size: 0.95rem !important;
+  }
+
+  .pricePeriod {
+    font-size: 0.68rem !important;
+  }
+
+  .planFeatures {
+    gap: 0.35rem !important;
+  }
+
+  .planFeature {
+    font-size: 0.75rem !important;
+  }
+
+  .callRatesGrid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.65rem !important;
+  }
+
+  .callRateCard {
+    padding: 0.85rem !important;
+    gap: 0.5rem !important;
+  }
+
+  .callRateIcon {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 12px !important;
+  }
+
+  .callRateType {
+    font-size: 0.75rem !important;
+  }
+
+  .callRateValue {
+    font-size: 0.95rem !important;
+  }
+
+  .callRateUnit {
+    font-size: 0.65rem !important;
+  }
+
+  .callRateDesc {
+    font-size: 0.65rem !important;
+  }
+
+  .callNowBtn {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .contentHeader {
+    margin-bottom: 0.75rem !important;
+  }
+
+  .contentTabs {
+    overflow-x: auto;
+    gap: 0.25rem !important;
+  }
+
+  .contentTab {
+    padding: 0.3rem 0.55rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  .viewAllLink {
+    font-size: 0.72rem !important;
+  }
+
+  .contentGrid {
+    gap: 0.65rem !important;
+  }
+
+  .contentItem {
+    min-width: 130px !important;
+  }
+
+  .contentThumb {
+    height: 130px !important;
+    border-radius: 8px !important;
+    margin-bottom: 0.35rem !important;
+  }
+
+  .contentBadge {
+    font-size: 0.55rem !important;
+    padding: 0.15rem 0.4rem !important;
+  }
+
+  .contentStats .statItem {
+    font-size: 0.6rem !important;
+  }
+
+  .contentTitle {
+    font-size: 0.75rem !important;
+  }
+
+  .contentTime {
+    font-size: 0.65rem !important;
+  }
+
+  .carouselNext {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .cardTitle {
+    font-size: 0.82rem !important;
+  }
+
+  .aboutBio {
+    font-size: 0.78rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .aboutDetails {
+    gap: 0.5rem !important;
+  }
+
+  .aboutItem {
+    flex-wrap: wrap;
+  }
+
+  .aboutLabel {
+    min-width: auto !important;
+    width: 100%;
+    font-size: 0.72rem !important;
+  }
+
+  .aboutValue {
+    font-size: 0.75rem !important;
+  }
+
+  .insightsHeader {
+    margin-bottom: 0.65rem !important;
+  }
+
+  .periodBtn {
+    padding: 0.3rem 0.55rem !important;
+    font-size: 0.7rem !important;
+  }
+
+  .insightRow {
+    font-size: 0.75rem !important;
+  }
+
+  .insightLabel {
+    font-size: 0.75rem !important;
+  }
+
+  .insightValue {
+    font-size: 0.82rem !important;
+  }
+
+  .insightChange {
+    font-size: 0.7rem !important;
+  }
+
+  .fanHeader {
+    margin-bottom: 0.65rem !important;
+  }
+
+  .fanAvatar {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .fanLabel {
+    font-size: 0.65rem !important;
+  }
+
+  .fanName {
+    font-size: 0.82rem !important;
+  }
+
+  .fanSpent {
+    font-size: 0.7rem !important;
+  }
+
+  .fanMessage {
+    font-size: 0.78rem !important;
+  }
+
+  .subscribeTitle {
+    font-size: 0.85rem !important;
+  }
+
+  .subscribeSubtitle {
+    font-size: 0.72rem !important;
+  }
+
+  .subscribeNowBtn {
+    padding: 0.65rem !important;
+    font-size: 0.82rem !important;
+  }
+
+  .subscribePrice {
+    font-size: 0.7rem !important;
   }
 }

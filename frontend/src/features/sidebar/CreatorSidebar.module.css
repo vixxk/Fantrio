@@ -3,16 +3,16 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 0.4rem 1rem 1rem 1rem;
+  padding: 0.6rem 1rem 1.5rem 1rem;
   border-right: 1px solid rgba(255, 255, 255, 0.04);
-  background-color: #08080c;
+  background-color: #0a0a0a;
   color: #ffffff;
   overflow: hidden;
   box-sizing: border-box;
 }
 
 .logoContainer {
-  padding: 0.6rem 1.2rem 1.8rem 1.2rem;
+  padding: 0.6rem 1rem 2rem 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -78,7 +78,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.7rem 1.2rem;
+  padding: 0.75rem 1rem;
   border-radius: 12px;
   background: transparent;
   border: none;
@@ -106,6 +106,10 @@
 .navItem:hover {
   color: #ffffff;
   background-color: rgba(255, 255, 255, 0.05);
+}
+
+.navItem:hover .navIcon {
+  transform: translateX(2px);
 }
 
 .active {
@@ -143,7 +147,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
-  padding-left: 1.2rem;
+  padding-left: 1rem;
   margin-top: 0.15rem;
   margin-bottom: 0.4rem;
 }
@@ -152,7 +156,7 @@
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.55rem 1.2rem;
+  padding: 0.55rem 1rem;
   border-radius: 8px;
   background: transparent;
   border: none;
@@ -198,9 +202,9 @@
 }
 
 .themeLabel {
-  font-size: 0.85rem;
+  font-size: 1.05rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.6);
+  color: #ffffff;
 }
 
 .switch {
@@ -346,7 +350,7 @@
 
 /* Light mode support */
 .light {
-  background-color: #f6f6f9;
+  background-color: #f7f6fb;
   color: #1a1625;
   border-right: 1px solid rgba(0, 0, 0, 0.06);
 }
@@ -356,24 +360,31 @@
 }
 
 .light .navItem {
-  color: rgba(26, 22, 37, 0.85);
+  color: rgba(26, 22, 37, 0.6);
 }
 
 .light .navItem:hover {
   color: #1a1625;
-  background-color: rgba(0, 0, 0, 0.04);
+  background-color: rgba(0, 0, 0, 0.03);
 }
 
 .light .navIcon {
-  color: rgba(26, 22, 37, 0.85);
+  color: rgba(26, 22, 37, 0.6);
 }
 
 .light .navLabel {
-  color: rgba(26, 22, 37, 0.85);
+  color: rgba(26, 22, 37, 0.6);
 }
 
 .light .navItem svg {
-  color: rgba(26, 22, 37, 0.85);
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .active,
+.light .active .navLabel,
+.light .active .navIcon,
+.light .active svg {
+  color: #ffffff !important;
 }
 
 .light .groupActive {
@@ -381,7 +392,7 @@
 }
 
 .light .subNavItem {
-  color: rgba(26, 22, 37, 0.65);
+  color: rgba(26, 22, 37, 0.55);
 }
 
 .light .subNavItem:hover {
@@ -390,7 +401,7 @@
 }
 
 .light .subNavIcon {
-  color: rgba(26, 22, 37, 0.65);
+  color: rgba(26, 22, 37, 0.55);
 }
 
 .light .creatorName {
@@ -398,7 +409,7 @@
 }
 
 .light .creatorHandle {
-  color: rgba(26, 22, 37, 0.5);
+  color: rgba(26, 22, 37, 0.45);
 }
 
 .light .subActive {
@@ -415,7 +426,7 @@
 }
 
 .light .themeLabel {
-  color: rgba(26, 22, 37, 0.6);
+  color: rgba(26, 22, 37, 0.5);
 }
 
 .light .slider {

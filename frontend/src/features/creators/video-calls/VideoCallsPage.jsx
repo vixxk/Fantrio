@@ -105,15 +105,7 @@ export const VideoCallsPage = () => {
                     <span className={styles.statLabel}>{stat.label}</span>
                   </div>
                   <div className={styles.statValueRow}>
-                    <div 
-                      className={styles.statIconWrap}
-                      style={{ 
-                        background: `${stat.color}15`,
-                        boxShadow: `0 0 12px ${stat.color}30`
-                      }}
-                    >
-                      <Icon size={22} style={{ color: stat.color }} fill={stat.icon === 'clock' || stat.icon === 'dollar' ? 'none' : stat.color} />
-                    </div>
+                    <Icon size={24} style={{ color: stat.color }} fill={stat.icon === 'clock' || stat.icon === 'dollar' ? 'none' : stat.color} />
                     <div className={styles.statValueCol}>
                       <span className={styles.statValue}>{stat.value}</span>
                       {stat.period && <span className={styles.statPeriod}>{stat.period}</span>}
@@ -323,7 +315,7 @@ export const VideoCallsPage = () => {
             </div>
             <div className={styles.dailyChartWrapper}>
               <div className={styles.dailyYAxis}>
-                {[dailyMinutes.maxY, Math.round(dailyMinutes.maxY * 0.67), Math.round(dailyMinutes.maxY * 0.33), 0].map((val, i) => (
+                {[dailyMinutes.maxY, Math.round(dailyMinutes.maxY * 0.75), Math.round(dailyMinutes.maxY * 0.5), Math.round(dailyMinutes.maxY * 0.25), 0].map((val, i) => (
                   <span key={i} className={styles.dailyYLabel}>{val}</span>
                 ))}
               </div>

@@ -29,7 +29,7 @@ export const TrafficSources = ({ isDark }) => {
                   }}
                 />
               </div>
-              <span className={styles.trafficViews}>{source.views}</span>
+              <span className={styles.trafficViews} style={{ marginLeft: 'auto' }}>{source.views}</span>
               <span className={styles.trafficPercentage}>{source.percentage}%</span>
             </div>
           </div>

@@ -49,6 +49,7 @@ export const SubscriberGrowthChart = ({ isDark }) => {
 
   const svgX = getX(activeIndex);
   const tooltipX = (svgX / width) * 100;
+  const tooltipTransform = tooltipX > 80 ? 'translateX(-100%)' : 'translateX(-50%)';
 
   return (
     <div className={`${styles.chartCard} ${!isDark ? styles.light : ''}`}>
@@ -87,7 +88,7 @@ export const SubscriberGrowthChart = ({ isDark }) => {
           ))}
           <line x1={svgX} y1={padding.top} x2={svgX} y2={padding.top + chartHeight} className={styles.tooltipLine} />
         </svg>
-        <div className={styles.chartTooltip} style={{ left: `${tooltipX}%`, transform: 'translateX(-50%)' }}>
+        <div className={styles.chartTooltip} style={{ left: `${tooltipX}%`, transform: tooltipTransform }}>
           <div className={styles.chartTooltipDate}>{activeTooltip.date}</div>
           <div className={styles.chartTooltipValue}>{activeTooltip.total}</div>
           <div className={styles.chartTooltipSub}>{activeTooltip.new}</div>

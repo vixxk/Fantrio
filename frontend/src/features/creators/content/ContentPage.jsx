@@ -12,13 +12,16 @@ import styles from './ContentPage.module.css';
 
 export const ContentPage = () => {
   const { darkMode, navigateTo } = useApp();
-  const [activeTab, setActiveTab] = useState('Open Content');
+  const [activeTab, setActiveTab] = useState('All Content');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState('All Types');
   const [selectedSort, setSelectedSort] = useState('Newest First');
   const [typeDropdownOpen, setTypeDropdownOpen] = useState(false);
   const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
+  const [periodDropdownOpen, setPeriodDropdownOpen] = useState(false);
+  const [selectedPeriod, setSelectedPeriod] = useState(contentOverview.period);
   const [currentPage, setCurrentPage] = useState(1);
+  const [visibleContent, setVisibleContent] = useState(8);
 
   const getTypeIcon = (type) => {
     return type === 'Video' ? <Video size={16} /> : <Image size={16} />;
@@ -32,35 +35,31 @@ export const ContentPage = () => {
     if (searchQuery && !item.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     return true;
   });
+  const displayedContent = filteredContent.slice(0, visibleContent);
+  const hasMoreContent = visibleContent < filteredContent.length;
 
   return (
     <div className={`${styles.pageContainer} ${!darkMode ? styles.light : ''}`}>
-      {/* Page Header */}
-      <div className={styles.pageHeader}>
-        <div className={styles.headerLeft}>
-          <div className={styles.welcomeRow}>
-            <span className={styles.welcomeText}>Welcome back, Bella! 👋</span>
-          </div>
-          <p className={styles.welcomeSubtitle}>Here's what's happening with your content.</p>
-          <h1 className={styles.pageTitle}>Content</h1>
-        </div>
-      </div>
-
       {/* Main Content Grid */}
       <div className={styles.mainGrid}>
         {/* Left Column */}
         <div className={styles.leftColumn}>
-          {/* Tabs */}
-          <div className={styles.tabsRow}>
-            {contentTabs.map((tab) => (
-              <button
-                key={tab}
-                className={`${styles.tab} ${activeTab === tab ? styles.activeTab : ''}`}
-                onClick={() => setActiveTab(tab)}
-              >
-                {tab}
-              </button>
-            ))}
+          {/* Page Header */}
+          <div className={styles.pageHeader}>
+            <div className={styles.headerLeft}>
+              <h1 className={styles.pageTitle}>Content</h1>
+              <div className={styles.tabsRow}>
+                {contentTabs.map((tab) => (
+                  <button
+                    key={tab}
+                    className={`${styles.tab} ${activeTab === tab ? styles.activeTab : ''}`}
+                    onClick={() => setActiveTab(tab)}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Toolbar */}
@@ -80,7 +79,7 @@ export const ContentPage = () => {
               <div className={styles.dropdownWrapper}>
                 <button
                   className={styles.dropdownBtn}
-                  onClick={() => { setTypeDropdownOpen(!typeDropdownOpen); setSortDropdownOpen(false); }}
+                  onClick={() => { setTypeDropdownOpen(!typeDropdownOpen); setSortDropdownOpen(false); setPeriodDropdownOpen(false); }}
                 >
                   {selectedType} <ChevronDown size={14} />
                 </button>
@@ -103,7 +102,7 @@ export const ContentPage = () => {
               <div className={styles.dropdownWrapper}>
                 <button
                   className={styles.dropdownBtn}
-                  onClick={() => { setSortDropdownOpen(!sortDropdownOpen); setTypeDropdownOpen(false); }}
+                  onClick={() => { setSortDropdownOpen(!sortDropdownOpen); setTypeDropdownOpen(false); setPeriodDropdownOpen(false); }}
                 >
                   {selectedSort} <ChevronDown size={14} />
                 </button>
@@ -133,7 +132,8 @@ export const ContentPage = () => {
 
           {/* Content Table */}
           <div className={styles.tableCard}>
-            <div className={styles.tableContainer}>
+            {/* Desktop Table */}
+            <div className={`${styles.tableContainer} ${styles.hideMobile}`}>
               <table className={styles.contentTable}>
                 <thead>
                   <tr>
@@ -150,7 +150,7 @@ export const ContentPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredContent.map((item) => (
+                  {displayedContent.map((item) => (
                     <tr key={item.id} className={styles.tableRow}>
                       <td className={styles.td}>
                         <div className={styles.contentInfo}>
@@ -171,7 +171,6 @@ export const ContentPage = () => {
                           <span className={`${styles.statusBadge} ${item.status === 'Open' ? styles.statusOpen : styles.statusLocked}`}>
                             {item.status.toUpperCase()}
                           </span>
-                          {item.price && <span className={styles.priceTag}>{item.price}</span>}
                         </div>
                       </td>
                       <td className={styles.td}>
@@ -192,6 +191,63 @@ export const ContentPage = () => {
                   ))}
                 </tbody>
               </table>
+            </div>
+
+            {/* Mobile Card View */}
+                    <div className={`${styles.mobileCards} ${styles.showMobile}`}>
+              {displayedContent.map((item) => (
+                <div key={item.id} className={styles.mobileCard}>
+                  <div className={styles.mobileCardTop}>
+                    <div className={styles.mobileCardThumbCol}>
+                      <img src={item.thumbnail} alt={item.title} className={styles.mobileCardThumb} />
+                      <div className={styles.mobileCardStatusRow}>
+                        <span className={`${styles.statusBadge} ${item.status === 'Open' ? styles.statusOpen : styles.statusLocked}`}>
+                          {item.status.toUpperCase()}
+                        </span>
+                      </div>
+                    </div>
+                    <div className={styles.mobileCardContent}>
+                      <div className={styles.mobileCardTitleRow}>
+                        <span className={styles.mobileCardTitle}>{item.title}</span>
+                        <div className={styles.mobileCardActions}>
+                          <button className={styles.actionBtn}><Edit2 size={13} /></button>
+                          <button className={styles.actionBtn}><MoreVertical size={13} /></button>
+                        </div>
+                      </div>
+                      <span className={styles.mobileCardMeta}>
+                        {item.type}{item.duration ? ` • ${item.duration}` : ''}
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles.mobileCardStats}>
+                    <div className={styles.mobileStatItem}>
+                      <Eye size={12} />
+                      <span>{item.views}</span>
+                    </div>
+                    <div className={styles.mobileStatItem}>
+                      <Heart size={12} />
+                      <span>{item.likes}</span>
+                    </div>
+                    <div className={styles.mobileStatItem}>
+                        <span className={styles.mobileStatDate}>{item.date}</span>
+                    </div>
+                    {item.price && (
+                      <div className={styles.mobileStatItem}>
+                        <span className={styles.priceValue}>{item.price}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Load More */}
+            <div className={styles.loadMore}>
+              {hasMoreContent && (
+                <button className={styles.loadMoreBtn} onClick={() => setVisibleContent(visibleContent + 5)}>
+                  Load More <ChevronDown size={16} />
+                </button>
+              )}
             </div>
 
             {/* Pagination */}
@@ -236,9 +292,27 @@ export const ContentPage = () => {
           <div className={styles.overviewCard}>
             <div className={styles.overviewHeader}>
               <h3 className={styles.overviewTitle}>Content Overview</h3>
-              <button className={styles.periodBtn}>
-                {contentOverview.period} <ChevronDown size={14} />
-              </button>
+              <div className={styles.dropdownWrapper}>
+                <button
+                  className={styles.dropdownBtn}
+                  onClick={() => { setPeriodDropdownOpen(!periodDropdownOpen); setTypeDropdownOpen(false); setSortDropdownOpen(false); }}
+                >
+                  {selectedPeriod} <ChevronDown size={14} />
+                </button>
+                {periodDropdownOpen && (
+                  <div className={styles.dropdownMenu}>
+                    {contentOverview.periodOptions.map((opt) => (
+                      <button
+                        key={opt}
+                        className={`${styles.dropdownItem} ${selectedPeriod === opt ? styles.dropdownItemActive : ''}`}
+                        onClick={() => { setSelectedPeriod(opt); setPeriodDropdownOpen(false); }}
+                      >
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
             <div className={styles.overviewGrid}>
               {contentOverview.stats.map((stat, idx) => (
@@ -258,33 +332,37 @@ export const ContentPage = () => {
           {/* Content Breakdown */}
           <div className={styles.breakdownCard}>
             <h3 className={styles.breakdownTitle}>Content Breakdown</h3>
-            <div className={styles.breakdownContainer}>
-              <div className={styles.donutChart}>
-                <svg viewBox="0 0 100 100" className={styles.donutSvg}>
-                  <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="14" />
-                  {(() => {
-                    const circumference = 2 * Math.PI * 40;
-                    let accumulatedOffset = 0;
-                    return contentBreakdown.categories.map((cat, idx) => {
-                      const segmentLength = (cat.percentage / 100) * circumference;
-                      const dashOffset = -accumulatedOffset;
-                      accumulatedOffset += segmentLength;
-                      return (
-                        <circle
-                          key={idx}
-                          cx="50" cy="50" r="40"
-                          fill="none"
-                          stroke={cat.color}
-                          strokeWidth="14"
-                          strokeDasharray={`${segmentLength} ${circumference}`}
-                          strokeDashoffset={dashOffset}
-                          strokeLinecap="round"
-                          transform="rotate(-90 50 50)"
-                        />
-                      );
-                    });
-                  })()}
-                </svg>
+            <div className={styles.breakdownBody}>
+              <div className={styles.donutContainer}>
+                <div className={styles.donutChart}>
+                  <svg viewBox="0 0 100 100" className={styles.donutSvg}>
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="12" />
+                    {(() => {
+                      const circumference = 2 * Math.PI * 40;
+                      let accumulatedOffset = 0;
+                      return contentBreakdown.categories.map((cat, idx) => {
+                        const segmentLength = (cat.percentage / 100) * circumference;
+                        const dashOffset = -accumulatedOffset;
+                        accumulatedOffset += segmentLength;
+                        return (
+                          <circle
+                            key={idx}
+                            cx="50" cy="50" r="40"
+                            fill="none"
+                            stroke={cat.color}
+                            strokeWidth="12"
+                            strokeDasharray={`${segmentLength} ${circumference}`}
+                            strokeDashoffset={dashOffset}
+                            strokeLinecap="round"
+                            transform="rotate(-90 50 50)"
+                          />
+                        );
+                      });
+                    })()}
+                    <text x="50" y="48" textAnchor="middle" className={styles.donutValue}>{contentBreakdown.total}</text>
+                    <text x="50" y="58" textAnchor="middle" className={styles.donutLabel}>Total Posts</text>
+                  </svg>
+                </div>
               </div>
               <div className={styles.breakdownLegend}>
                 {contentBreakdown.categories.map((cat, idx) => (

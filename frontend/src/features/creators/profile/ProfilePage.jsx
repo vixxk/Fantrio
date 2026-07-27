@@ -1,7 +1,7 @@
 import React from 'react';
 import { useApp } from '../../../context/AppContext';
 import { ProfileHero } from './ProfileHero';
-import { AboutMe } from './AboutMe';
+import { AboutMe, CreatorPanel } from './AboutMe';
 import { ProfileInsights } from './ProfileInsights';
 import { FanSpotlight } from './FanSpotlight';
 import { SubscriptionPlans } from './SubscriptionPlans';
@@ -28,6 +28,9 @@ export const ProfilePage = () => {
         <div className={styles.leftColumn}>
           {/* Profile Hero Card */}
           <ProfileHero isDark={darkMode} />
+
+          {/* Creator Panel */}
+          <CreatorPanel isDark={darkMode} />
 
           {/* Bottom Grid: Plans + Call Rates */}
           <div className={styles.bottomGrid}>

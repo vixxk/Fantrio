@@ -18,9 +18,15 @@ export const Header = ({ onMenuToggle }) => {
 
   const getHeaderMeta = () => {
     switch (activeTab) {
-      case 'Creator Analytics':
+      case 'Creator Live Calls':
         return {
-          title: "Welcome back, Bella! 👋",
+          title: "Live Calls Overview",
+          subtitle: "Manage your audio calls and video calls, track performance, and maximize your earnings."
+        };
+      case 'Creator Analytics':
+      case 'Creator Dashboard':
+        return {
+          title: "Welcome Back! Bella 👋",
           subtitle: "Here's what's happening with your account today."
         };
       case 'Creator Audio Calls':
@@ -40,7 +46,7 @@ export const Header = ({ onMenuToggle }) => {
         };
       default:
         return {
-          title: "Welcome back, Bella! 👋",
+          title: "Welcome Back! Bella 👋",
           subtitle: "Here's what's happening with your account today."
         };
     }
@@ -80,14 +86,14 @@ export const Header = ({ onMenuToggle }) => {
         {isCreatorPage && (
           <button className={styles.helpCenterBtn} onClick={() => alert('Help Center coming soon!')}>
             <HelpCircle size={18} />
-            <span>Help Center</span>
+            <span>HelpCentre</span>
           </button>
         )}
 
         <button className={styles.iconButton}>
           <div className={styles.iconWrapper}>
             <Bell size={20} />
-            <span className={styles.badge}>{isCreatorPage ? 8 : 3}</span>
+            <span className={styles.badge}>3</span>
           </div>
         </button>
 
@@ -104,7 +110,7 @@ export const Header = ({ onMenuToggle }) => {
         {!isCreatorPage && (
           <div className={styles.coinsIndicator} onClick={handleAddCoinsClick}>
             <img src="/coin.png" alt="Coin" className={styles.coinIcon} />
-            <span className={styles.coinsText}>{formattedBalance} Coins</span>
+            <span className={styles.coinsText}>{formattedBalance}</span>
             <button className={styles.plusButton}>
               <Plus size={14} strokeWidth={3} />
             </button>

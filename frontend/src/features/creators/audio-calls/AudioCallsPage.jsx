@@ -120,15 +120,7 @@ export const AudioCallsPage = () => {
                     <span className={styles.statLabel}>{stat.label}</span>
                   </div>
                   <div className={styles.statValueRow}>
-                    <div 
-                      className={styles.statIconWrap}
-                      style={{ 
-                        background: `${stat.color}15`,
-                        boxShadow: `0 0 12px ${stat.color}30`
-                      }}
-                    >
-                      <Icon size={22} style={{ color: stat.color }} fill={stat.icon === 'clock' || stat.icon === 'dollar' ? 'none' : stat.color} />
-                    </div>
+                    <Icon size={24} style={{ color: stat.color }} fill={stat.icon === 'clock' || stat.icon === 'dollar' ? 'none' : stat.color} />
                     <div className={styles.statValueCol}>
                       <span className={styles.statValue}>{stat.value}</span>
                       {stat.period && <span className={styles.statPeriod}>{stat.period}</span>}

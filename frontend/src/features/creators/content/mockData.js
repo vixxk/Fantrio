@@ -1,17 +1,16 @@
-export const contentTabs = ['Open Content', 'Locked Content', 'Stories', 'All Content'];
+export const contentTabs = ['All Content', 'Open Content', 'Locked Content', 'Stories'];
 
 export const contentTypes = ['All Types', 'Image', 'Video', 'Story'];
 export const sortOptions = ['Newest First', 'Oldest First', 'Most Viewed', 'Most Liked'];
 
 export const contentOverview = {
   period: 'This Month',
+  periodOptions: ['This Month', 'Last Month', 'This Year', 'All Time'],
   stats: [
     { label: 'Total Posts', value: '128', change: '18%', changeType: 'positive' },
     { label: 'Open Posts', value: '78', change: '14%', changeType: 'positive' },
     { label: 'Locked Posts', value: '50', change: '22%', changeType: 'positive' },
     { label: 'Stories', value: '36', change: '16%', changeType: 'positive' },
-    { label: 'Total Views', value: '24.5K', change: '18%', changeType: 'positive' },
-    { label: 'Total Likes', value: '3,246', change: '17%', changeType: 'positive' },
   ],
 };
 

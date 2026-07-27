@@ -11,7 +11,7 @@
 .mainGrid {
   display: grid;
   grid-template-columns: 1fr 340px;
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
 .leftColumn {
@@ -212,15 +212,11 @@
   gap: 0.6rem;
 }
 
-.statIconWrap {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+.statValueRow {
   display: flex;
   align-items: center;
-  justify-content: center;
-  border: 1.5px solid rgba(255, 255, 255, 0.1);
-  flex-shrink: 0;
+  gap: 0.45rem;
+  margin-bottom: 0.15rem;
 }
 
 .statLabelRow {
@@ -228,13 +224,6 @@
   align-items: center;
   gap: 0.35rem;
   flex-wrap: wrap;
-  margin-bottom: 0.15rem;
-}
-
-.statValueRow {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
   margin-bottom: 0.15rem;
 }
 
@@ -735,18 +724,16 @@
 .donutLegend {
   flex: 1;
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .legendItem {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  flex: 1;
-  min-width: 0;
 }
 
 .legendDot {
@@ -798,14 +785,15 @@
 }
 
 .dailyYAxis {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 0 0.5rem 0 0;
-  height: 120px;
-  position: relative;
-  flex-shrink: 0;
-}
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 3px;
+    padding: 0 0.5rem 0 0;
+    height: 180px;
+    position: relative;
+    flex-shrink: 0;
+  }
 
 .dailyYLabel {
   font-size: 0.7rem;
@@ -820,7 +808,7 @@
   display: flex;
   align-items: flex-end;
   gap: 3px;
-  height: 120px;
+  height: 180px;
   border-left: 1px solid rgba(255, 255, 255, 0.06);
   padding-left: 6px;
   position: relative;
@@ -1001,10 +989,6 @@
 .light .dailyCard:hover {
   border-color: rgba(225, 0, 117, 0.2);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-}
-
-.light .statIconWrap {
-  border-color: rgba(0, 0, 0, 0.1);
 }
 
 .light .statLabel,
@@ -1214,6 +1198,7 @@
 @media (max-width: 768px) {
   .callsContainer {
     padding: 0 0 2rem 0 !important;
+    overflow-x: hidden !important;
   }
 
   .pageHeader {
@@ -1239,8 +1224,31 @@
   }
 
   .rightSidebar {
-    flex-direction: column !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
     gap: 0.75rem !important;
+  }
+
+  .rightSidebar > .earningsCard {
+    flex: 1 1 100%;
+    order: 1;
+  }
+
+  .rightSidebar > .performanceCard {
+    flex: 0 1 calc(50% - 0.375rem) !important;
+    order: 2;
+    min-width: 0;
+  }
+
+  .rightSidebar > .dailyCard {
+    flex: 1 1 100% !important;
+    order: 4;
+  }
+
+  .rightSidebar > .tipsCard {
+    flex: 0 1 calc(50% - 0.375rem) !important;
+    order: 3;
+    min-width: 0;
   }
 
   .heroCard,
@@ -1289,16 +1297,6 @@
 
   .statCard {
     padding: 0.75rem !important;
-  }
-
-  .statIconWrap {
-    width: 32px !important;
-    height: 32px !important;
-  }
-
-  .statIconWrap svg {
-    width: 18px !important;
-    height: 18px !important;
   }
 
   .statLabel {
@@ -1372,37 +1370,112 @@
   }
 
   .donutChart {
-    width: 100px !important;
-    height: 100px !important;
+    width: 80px !important;
+    height: 80px !important;
   }
 
   .performanceBody {
     flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
   }
 
-  .dailyChart {
-    height: 65px !important;
+  .donutLegend {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    flex-wrap: wrap !important;
   }
 
-  .dailyYAxis {
-    height: 65px !important;
+  .legendItem {
+    gap: 0.3rem !important;
   }
 
-  .dailyYLabel {
-    font-size: 0.58rem !important;
-  }
-
-  .dailyBarLabel {
-    font-size: 0.5rem !important;
-  }
-
-  .tipItem {
+  .legendLabel {
     font-size: 0.65rem !important;
   }
 
-  .viewEarningsBtn {
-    padding: 0.5rem 0.75rem !important;
-    font-size: 0.75rem !important;
+  .legendValue {
+    font-size: 0.6rem !important;
+  }
+
+  .tipsCard {
+    padding: 0.5rem !important;
+  }
+
+  .tipsTitle {
+    font-size: 0.7rem !important;
+  }
+
+  .tipItem {
+    font-size: 0.6rem !important;
+    padding: 0.3rem 0 !important;
+  }
+
+  .dailyChart {
+    height: 180px !important;
+    border-left: none !important;
+    padding-left: 0 !important;
+  }
+
+  .dailyYAxis {
+    height: 180px !important;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+  }
+
+  .dailyChartWrapper {
+    display: flex !important;
+  }
+
+  .performanceCard,
+  .tipsCard {
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+
+  .rightSidebar {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+
+  .rightSidebar > * {
+    flex: 1 1 calc(50% - 0.25rem) !important;
+  }
+
+  .performanceBody {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+  }
+
+  .donutChart {
+    width: 70px !important;
+    height: 70px !important;
+  }
+
+  .donutLegend {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    flex-wrap: wrap !important;
+  }
+
+  .legendItem {
+    gap: 0.3rem !important;
+  }
+
+  .legendLabel {
+    font-size: 0.6rem !important;
+  }
+
+  .legendValue {
+    font-size: 0.55rem !important;
   }
 
   .loadMoreBtn {
@@ -1417,6 +1490,7 @@
 @media (max-width: 480px) {
   .callsContainer {
     padding: 0 0 1.25rem 0 !important;
+    overflow-x: hidden !important;
   }
 
   .pageTitle {
@@ -1436,16 +1510,6 @@
 
   .statCard {
     padding: 0.5rem !important;
-  }
-
-  .statIconWrap {
-    width: 26px !important;
-    height: 26px !important;
-  }
-
-  .statIconWrap svg {
-    width: 14px !important;
-    height: 14px !important;
   }
 
   .statLabel {
@@ -1608,16 +1672,6 @@
 
   .statCard {
     padding: 0.4rem !important;
-  }
-
-  .statIconWrap {
-    width: 22px !important;
-    height: 22px !important;
-  }
-
-  .statIconWrap svg {
-    width: 12px !important;
-    height: 12px !important;
   }
 
   .statLabel {

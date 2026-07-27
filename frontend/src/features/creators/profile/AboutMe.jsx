@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Globe, Calendar, Clock } from 'lucide-react';
+import { MapPin, Globe, Calendar, Clock, BadgeCheck } from 'lucide-react';
 import { creatorProfile } from './mockData';
 import styles from './ProfilePage.module.css';
 
@@ -30,6 +30,35 @@ export const AboutMe = ({ isDark }) => {
           <span className={styles.aboutValue}>{creatorProfile.responseTime}</span>
         </div>
       </div>
+    </div>
+  );
+};
+
+export const CreatorPanel = ({ isDark }) => {
+  return (
+    <div className={`${styles.creatorSidebar} ${!isDark ? styles.light : ''}`}>
+      <div className={styles.creatorProfile}>
+        <img
+          src={creatorProfile.avatar}
+          alt={creatorProfile.name}
+          className={styles.sidebarAvatar}
+        />
+        <div className={styles.sidebarInfo}>
+          <div className={styles.sidebarNameRow}>
+            <span className={styles.sidebarName}>{creatorProfile.name}</span>
+            {creatorProfile.isVerified && (
+              <BadgeCheck size={16} className={styles.verifiedIcon} />
+            )}
+          </div>
+          <span className={styles.sidebarHandle}>{creatorProfile.handle}</span>
+          {creatorProfile.isOnline && (
+            <div className={styles.sidebarOnline}>
+              <span className={styles.onlineDot} /> Online
+            </div>
+          )}
+        </div>
+      </div>
+      <button className={styles.viewProfileBtn}>View Profile</button>
     </div>
   );
 };

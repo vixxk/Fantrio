@@ -17,10 +17,12 @@ export const AppProvider = ({ children }) => {
     'Discover Feed': '/discover',
     'All Creators': '/creators',
     'Creator Analytics': '/creators/analytics',
+    'Creator Live Calls': '/creators/live-calls',
     'Creator Audio Calls': '/creators/audio-calls',
     'Creator Video Calls': '/creators/video-calls',
     'Creator Profile': '/creators/profile',
     'Creator Content': '/creators/content',
+    'Creator Dashboard': '/creators/dashboard',
     'Live Streams': '/live',
     '1:1 Audio Calls': '/audio-calls',
     '1:1 Video Calls': '/video-calls',
@@ -37,10 +39,12 @@ export const AppProvider = ({ children }) => {
     '/discover': 'Discover Feed',
     '/creators': 'All Creators',
     '/creators/analytics': 'Creator Analytics',
+    '/creators/live-calls': 'Creator Live Calls',
     '/creators/audio-calls': 'Creator Audio Calls',
     '/creators/video-calls': 'Creator Video Calls',
     '/creators/profile': 'Creator Profile',
     '/creators/content': 'Creator Content',
+    '/creators/dashboard': 'Creator Dashboard',
     '/live': 'Live Streams',
     '/audio-calls': '1:1 Audio Calls',
     '/video-calls': '1:1 Video Calls',
@@ -56,9 +60,11 @@ export const AppProvider = ({ children }) => {
     if (path.startsWith('/admin')) return 'Admin Panel';
     if (path.startsWith('/messages')) return 'Messages';
     if (path.startsWith('/creators/profile')) return 'Creator Profile';
+    if (path.startsWith('/creators/live-calls')) return 'Creator Live Calls';
     if (path.startsWith('/creators/audio-calls')) return 'Creator Audio Calls';
     if (path.startsWith('/creators/video-calls')) return 'Creator Video Calls';
     if (path.startsWith('/creators/analytics')) return 'Creator Analytics';
+    if (path.startsWith('/creators/dashboard')) return 'Creator Dashboard';
     if (path.startsWith('/creators/content')) return 'Creator Content';
     return pathToTab[path] || 'Discover Feed';
   };
