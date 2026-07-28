@@ -17,6 +17,8 @@ import { VideoCallsPage as CreatorVideoCallsPage } from './features/creators/vid
 import { ProfilePage } from './features/creators/profile/ProfilePage';
 import { ContentPage } from './features/creators/content/ContentPage';
 import { DashboardPage } from './features/creators/dashboard/DashboardPage';
+import { CreatorMessagesPage } from './features/creators/messages/CreatorMessagesPage';
+import { PPVContentPage } from './features/creators/ppv-content/PPVContentPage';
 import { AudioCallsPage } from './features/users/audio/AudioCallsPage';
 import { VideoCallsPage } from './features/users/video/VideoCallsPage';
 import { SubscriptionsPage } from './features/users/subscriptions/SubscriptionsPage';
@@ -85,7 +87,7 @@ const AppContent = () => {
     };
   }, []);
 
-  const isChatOpen = activeTab === 'Messages' && currentPath && currentPath.split('/').filter(Boolean).length > 1;
+  const isChatOpen = (activeTab === 'Messages' || activeTab === 'Creator Messages') && currentPath && currentPath.split('/').filter(Boolean).length > 1;
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -151,10 +153,22 @@ const AppContent = () => {
             <DashboardPage />
           </div>
         );
+      case 'Creator Messages':
+        return (
+          <div className="tabMessages">
+            <CreatorMessagesPage />
+          </div>
+        );
       case 'Creator Content':
         return (
           <div className="tabAnalytics">
             <ContentPage />
+          </div>
+        );
+      case 'Creator PPV Content':
+        return (
+          <div className="tabAnalytics">
+            <PPVContentPage />
           </div>
         );
       case '1:1 Audio Calls':
@@ -259,7 +273,7 @@ const AppContent = () => {
           <Header onMenuToggle={() => setMobileMenuOpen(true)} />
         </div>
 
-        <main className={`scrollableContent ${activeTab === 'Messages' ? 'noScroll' : ''}`}>
+        <main className={`scrollableContent ${activeTab === 'Messages' || activeTab === 'Creator Messages' ? 'noScroll' : ''}`}>
           {renderTabContent()}
         </main>
       </div>

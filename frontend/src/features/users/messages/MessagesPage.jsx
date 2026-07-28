@@ -4,7 +4,7 @@ import { api } from '../../../services/api';
 import { 
   Search, Edit, BadgeCheck, Phone, Video, Heart, MoreVertical,
   Lock, Smile, Image as ImageIcon, Send, Plus, Archive, Star,
-  X, Check, MessageSquare, User, ChevronLeft
+  X, Check, MessageSquare, User, ChevronLeft, SlidersHorizontal
 } from 'lucide-react';
 import styles from './MessagesPage.module.css';
 
@@ -595,13 +595,10 @@ export const MessagesPage = () => {
                   ) : (
                     <MessageSquare size={24} style={{ stroke: 'url(#activeGradient)', filter: 'drop-shadow(0 2px 6px rgba(225,0,117,0.3))' }} />
                   )}
-                  <h1 className={styles.pageTitle} style={{ fontSize: '1.4rem', fontWeight: 800, margin: 0, color: 'inherit' }}>
+                  <h1 className={styles.pageTitle} style={{ fontSize: '1.15rem', fontWeight: 800, margin: 0, color: 'inherit' }}>
                     {showArchived ? 'Archived' : 'Chats'}
                   </h1>
                 </div>
-                <p className={styles.pageSubtitle} style={{ fontSize: '0.8rem', margin: 0 }}>
-                  {showArchived ? 'View and manage archived conversations' : 'Connect and chat with your favorite creators'}
-                </p>
               </div>
               <div className={styles.mobileHeaderActions} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem' }}>
                 <button 
@@ -631,6 +628,9 @@ export const MessagesPage = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={styles.mobileSearchInput}
               />
+              <button className={styles.mobileFilterBtn}>
+                <SlidersHorizontal size={16} />
+              </button>
             </div>
 
             {/* Filter Pills */}
@@ -864,8 +864,13 @@ export const MessagesPage = () => {
                     className={`${styles.msgRow} ${isUser ? styles.msgRowRight : styles.msgRowLeft}`}
                     onClick={() => selectMessage(msg.id)}
                   >
-                    <div className={`${styles.msgBubble} ${isUser ? styles.bubbleUser : styles.bubbleCreator} ${msg.isTip ? styles.bubbleTip : ''} ${selectedMsgId === msg.id ? styles.bubbleSelected : ''}`}>
-                      <p className={styles.msgText}>{msg.text}</p>
+                    <div className={styles.msgContentWrapper}>
+                      <div className={`${styles.msgBubble} ${isUser ? styles.bubbleUser : styles.bubbleCreator} ${msg.isTip ? styles.bubbleTip : ''} ${selectedMsgId === msg.id ? styles.bubbleSelected : ''}`}>
+                        <p className={styles.msgText}>{msg.text}</p>
+                      </div>
+                      <div className={`${styles.msgTimestampInline} ${isUser ? styles.timestampRight : styles.timestampLeft}`}>
+                        <span className={styles.msgTimestamp}>{msg.time}</span>
+                      </div>
                     </div>
                   </div>
                 );
@@ -1405,8 +1410,13 @@ export const MessagesPage = () => {
                       onClick={() => selectMessage(msg.id)}
                       style={{ cursor: 'pointer' }}
                     >
-                      <div className={`${styles.msgBubble} ${isUser ? styles.bubbleUser : styles.bubbleCreator} ${msg.isTip ? styles.bubbleTip : ''} ${selectedMsgId === msg.id ? styles.bubbleSelected : ''}`}>
-                        <p className={styles.msgText}>{msg.text}</p>
+                      <div className={styles.msgContentWrapper}>
+                        <div className={`${styles.msgBubble} ${isUser ? styles.bubbleUser : styles.bubbleCreator} ${msg.isTip ? styles.bubbleTip : ''} ${selectedMsgId === msg.id ? styles.bubbleSelected : ''}`}>
+                          <p className={styles.msgText}>{msg.text}</p>
+                        </div>
+                        <div className={`${styles.msgTimestampInline} ${isUser ? styles.timestampRight : styles.timestampLeft}`}>
+                          <span className={styles.msgTimestamp}>{msg.time}</span>
+                        </div>
                       </div>
                     </div>
                   );

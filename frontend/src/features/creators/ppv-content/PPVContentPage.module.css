@@ -1,0 +1,1264 @@
+/* ================= PPV CONTENT PAGE ================= */
+.ppvContainer {
+  width: 100%;
+  min-height: 100%;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ================= MAIN GRID ================= */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.5rem;
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.rightSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ================= HERO CARD ================= */
+.heroCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.heroContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.heroIconWrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(155, 81, 224, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.heroIcon {
+  color: #9b51e0;
+}
+
+.heroInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.heroTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.heroDesc {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+.rateInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.rateLabel {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.rateValue {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #9b51e0;
+}
+
+.onlineStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: #ffffff;
+  margin-top: 0.25rem;
+}
+
+.onlineDot {
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.heroVisual {
+  flex-shrink: 0;
+}
+
+.visualCard {
+  background: linear-gradient(135deg, rgba(155, 81, 224, 0.15) 0%, rgba(225, 0, 117, 0.15) 100%);
+  border: 1px solid rgba(155, 81, 224, 0.3);
+  border-radius: 16px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 140px;
+}
+
+.visualIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(155, 81, 224, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9b51e0;
+}
+
+.visualText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.visualValue {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #10b981;
+  letter-spacing: -0.02em;
+}
+
+.visualLabel {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.heroActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.createBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #7c3aed 0%, #9b51e0 100%);
+  border: none;
+  color: #ffffff;
+  padding: 0.85rem 1.5rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.createBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(155, 81, 224, 0.3);
+}
+
+.scheduleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: 1px solid rgba(155, 81, 224, 0.5);
+  color: #9b51e0;
+  padding: 0.85rem 1.5rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.scheduleBtn:hover {
+  background: rgba(155, 81, 224, 0.1);
+  border-color: #9b51e0;
+}
+
+/* ================= STATS GRID ================= */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.75rem;
+}
+
+.statCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  justify-content: center;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.statCard:hover {
+  border-color: rgba(155, 81, 224, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.statLabelRow {
+  margin-bottom: 0.15rem;
+}
+
+.statValueRow {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.15rem;
+}
+
+.statLabel {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+  display: block;
+}
+
+.statValue {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.statValueCol {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.statChangeInline {
+  margin-left: auto;
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.statChangeInline.positive {
+  color: #10b981;
+}
+
+.statChangeInline.negative {
+  color: #ef4444;
+}
+
+/* ================= PPV TABLE ================= */
+.ppvTableCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.tableHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.tableTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.tableTabs {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.tab {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 0.65rem 1.1rem;
+  border-radius: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.tab:hover {
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.activeTab {
+  background: transparent !important;
+  color: #e10075 !important;
+  position: relative;
+}
+
+.activeTab::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #e10075;
+  border-radius: 1px;
+}
+
+.searchWrapper {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.searchInput {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  color: #ffffff;
+  padding: 0.65rem 1rem 0.65rem 2.25rem;
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.searchInput::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.searchInput:focus {
+  border-color: rgba(155, 81, 224, 0.4);
+}
+
+.tableContainer {
+  overflow-x: auto;
+}
+
+.ppvTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.th {
+  text-align: left;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  padding: 0 1rem 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.tableRow {
+  transition: background 0.2s ease;
+}
+
+.tableRow:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.td {
+  padding: 1rem 1rem 1rem 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+  vertical-align: middle;
+}
+
+.contentInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.contentThumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.contentDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.contentTitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.contentMeta {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.price {
+  color: #9b51e0;
+  font-weight: 600;
+}
+
+.revenue {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.statusBadge {
+  padding: 0.3rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.statusActive {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.statusScheduled {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
+.statusExpired {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.actionBtn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.actionBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.loadMore {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.loadMoreBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: none;
+  color: #e10075;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.loadMoreBtn:hover {
+  opacity: 0.8;
+}
+
+/* ================= RIGHT SIDEBAR CARDS ================= */
+.revenueCard,
+.topCard,
+.transactionsCard,
+.tipsCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+/* ================= REVENUE CARD ================= */
+.revenueHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.revenueTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.revenueIcon {
+  color: #9b51e0;
+}
+
+.revenueTitle {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.revenueAmount {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #10b981;
+  margin-bottom: 0.25rem;
+  letter-spacing: -0.02em;
+}
+
+.revenueChange {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.revenueChange .positive {
+  color: #10b981;
+  font-weight: 600;
+  font-size: 0.82rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.changeLabel {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.revenueStats {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.revenueStat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.revenueStat:last-child {
+  border-bottom: none;
+}
+
+.revenueStatLabel {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.revenueStatValue {
+  font-size: 0.85rem;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.viewRevenueBtn {
+  width: 100%;
+  background: linear-gradient(135deg, #9b51e0 0%, #e10075 50%, #ff4d6a 80%, #3b82f6 100%);
+  border: none;
+  color: #ffffff;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 1.25rem;
+}
+
+.viewRevenueBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(155, 81, 224, 0.4);
+}
+
+/* ================= TOP PERFORMING ================= */
+.topTitle {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 1rem 0;
+}
+
+.topList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.topItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.topThumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.topInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.topItemTitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topItemRevenue {
+  font-size: 0.78rem;
+  color: #10b981;
+  font-weight: 600;
+}
+
+.topUnlockRate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+}
+
+.unlockRateValue {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #9b51e0;
+}
+
+.unlockRateLabel {
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ================= TRANSACTIONS ================= */
+.transactionsTitle {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 1rem 0;
+}
+
+.transactionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.transactionItem {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.transactionAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.transactionInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.transactionFan {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.transactionContent {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.transactionRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+}
+
+.transactionAmount {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #10b981;
+}
+
+.transactionTime {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.viewAllTxBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: none;
+  color: #e10075;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  padding: 0;
+  margin-top: 1rem;
+}
+
+.viewAllTxBtn:hover {
+  opacity: 0.8;
+}
+
+/* ================= TIPS CARD ================= */
+.tipsHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tipsIconWrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tipsIcon {
+  color: #3b82f6;
+}
+
+.tipsTitle {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.tipsList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.tipItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+}
+
+.tipCheck {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.tipCheckIcon {
+  color: #3b82f6;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.viewAllTipsBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: none;
+  color: #e10075;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  padding: 0;
+}
+
+.viewAllTipsBtn:hover {
+  opacity: 0.8;
+}
+
+/* ================= LIGHT THEME ================= */
+.light {
+  color: #1a1625;
+}
+
+.light .heroTitle,
+.light .tableTitle,
+.light .contentTitle {
+  color: #1a1625;
+}
+
+.light .heroDesc,
+.light .rateLabel,
+.light .statLabel,
+.light .contentMeta,
+.light .revenueStatLabel,
+.light .changeLabel,
+.light .revenueTitle,
+.light .topTitle,
+.light .transactionsTitle,
+.light .tipsTitle {
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .heroCard,
+.light .statCard,
+.light .ppvTableCard,
+.light .revenueCard,
+.light .topCard,
+.light .transactionsCard,
+.light .tipsCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.light .heroCard:hover,
+.light .statCard:hover,
+.light .ppvTableCard:hover {
+  border-color: rgba(155, 81, 224, 0.2);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+.light .heroIconWrap {
+  background: rgba(155, 81, 224, 0.15);
+}
+
+.light .statValue,
+.light .revenueStatValue,
+.light .transactionFan,
+.light .topItemTitle {
+  color: #1a1625;
+}
+
+.light .onlineStatus {
+  color: #1a1625;
+}
+
+.light .visualCard {
+  background: linear-gradient(135deg, rgba(155, 81, 224, 0.1) 0%, rgba(225, 0, 117, 0.1) 100%);
+  border-color: rgba(155, 81, 224, 0.2);
+}
+
+.light .searchInput {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #1a1625;
+}
+
+.light .searchInput::placeholder {
+  color: rgba(26, 22, 37, 0.35);
+}
+
+.light .tab {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .tab:hover {
+  color: rgba(26, 22, 37, 0.8);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.light .activeTab {
+  color: #e10075 !important;
+}
+
+.light .activeTab::after {
+  background: #e10075;
+}
+
+.light .th {
+  color: rgba(26, 22, 37, 0.4);
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .tableRow:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.light .td {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .price {
+  color: #7c3aed;
+}
+
+.light .revenue {
+  color: #059669;
+}
+
+.light .actionBtn {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .actionBtn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .revenueStat {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .transactionContent {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .transactionTime {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .tipItem {
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .goLiveBtn {
+  background: linear-gradient(135deg, #7c3aed 0%, #9b51e0 100%);
+}
+
+.light .scheduleBtn {
+  border-color: rgba(124, 58, 237, 0.5);
+  color: #7c3aed;
+}
+
+.light .scheduleBtn:hover {
+  background: rgba(124, 58, 237, 0.1);
+  border-color: #7c3aed;
+}
+
+.light .statusActive {
+  background: rgba(5, 150, 105, 0.12);
+  color: #059669;
+}
+
+.light .statusScheduled {
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+}
+
+.light .statusExpired {
+  background: rgba(220, 38, 38, 0.12);
+  color: #dc2626;
+}
+
+.light .unlockRateValue {
+  color: #7c3aed;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1200px) {
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .rightSidebar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .revenueCard,
+  .topCard,
+  .transactionsCard,
+  .tipsCard {
+    flex: 1;
+    min-width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .ppvContainer {
+    padding: 0 !important;
+  }
+
+  .mainGrid {
+    gap: 0.75rem;
+  }
+
+  .rightSidebar {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+  }
+
+  .heroCard,
+  .statCard,
+  .ppvTableCard,
+  .revenueCard,
+  .topCard,
+  .transactionsCard,
+  .tipsCard {
+    padding: 0.75rem !important;
+    border-radius: 10px !important;
+  }
+
+  .heroContent {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .heroIconWrap {
+    width: 40px;
+    height: 40px;
+  }
+
+  .heroIcon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .heroVisual {
+    display: none;
+  }
+
+  .heroActions {
+    grid-template-columns: 1fr;
+  }
+
+  .createBtn,
+  .scheduleBtn {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.78rem !important;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  .statCard {
+    padding: 0.7rem !important;
+  }
+
+  .statLabel {
+    font-size: 0.62rem !important;
+  }
+
+  .statValue {
+    font-size: 1.1rem !important;
+  }
+
+  .tableHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .tableTitle {
+    font-size: 0.82rem !important;
+  }
+
+  .tableTabs {
+    overflow-x: auto;
+    gap: 0.1rem !important;
+  }
+
+  .tab {
+    padding: 0.3rem 0.5rem !important;
+    font-size: 0.68rem !important;
+    white-space: nowrap;
+  }
+
+  .hideMobile {
+    display: none !important;
+  }
+
+  .contentThumb {
+    width: 36px;
+    height: 36px;
+  }
+
+  .contentTitle {
+    font-size: 0.75rem !important;
+  }
+
+  .td {
+    padding: 0.5rem 0.35rem 0.5rem 0 !important;
+    font-size: 0.68rem !important;
+  }
+
+  .th {
+    padding: 0 0.35rem 0.4rem 0 !important;
+    font-size: 0.58rem !important;
+  }
+
+  .revenueAmount {
+    font-size: 1.5rem !important;
+  }
+
+  .topThumb {
+    width: 40px;
+    height: 40px;
+  }
+
+  .transactionAvatar {
+    width: 30px;
+    height: 30px;
+  }
+
+  .transactionFan {
+    font-size: 0.75rem !important;
+  }
+
+  .transactionContent {
+    font-size: 0.65rem !important;
+  }
+
+  .transactionAmount {
+    font-size: 0.75rem !important;
+  }
+
+  .transactionTime {
+    font-size: 0.58rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .heroTitle {
+    font-size: 1rem !important;
+  }
+
+  .heroDesc {
+    font-size: 0.7rem !important;
+  }
+
+  .rateValue {
+    font-size: 1rem !important;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.4rem !important;
+  }
+
+  .statCard {
+    padding: 0.5rem !important;
+  }
+
+  .statLabel {
+    font-size: 0.58rem !important;
+  }
+
+  .statValue {
+    font-size: 0.95rem !important;
+  }
+
+  .ppvTableCard {
+    padding: 0.5rem !important;
+  }
+
+  .topItem {
+    gap: 0.5rem;
+  }
+
+  .topThumb {
+    width: 36px;
+    height: 36px;
+  }
+
+  .topItemTitle {
+    font-size: 0.72rem !important;
+  }
+
+  .topItemRevenue {
+    font-size: 0.65rem !important;
+  }
+
+  .transactionItem {
+    gap: 0.5rem;
+  }
+
+  .tipItem {
+    font-size: 0.72rem !important;
+  }
+}

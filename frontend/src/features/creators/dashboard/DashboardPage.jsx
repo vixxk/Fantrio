@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../../context/AppContext';
 import {
-  Phone, Video, MessageCircle, Lock, Globe, CircleDot, FolderOpen,
+  Phone, Video, MessageSquareText, Lock, Globe, CircleDot, FolderOpen,
   ChevronDown, ChevronUp, Play, ArrowRight, Eye, Heart, MoreVertical,
   Zap, Calendar, Radio, Check
 } from 'lucide-react';
@@ -10,10 +10,11 @@ import {
   recentContentTabs, recentContent, earningsOverview,
   upcomingStreams, quickStats
 } from './mockData';
+import { PeriodDropdown } from '../analytics/PeriodDropdown';
 import styles from './DashboardPage.module.css';
 
 const iconMap = {
-  Phone, Video, MessageCircle, Lock, Globe, CircleDot, FolderOpen,
+  Phone, Video, MessageSquareText, Lock, Globe, CircleDot, FolderOpen,
 };
 
 export const DashboardPage = () => {
@@ -22,6 +23,8 @@ export const DashboardPage = () => {
   const [streamType, setStreamType] = useState('goLive');
   const [entryPrice, setEntryPrice] = useState('5.00');
   const [freeForSubs, setFreeForSubs] = useState(false);
+  const [showSchedulePopup, setShowSchedulePopup] = useState(false);
+  const [selectedScheduleType, setSelectedScheduleType] = useState('');
 
   const filteredRecent = recentContent.filter((item) => {
     if (activeContentTab === 'All') return true;
@@ -51,35 +54,37 @@ export const DashboardPage = () => {
                         <Icon size={24} style={{ color: action.color }} />
                       </div>
                       <div className={styles.quickActionInfo}>
-                        <h3 className={styles.quickActionTitle}>{action.title}</h3>
+                        <div className={styles.quickActionHeaderRow}>
+                          <h3 className={styles.quickActionTitle}>{action.title}</h3>
+                          {action.isOnline && (
+                            <div className={styles.onlineStatus}>
+                              <span className={styles.onlineDot} /> Online
+                            </div>
+                          )}
+                        </div>
                         {action.rate && (
                           <p className={styles.quickActionRate}>
                             Your rate: <strong style={{ color: action.color }}>{action.rate}</strong> {action.rateUnit}
                           </p>
                         )}
                         {action.badge && (
-                          <span className={styles.quickActionBadge}>{action.badge}</span>
+                          <span className={styles.quickActionBadge} style={{ background: action.color }}>{action.badge}</span>
                         )}
                         {action.description && (
                           <p className={styles.quickActionDesc}>{action.description}</p>
                         )}
                       </div>
                     </div>
-                    {action.isOnline && (
-                      <div className={styles.onlineStatus}>
-                        <span className={styles.onlineDot} /> Online
-                      </div>
-                    )}
                     <div className={styles.quickActionButtons}>
                       {action.isOnline ? (
                         <>
-                          <button className={styles.goLiveBtn} style={{ background: '#3b82f6' }}>
+                          <button className={styles.goLiveBtn} style={{ background: `linear-gradient(135deg, ${action.color} 0%, ${action.color} 90%, #ffffff 100%)` }}>
                             {action.goLiveBtnLabel}
                           </button>
-                          <button className={styles.editRateBtn}>{action.editRateLabel}</button>
+                          <button className={styles.editRateBtn} style={{ borderColor: `${action.color}80`, color: action.color }}>{action.editRateLabel}</button>
                         </>
                       ) : (
-                        <button className={styles.openMessagesBtn}>{action.actionLabel}</button>
+                        <button className={styles.openMessagesBtn} style={{ background: `linear-gradient(135deg, ${action.color} 0%, ${action.color} 90%, #ffffff 100%)` }}>{action.actionLabel}</button>
                       )}
                     </div>
                   </div>
@@ -93,21 +98,7 @@ export const DashboardPage = () => {
             <div className={styles.streamHeader}>
               <div className={styles.streamHeaderLeft}>
                 <h2 className={styles.sectionTitle}>Go Stream Live</h2>
-                <span className={styles.streamSubtitle}>Go live and charge for entry</span>
-              </div>
-              <div className={styles.streamToggle}>
-                <button
-                  className={`${styles.streamToggleBtn} ${streamType === 'goLive' ? styles.streamToggleActive : ''}`}
-                  onClick={() => setStreamType('goLive')}
-                >
-                  {streamOptions.goLiveLabel}
-                </button>
-                <button
-                  className={`${styles.streamToggleBtn} ${streamType === 'schedule' ? styles.streamToggleActive : ''}`}
-                  onClick={() => setStreamType('schedule')}
-                >
-                  {streamOptions.scheduleLabel}
-                </button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.streamSubtitle}>Go live and charge for entry</span>
               </div>
             </div>
 
@@ -167,7 +158,10 @@ export const DashboardPage = () => {
               {/* Start Options */}
               <div className={styles.startOptions}>
                 <label className={styles.formLabel}>Start</label>
-                <div className={styles.startOption}>
+                <div 
+                  className={styles.startOption}
+                  onClick={() => setStreamType('goLive')}
+                >
                   <div className={`${styles.startOptionRadio} ${streamType === 'goLive' ? styles.startOptionActive : ''}`}>
                     {streamType === 'goLive' && <Check size={14} />}
                   </div>
@@ -179,7 +173,10 @@ export const DashboardPage = () => {
                     <span className={styles.startOptionDesc}>{streamOptions.startGoLiveDesc}</span>
                   </div>
                 </div>
-                <div className={styles.startOption}>
+                <div 
+                  className={styles.startOption}
+                  onClick={() => setStreamType('schedule')}
+                >
                   <div className={`${styles.startOptionRadio} ${streamType === 'schedule' ? styles.startOptionActive : ''}`}>
                     {streamType === 'schedule' && <Check size={14} />}
                   </div>
@@ -191,12 +188,106 @@ export const DashboardPage = () => {
                     <span className={styles.startOptionDesc}>{streamOptions.scheduleForLaterDesc}</span>
                   </div>
                 </div>
+
+                {/* Smaller Start/Schedule Stream Button */}
+                <button 
+                  className={styles.startNowBtn}
+                  onClick={() => {
+                    if (streamType === 'goLive') {
+                      alert('Starting live stream now!');
+                    } else {
+                      // Show schedule popup
+                      setShowSchedulePopup(true);
+                    }
+                  }}
+                >
+                  {streamType === 'goLive' ? 'Start Stream' : 'Schedule Stream'}
+                </button>
+
+                {/* Schedule Popup */}
+                <div className={`${styles.popupOverlay} ${showSchedulePopup ? styles.active : ''}`}>
+                  <div className={styles.popupContainer}>
+                    <div className={styles.popupHeader}>
+                      <h3 className={styles.popupTitle}>Schedule Stream</h3>
+                      <button 
+                        className={styles.popupClose}
+                        onClick={() => setShowSchedulePopup(false)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <div className={styles.popupContent}>
+                      <div className={`${styles.popupOption} ${selectedScheduleType === 'later' ? styles.selected : ''}`}
+                        onClick={() => setSelectedScheduleType('later')}
+                      >
+                        <div className={styles.popupOptionIcon}>
+                          <Calendar size={20} />
+                        </div>
+                        <div className={styles.popupOptionInfo}>
+                          <div className={styles.popupOptionTitle}>Schedule for Later</div>
+                          <div className={styles.popupOptionDesc}>Pick date and time for your stream</div>
+                        </div>
+                        {selectedScheduleType === 'later' && (
+                          <div className={styles.popupOptionSelected}>
+                            ✓
+                          </div>
+                        )}
+                      </div>
+
+                      <div className={`${styles.popupOption} ${selectedScheduleType === 'custom' ? styles.selected : ''}`}
+                        onClick={() => setSelectedScheduleType('custom')}
+                      >
+                        <div className={styles.popupOptionIcon}>
+                          <Calendar size={20} />
+                        </div>
+                        <div className={styles.popupOptionInfo}>
+                          <div className={styles.popupOptionTitle}>Custom Schedule</div>
+                          <div className={styles.popupOptionDesc}>Set specific stream times and timezone</div>
+                        </div>
+                        {selectedScheduleType === 'custom' && (
+                          <div className={styles.popupOptionSelected}>
+                            ✓
+                          </div>
+                        )}
+                      </div>
+
+                      {selectedScheduleType && (
+                        <div className={styles.popupScheduleDetails}>
+                          <p><strong>Selected:</strong> {selectedScheduleType === 'later' ? 'Schedule for Later' : 'Custom Schedule'}</p>
+                          <p><strong>Stream entry fee:</strong> ${entryPrice}</p>
+                          <p><strong>Status:</strong> {streamType === 'schedule' ? 'Scheduled' : 'Queued'}</p>
+                          <p><strong>Reminder:</strong> You'll receive a notification 15 minutes before your scheduled stream</p>
+                        </div>
+                      )}
+                    </div>
+                    <div className={styles.popupFooter}>
+                      <button 
+                        className={styles.popupCancelBtn}
+                        onClick={() => setShowSchedulePopup(false)}
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        className={styles.popupSaveBtn}
+                        onClick={() => {
+                          console.log('Stream scheduled:', {
+                            type: 'scheduled',
+                            streamType,
+                            entryPrice,
+                            freeForSubs,
+                            scheduleType: selectedScheduleType,
+                            status: 'scheduled'
+                          });
+                          setShowSchedulePopup(false);
+                        }}
+                      >
+                        Confirm Schedule
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-
-            <button className={styles.streamGoLiveBtn}>
-              {streamOptions.mainGoLiveLabel}
-            </button>
           </div>
 
           {/* Create Content */}

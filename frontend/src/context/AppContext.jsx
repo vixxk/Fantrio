@@ -23,6 +23,7 @@ export const AppProvider = ({ children }) => {
     'Creator Profile': '/creators/profile',
     'Creator Content': '/creators/content',
     'Creator Dashboard': '/creators/dashboard',
+    'Creator Messages': '/creators/messages',
     'Live Streams': '/live',
     '1:1 Audio Calls': '/audio-calls',
     '1:1 Video Calls': '/video-calls',
@@ -45,6 +46,7 @@ export const AppProvider = ({ children }) => {
     '/creators/profile': 'Creator Profile',
     '/creators/content': 'Creator Content',
     '/creators/dashboard': 'Creator Dashboard',
+    '/creators/messages': 'Creator Messages',
     '/live': 'Live Streams',
     '/audio-calls': '1:1 Audio Calls',
     '/video-calls': '1:1 Video Calls',
@@ -65,6 +67,7 @@ export const AppProvider = ({ children }) => {
     if (path.startsWith('/creators/video-calls')) return 'Creator Video Calls';
     if (path.startsWith('/creators/analytics')) return 'Creator Analytics';
     if (path.startsWith('/creators/dashboard')) return 'Creator Dashboard';
+    if (path.startsWith('/creators/messages')) return 'Creator Messages';
     if (path.startsWith('/creators/content')) return 'Creator Content';
     return pathToTab[path] || 'Discover Feed';
   };
