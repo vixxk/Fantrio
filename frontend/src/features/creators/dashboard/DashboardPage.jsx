@@ -376,9 +376,7 @@ export const DashboardPage = () => {
           <div className={styles.sidebarCard}>
             <div className={styles.cardHeader}>
               <h3 className={styles.cardTitle}>Earnings Overview</h3>
-              <button className={styles.periodBtn}>
-                {earningsOverview.period} <ChevronDown size={12} />
-              </button>
+              <PeriodDropdown variant="text" />
             </div>
             <div className={styles.earningsList}>
               <div className={styles.earningsItem}>
@@ -428,9 +426,7 @@ export const DashboardPage = () => {
           <div className={styles.sidebarCard}>
             <div className={styles.cardHeader}>
               <h3 className={styles.cardTitle}>Quick Stats</h3>
-              <button className={styles.periodBtn}>
-                {quickStats.period} <ChevronDown size={12} />
-              </button>
+              <PeriodDropdown variant="text" />
             </div>
             <div className={styles.statsGrid}>
               {quickStats.stats.map((stat, idx) => (

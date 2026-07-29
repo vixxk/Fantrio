@@ -1709,54 +1709,466 @@
   }
 
   .quickActionsGrid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr 1fr !important;
     gap: 0.75rem !important;
   }
 
-  .quickActionCard,
-  .createContentCard,
-  .recentCard,
+  .quickActionsGrid .quickActionCard:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+
+  .quickActionCard {
+    padding: 0.7rem !important;
+    border-radius: 10px !important;
+    gap: 0.35rem !important;
+    overflow: hidden !important;
+  }
+
+  .quickActionTop {
+    gap: 0.45rem !important;
+  }
+
+  .quickActionIconWrap {
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 8px !important;
+  }
+
+  .quickActionIconWrap svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  .quickActionTitle {
+    font-size: 0.7rem !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .quickActionRate {
+    font-size: 0.55rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .quickActionRate strong {
+    font-size: 0.55rem !important;
+  }
+
+  .quickActionDesc {
+    font-size: 0.55rem !important;
+    overflow: hidden !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+  }
+
+  .quickActionButtons {
+    gap: 0.25rem !important;
+    flex-direction: column !important;
+  }
+
+  .goLiveBtn, .editRateBtn, .openMessagesBtn {
+    padding: 0.4rem 0.45rem !important;
+    font-size: 0.62rem !important;
+    border-radius: 7px !important;
+    white-space: nowrap !important;
+    width: 100% !important;
+  }
+
+  .onlineStatus {
+    font-size: 0.52rem !important;
+    gap: 0.15rem !important;
+  }
+
+  .onlineDot {
+    width: 4px !important;
+    height: 4px !important;
+  }
+
+  .quickActionBadge {
+    width: 17px !important;
+    height: 17px !important;
+    min-width: 17px !important;
+    font-size: 0.5rem !important;
+    top: 0.35rem !important;
+    right: 0.35rem !important;
+  }
+
+  .quickActionHeaderRow {
+    flex-direction: column !important;
+    gap: 0.05rem !important;
+    align-items: flex-start !important;
+  }
+
+  /* Create Content Section */
+  .createContentCard {
+    padding: 0.7rem !important;
+    border-radius: 10px !important;
+    gap: 0.4rem !important;
+    overflow: hidden !important;
+  }
+
+  .createCardTop {
+    gap: 0.45rem !important;
+  }
+
+  .createCardIconWrap {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+  }
+
+  .createCardIconWrap svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .createCardTitle {
+    font-size: 0.68rem !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .createCardDesc {
+    font-size: 0.52rem !important;
+    line-height: 1.3 !important;
+    overflow: hidden !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+  }
+
+  .createCardBtn {
+    padding: 0.35rem 0.4rem !important;
+    font-size: 0.58rem !important;
+    border-radius: 6px !important;
+    white-space: nowrap !important;
+  }
+
+  /* Sidebar Cards */
   .sidebarCard {
-    padding: 1rem !important;
-    border-radius: 12px !important;
+    padding: 0.7rem !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+  }
+
+  .cardHeader {
+    margin-bottom: 0.6rem !important;
+  }
+
+  .cardTitle {
+    font-size: 0.68rem !important;
+  }
+
+  .periodBtn {
+    padding: 0.25rem 0.45rem !important;
+    font-size: 0.55rem !important;
+    border-radius: 5px !important;
+  }
+
+  .viewAllSmall {
+    font-size: 0.58rem !important;
+  }
+
+  /* Earnings */
+  .earningsItem {
+    padding: 0.5rem 0 !important;
+  }
+
+  .earningsLabel {
+    font-size: 0.52rem !important;
+    margin-bottom: 0.2rem !important;
+  }
+
+  .earningsValue, .earningsPending, .earningsPaidOut, .earningsCalls {
+    font-size: 0.85rem !important;
+  }
+
+  .viewEarningsBtn {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.62rem !important;
+    border-radius: 8px !important;
+    margin-top: 0.6rem !important;
+  }
+
+  /* Upcoming Streams */
+  .streamsList {
+    gap: 0.4rem !important;
+  }
+
+  .streamItem {
+    gap: 0.4rem !important;
+  }
+
+  .streamThumb {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 6px !important;
+  }
+
+  .streamTitle {
+    font-size: 0.62rem !important;
+  }
+
+  .streamDate {
+    font-size: 0.5rem !important;
+  }
+
+  .streamPrice {
+    padding: 0.15rem 0.4rem !important;
+    font-size: 0.55rem !important;
+    border-radius: 4px !important;
+  }
+
+  .viewStreamsBtn {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.62rem !important;
+    border-radius: 8px !important;
+    margin-top: 0.6rem !important;
+  }
+
+  /* Quick Stats */
+  .statsGrid {
+    gap: 0 !important;
+  }
+
+  .statItem {
+    padding: 0.4rem 0 !important;
+  }
+
+  .statLabel {
+    font-size: 0.5rem !important;
+  }
+
+  .statValue {
+    font-size: 0.8rem !important;
+  }
+
+  .statChange {
+    font-size: 0.5rem !important;
+  }
+
+  /* Recent Content */
+  .recentCard {
+    padding: 0 !important;
+    border-radius: 10px !important;
+  }
+
+  .recentInfo {
+    padding: 0.4rem 0.5rem 0.2rem !important;
+  }
+
+  .recentFooter {
+    padding: 0.25rem 0.5rem 0.4rem !important;
+    gap: 0.35rem !important;
+  }
+
+  .recentTitle {
+    font-size: 0.58rem !important;
+  }
+
+  .recentMeta {
+    font-size: 0.48rem !important;
+  }
+
+  .recentPrice {
+    font-size: 0.5rem !important;
+  }
+
+  .recentStat {
+    font-size: 0.48rem !important;
+  }
+
+  .recentStatusBadge {
+    font-size: 0.45rem !important;
+    padding: 0.1rem 0.3rem !important;
+    top: 4px !important;
+    left: 4px !important;
+  }
+
+  .viewAllLink {
+    font-size: 0.62rem !important;
+  }
+
+  .streamHeader {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+
+  .streamHeaderLeft {
+    flex-wrap: wrap !important;
+  }
+
+  .streamSubtitle {
+    font-size: 0.7rem !important;
   }
 
   .streamBody {
     grid-template-columns: 1fr !important;
-    gap: 1rem !important;
+    gap: 0.5rem !important;
+    padding: 0.75rem !important;
+    border-radius: 12px !important;
+    overflow-x: hidden !important;
   }
 
   .streamPreview {
-    max-width: 200px;
+    max-width: 100% !important;
   }
 
   .streamPreviewInner {
-    height: 110px;
+    height: 80px !important;
+  }
+
+  .playButton {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .playButton svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .liveBadge {
+    font-size: 0.5rem !important;
+    padding: 0.15rem 0.35rem !important;
+    gap: 0.2rem !important;
+  }
+
+  .liveBadge svg {
+    width: 8px !important;
+    height: 8px !important;
+  }
+
+  .streamForm {
+    gap: 0.5rem !important;
+  }
+
+  .formGroup {
+    gap: 0.2rem !important;
+  }
+
+  .formLabel {
+    font-size: 0.55rem !important;
+  }
+
+  .formInput {
+    font-size: 0.62rem !important;
+    padding: 0.4rem 0.5rem !important;
+    min-width: 0 !important;
+  }
+
+  .priceInputGroup {
+    min-width: 0 !important;
+  }
+
+  .pricePrefix {
+    font-size: 0.6rem !important;
+    padding: 0.4rem 0.4rem !important;
+  }
+
+  .priceInput {
+    font-size: 0.62rem !important;
+    padding: 0.4rem 0 !important;
+  }
+
+  .currencyLabel {
+    font-size: 0.55rem !important;
+    padding: 0.4rem 0.5rem !important;
+  }
+
+  .formHint {
+    font-size: 0.5rem !important;
+  }
+
+  .toggleLabel {
+    font-size: 0.55rem !important;
+  }
+
+  .toggleDesc {
+    font-size: 0.5rem !important;
+  }
+
+  .switch {
+    width: 32px !important;
+    height: 18px !important;
+  }
+
+  .slider::before {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .switch input:checked + .slider::before {
+    transform: translateX(14px) !important;
   }
 
   .startOptions {
     min-width: auto !important;
+    gap: 0.4rem !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+  }
+
+  .startOption {
+    padding: 0.4rem !important;
+    gap: 0.3rem !important;
+    border-radius: 6px !important;
+    flex: 1 1 calc(50% - 0.2rem) !important;
+    min-width: 0 !important;
+  }
+
+  .startOptionRadio {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .startOptionTitle {
+    font-size: 0.55rem !important;
+    gap: 0.2rem !important;
+  }
+
+  .startOptionTitle svg {
+    width: 10px !important;
+    height: 10px !important;
+  }
+
+  .startOptionDesc {
+    font-size: 0.45rem !important;
+    display: none !important;
+  }
+
+  .startNowBtn {
+    padding: 0.45rem 0.75rem !important;
+    font-size: 0.62rem !important;
+    border-radius: 8px !important;
+    margin-top: 0.5rem !important;
   }
 
   .createContentGrid {
-    grid-template-columns: 1fr !important;
-    gap: 0.75rem !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
   }
 
   .recentGrid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 0.75rem !important;
+    gap: 0.5rem !important;
   }
 
   .recentTabs {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    margin-bottom: 0.6rem !important;
   }
 
   .recentTab {
     white-space: nowrap;
-    padding: 0.45rem 0.6rem !important;
-    font-size: 0.72rem !important;
+    padding: 0.35rem 0.5rem !important;
+    font-size: 0.6rem !important;
   }
 
   .recentThumbWrap {
@@ -1771,15 +2183,56 @@
 @media (max-width: 480px) {
   .dashboardContainer {
     padding: 0 0 1.5rem 0 !important;
+    overflow-x: hidden !important;
   }
 
   .sectionTitle {
-    font-size: 0.92rem !important;
+    font-size: 0.85rem !important;
+  }
+
+  .quickActionIconWrap {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .quickActionIconWrap svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .quickActionTitle {
+    font-size: 0.68rem !important;
+  }
+
+  .quickActionRate {
+    font-size: 0.52rem !important;
+  }
+
+  .quickActionRate strong {
+    font-size: 0.52rem !important;
+  }
+
+  .goLiveBtn, .editRateBtn, .openMessagesBtn {
+    padding: 0.4rem 0.4rem !important;
+    font-size: 0.6rem !important;
+  }
+
+  .onlineStatus {
+    font-size: 0.5rem !important;
+  }
+
+  .onlineDot {
+    width: 3px !important;
+    height: 3px !important;
+  }
+
+  .sectionTitle {
+    font-size: 0.8rem !important;
   }
 
   .streamHeader {
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
 
   .streamToggle {
@@ -1789,13 +2242,13 @@
   .streamToggleBtn {
     flex: 1;
     text-align: center;
-    padding: 0.4rem 0.5rem !important;
-    font-size: 0.7rem !important;
+    padding: 0.35rem 0.4rem !important;
+    font-size: 0.6rem !important;
   }
 
   .recentGrid {
     grid-template-columns: 1fr 1fr !important;
-    gap: 0.5rem !important;
+    gap: 0.4rem !important;
   }
 
   .recentCard {
@@ -1803,53 +2256,87 @@
   }
 
   .recentInfo {
-    padding: 0.5rem 0.6rem 0.2rem !important;
+    padding: 0.35rem 0.4rem 0.15rem !important;
   }
 
   .recentFooter {
-    padding: 0.3rem 0.6rem 0.5rem !important;
-    gap: 0.4rem !important;
+    padding: 0.2rem 0.4rem 0.3rem !important;
+    gap: 0.25rem !important;
   }
 
   .recentTitle {
-    font-size: 0.72rem !important;
+    font-size: 0.52rem !important;
   }
 
   .recentMeta {
-    font-size: 0.62rem !important;
+    font-size: 0.42rem !important;
+  }
+
+  .recentPrice {
+    font-size: 0.45rem !important;
   }
 
   .recentStat {
-    font-size: 0.6rem !important;
+    font-size: 0.42rem !important;
   }
 
-  .earningsValue {
-    font-size: 1.15rem !important;
+  .recentStatusBadge {
+    font-size: 0.4rem !important;
+    padding: 0.08rem 0.25rem !important;
+  }
+
+  .earningsValue, .earningsPending, .earningsPaidOut, .earningsCalls {
+    font-size: 0.75rem !important;
+  }
+
+  .earningsLabel {
+    font-size: 0.45rem !important;
   }
 
   .statValue {
-    font-size: 1rem !important;
+    font-size: 0.7rem !important;
   }
 
-  .quickActionIconWrap {
-    width: 40px !important;
-    height: 40px !important;
+  .statLabel {
+    font-size: 0.42rem !important;
   }
 
-  .quickActionTitle {
-    font-size: 0.82rem !important;
+  .statChange {
+    font-size: 0.42rem !important;
+  }
+
+  .cardTitle {
+    font-size: 0.6rem !important;
   }
 
   .createCardTitle {
-    font-size: 0.78rem !important;
+    font-size: 0.6rem !important;
   }
 
   .createCardDesc {
-    font-size: 0.65rem !important;
+    font-size: 0.48rem !important;
   }
 
   .createCardBtn {
-    font-size: 0.65rem !important;
-    padding: 0.35rem 0.5rem !important;
+    font-size: 0.52rem !important;
+    padding: 0.3rem 0.4rem !important;
+  }
+
+  .streamTitle {
+    font-size: 0.55rem !important;
+  }
+
+  .streamDate {
+    font-size: 0.45rem !important;
+  }
+
+  .streamPrice {
+    font-size: 0.48rem !important;
+    padding: 0.1rem 0.3rem !important;
+  }
+
+  .streamThumb {
+    width: 28px !important;
+    height: 28px !important;
   }
 }
