@@ -44,6 +44,11 @@ export const Header = ({ onMenuToggle }) => {
           title: "Content",
           subtitle: "Manage your posts, videos, and stories. Track performance and engage with your audience."
         };
+      case 'Creator PPV Content':
+        return {
+          title: "PPV Content",
+          subtitle: "Manage your locked content and pay-per-view pricing."
+        };
       case 'Creator Profile':
         return {
           title: "Profile Settings",
