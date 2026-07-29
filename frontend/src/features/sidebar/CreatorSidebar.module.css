@@ -119,8 +119,18 @@
 }
 
 .groupActive {
+  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
+  box-shadow: 0 4px 15px rgba(225, 0, 117, 0.25);
+}
+
+.groupActive .navItem,
+.groupActive .chevronBtn {
   color: #ffffff !important;
-  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.groupActive .navItem:hover,
+.groupActive .chevronBtn:hover {
+  color: #ffffff !important;
 }
 
 .countBadge {
@@ -141,6 +151,51 @@
 .groupContainer {
   display: flex;
   flex-direction: column;
+}
+
+.groupHeader {
+  display: flex;
+  align-items: center;
+  border-radius: 12px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.groupHeader:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.groupHeader .navItem {
+  flex: 1;
+  border-radius: 12px 0 0 12px;
+  background: transparent !important;
+}
+
+.groupHeader .navItem:hover {
+  background: transparent !important;
+}
+
+.groupHeader .navItem:hover .navIcon {
+  transform: none;
+}
+
+.chevronBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 0.75rem 0.75rem 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  border-radius: 0 12px 12px 0;
+  font-family: inherit;
+  transition: color 0.2s ease;
+}
+
+.chevronBtn:hover {
+  color: #ffffff;
+  background: transparent;
 }
 
 .subItemsContainer {
@@ -388,7 +443,29 @@
 }
 
 .light .groupActive {
-  background-color: rgba(0, 0, 0, 0.06);
+  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
+  box-shadow: 0 4px 15px rgba(225, 0, 117, 0.25);
+}
+
+.light .groupActive .navItem,
+.light .groupActive .chevronBtn,
+.light .groupActive .navLabel,
+.light .groupActive .navIcon,
+.light .groupActive .navItem svg {
+  color: #ffffff !important;
+}
+
+.light .groupHeader:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.light .chevronBtn {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .chevronBtn:hover {
+  color: #1a1625;
+  background: transparent;
 }
 
 .light .subNavItem {
@@ -413,12 +490,13 @@
 }
 
 .light .subActive {
-  background-color: rgba(255, 0, 127, 0.08);
+  background-color: rgba(255, 0, 127, 0.1);
   color: #ff007f !important;
+  font-weight: 600;
 }
 
 .light .subActive .subNavIcon {
-  color: #ff007f;
+  color: #ff007f !important;
 }
 
 .light .sidebarFooter {
@@ -458,17 +536,21 @@
   }
 
   .navItemLeft {
-  gap: 0.6rem;
+    gap: 0.6rem;
   }
 
   .navIcon {
-  width: 18px;
-  height: 18px;
+    width: 18px;
+    height: 18px;
   }
 
   .navMenu {
-  gap: 0.15rem;
-  margin-bottom: 1rem;
+    gap: 0.15rem;
+    margin-bottom: 1rem;
+  }
+
+  .chevronBtn {
+    padding: 0.5rem 0.5rem 0.5rem 0;
   }
 
   .subNavItem {

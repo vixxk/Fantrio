@@ -71,9 +71,7 @@ export const CreatorSidebar = ({ onClose }) => {
   };
 
   const isLiveCallsActive =
-    activeTab === 'Creator Live Calls' ||
-    activeTab === 'Creator Audio Calls' ||
-    activeTab === 'Creator Video Calls';
+    activeTab === 'Creator Live Calls';
 
   return (
     <aside className={`${styles.sidebar} ${darkMode ? styles.dark : styles.light}`}>
@@ -99,16 +97,24 @@ export const CreatorSidebar = ({ onClose }) => {
             const GroupIcon = item.icon;
             return (
               <div key={item.label} className={styles.groupContainer}>
-                <button
-                  className={`${styles.navItem} ${isLiveCallsActive ? styles.groupActive : ''}`}
-                  onClick={() => setLiveCallsExpanded(!liveCallsExpanded)}
-                >
-                  <div className={styles.navItemLeft}>
-                    <GroupIcon size={20} className={styles.navIcon} />
-                    <span className={styles.navLabel}>{item.label}</span>
-                  </div>
-                  {liveCallsExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                </button>
+                <div className={`${styles.groupHeader} ${isLiveCallsActive ? styles.groupActive : ''}`}>
+                  <button
+                    className={styles.navItem}
+                    onClick={() => handleItemClick('Creator Live Calls')}
+                  >
+                    <div className={styles.navItemLeft}>
+                      <GroupIcon size={20} className={styles.navIcon} />
+                      <span className={styles.navLabel}>{item.label}</span>
+                    </div>
+                  </button>
+                  <button
+                    className={styles.chevronBtn}
+                    onClick={() => setLiveCallsExpanded(!liveCallsExpanded)}
+                    aria-label={liveCallsExpanded ? 'Collapse' : 'Expand'}
+                  >
+                    {liveCallsExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  </button>
+                </div>
                 {liveCallsExpanded && (
                   <div className={styles.subItemsContainer}>
                     {item.subItems.map((subItem) => {
