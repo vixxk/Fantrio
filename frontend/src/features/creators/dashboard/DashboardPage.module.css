@@ -804,6 +804,12 @@
   transform: translateX(18px);
 }
 
+.startOptionsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .startOptions {
   display: flex;
   flex-direction: column;
@@ -2107,11 +2113,14 @@
     transform: translateX(14px) !important;
   }
 
+  .startOptionsSection {
+    gap: 0.35rem !important;
+  }
+
   .startOptions {
     min-width: auto !important;
     gap: 0.4rem !important;
     flex-direction: row !important;
-    flex-wrap: wrap !important;
   }
 
   .startOption {
@@ -2128,7 +2137,7 @@
   }
 
   .startOptionTitle {
-    font-size: 0.55rem !important;
+    font-size: 0.58rem !important;
     gap: 0.2rem !important;
   }
 
@@ -2138,8 +2147,10 @@
   }
 
   .startOptionDesc {
-    font-size: 0.45rem !important;
-    display: none !important;
+    font-size: 0.48rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
 
   .startNowBtn {

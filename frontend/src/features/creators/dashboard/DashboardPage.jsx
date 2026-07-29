@@ -156,36 +156,38 @@ export const DashboardPage = () => {
               </div>
 
               {/* Start Options */}
-              <div className={styles.startOptions}>
+              <div className={styles.startOptionsSection}>
                 <label className={styles.formLabel}>Start</label>
-                <div 
-                  className={styles.startOption}
-                  onClick={() => setStreamType('goLive')}
-                >
-                  <div className={`${styles.startOptionRadio} ${streamType === 'goLive' ? styles.startOptionActive : ''}`}>
-                    {streamType === 'goLive' && <Check size={14} />}
-                  </div>
-                  <div className={styles.startOptionInfo}>
-                    <div className={styles.startOptionTitle}>
-                      <Zap size={16} className={styles.startOptionIcon} />
-                      {streamOptions.startGoLiveLabel}
+                <div className={styles.startOptions}>
+                  <div 
+                    className={styles.startOption}
+                    onClick={() => setStreamType('goLive')}
+                  >
+                    <div className={`${styles.startOptionRadio} ${streamType === 'goLive' ? styles.startOptionActive : ''}`}>
+                      {streamType === 'goLive' && <Check size={14} />}
                     </div>
-                    <span className={styles.startOptionDesc}>{streamOptions.startGoLiveDesc}</span>
-                  </div>
-                </div>
-                <div 
-                  className={styles.startOption}
-                  onClick={() => setStreamType('schedule')}
-                >
-                  <div className={`${styles.startOptionRadio} ${streamType === 'schedule' ? styles.startOptionActive : ''}`}>
-                    {streamType === 'schedule' && <Check size={14} />}
-                  </div>
-                  <div className={styles.startOptionInfo}>
-                    <div className={styles.startOptionTitle}>
-                      <Calendar size={16} className={styles.startOptionIcon} />
-                      {streamOptions.scheduleForLaterLabel}
+                    <div className={styles.startOptionInfo}>
+                      <div className={styles.startOptionTitle}>
+                        <Zap size={16} className={styles.startOptionIcon} />
+                        {streamOptions.startGoLiveLabel}
+                      </div>
+                      <span className={styles.startOptionDesc}>{streamOptions.startGoLiveDesc}</span>
                     </div>
-                    <span className={styles.startOptionDesc}>{streamOptions.scheduleForLaterDesc}</span>
+                  </div>
+                  <div 
+                    className={styles.startOption}
+                    onClick={() => setStreamType('schedule')}
+                  >
+                    <div className={`${styles.startOptionRadio} ${streamType === 'schedule' ? styles.startOptionActive : ''}`}>
+                      {streamType === 'schedule' && <Check size={14} />}
+                    </div>
+                    <div className={styles.startOptionInfo}>
+                      <div className={styles.startOptionTitle}>
+                        <Calendar size={16} className={styles.startOptionIcon} />
+                        {streamOptions.scheduleForLaterLabel}
+                      </div>
+                      <span className={styles.startOptionDesc}>{streamOptions.scheduleForLaterDesc}</span>
+                    </div>
                   </div>
                 </div>
 
