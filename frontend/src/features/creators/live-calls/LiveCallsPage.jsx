@@ -334,6 +334,58 @@ export const LiveCallsPage = () => {
             </article>
           </div>
 
+          {/* Mobile quick action cards - exact dashboard style */}
+          <div className={styles.mobileQuickActions}>
+            <div className={styles.mobileQaCard}>
+              <div className={styles.mobileQaTop}>
+                <div className={styles.mobileQaIconWrap} style={{ background: 'rgba(16, 185, 129, 0.2)' }}>
+                  <Phone size={24} style={{ color: '#10b981' }} />
+                </div>
+                <div className={styles.mobileQaInfo}>
+                  <div className={styles.mobileQaHeaderRow}>
+                    <h3 className={styles.mobileQaTitle}>Audio Calls</h3>
+                    <div className={styles.mobileQaStatus}>
+                      <span className={styles.mobileQaDot} /> Online
+                    </div>
+                  </div>
+                  <p className={styles.mobileQaRate}>Your rate: <strong style={{ color: '#10b981' }}>$0.50</strong> / min</p>
+                </div>
+              </div>
+              <div className={styles.mobileQaButtons}>
+                <button className={styles.mobileGoLiveBtn} type="button" style={{ background: 'linear-gradient(135deg, #10b981 0%, #10b981 90%, #ffffff 100%)' }}>
+                  Go Live Now
+                </button>
+                <button className={styles.mobileEditRateBtn} type="button" style={{ borderColor: 'rgba(16, 185, 129, 0.5)', color: '#10b981' }}>
+                  Edit Rate
+                </button>
+              </div>
+            </div>
+            <div className={styles.mobileQaCard}>
+              <div className={styles.mobileQaTop}>
+                <div className={styles.mobileQaIconWrap} style={{ background: 'rgba(59, 130, 246, 0.2)' }}>
+                  <Video size={24} style={{ color: '#3b82f6' }} />
+                </div>
+                <div className={styles.mobileQaInfo}>
+                  <div className={styles.mobileQaHeaderRow}>
+                    <h3 className={styles.mobileQaTitle}>Video Calls</h3>
+                    <div className={styles.mobileQaStatus}>
+                      <span className={styles.mobileQaDot} /> Online
+                    </div>
+                  </div>
+                  <p className={styles.mobileQaRate}>Your rate: <strong style={{ color: '#3b82f6' }}>$2.00</strong> / min</p>
+                </div>
+              </div>
+              <div className={styles.mobileQaButtons}>
+                <button className={styles.mobileGoLiveBtn} type="button" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #3b82f6 90%, #ffffff 100%)' }}>
+                  Go Live Now
+                </button>
+                <button className={styles.mobileEditRateBtn} type="button" style={{ borderColor: 'rgba(59, 130, 246, 0.5)', color: '#3b82f6' }}>
+                  Edit Rate
+                </button>
+              </div>
+            </div>
+          </div>
+
           <section className={styles.statsGrid}>
             {callStats.map((stat) => {
               const Icon = iconMap[stat.icon];

@@ -463,11 +463,7 @@ export const MessagesPage = () => {
 
   const selectMessage = (msgId) => {
     if (selectedConvId) {
-      if (selectedMsgId === msgId) {
-        navigateTo(`/messages/${selectedConvId}`);
-      } else {
-        navigateTo(`/messages/${selectedConvId}/${msgId}`);
-      }
+      navigateTo(`/messages/${selectedConvId}`);
     }
   };
 

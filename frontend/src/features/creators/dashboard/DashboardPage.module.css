@@ -1710,8 +1710,75 @@
   }
 
   .rightSidebar {
-    grid-template-columns: 1fr !important;
-    gap: 0.75rem !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0 !important;
+  }
+
+  .rightSidebar > .sidebarCard:nth-child(1) {
+    order: 1;
+    padding: 0.5rem !important;
+    border-radius: 10px 0 0 10px !important;
+    border-right: none !important;
+  }
+
+  .rightSidebar > .sidebarCard:nth-child(2) {
+    order: 3;
+    grid-column: 1 / -1;
+    margin-top: 0.75rem;
+  }
+
+  .rightSidebar > .sidebarCard:nth-child(3) {
+    order: 2;
+    padding: 0.5rem !important;
+    border-radius: 0 10px 10px 0 !important;
+  }
+
+  .rightSidebar > .sidebarCard:nth-child(1) .earningsValue,
+  .rightSidebar > .sidebarCard:nth-child(1) .earningsPending,
+  .rightSidebar > .sidebarCard:nth-child(1) .earningsPaidOut,
+  .rightSidebar > .sidebarCard:nth-child(1) .earningsCalls {
+    font-size: 0.72rem !important;
+  }
+
+  .rightSidebar > .sidebarCard:nth-child(1) .earningsLabel {
+    font-size: 0.48rem !important;
+  }
+
+  .rightSidebar > .sidebarCard:nth-child(1) .earningsItem {
+    padding: 0.35rem 0 !important;
+  }
+
+  .rightSidebar > .sidebarCard:nth-child(1) .viewEarningsBtn {
+    margin-top: 0.4rem !important;
+    padding: 0.35rem 0.4rem !important;
+    font-size: 0.5rem !important;
+  }
+
+  .rightSidebar > .sidebarCard:nth-child(3) .statValue {
+    font-size: 0.85rem !important;
+  }
+
+  .rightSidebar > .sidebarCard:nth-child(3) .statLabel {
+    font-size: 0.55rem !important;
+  }
+
+  .rightSidebar > .sidebarCard:nth-child(3) .statItem {
+    padding: 0.5rem 0 !important;
+  }
+
+  .rightSidebar > .sidebarCard:nth-child(3) .statChange {
+    font-size: 0.55rem !important;
+  }
+
+  .rightSidebar > .sidebarCard:nth-child(3) .statRow {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.15rem !important;
+  }
+
+  .rightSidebar > .sidebarCard:nth-child(3) .statItem {
+    padding: 0.4rem 0 !important;
   }
 
   .quickActionsGrid {

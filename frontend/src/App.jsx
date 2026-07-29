@@ -18,17 +18,24 @@ import { ProfilePage } from './features/creators/profile/ProfilePage';
 import { ContentPage } from './features/creators/content/ContentPage';
 import { DashboardPage } from './features/creators/dashboard/DashboardPage';
 import { CreatorMessagesPage } from './features/creators/messages/CreatorMessagesPage';
+import { CreatorMobileChatPage } from './features/creators/messages/CreatorMobileChatPage';
 import { PPVContentPage } from './features/creators/ppv-content/PPVContentPage';
+import { SubscribersPage } from './features/creators/subscribers/SubscribersPage';
+import { CreatorLiveStreamsPage } from './features/creators/live-streams/CreatorLiveStreamsPage';
+import { EarningsPage } from './features/creators/earnings/EarningsPage';
+import { StorePage } from './features/creators/store/StorePage';
+import { CreatorSettingsPage } from './features/creators/settings/CreatorSettingsPage';
 import { AudioCallsPage } from './features/users/audio/AudioCallsPage';
 import { VideoCallsPage } from './features/users/video/VideoCallsPage';
 import { SubscriptionsPage } from './features/users/subscriptions/SubscriptionsPage';
 import { MessagesPage } from './features/users/messages/MessagesPage';
+import { MobileChatPage } from './features/users/messages/MobileChatPage';
 import { BuyCoinsPage } from './features/users/coins/BuyCoinsPage';
 import { SettingsPage } from './features/users/settings/SettingsPage';
 import { MorePage } from './features/users/more/MorePage';
 import { AdminPage } from './features/admin/AdminPage';
 import { AdminLogin } from './features/admin/AdminLogin';
-import { Menu, X, Compass, Radio, Phone, MessageSquare, User } from 'lucide-react';
+import { Menu, X, Compass, Radio, Phone, MessageSquare, User, LayoutDashboard, PenSquare } from 'lucide-react';
 import './App.css';
 
 const AppContent = () => {
@@ -36,7 +43,14 @@ const AppContent = () => {
   const isCreatorPage = activeTab.startsWith('Creator');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showBottomNav, setShowBottomNav] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const handleScroll = (e) => {
@@ -154,6 +168,9 @@ const AppContent = () => {
           </div>
         );
       case 'Creator Messages':
+        if (isMobile && currentPath && currentPath.split('/').filter(Boolean).length > 2) {
+          return <CreatorMobileChatPage />;
+        }
         return (
           <div className="tabMessages">
             <CreatorMessagesPage />
@@ -169,6 +186,36 @@ const AppContent = () => {
         return (
           <div className="tabAnalytics">
             <PPVContentPage />
+          </div>
+        );
+      case 'Creator Subscribers':
+        return (
+          <div className="tabAnalytics">
+            <SubscribersPage />
+          </div>
+        );
+      case 'Creator Live Streams':
+        return (
+          <div className="tabAnalytics">
+            <CreatorLiveStreamsPage />
+          </div>
+        );
+      case 'Creator Earnings':
+        return (
+          <div className="tabAnalytics">
+            <EarningsPage />
+          </div>
+        );
+      case 'Creator Store':
+        return (
+          <div className="tabAnalytics">
+            <StorePage />
+          </div>
+        );
+      case 'Creator Settings':
+        return (
+          <div className="tabAnalytics">
+            <CreatorSettingsPage />
           </div>
         );
       case '1:1 Audio Calls':
@@ -190,6 +237,9 @@ const AppContent = () => {
           </div>
         );
       case 'Messages':
+        if (isMobile && currentPath && currentPath.split('/').filter(Boolean).length > 1) {
+          return <MobileChatPage />;
+        }
         return (
           <div className="tabMessages">
             <MessagesPage />
@@ -280,37 +330,69 @@ const AppContent = () => {
 
       {/* Mobile Bottom Navigation Bar */}
       <nav className={`mobileBottomNav ${(!showBottomNav || isChatOpen || mobileMenuOpen) ? 'bottomNavHidden' : ''}`}>
-        <button 
-          className={`bottomNavItem ${activeTab === 'Discover Feed' ? 'bottomActive' : ''}`}
-          onClick={() => setActiveTab('Discover Feed')}
-        >
-          <Compass size={20} />
-          <span>Discover</span>
-        </button>
-
-        <button 
-          className={`bottomNavItem ${activeTab === 'Live Streams' ? 'bottomActive' : ''}`}
-          onClick={() => setActiveTab('Live Streams')}
-        >
-          <Radio size={20} />
-          <span>Live</span>
-        </button>
-
-        <button 
-          className={`bottomNavItem ${activeTab === '1:1 Audio Calls' ? 'bottomActive' : ''}`}
-          onClick={() => setActiveTab('1:1 Audio Calls')}
-        >
-          <Phone size={20} />
-          <span>Calls</span>
-        </button>
-
-        <button 
-          className={`bottomNavItem ${activeTab === 'Messages' ? 'bottomActive' : ''}`}
-          onClick={() => setActiveTab('Messages')}
-        >
-          <MessageSquare size={20} />
-          <span>Chats</span>
-        </button>
+        {isCreatorPage ? (
+          <>
+            <button 
+              className={`bottomNavItem ${activeTab === 'Creator Dashboard' ? 'bottomActive' : ''}`}
+              onClick={() => setActiveTab('Creator Dashboard')}
+            >
+              <LayoutDashboard size={20} />
+              <span>Dashboard</span>
+            </button>
+            <button 
+              className={`bottomNavItem ${activeTab === 'Creator Content' ? 'bottomActive' : ''}`}
+              onClick={() => setActiveTab('Creator Content')}
+            >
+              <PenSquare size={20} />
+              <span>Content</span>
+            </button>
+            <button 
+              className={`bottomNavItem ${activeTab === 'Creator Messages' ? 'bottomActive' : ''}`}
+              onClick={() => setActiveTab('Creator Messages')}
+            >
+              <MessageSquare size={20} />
+              <span>Messages</span>
+            </button>
+            <button 
+              className={`bottomNavItem ${activeTab === 'Creator Live Calls' ? 'bottomActive' : ''}`}
+              onClick={() => setActiveTab('Creator Live Calls')}
+            >
+              <Phone size={20} />
+              <span>Calls</span>
+            </button>
+          </>
+        ) : (
+          <>
+            <button 
+              className={`bottomNavItem ${activeTab === 'Discover Feed' ? 'bottomActive' : ''}`}
+              onClick={() => setActiveTab('Discover Feed')}
+            >
+              <Compass size={20} />
+              <span>Discover</span>
+            </button>
+            <button 
+              className={`bottomNavItem ${activeTab === 'Live Streams' ? 'bottomActive' : ''}`}
+              onClick={() => setActiveTab('Live Streams')}
+            >
+              <Radio size={20} />
+              <span>Live</span>
+            </button>
+            <button 
+              className={`bottomNavItem ${activeTab === '1:1 Audio Calls' ? 'bottomActive' : ''}`}
+              onClick={() => setActiveTab('1:1 Audio Calls')}
+            >
+              <Phone size={20} />
+              <span>Calls</span>
+            </button>
+            <button 
+              className={`bottomNavItem ${activeTab === 'Messages' ? 'bottomActive' : ''}`}
+              onClick={() => setActiveTab('Messages')}
+            >
+              <MessageSquare size={20} />
+              <span>Chats</span>
+            </button>
+          </>
+        )}
       </nav>
     </div>
   );

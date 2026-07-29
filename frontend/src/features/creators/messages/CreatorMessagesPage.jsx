@@ -294,7 +294,11 @@ const INITIAL_MESSAGES = {
 export const CreatorMessagesPage = () => {
   const { darkMode, navigateTo, currentPath } = useApp();
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-  const [mobileView, setMobileView] = useState('list'); // 'list', 'chat', 'profile'
+  const [mobileView, setMobileView] = useState(() => {
+    const parts = window.location.pathname.split('/').filter(Boolean);
+    const convId = parts[2] || null;
+    return convId ? 'chat' : 'list';
+  });
   const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [inputText, setInputText] = useState('');
@@ -552,6 +556,7 @@ export const CreatorMessagesPage = () => {
                   <div
                     key={msg.id}
                     className={`${styles.msgRow} ${isCreator ? styles.msgRowRight : styles.msgRowLeft}`}
+                    style={isCreator ? { maxWidth: '85%' } : undefined}
                   >
                     {!isCreator && (
                       <img src={selectedConv.user.avatarUrl} alt="" className={styles.msgAvatar} />

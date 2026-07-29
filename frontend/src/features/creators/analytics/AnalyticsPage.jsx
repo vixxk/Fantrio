@@ -16,9 +16,7 @@ export const AnalyticsPage = () => {
     <div className={`${styles.analyticsContainer} ${!darkMode ? styles.light : ''}`}>
       {/* Page Header */}
       <div className={styles.pageHeader}>
-        <div className={styles.headerLeft}>
-          <h1 className={styles.pageTitle}>Analytics</h1>
-        </div>
+        <div className={styles.headerLeft}></div>
         <PeriodDropdown variant="btn" />
       </div>
 

@@ -78,6 +78,11 @@
   display: none;
 }
 
+/* Mobile add button - hidden on desktop */
+.mobileAddBtn {
+  display: none;
+}
+
 /* ================= TABS ================= */
 .tabsRow {
   display: flex;
@@ -236,7 +241,7 @@
 }
 
 .tableRow:last-child .td {
-  border-bottom: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .contentInfo {
@@ -597,7 +602,7 @@
   .pageContainer {
     display: flex;
     flex-direction: column;
-    padding: 0 !important;
+    padding: 0 0 5rem 0 !important;
     gap: 0;
     max-width: 100vw;
     overflow-x: hidden;
@@ -609,23 +614,33 @@
   }
 
   .addBtn {
-    order: 0;
-    align-self: flex-end;
-    padding: 0.5rem;
-    font-size: 0.8rem;
-    border-radius: 8px;
-    margin-bottom: 0.75rem;
-    position: static;
-    grid-column: auto;
-    grid-row: auto;
-  }
-
-  .addBtnText {
     display: none;
   }
 
-  .addBtnIcon {
+  .mobileAddBtn {
     display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: #e10075;
+    border: none;
+    color: #ffffff;
+    padding: 0.7rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    width: 100%;
+    margin-bottom: 0.75rem;
+    order: 2;
+  }
+
+  .mobileAddBtn:hover {
+    background: #c5006a;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(225, 0, 117, 0.3);
   }
 
   .statsRow {
@@ -912,10 +927,10 @@
     font-size: 0.75rem !important;
   }
 
-  .addBtn {
-    padding: 0.4rem !important;
-    border-radius: 6px !important;
-    margin-bottom: 0.5rem !important;
+  .mobileAddBtn {
+    padding: 0.6rem 1rem;
+    font-size: 0.78rem;
+    margin-bottom: 0.5rem;
   }
 
   .tab {

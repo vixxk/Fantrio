@@ -24,6 +24,10 @@ export const Header = ({ onMenuToggle }) => {
           subtitle: "Manage your audio calls and video calls, track performance, and maximize your earnings."
         };
       case 'Creator Analytics':
+        return {
+          title: "Analytics",
+          subtitle: "Track your performance, engagement metrics, and revenue insights."
+        };
       case 'Creator Dashboard':
         return {
           title: "Welcome Back! Bella 👋",
@@ -49,10 +53,95 @@ export const Header = ({ onMenuToggle }) => {
           title: "PPV Content",
           subtitle: "Manage your locked content and pay-per-view pricing."
         };
+      case 'Creator Subscribers':
+        return {
+          title: "Subscribers",
+          subtitle: "Manage your subscribers, view analytics, and track subscription growth."
+        };
+      case 'Creator Live Streams':
+        return {
+          title: "Live Streams",
+          subtitle: "Start, schedule, and manage your live streaming sessions."
+        };
+      case 'Creator Earnings':
+        return {
+          title: "Earnings",
+          subtitle: "Track your revenue, payouts, and financial performance."
+        };
+      case 'Creator Store':
+        return {
+          title: "Store",
+          subtitle: "Set up and manage your merchandise and digital products."
+        };
+      case 'Creator Settings':
+        return {
+          title: "Settings",
+          subtitle: "Configure your account, notifications, and creator preferences."
+        };
       case 'Creator Profile':
         return {
           title: "Profile Settings",
           subtitle: "Here's your public profile as your fans see it."
+        };
+      case 'Creator Messages':
+        return {
+          title: "Messages",
+          subtitle: "Manage your creator inbox and engage with your community."
+        };
+      case 'Discover Feed':
+        return {
+          title: "Discover",
+          subtitle: "Explore creators, trending content, and live streams."
+        };
+      case 'All Creators':
+        return {
+          title: "All Creators",
+          subtitle: "Browse and discover talented creators."
+        };
+      case 'Live Streams':
+        return {
+          title: "Live Streams",
+          subtitle: "Watch live broadcasts and connect with creators in real time."
+        };
+      case '1:1 Audio Calls':
+        return {
+          title: "Audio Calls",
+          subtitle: "Connect with creators through private audio calls."
+        };
+      case '1:1 Video Calls':
+        return {
+          title: "Video Calls",
+          subtitle: "Connect face-to-face through private video calls."
+        };
+      case 'My Subscription':
+        return {
+          title: "My Subscriptions",
+          subtitle: "Manage your subscriptions and exclusive content."
+        };
+      case 'Messages':
+        return {
+          title: "Messages",
+          subtitle: "Your private conversations and notifications."
+        };
+      case 'Buy Coins':
+        return {
+          title: "Buy Coins",
+          subtitle: "Purchase coins to support your favorite creators."
+        };
+      case 'Settings':
+        return {
+          title: "Settings",
+          subtitle: "Manage your account, privacy, and preferences."
+        };
+      case 'More':
+        return {
+          title: "More",
+          subtitle: "Additional features and resources."
+        };
+      case 'Admin Panel':
+        return {
+          title: "Admin Panel",
+          subtitle: "Manage the platform, users, and content."
         };
       default:
         return {

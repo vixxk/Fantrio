@@ -491,6 +491,7 @@
 
 .timestampRight {
   justify-content: flex-end;
+  padding-right: 0.5rem;
 }
 
 .timestampLeft {
@@ -1621,11 +1622,17 @@
 .mobileChatBody {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem;
+  padding: 1rem 0 1rem 1rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 0.5rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.mobileChatBody::-webkit-scrollbar {
+  display: none;
 }
 
 .mobileChatBody .dateSeparator {

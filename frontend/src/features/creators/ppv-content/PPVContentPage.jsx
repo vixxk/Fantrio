@@ -44,6 +44,12 @@ export const PPVContentPage = () => {
         })}
       </div>
 
+      {/* Mobile Add Button (below stats) */}
+      <button className={styles.mobileAddBtn}>
+        <Plus size={16} />
+        Add New PPV Content
+      </button>
+
       {/* Add Button */}
       <button className={styles.addBtn}>
         <span className={styles.addBtnText}>Add New PPV Content</span>

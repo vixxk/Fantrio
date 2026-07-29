@@ -25,6 +25,11 @@ export const AppProvider = ({ children }) => {
     'Creator PPV Content': '/creators/ppv-content',
     'Creator Dashboard': '/creators/dashboard',
     'Creator Messages': '/creators/messages',
+    'Creator Subscribers': '/creators/subscribers',
+    'Creator Live Streams': '/creators/live-streams',
+    'Creator Earnings': '/creators/earnings',
+    'Creator Store': '/creators/store',
+    'Creator Settings': '/creators/settings',
     'Live Streams': '/live',
     '1:1 Audio Calls': '/audio-calls',
     '1:1 Video Calls': '/video-calls',
@@ -49,6 +54,11 @@ export const AppProvider = ({ children }) => {
     '/creators/ppv-content': 'Creator PPV Content',
     '/creators/dashboard': 'Creator Dashboard',
     '/creators/messages': 'Creator Messages',
+    '/creators/subscribers': 'Creator Subscribers',
+    '/creators/live-streams': 'Creator Live Streams',
+    '/creators/earnings': 'Creator Earnings',
+    '/creators/store': 'Creator Store',
+    '/creators/settings': 'Creator Settings',
     '/live': 'Live Streams',
     '/audio-calls': '1:1 Audio Calls',
     '/video-calls': '1:1 Video Calls',
@@ -72,6 +82,11 @@ export const AppProvider = ({ children }) => {
     if (path.startsWith('/creators/messages')) return 'Creator Messages';
     if (path.startsWith('/creators/ppv-content')) return 'Creator PPV Content';
     if (path.startsWith('/creators/content')) return 'Creator Content';
+    if (path.startsWith('/creators/subscribers')) return 'Creator Subscribers';
+    if (path.startsWith('/creators/live-streams')) return 'Creator Live Streams';
+    if (path.startsWith('/creators/earnings')) return 'Creator Earnings';
+    if (path.startsWith('/creators/store')) return 'Creator Store';
+    if (path.startsWith('/creators/settings')) return 'Creator Settings';
     return pathToTab[path] || 'Discover Feed';
   };
 

@@ -1380,39 +1380,69 @@
     padding: 0.6rem 0;
   }
 
-  .donutContainer {
-    flex: 0 0 80px;
+  .sidebarCard .donutContainer {
+    flex: 0 0 110px !important;
   }
 
-  .donutChart {
-    width: 80px !important;
-    height: 80px !important;
+  .sidebarCard .donutChart {
+    width: 110px !important;
+    height: 110px !important;
   }
 
-  .performanceBody {
+  .sidebarCard .donutValue {
+    font-size: 18px !important;
+  }
+
+  .sidebarCard .donutLabel {
+    font-size: 8px !important;
+  }
+
+  .sidebarCard .performanceBody {
     flex-direction: column !important;
     align-items: center !important;
-    gap: 0.5rem !important;
+    gap: 1.5rem !important;
+    padding: 0 0.25rem !important;
   }
 
-  .donutLegend {
-    flex-direction: row !important;
-    align-items: center !important;
+  .sidebarCard .donutLegend {
+    display: grid !important;
+    grid-template-columns: repeat(2, auto) !important;
+    gap: 0.4rem 1.5rem !important;
     justify-content: center !important;
-    gap: 0.5rem !important;
-    flex-wrap: wrap !important;
+    width: 100% !important;
+    padding: 0 0.5rem !important;
   }
 
-  .legendItem {
+  .sidebarCard .donutLegend > .legendItem:last-child {
+    grid-column: 1 / -1;
+    justify-self: center;
+  }
+
+  .sidebarCard .donutLegend > .legendItem:first-child {
+    padding-left: 0.25rem;
+  }
+
+  .sidebarCard .donutLegend > .legendItem:nth-child(2) {
+    padding-right: 0.25rem;
+  }
+
+  .sidebarCard .legendItem {
     gap: 0.3rem !important;
+    white-space: nowrap !important;
   }
 
-  .legendLabel {
-    font-size: 0.65rem !important;
+  .sidebarCard .legendDot {
+    width: 7px !important;
+    height: 7px !important;
   }
 
-  .legendValue {
+  .sidebarCard .legendLabel {
     font-size: 0.6rem !important;
+    font-weight: 600 !important;
+  }
+
+  .sidebarCard .legendValue {
+    font-size: 0.52rem !important;
   }
 
   .hoursChart {
@@ -1455,14 +1485,38 @@
     font-size: 0.62rem !important;
   }
 
-  .rightSidebar {
-    flex-direction: row !important;
-    flex-wrap: wrap !important;
-    gap: 0.5rem !important;
+  .rightSidebar > .sidebarCard:nth-child(1) {
+    flex: 1 1 100% !important;
+    order: 1;
+    margin-bottom: 0.5rem;
   }
 
-  .rightSidebar > * {
-    flex: 1 1 calc(50% - 0.25rem) !important;
+  .rightSidebar > .sidebarCard:nth-child(2) {
+    flex: 0 1 calc(50% - 0.375rem) !important;
+    order: 2;
+    min-width: 0;
+  }
+
+  .rightSidebar > .sidebarCard:nth-child(3) {
+    flex: 1 1 100% !important;
+    order: 4;
+    margin-top: 0.5rem;
+  }
+
+  .rightSidebar > .sidebarCard:nth-child(4) {
+    flex: 0 1 calc(50% - 0.375rem) !important;
+    order: 3;
+    min-width: 0;
+  }
+
+  .rightSidebar > .sidebarCard:nth-child(4) .tipsHeader {
+    margin-bottom: 0.4rem;
+  }
+
+  .rightSidebar > .sidebarCard:nth-child(4) .tipItem {
+    font-size: 0.55rem !important;
+    padding: 0.15rem 0 !important;
+    gap: 0.25rem;
   }
 }
 
@@ -1652,6 +1706,7 @@
 
   .performanceBody {
     gap: 0.5rem !important;
+    padding: 0 0.5rem !important;
   }
 
   .legendLabel {
@@ -1701,5 +1756,215 @@
 
   .periodTextBtn {
     font-size: 0.55rem !important;
+  }
+}
+
+/* Mobile quick action cards (dashboard style) - hidden on desktop */
+.mobileQuickActions {
+  display: none;
+}
+
+.light .mobileQaCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .mobileQaTitle {
+  color: #111111;
+}
+
+.light .mobileQaStatus {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.light .mobileQaRate {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 768px) {
+  .callCardsGrid {
+    display: none !important;
+  }
+
+  .mobileQuickActions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .mobileQaCard {
+    background: #121212;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 0.7rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    overflow: hidden;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .mobileQaCard:hover {
+    border-color: rgba(225, 0, 117, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+
+  .mobileQaTop {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.45rem;
+  }
+
+  .mobileQaIconWrap {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .mobileQaIconWrap svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .mobileQaInfo {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .mobileQaHeaderRow {
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+    align-items: flex-start;
+  }
+
+  .mobileQaTitle {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .mobileQaStatus {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.52rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .mobileQaDot {
+    width: 4px;
+    height: 4px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  .mobileQaRate {
+    font-size: 0.55rem;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mobileQaRate strong {
+    font-weight: 700;
+    font-size: 0.55rem;
+  }
+
+  .mobileQaButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .mobileGoLiveBtn,
+  .mobileEditRateBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: none;
+    color: #ffffff;
+    padding: 0.4rem 0.45rem;
+    border-radius: 7px;
+    font-size: 0.62rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    width: 100%;
+  }
+
+  .mobileGoLiveBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  }
+
+  .mobileEditRateBtn:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .mobileEditRateBtn {
+    background: transparent;
+    border: 1px solid;
+  }
+}
+
+@media (max-width: 480px) {
+  .mobileQuickActions {
+    gap: 0.5rem;
+  }
+
+  .mobileQaCard {
+    padding: 0.5rem;
+    border-radius: 8px;
+  }
+
+  .mobileQaIconWrap {
+    width: 28px;
+    height: 28px;
+  }
+
+  .mobileQaIconWrap svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .mobileQaTitle {
+    font-size: 0.68rem;
+  }
+
+  .mobileQaRate {
+    font-size: 0.52rem;
+  }
+
+  .mobileQaRate strong {
+    font-size: 0.52rem;
+  }
+
+  .mobileGoLiveBtn,
+  .mobileEditRateBtn {
+    padding: 0.4rem 0.4rem;
+    font-size: 0.6rem;
+  }
+
+  .mobileQaStatus {
+    font-size: 0.5rem;
+  }
+
+  .mobileQaDot {
+    width: 3px;
+    height: 3px;
   }
 }
