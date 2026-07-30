@@ -5,7 +5,7 @@ export const videoCallStats = [
     id: 'totalCalls',
     label: 'Total Video Calls',
     value: '286',
-    change: '+26%',
+  change: '26%',
     changeType: 'positive',
     period: 'vs last week',
     icon: 'video',
@@ -57,7 +57,7 @@ export const videoCallStats = [
 
 export const todayEarnings = {
   amount: '$412.80',
-  change: '+26%',
+  change: '26%',
   changeLabel: 'vs yesterday',
   totalMinutes: 830,
   completedCalls: 28,

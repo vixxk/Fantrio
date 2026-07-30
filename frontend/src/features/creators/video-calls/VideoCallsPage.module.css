@@ -1196,6 +1196,10 @@
 }
 
 @media (max-width: 768px) {
+  .missedStatMobile {
+    display: none;
+  }
+
   .callsContainer {
     padding: 0 0 2rem 0 !important;
     overflow-x: hidden !important;
@@ -1264,6 +1268,7 @@
 
   .heroContent {
     flex-wrap: wrap;
+    gap: 0.35rem;
   }
 
   .heroIconWrap {
@@ -1274,6 +1279,48 @@
   .heroIcon {
     width: 20px;
     height: 20px;
+  }
+
+  .heroInfo {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.4rem;
+  }
+
+  .heroTitle {
+    width: 100%;
+    font-size: 0.82rem;
+  }
+
+  .heroDesc {
+    width: 100%;
+    font-size: 0.6rem;
+  }
+
+  .rateInfo {
+    margin-top: 0;
+  }
+
+  .rateLabel {
+    font-size: 0.55rem;
+  }
+
+  .rateValue {
+    font-size: 0.75rem;
+  }
+
+  .rateUnit {
+    font-size: 0.55rem;
+  }
+
+  .onlineStatus {
+    margin-top: 0;
+    font-size: 0.6rem;
+  }
+
+  .onlineDot {
+    width: 5px;
+    height: 5px;
   }
 
   .heroWaveform {
@@ -1370,6 +1417,55 @@
     font-size: 0.72rem !important;
   }
 
+  .earningsCard {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .earningsCard > .earningsHeader {
+    width: 100%;
+    flex: 0 0 100%;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .earningsCard > .earningsAmount {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin-bottom: 0 !important;
+  }
+
+  .earningsCard > .earningsChange {
+    flex-direction: column;
+    align-items: flex-end;
+    margin-bottom: 0 !important;
+    margin-left: auto;
+    gap: 0;
+  }
+
+  .earningsCard > .earningsChange .positive {
+    margin-left: 0;
+  }
+
+  .earningsCard > .earningsStats {
+    width: 100%;
+    flex: 0 0 100%;
+  }
+
+  .earningsCard > .viewEarningsBtn {
+    width: 100%;
+    flex: 0 0 100%;
+    margin-top: 0.65rem !important;
+  }
+
+  .earningsTitle {
+    font-size: 0.95rem !important;
+  }
+
+  .earningsStat {
+    padding: 0.5rem 0 !important;
+  }
+
   .donutChart {
     width: 80px !important;
     height: 80px !important;
@@ -1432,20 +1528,16 @@
     display: flex !important;
   }
 
-  .performanceCard,
-  .tipsCard {
-    flex: 1 !important;
-    min-width: 0 !important;
-  }
-
   .rightSidebar {
     flex-direction: row !important;
     flex-wrap: wrap !important;
     gap: 0.5rem !important;
   }
 
-  .rightSidebar > * {
-    flex: 1 1 calc(50% - 0.25rem) !important;
+  .rightSidebar > .performanceCard,
+  .rightSidebar > .tipsCard {
+    flex: 0 1 calc(50% - 0.25rem) !important;
+    min-width: 0 !important;
   }
 
   .performanceBody {
@@ -1541,8 +1633,8 @@
   }
 
   .heroIconWrap {
-    width: 32px !important;
-    height: 32px !important;
+    width: 34px !important;
+    height: 34px !important;
   }
 
   .heroIcon {
@@ -1550,17 +1642,46 @@
     height: 18px !important;
   }
 
+  .heroInfo {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.15rem 0.35rem;
+  }
+
   .heroTitle {
-    font-size: 0.9rem !important;
+    font-size: 0.78rem !important;
   }
 
   .heroDesc {
-    font-size: 0.65rem !important;
+    font-size: 0.55rem !important;
+  }
+
+  .rateInfo {
+    margin-top: 0;
+  }
+
+  .rateLabel {
+    font-size: 0.5rem !important;
   }
 
   .rateValue {
-    font-size: 0.85rem !important;
+    font-size: 0.68rem !important;
   }
+
+  .rateUnit {
+    font-size: 0.5rem !important;
+  }
+
+  .onlineStatus {
+    margin-top: 0;
+    font-size: 0.55rem !important;
+  }
+
+  .onlineDot {
+    width: 4px !important;
+    height: 4px !important;
+  }
+
 
   .goLiveBtn,
   .editRateBtn {
@@ -1626,6 +1747,26 @@
   .dailyTitle,
   .tipsTitle {
     font-size: 0.6rem !important;
+  }
+
+  .earningsCard > .earningsHeader {
+    margin-bottom: 0.35rem !important;
+  }
+
+  .earningsCard > .earningsChange {
+    margin-bottom: 0 !important;
+  }
+
+  .earningsCard > .viewEarningsBtn {
+    margin-top: 0.5rem !important;
+  }
+
+  .earningsTitle {
+    font-size: 0.85rem !important;
+  }
+
+  .earningsStat {
+    padding: 0.35rem 0 !important;
   }
 
   .earningsStatLabel,
@@ -1703,25 +1844,53 @@
   }
 
   .heroIconWrap {
-    width: 28px !important;
-    height: 28px !important;
+    width: 34px !important;
+    height: 34px !important;
   }
 
   .heroIcon {
-    width: 16px !important;
-    height: 16px !important;
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .heroInfo {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.15rem 0.35rem;
   }
 
   .heroTitle {
-    font-size: 0.82rem !important;
+    font-size: 0.78rem !important;
   }
 
   .heroDesc {
-    font-size: 0.6rem !important;
+    font-size: 0.55rem !important;
+  }
+
+  .rateInfo {
+    margin-top: 0;
+  }
+
+  .rateLabel {
+    font-size: 0.5rem !important;
   }
 
   .rateValue {
-    font-size: 0.78rem !important;
+    font-size: 0.68rem !important;
+  }
+
+  .rateUnit {
+    font-size: 0.5rem !important;
+  }
+
+  .onlineStatus {
+    margin-top: 0;
+    font-size: 0.55rem !important;
+  }
+
+  .onlineDot {
+    width: 4px !important;
+    height: 4px !important;
   }
 
   .goLiveBtn,
@@ -1788,6 +1957,26 @@
   .dailyTitle,
   .tipsTitle {
     font-size: 0.52rem !important;
+  }
+
+  .earningsCard > .earningsHeader {
+    margin-bottom: 0.25rem !important;
+  }
+
+  .earningsCard > .earningsChange {
+    margin-bottom: 0 !important;
+  }
+
+  .earningsCard > .viewEarningsBtn {
+    margin-top: 0.35rem !important;
+  }
+
+  .earningsTitle {
+    font-size: 0.78rem !important;
+  }
+
+  .earningsStat {
+    padding: 0.3rem 0 !important;
   }
 
   .earningsStatLabel,

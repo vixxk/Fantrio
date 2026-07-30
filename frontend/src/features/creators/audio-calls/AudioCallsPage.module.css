@@ -646,6 +646,102 @@
   box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
 }
 
+/* ================= PERFORMANCE DONUT ================= */
+.performanceCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.performanceHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.performanceTitle {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.performanceBody {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.donutContainer {
+  flex: 0 0 130px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.donutChart {
+  width: 130px;
+  height: 130px;
+}
+
+.donutSvg {
+  width: 100%;
+  height: 100%;
+}
+
+.donutValue {
+  fill: #ffffff;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.donutLabel {
+  fill: rgba(255, 255, 255, 0.5);
+  font-size: 7px;
+}
+
+.donutLegend {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.legendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legendText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+
+.legendLabel {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+}
+
+.legendValue {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.3;
+}
+
 /* ================= PEAK HOURS ================= */
 .peakHeader {
   display: flex;
@@ -967,6 +1063,7 @@
 .light .statCard,
 .light .callsTableCard,
 .light .earningsCard,
+.light .performanceCard,
 .light .peakCard,
 .light .tipsCard,
 .light .creatorSidebar {
@@ -979,6 +1076,7 @@
 .light .statCard:hover,
 .light .callsTableCard:hover,
 .light .earningsCard:hover,
+.light .performanceCard:hover,
 .light .peakCard:hover {
   border-color: rgba(225, 0, 117, 0.2);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
@@ -1194,6 +1292,7 @@
   }
 
   .earningsCard,
+  .performanceCard,
   .peakCard,
   .tipsCard {
     flex: 1;
@@ -1205,6 +1304,10 @@
 }
 
 @media (max-width: 768px) {
+  .missedStatMobile {
+    display: none;
+  }
+
   .callsContainer {
     padding: 0 0 2rem 0 !important;
     overflow-x: hidden !important;
@@ -1233,23 +1336,80 @@
   }
 
   .rightSidebar {
-    flex-direction: column !important;
-    gap: 0.75rem !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+
+  .rightSidebar > .earningsCard {
+    flex: 1 1 100% !important;
+    order: 1;
+  }
+
+  .rightSidebar > .performanceCard {
+    flex: 0 1 calc(50% - 0.25rem) !important;
+    min-width: 0 !important;
+    order: 2;
+  }
+
+  .rightSidebar > .tipsCard {
+    flex: 0 1 calc(50% - 0.25rem) !important;
+    min-width: 0 !important;
+    order: 3;
+  }
+
+  .rightSidebar > .peakCard {
+    flex: 1 1 100% !important;
+    order: 4;
   }
 
   .heroCard,
   .statCard,
   .callsTableCard,
   .earningsCard,
+  .performanceCard,
   .peakCard,
   .tipsCard {
     padding: 0.75rem !important;
     border-radius: 10px !important;
   }
 
+  .performanceBody {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+  }
+
+  .donutChart {
+    width: 80px !important;
+    height: 80px !important;
+  }
+
+  .donutLegend {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.4rem !important;
+    flex-wrap: wrap !important;
+  }
+
+  .legendItem {
+    gap: 0.2rem !important;
+    flex: 0 1 calc(50% - 0.3rem) !important;
+    min-width: 0 !important;
+  }
+
+  .legendLabel {
+    font-size: 0.55rem !important;
+  }
+
+  .legendValue {
+    font-size: 0.45rem !important;
+  }
+
   .heroContent {
     flex-wrap: wrap;
-    gap: 0.75rem;
+    gap: 0.35rem;
   }
 
   .heroIconWrap {
@@ -1260,6 +1420,48 @@
   .heroIcon {
     width: 20px;
     height: 20px;
+  }
+
+  .heroInfo {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.4rem;
+  }
+
+  .heroTitle {
+    width: 100%;
+    font-size: 0.82rem;
+  }
+
+  .heroDesc {
+    width: 100%;
+    font-size: 0.6rem;
+  }
+
+  .rateInfo {
+    margin-top: 0;
+  }
+
+  .rateLabel {
+    font-size: 0.55rem;
+  }
+
+  .rateValue {
+    font-size: 0.75rem;
+  }
+
+  .rateUnit {
+    font-size: 0.55rem;
+  }
+
+  .onlineStatus {
+    margin-top: 0;
+    font-size: 0.6rem;
+  }
+
+  .onlineDot {
+    width: 5px;
+    height: 5px;
   }
 
   .heroWaveform {
@@ -1278,15 +1480,15 @@
 
   .statsGrid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 0.5rem !important;
+    gap: 0.75rem !important;
   }
 
   .statCard {
-    padding: 0.7rem !important;
+    padding: 0.75rem !important;
   }
 
   .statLabel {
-    font-size: 0.62rem !important;
+    font-size: 0.55rem !important;
   }
 
   .statValue {
@@ -1294,7 +1496,7 @@
   }
 
   .statChangeInline {
-    font-size: 0.65rem !important;
+    font-size: 0.58rem !important;
   }
 
   .statPeriod {
@@ -1350,8 +1552,53 @@
     font-size: 1.2rem !important;
   }
 
+  .earningsCard {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .earningsCard > .earningsHeader {
+    width: 100%;
+    flex: 0 0 100%;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .earningsCard > .earningsAmount {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin-bottom: 0 !important;
+  }
+
+  .earningsCard > .earningsChange {
+    flex-direction: column;
+    align-items: flex-end;
+    margin-bottom: 0 !important;
+    margin-left: auto;
+    gap: 0;
+  }
+
+  .earningsCard > .earningsChange .positive {
+    margin-left: 0;
+  }
+
+  .earningsCard > .earningsStats {
+    width: 100%;
+    flex: 0 0 100%;
+  }
+
+  .earningsCard > .viewEarningsBtn {
+    width: 100%;
+    flex: 0 0 100%;
+    margin-top: 0.65rem !important;
+  }
+
   .earningsTitle {
-    font-size: 0.65rem !important;
+    font-size: 0.95rem !important;
+  }
+
+  .earningsStat {
+    padding: 0.5rem 0 !important;
   }
 
   .peakTitle {
@@ -1522,10 +1769,38 @@
   .statCard,
   .callsTableCard,
   .earningsCard,
+  .performanceCard,
   .peakCard,
   .tipsCard {
     padding: 0.55rem !important;
     border-radius: 8px !important;
+  }
+
+  .donutChart {
+    width: 70px !important;
+    height: 70px !important;
+  }
+
+  .donutLegend {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.4rem !important;
+    flex-wrap: wrap !important;
+  }
+
+  .legendItem {
+    gap: 0.2rem !important;
+    flex: 0 1 calc(50% - 0.3rem) !important;
+    min-width: 0 !important;
+  }
+
+  .legendLabel {
+    font-size: 0.55rem !important;
+  }
+
+  .legendValue {
+    font-size: 0.45rem !important;
   }
 
   .heroIconWrap {
@@ -1538,20 +1813,45 @@
     height: 18px !important;
   }
 
+  .heroInfo {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.15rem 0.35rem;
+  }
+
   .heroTitle {
-    font-size: 0.9rem !important;
+    font-size: 0.78rem !important;
   }
 
   .heroDesc {
-    font-size: 0.65rem !important;
+    font-size: 0.55rem !important;
   }
 
   .rateInfo {
     gap: 0.25rem;
+    margin-top: 0;
+  }
+
+  .rateLabel {
+    font-size: 0.5rem !important;
   }
 
   .rateValue {
-    font-size: 0.85rem !important;
+    font-size: 0.68rem !important;
+  }
+
+  .rateUnit {
+    font-size: 0.5rem !important;
+  }
+
+  .onlineStatus {
+    margin-top: 0;
+    font-size: 0.55rem !important;
+  }
+
+  .onlineDot {
+    width: 4px !important;
+    height: 4px !important;
   }
 
   .goLiveBtn,
@@ -1617,6 +1917,26 @@
   .peakTitle,
   .tipsTitle {
     font-size: 0.6rem !important;
+  }
+
+  .earningsTitle {
+    font-size: 0.85rem !important;
+  }
+
+  .earningsStat {
+    padding: 0.35rem 0 !important;
+  }
+
+  .earningsCard > .earningsHeader {
+    margin-bottom: 0.35rem !important;
+  }
+
+  .earningsCard > .earningsChange {
+    margin-bottom: 0 !important;
+  }
+
+  .earningsCard > .viewEarningsBtn {
+    margin-top: 0.5rem !important;
   }
 
   .earningsStatLabel,

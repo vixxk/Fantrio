@@ -1103,10 +1103,18 @@
   gap: 0.1rem;
 }
 
+.recentTitleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .recentTitle {
   font-size: 0.78rem;
   font-weight: 600;
   color: #ffffff;
+  min-width: 0;
 }
 
 .recentMeta {
@@ -1118,7 +1126,7 @@
   font-size: 0.72rem;
   color: #e10075;
   font-weight: 600;
-  margin-top: 0.1rem;
+  flex-shrink: 0;
 }
 
 .recentFooter {
@@ -2069,15 +2077,21 @@
 
   .streamHeader {
     flex-direction: column !important;
-    gap: 0.5rem !important;
+    gap: 0 !important;
+    margin-bottom: 0.75rem !important;
   }
 
   .streamHeaderLeft {
-    flex-wrap: wrap !important;
+    flex-direction: column !important;
+    gap: 0.15rem !important;
+  }
+
+  .sectionTitle {
+    margin-bottom: 0 !important;
   }
 
   .streamSubtitle {
-    font-size: 0.7rem !important;
+    display: none !important;
   }
 
   .streamBody {

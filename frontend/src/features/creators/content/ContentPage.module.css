@@ -1359,6 +1359,14 @@
     height: 30px;
     font-size: 0.75rem;
   }
+
+  .mobileCardStatsRow {
+    margin-top: auto;
+  }
+
+  .mobileCardMeta {
+    margin-top: 0.15rem;
+  }
 }
 
 @media (max-width: 480px) {

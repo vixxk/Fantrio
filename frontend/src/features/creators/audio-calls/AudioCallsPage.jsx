@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { Phone, Clock, Wallet, PhoneOff, Users, ChevronDown, Video, Edit2, MoreVertical, ArrowRight, Check, Lightbulb, ArrowUp, ArrowDown } from 'lucide-react';
-import { audioCallStats, todayEarnings, peakHours, recentCalls, tips, callTabs } from './mockData';
+import { audioCallStats, todayEarnings, performanceData, peakHours, recentCalls, tips, callTabs } from './mockData';
 import { PeriodDropdown } from '../analytics/PeriodDropdown';
 import styles from './AudioCallsPage.module.css';
 
@@ -115,7 +115,7 @@ export const AudioCallsPage = () => {
               const Icon = iconMap[stat.icon];
               const changeNum = stat.change ? stat.change.replace(/[+\-]/g, '') : '';
               return (
-                <div key={stat.id} className={styles.statCard}>
+                <div key={stat.id} className={`${styles.statCard} ${stat.id === 'missedCalls' ? styles.missedStatMobile : ''}`}>
                   <div className={styles.statLabelRow}>
                     <span className={styles.statLabel}>{stat.label}</span>
                   </div>
@@ -251,6 +251,75 @@ export const AudioCallsPage = () => {
               </div>
             </div>
             <button className={styles.viewEarningsBtn}>View Earnings</button>
+          </div>
+
+          {/* Performance Donut Card */}
+          <div className={styles.performanceCard}>
+            <div className={styles.performanceHeader}>
+              <h3 className={styles.performanceTitle}>Audio Call Performance</h3>
+              <PeriodDropdown variant="text" />
+            </div>
+            <div className={styles.performanceBody}>
+              <div className={styles.donutContainer}>
+                <div className={styles.donutChart}>
+                  <svg viewBox="0 0 100 100" className={styles.donutSvg}>
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="12" />
+                    <circle
+                      cx="50" cy="50" r="40"
+                      fill="none"
+                      stroke={performanceData.completed.color}
+                      strokeWidth="12"
+                      strokeDasharray={`${performanceData.completed.percentage * 2.51} ${251 - performanceData.completed.percentage * 2.51}`}
+                      strokeDashoffset="62.75"
+                      strokeLinecap="round"
+                    />
+                    <circle
+                      cx="50" cy="50" r="40"
+                      fill="none"
+                      stroke={performanceData.missed.color}
+                      strokeWidth="12"
+                      strokeDasharray={`${performanceData.missed.percentage * 2.51} ${251 - performanceData.missed.percentage * 2.51}`}
+                      strokeDashoffset={62.75 - performanceData.completed.percentage * 2.51}
+                      strokeLinecap="round"
+                    />
+                    <circle
+                      cx="50" cy="50" r="40"
+                      fill="none"
+                      stroke={performanceData.pending.color}
+                      strokeWidth="12"
+                      strokeDasharray={`${performanceData.pending.percentage * 2.51} ${251 - performanceData.pending.percentage * 2.51}`}
+                      strokeDashoffset={62.75 - (performanceData.completed.percentage + performanceData.missed.percentage) * 2.51}
+                      strokeLinecap="round"
+                    />
+                    <text x="50" y="48" textAnchor="middle" className={styles.donutValue}>{performanceData.totalMinutes}</text>
+                    <text x="50" y="58" textAnchor="middle" className={styles.donutLabel}>Total Minutes</text>
+                  </svg>
+                </div>
+              </div>
+              <div className={styles.donutLegend}>
+                <div className={styles.legendItem}>
+                  <span className={styles.legendDot} style={{ background: performanceData.completed.color }} />
+                  <div className={styles.legendText}>
+                    <span className={styles.legendLabel}>Completed</span>
+                    <span className={styles.legendValue}>{performanceData.completed.minutes} min ({performanceData.completed.percentage}%)</span>
+                  </div>
+                </div>
+                <div className={styles.legendItem}>
+                  <span className={styles.legendDot} style={{ background: performanceData.missed.color }} />
+                  <div className={styles.legendText}>
+                    <span className={styles.legendLabel}>Missed</span>
+                    <span className={styles.legendValue}>{performanceData.missed.minutes} min ({performanceData.missed.percentage}%)</span>
+                  </div>
+                </div>
+                <div className={styles.legendItem}>
+                  <span className={styles.legendDot} style={{ background: performanceData.pending.color }} />
+                  <div className={styles.legendText}>
+                    <span className={styles.legendLabel}>Pending</span>
+                    <span className={styles.legendValue}>{performanceData.pending.minutes} min ({performanceData.pending.percentage}%)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Peak Hours Chart */}

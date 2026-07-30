@@ -1,0 +1,1320 @@
+/* ================= STORE PAGE ================= */
+.pageContainer {
+  width: 100%;
+  min-height: 100%;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ================= MAIN GRID ================= */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.5rem;
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.rightSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ================= STATS ROW ================= */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.statCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  transition: all 0.2s ease;
+  min-height: 80px;
+}
+
+.statCard:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.statIconWrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.statContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.statLabel {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
+.statValue {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.statChange {
+  font-size: 0.68rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.changePositive {
+  color: #10b981;
+}
+
+.changePeriod {
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 400;
+}
+
+.statSubtitle {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ================= PRODUCTS SECTION ================= */
+.productsSection {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.productsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+}
+
+.productsTitleRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.sectionSubtitle {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.productsActions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.viewStoreBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.viewStoreBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.addProductBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #e10075;
+  border: none;
+  color: #ffffff;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.addProductBtn:hover {
+  background: #c5006a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(225, 0, 117, 0.3);
+}
+
+/* ================= TABS ================= */
+.tabsRow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 1rem;
+}
+
+.tab {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 0.75rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: -1px;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.activeTab {
+  color: #e10075 !important;
+  border-bottom-color: #e10075 !important;
+  font-weight: 600;
+}
+
+.tabsRight {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.filterBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.5rem 0.85rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filterBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.sortDropdown {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sortLabel {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.sortBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sortBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ================= TABLE ================= */
+.tableCard {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.tableContainer {
+  overflow-x: auto;
+}
+
+.contentTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.th {
+  text-align: left;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  padding: 0.75rem 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  white-space: nowrap;
+}
+
+.tableRow {
+  transition: background 0.2s ease;
+}
+
+.tableRow:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.td {
+  padding: 0.85rem 0.85rem;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.8);
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.tableRow:last-child .td {
+  border-bottom: none;
+}
+
+.productInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.productThumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.productDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.productName {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.productDesc {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.price {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.currency {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 400;
+}
+
+.stockStatus {
+  font-size: 0.68rem;
+}
+
+.inStock {
+  color: #10b981;
+}
+
+.outOfStock {
+  color: #ef4444;
+}
+
+.unlimited {
+  color: #8b5cf6;
+}
+
+.revenue {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.statusActive {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.statusOutOfStock {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.editBtn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.editBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+.moreBtn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.moreBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ================= PAGINATION ================= */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  margin-top: 0.5rem;
+}
+
+.paginationInfo {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.paginationButtons {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.pageBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pageBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.pageBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.pageBtnActive {
+  background: #e10075 !important;
+  border-color: #e10075 !important;
+  color: #ffffff !important;
+}
+
+/* ================= SIDEBAR CARDS ================= */
+.sidebarCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.sidebarCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.sidebarCardTitle {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+}
+
+.viewAllBtn {
+  background: transparent;
+  border: none;
+  color: #e10075;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.viewAllBtn:hover {
+  opacity: 0.8;
+}
+
+/* ================= STORE OVERVIEW ================= */
+.overviewList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.overviewItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.overviewItem:last-child {
+  border-bottom: none;
+}
+
+.overviewLabel {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.overviewValueRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.overviewValue {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.overviewChange {
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.viewStoreSidebarBtn {
+  width: 100%;
+  background: rgba(225, 0, 117, 0.1);
+  border: 1px solid rgba(225, 0, 117, 0.3);
+  color: #e10075;
+  padding: 0.7rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 1rem;
+}
+
+.viewStoreSidebarBtn:hover {
+  background: rgba(225, 0, 117, 0.2);
+  border-color: #e10075;
+}
+
+/* ================= TOP SELLING PRODUCTS ================= */
+.topProductsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.topProductItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.rankBadge {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e10075 0%, #ff6b9d 100%);
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.rankBadge[data-rank="2"] {
+  background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+}
+
+.rankBadge[data-rank="3"] {
+  background: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%);
+}
+
+.topProductThumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.topProductInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.topProductName {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topProductSold {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.topProductRevenue {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #e10075;
+  white-space: nowrap;
+}
+
+/* ================= RECENT ORDERS ================= */
+.ordersList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.orderItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.orderAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.orderInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.orderCustomer {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.orderDate {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.orderAmount {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #e10075;
+  white-space: nowrap;
+}
+
+/* ================= QUICK STATS ================= */
+.quickStatsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.quickStatItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.quickStatLabel {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.quickStatValueRow {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.quickStatValue {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.quickStatChange {
+  font-size: 0.6rem;
+  font-weight: 600;
+}
+
+/* ================= MOBILE CARDS ================= */
+.hideMobile {
+  display: block;
+}
+
+.showMobile {
+  display: none !important;
+}
+
+.mobileCards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mobileCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 0.75rem;
+  transition: background 0.2s ease;
+}
+
+.mobileCard:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.mobileCardTop {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.mobileCardThumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.mobileCardContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.mobileCardTitleRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.mobileCardName {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.mobileCardDesc {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.mobileCardStats {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.mobileStatItem {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.mobileStatDivider {
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 0.6rem;
+}
+
+.mobileCardActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mobileCardActions .editBtn {
+  flex: 1;
+  justify-content: center;
+}
+
+/* ================= LIGHT THEME ================= */
+.light {
+  color: #1a1625;
+}
+
+.light .statCard,
+.light .productsSection,
+.light .sidebarCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.light .statCard:hover,
+.light .sidebarCard:hover {
+  border-color: rgba(225, 0, 117, 0.2);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+.light .sectionTitle,
+.light .sidebarCardTitle {
+  color: #1a1625;
+}
+
+.light .sectionSubtitle {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .statLabel {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .statValue {
+  color: #1a1625;
+}
+
+.light .changePositive {
+  color: #059669;
+}
+
+.light .changePeriod {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .statSubtitle {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .viewStoreBtn {
+  border-color: rgba(0, 0, 0, 0.15);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .viewStoreBtn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.25);
+}
+
+.light .tabsRow {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .tab {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .tab:hover {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .activeTab {
+  color: #e10075 !important;
+  border-bottom-color: #e10075 !important;
+}
+
+.light .filterBtn {
+  border-color: rgba(0, 0, 0, 0.15);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .filterBtn:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.light .sortLabel {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .sortBtn {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .sortBtn:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.light .th {
+  color: rgba(26, 22, 37, 0.4);
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .tableRow:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.light .td {
+  color: rgba(26, 22, 37, 0.8);
+  border-bottom-color: rgba(0, 0, 0, 0.04);
+}
+
+.light .productName {
+  color: #1a1625;
+}
+
+.light .productDesc {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .price {
+  color: #1a1625;
+}
+
+.light .currency {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .revenue {
+  color: #059669;
+}
+
+.light .editBtn {
+  border-color: rgba(0, 0, 0, 0.15);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .editBtn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.25);
+  color: #1a1625;
+}
+
+.light .moreBtn {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .moreBtn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .paginationInfo {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .pageBtn {
+  border-color: rgba(0, 0, 0, 0.1);
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .pageBtn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.04);
+  color: #1a1625;
+}
+
+.light .overviewLabel {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .overviewValue {
+  color: #1a1625;
+}
+
+.light .viewStoreSidebarBtn {
+  background: rgba(225, 0, 117, 0.08);
+  border-color: rgba(225, 0, 117, 0.25);
+}
+
+.light .viewStoreSidebarBtn:hover {
+  background: rgba(225, 0, 117, 0.15);
+}
+
+.light .viewAllBtn {
+  color: #e10075;
+}
+
+.light .topProductName {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .topProductSold {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .topProductRevenue {
+  color: #e10075;
+}
+
+.light .orderCustomer {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .orderDate {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .orderAmount {
+  color: #e10075;
+}
+
+.light .quickStatLabel {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .quickStatValue {
+  color: #1a1625;
+}
+
+.light .mobileCard {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .mobileCard:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.light .mobileCardName {
+  color: #1a1625;
+}
+
+.light .mobileCardDesc {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .mobileStatItem {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .mobileStatDivider {
+  color: rgba(26, 22, 37, 0.2);
+}
+
+.light .mobileCardActions {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1200px) {
+  .statsRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .rightSidebar {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .rightSidebar > .sidebarCard:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .pageContainer {
+    padding: 0 0 5rem 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  .mainGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem !important;
+  }
+
+  .leftColumn {
+    order: 2;
+  }
+
+  .rightSidebar {
+    order: 1;
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  .statsRow {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  .statCard {
+    padding: 0.75rem !important;
+    gap: 0.6rem !important;
+  }
+
+  .statIconWrap {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .statLabel {
+    font-size: 0.62rem !important;
+  }
+
+  .statContent {
+    overflow: hidden;
+  }
+
+  .statValue {
+    font-size: 1.05rem !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .statChange {
+    font-size: 0.58rem !important;
+  }
+
+  .productsSection {
+    padding: 1rem !important;
+    border-radius: 12px !important;
+  }
+
+  .productsHeader {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .productsActions {
+    width: 100%;
+  }
+
+  .viewStoreBtn,
+  .addProductBtn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .tabsRow {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex-wrap: nowrap;
+    margin-bottom: 0.75rem;
+  }
+
+  .tabsRow::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab {
+    padding: 0.5rem 0.65rem;
+    font-size: 0.72rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .tabsRight {
+    display: none;
+  }
+
+  .hideMobile {
+    display: none !important;
+  }
+
+  .showMobile {
+    display: block !important;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+  }
+
+  .paginationInfo {
+    font-size: 0.7rem;
+  }
+
+  .sidebarCard {
+    padding: 1rem !important;
+    border-radius: 12px !important;
+  }
+
+  .sidebarCardTitle {
+    font-size: 0.82rem !important;
+  }
+
+  .overviewValue {
+    font-size: 0.82rem !important;
+  }
+
+  .quickStatsGrid {
+    gap: 0.5rem;
+  }
+
+  .quickStatValue {
+    font-size: 0.85rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .statsRow {
+    gap: 0.4rem !important;
+  }
+
+  .statCard {
+    padding: 0.6rem !important;
+    gap: 0.5rem !important;
+  }
+
+  .statIconWrap {
+    width: 30px !important;
+    height: 30px !important;
+  }
+
+  .statValue {
+    font-size: 0.95rem !important;
+  }
+
+  .productsSection {
+    padding: 0.75rem !important;
+  }
+
+  .sectionTitle {
+    font-size: 0.92rem !important;
+  }
+
+  .mobileCardThumb {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  .mobileCardName {
+    font-size: 0.82rem;
+  }
+
+  .mobileCardDesc {
+    font-size: 0.68rem;
+  }
+
+  .mobileStatItem {
+    font-size: 0.68rem;
+  }
+
+  .sidebarCard {
+    padding: 0.75rem !important;
+  }
+
+  .topProductThumb {
+    width: 36px;
+    height: 36px;
+  }
+
+  .topProductName {
+    font-size: 0.75rem;
+  }
+
+  .orderAvatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .orderCustomer {
+    font-size: 0.75rem;
+  }
+}

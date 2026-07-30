@@ -57,12 +57,19 @@ export const audioCallStats = [
 
 export const todayEarnings = {
   amount: '$126.50',
-  change: '+26%',
+  change: '26%',
   changeLabel: 'vs yesterday',
   totalMinutes: 253,
   completedCalls: 28,
   missedCalls: 2,
   estimatedPayout: '$126.50',
+};
+
+export const performanceData = {
+  totalMinutes: 5420,
+  completed: { minutes: 4200, percentage: 77, color: '#10b981' },
+  missed: { minutes: 680, percentage: 13, color: '#f43f5e' },
+  pending: { minutes: 540, percentage: 10, color: '#eab308' },
 };
 
 export const peakHours = {

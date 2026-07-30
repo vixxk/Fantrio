@@ -1,0 +1,1267 @@
+/* ================= SETTINGS PAGE ================= */
+.pageContainer {
+  width: 100%;
+  min-height: 100%;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ================= MAIN GRID ================= */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.5rem;
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.rightSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ================= SETTINGS SECTION ================= */
+.settingsSection {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+}
+
+.sectionTitleRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.sectionSubtitle {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.changePasswordBtn {
+  background: rgba(225, 0, 117, 0.1);
+  border: 1px solid rgba(225, 0, 117, 0.3);
+  color: #e10075;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.changePasswordBtn:hover {
+  background: rgba(225, 0, 117, 0.2);
+  border-color: #e10075;
+}
+
+/* ================= PROFILE SECTION ================= */
+.profileContent {
+  display: flex;
+  gap: 2rem;
+}
+
+.avatarSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.avatarWrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+}
+
+.cameraBtn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 30px;
+  height: 30px;
+  background: #e10075;
+  border: none;
+  border-radius: 50%;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid #121212;
+}
+
+.cameraBtn:hover {
+  background: #c5006a;
+  transform: scale(1.1);
+}
+
+.profileNameInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.profileName {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.profileUsername {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.profileSince {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ================= FORM FIELDS ================= */
+.formFields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  position: relative;
+}
+
+.formLabel {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
+.formInput,
+.formTextarea {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #ffffff;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.formInput:focus,
+.formTextarea:focus {
+  border-color: rgba(225, 0, 117, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.formTextarea {
+  min-height: 70px;
+  resize: vertical;
+}
+
+.charCount {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.75rem;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ================= SELECT & INPUT ================= */
+.selectWrapper {
+  position: relative;
+}
+
+.formSelect {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #ffffff;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  transition: all 0.2s ease;
+}
+
+.formSelect:focus {
+  border-color: rgba(225, 0, 117, 0.5);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.formSelect option {
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
+.inputWithSuffix {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.inputWithSuffix:focus-within {
+  border-color: rgba(225, 0, 117, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.inputWithSuffix .formInput {
+  border: none;
+  background: transparent;
+  flex: 1;
+}
+
+.inputWithSuffix .formInput:focus {
+  background: transparent;
+}
+
+.inputSuffix {
+  padding: 0 0.85rem;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.4);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ================= PAYOUT SECTION ================= */
+.payoutContent {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.payoutLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.connectedAccount {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.connectedHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.connectedLabel {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.verifiedBadge {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+
+.bankInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.bankIcon {
+  width: 40px;
+  height: 40px;
+  background: rgba(139, 92, 246, 0.15);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b5cf6;
+}
+
+.bankDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.bankName {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.accountRows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.accountRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.accountLabel {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.accountValue {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+.updatePayoutBtn {
+  width: 100%;
+  background: rgba(225, 0, 117, 0.1);
+  border: 1px solid rgba(225, 0, 117, 0.3);
+  color: #e10075;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.updatePayoutBtn:hover {
+  background: rgba(225, 0, 117, 0.2);
+  border-color: #e10075;
+}
+
+.payoutRight {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.payoutNote {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+
+.noteIcon {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.noteText {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.4;
+}
+
+/* ================= BOTTOM GRID ================= */
+.bottomGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+/* ================= SETTINGS LIST ================= */
+.settingsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.settingItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.settingItem:last-child {
+  border-bottom: none;
+}
+
+.settingLabel {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ================= TOGGLE SWITCH ================= */
+.toggleSwitch {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.toggleSwitch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggleSlider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 22px;
+  transition: all 0.3s ease;
+}
+
+.toggleSlider::before {
+  content: '';
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.toggleSwitch input:checked + .toggleSlider {
+  background: linear-gradient(135deg, #e10075 0%, #ff6b9d 100%);
+}
+
+.toggleSwitch input:checked + .toggleSlider::before {
+  transform: translateX(18px);
+}
+
+/* ================= SELECT SMALL ================= */
+.selectWrapperSmall {
+  position: relative;
+}
+
+.formSelectSmall {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.4rem 1.75rem 0.4rem 0.65rem;
+  font-size: 0.75rem;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  transition: all 0.2s ease;
+}
+
+.formSelectSmall:focus {
+  border-color: rgba(225, 0, 117, 0.5);
+}
+
+.formSelectSmall option {
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
+/* ================= SETTING LINK ================= */
+.settingLink {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.settingLink:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.linkHighlight {
+  color: #10b981;
+  font-weight: 500;
+}
+
+/* ================= ACTION BUTTONS ================= */
+.actionButtons {
+  display: flex;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+.cancelBtn {
+  flex: 1;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.85rem;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.saveBtn {
+  flex: 2;
+  background: linear-gradient(135deg, #e10075 0%, #ff6b9d 100%);
+  border: none;
+  color: #ffffff;
+  padding: 0.85rem;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.saveBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(225, 0, 117, 0.35);
+}
+
+/* ================= SIDEBAR CARDS ================= */
+.sidebarCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+.sidebarCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.sidebarCardTitle {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+}
+
+.sidebarCardDescription {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 0 0.75rem 0;
+  line-height: 1.4;
+}
+
+/* ================= ACCOUNT STATUS ================= */
+.statusBadgeActive {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+}
+
+.statusGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.statusItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.statusItemLabel {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.statusItemValue {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ================= VERIFICATION ================= */
+.verificationSteps {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+}
+
+.verificationStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.stepIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.stepComplete {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.stepConnector {
+  flex: 1;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.stepCompleteLine {
+  background: #10b981;
+}
+
+.stepLabel {
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+}
+
+.viewDetailsBtn {
+  width: 100%;
+  background: rgba(225, 0, 117, 0.1);
+  border: 1px solid rgba(225, 0, 117, 0.3);
+  color: #e10075;
+  padding: 0.65rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.viewDetailsBtn:hover {
+  background: rgba(225, 0, 117, 0.2);
+  border-color: #e10075;
+}
+
+/* ================= SECURITY SCORE ================= */
+.securityScoreHeader {
+  margin-bottom: 1rem;
+}
+
+.securityScoreContent {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.scoreCircle {
+  width: 70px;
+  height: 70px;
+  flex-shrink: 0;
+}
+
+.scoreSvg {
+  width: 100%;
+  height: 100%;
+}
+
+.scoreValue {
+  fill: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.scoreDetails {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.scoreTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.scoreStrength {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.scoreDescription {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.scoreItems {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 0.25rem;
+}
+
+.scoreItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.scoreItemIcon {
+  font-size: 0.5rem;
+  line-height: 1;
+}
+
+.itemGreen {
+  color: #10b981;
+}
+
+.itemYellow {
+  color: #f59e0b;
+}
+
+.scoreItemLabel {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.5);
+  flex: 1;
+}
+
+.scoreItemValue {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+.manageSecurityBtn {
+  width: 100%;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10b981;
+  padding: 0.65rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.manageSecurityBtn:hover {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: #10b981;
+}
+
+/* ================= HELP LIST ================= */
+.helpList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.helpItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0.75rem 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  text-align: left;
+}
+
+.helpItem:last-child {
+  border-bottom: none;
+}
+
+.helpItem:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.helpIcon {
+  width: 36px;
+  height: 36px;
+  background: rgba(225, 0, 117, 0.1);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e10075;
+  flex-shrink: 0;
+}
+
+.helpInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.helpLabel {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.helpDescription {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.helpArrow {
+  color: rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+
+/* ================= QUICK INFO ================= */
+.quickInfoList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.quickInfoItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.quickInfoLabel {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.quickInfoValue {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+/* ================= LIGHT THEME ================= */
+.light {
+  color: #1a1625;
+}
+
+.light .settingsSection,
+.light .sidebarCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.light .sectionTitle,
+.light .sidebarCardTitle {
+  color: #1a1625;
+}
+
+.light .sectionSubtitle,
+.light .sidebarCardDescription {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .changePasswordBtn {
+  background: rgba(225, 0, 117, 0.08);
+  border-color: rgba(225, 0, 117, 0.25);
+}
+
+.light .changePasswordBtn:hover {
+  background: rgba(225, 0, 117, 0.15);
+}
+
+.light .avatar {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.light .cameraBtn {
+  border-color: #ffffff;
+}
+
+.light .profileName {
+  color: #1a1625;
+}
+
+.light .profileUsername,
+.light .profileSince {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .formInput,
+.light .formTextarea,
+.light .formSelect {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #1a1625;
+}
+
+.light .formInput:focus,
+.light .formTextarea:focus,
+.light .formSelect:focus {
+  border-color: rgba(225, 0, 117, 0.5);
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.light .formLabel {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .charCount {
+  color: rgba(26, 22, 37, 0.3);
+}
+
+.light .inputWithSuffix {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.light .inputWithSuffix:focus-within {
+  border-color: rgba(225, 0, 117, 0.5);
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.light .inputSuffix {
+  color: rgba(26, 22, 37, 0.4);
+  border-left-color: rgba(0, 0, 0, 0.1);
+}
+
+.light .connectedAccount {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .connectedLabel {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .bankName {
+  color: #1a1625;
+}
+
+.light .accountLabel {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .accountValue {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .updatePayoutBtn {
+  background: rgba(225, 0, 117, 0.08);
+  border-color: rgba(225, 0, 117, 0.25);
+}
+
+.light .updatePayoutBtn:hover {
+  background: rgba(225, 0, 117, 0.15);
+}
+
+.light .payoutNote {
+  background: rgba(139, 92, 246, 0.05);
+  border-color: rgba(139, 92, 246, 0.15);
+}
+
+.light .noteText {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .settingLabel {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .settingItem {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .toggleSlider {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.light .formSelectSmall {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .settingLink {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .settingLink:hover {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .cancelBtn {
+  border-color: rgba(0, 0, 0, 0.15);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .cancelBtn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.25);
+}
+
+.light .statusItemLabel,
+.light .stepLabel,
+.light .scoreDescription,
+.light .scoreItemLabel,
+.light .helpDescription,
+.light .quickInfoLabel {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .statusItemValue,
+.light .scoreItemValue,
+.light .helpLabel,
+.light .quickInfoValue {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .scoreValue {
+  fill: #1a1625;
+}
+
+.light .helpItem {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .helpItem:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.light .helpArrow {
+  color: rgba(26, 22, 37, 0.3);
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1200px) {
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .rightSidebar {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .rightSidebar > .sidebarCard:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .pageContainer {
+    padding: 0 0 2rem 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  .mainGrid {
+    gap: 1rem !important;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .leftColumn {
+    order: 2;
+  }
+
+  .rightSidebar {
+    order: 1;
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  .settingsSection {
+    padding: 1rem !important;
+    border-radius: 12px !important;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .changePasswordBtn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .profileContent {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .avatarSection {
+    flex-direction: row;
+    gap: 1rem;
+  }
+
+  .avatarWrapper {
+    width: 70px;
+    height: 70px;
+  }
+
+  .profileNameInfo {
+    align-items: flex-start;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .payoutContent {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .bottomGrid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .bottomGrid .settingsSection {
+    padding: 1rem !important;
+  }
+
+  .sectionTitle {
+    font-size: 0.92rem !important;
+  }
+
+  .actionButtons {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .saveBtn,
+  .cancelBtn {
+    flex: none;
+    width: 100%;
+  }
+
+  .verificationSteps {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .stepConnector {
+    width: 2px;
+    height: 15px;
+    margin: 0;
+  }
+
+  .securityScoreContent {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .scoreItems {
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .settingsSection {
+    padding: 0.75rem !important;
+  }
+
+  .avatarSection {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .profileNameInfo {
+    align-items: center;
+  }
+
+  .bottomGrid .settingsSection {
+    padding: 0.75rem !important;
+  }
+
+  .settingItem {
+    padding: 0.6rem 0;
+  }
+
+  .settingLabel {
+    font-size: 0.78rem;
+  }
+}

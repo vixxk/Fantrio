@@ -98,7 +98,7 @@ export const DashboardPage = () => {
             <div className={styles.streamHeader}>
               <div className={styles.streamHeaderLeft}>
                 <h2 className={styles.sectionTitle}>Go Stream Live</h2>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className={styles.streamSubtitle}>Go live and charge for entry</span>
+                <span className={styles.streamSubtitle}>Go live and charge for entry</span>
               </div>
             </div>
 
@@ -354,11 +354,13 @@ export const DashboardPage = () => {
                     </span>
                   </div>
                   <div className={styles.recentInfo}>
-                    <span className={styles.recentTitle}>{item.title}</span>
+                    <div className={styles.recentTitleRow}>
+                      <span className={styles.recentTitle}>{item.title}</span>
+                      {item.price && <span className={styles.recentPrice}>{item.price}</span>}
+                    </div>
                     <span className={styles.recentMeta}>
                       {item.type} • {item.timeAgo}
                     </span>
-                    {item.price && <span className={styles.recentPrice}>{item.price}</span>}
                   </div>
                   <div className={styles.recentFooter}>
                     <span className={styles.recentStat}><Eye size={12} /> {item.views}</span>

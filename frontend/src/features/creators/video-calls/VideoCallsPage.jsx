@@ -59,7 +59,7 @@ export const VideoCallsPage = () => {
               </div>
               <div className={styles.heroInfo}>
                 <h2 className={styles.heroTitle}>Video Calls</h2>
-                <p className={styles.heroDesc}>Connect face-to-face with your fans and earn per minute on every call.</p>
+                <p className={styles.heroDesc}>Connect face-to-face with your fans.</p>
                 <div className={styles.rateInfo}>
                   <span className={styles.rateLabel}>Your rate:</span>
                   <span className={styles.rateValue}>$2.00</span>
@@ -100,7 +100,7 @@ export const VideoCallsPage = () => {
               const Icon = iconMap[stat.icon];
               const changeNum = stat.change ? stat.change.replace(/[+\-]/g, '') : '';
               return (
-                <div key={stat.id} className={styles.statCard}>
+                <div key={stat.id} className={`${styles.statCard} ${stat.id === 'missedCalls' ? styles.missedStatMobile : ''}`}>
                   <div className={styles.statLabelRow}>
                     <span className={styles.statLabel}>{stat.label}</span>
                   </div>
