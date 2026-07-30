@@ -204,7 +204,7 @@ export const VideoCallsPage = () => {
             <div className={styles.earningsHeader}>
               <div className={styles.earningsTitleRow}>
                 <div className={styles.earningsIconWrap}>
-                  <Video size={14} className={styles.earningsIcon} fill="none" />
+                  <Video size={20} className={styles.earningsIcon} fill="none" />
                 </div>
                 <h3 className={styles.earningsTitle}>Today's Video Call Earnings</h3>
               </div>

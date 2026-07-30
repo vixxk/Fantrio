@@ -541,11 +541,11 @@
 
 .earningsIcon {
   color: #9b51e0;
-  font-size: 14px;
+  font-size: 1.25rem;
 }
 
 .earningsTitle {
-  font-size: 0.82rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.7);
   margin: 0;

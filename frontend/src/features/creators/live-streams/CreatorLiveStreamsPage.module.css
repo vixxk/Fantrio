@@ -1,0 +1,1712 @@
+/* ================= LIVE STREAMS PAGE ================= */
+.pageContainer {
+  width: 100%;
+  min-height: 100%;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ================= PAGE HEADER ================= */
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.pageTitle {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.02em;
+}
+
+.pageSubtitle {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+/* ================= MAIN GRID ================= */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.5rem;
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.rightSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ================= STREAM CARD ================= */
+.streamCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.streamTabsRow {
+  display: flex;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.streamTab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 1rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.streamTab:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.streamTabActive {
+  color: #e10075 !important;
+  border-bottom-color: #e10075 !important;
+}
+
+.streamBody {
+  display: grid;
+  grid-template-columns: 200px 1fr auto;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+/* ================= STREAM PREVIEW ================= */
+.streamPreview {
+  position: relative;
+}
+
+.streamPreviewInner {
+  width: 100%;
+  height: 160px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.liveBadge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #ef4444;
+  color: #ffffff;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.playButton {
+  width: 56px;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.playButton:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+/* ================= STREAM FORM ================= */
+.streamForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.formLabel {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.formInput {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.85rem;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.formInput::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.formInput:focus {
+  border-color: rgba(225, 0, 117, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.priceInputGroup {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.pricePrefix {
+  padding: 0.7rem 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.priceInput {
+  flex: 1;
+  padding: 0.7rem 0;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 0.88rem;
+  outline: none;
+  min-width: 0;
+}
+
+.currencyLabel {
+  padding: 0.7rem 1rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.78rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.formHint {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0;
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.toggleInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.toggleLabel {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.toggleDesc {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  transition: 0.3s;
+}
+
+.slider::before {
+  content: '';
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.switch input:checked + .slider {
+  background: #e10075;
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(20px);
+}
+
+/* ================= START OPTIONS ================= */
+.startOptionsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.startOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.startOption {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.startOption:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.startOptionActive {
+  border-color: rgba(225, 0, 117, 0.4) !important;
+  background: rgba(225, 0, 117, 0.05);
+}
+
+.startOptionRadio {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: all 0.2s ease;
+  color: #ffffff;
+}
+
+.startOptionRadioActive {
+  border-color: #e10075;
+  background: #e10075;
+}
+
+.startOptionInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.startOptionTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.startOptionIcon {
+  color: #e10075;
+}
+
+.startOptionDesc {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.startNowBtn {
+  width: 100%;
+  background: linear-gradient(135deg, #e10075 0%, #e10075 90%, #ffffff 100%);
+  border: none;
+  color: #ffffff;
+  padding: 0.9rem 1.5rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 0.5rem;
+}
+
+.startNowBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(225, 0, 117, 0.3);
+}
+
+/* ================= SECTION ================= */
+.section {
+  display: flex;
+  flex-direction: column;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.sectionTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.viewCalendarBtn,
+.viewAllBtn {
+  background: transparent;
+  border: none;
+  color: #e10075;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.viewCalendarBtn:hover,
+.viewAllBtn:hover {
+  opacity: 0.8;
+}
+
+/* ================= UPCOMING STREAMS ================= */
+.upcomingList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.upcomingItem {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 1rem;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.upcomingItem:hover {
+  border-color: rgba(225, 0, 117, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.upcomingItemTop {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.upcomingThumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.upcomingInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.upcomingTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.upcomingTitle {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.scheduledBadge {
+  padding: 0.2rem 0.6rem;
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.upcomingDate {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.upcomingCategory {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.categoryDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.upcomingRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.entryPriceLabel {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.entryPriceValue {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #e10075;
+}
+
+.editBtn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.editBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.viewAllLink {
+  display: block;
+  text-align: center;
+  background: transparent;
+  border: none;
+  color: #e10075;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.85rem;
+  transition: opacity 0.2s ease;
+}
+
+.viewAllLink:hover {
+  opacity: 0.8;
+}
+
+/* ================= RECENT STREAMS TABLE ================= */
+.recentTableCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.tableContainer {
+  overflow-x: auto;
+}
+
+.contentTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.th {
+  text-align: left;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  padding: 1rem 1rem 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  white-space: nowrap;
+}
+
+.tableRow {
+  transition: background 0.2s ease;
+}
+
+.tableRow:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.td {
+  padding: 0.85rem 1rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.tableRow:last-child .td {
+  border-bottom: none;
+}
+
+.streamInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.streamThumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.streamTitle {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.categoryBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.dateText,
+.durationText,
+.viewsText {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.earningsValue {
+  font-weight: 600;
+  color: #10b981;
+}
+
+.actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.actionBtn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.actionBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ================= RIGHT SIDEBAR CARDS ================= */
+.overviewCard,
+.categoriesCard,
+.topCard,
+.statsCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+}
+
+/* ================= STREAM OVERVIEW ================= */
+.overviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.overviewTitle {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+.overviewGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+.overviewStat {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.overviewStat:nth-child(odd) {
+  padding-right: 0.75rem;
+}
+
+.overviewStat:nth-child(even) {
+  padding-left: 0.75rem;
+}
+
+.overviewStatLabel {
+  display: block;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 0.35rem;
+}
+
+.overviewStatRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.overviewStatValue {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.overviewStatChange {
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+.positive {
+  color: #10b981;
+}
+
+.negative {
+  color: #ef4444;
+}
+
+.viewAnalyticsBtn {
+  width: 100%;
+  background: rgba(225, 0, 117, 0.1);
+  border: 1px solid rgba(225, 0, 117, 0.3);
+  color: #e10075;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 1.25rem;
+}
+
+.viewAnalyticsBtn:hover {
+  background: rgba(225, 0, 117, 0.2);
+  border-color: #e10075;
+}
+
+/* ================= STREAM CATEGORIES ================= */
+.categoriesHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.categoriesTitle {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+.manageLink {
+  background: transparent;
+  border: none;
+  color: #e10075;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.manageLink:hover {
+  opacity: 0.8;
+}
+
+.categoriesList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.categoryItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.categoryItemLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 1;
+}
+
+.categoryIconWrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.categoryInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.categoryName {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.categoryCount {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.categoryRight {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.categoryPercentage {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  min-width: 35px;
+  text-align: right;
+}
+
+.categoryProgressBar {
+  width: 60px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.categoryProgressFill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* ================= TOP STREAMERS ================= */
+.topHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.topTitle {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+.topList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.topItem {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.topRank {
+  width: 20px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.topInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.topItemTitle {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.topItemCategory {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.topEarnings {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+}
+
+.topEarningsLabel {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.topEarningsValue {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.viewAllStreamsBtn {
+  width: 100%;
+  background: rgba(225, 0, 117, 0.1);
+  border: 1px solid rgba(225, 0, 117, 0.3);
+  color: #e10075;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 1rem;
+}
+
+.viewAllStreamsBtn:hover {
+  background: rgba(225, 0, 117, 0.2);
+  border-color: #e10075;
+}
+
+/* ================= QUICK STATS ================= */
+.statsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.statsTitle {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+.statItem {
+  padding: 0.65rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.statItem:nth-child(odd) {
+  padding-right: 0.75rem;
+}
+
+.statItem:nth-child(even) {
+  padding-left: 0.75rem;
+}
+
+.statItem:nth-last-child(-n+2) {
+  border-bottom: none;
+}
+
+.statLabel {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 500;
+}
+
+.statRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.statValue {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.statChange {
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+/* ================= LIGHT THEME OVERRIDES ================= */
+.light {
+  color: #1a1625;
+}
+
+.light .pageTitle {
+  color: #1a1625;
+}
+
+.light .pageSubtitle {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .streamCard,
+.light .recentTableCard,
+.light .overviewCard,
+.light .categoriesCard,
+.light .topCard,
+.light .statsCard,
+.light .upcomingItem {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.light .streamCard:hover,
+.light .upcomingItem:hover,
+.light .overviewCard:hover,
+.light .categoriesCard:hover,
+.light .topCard:hover,
+.light .statsCard:hover {
+  border-color: rgba(225, 0, 117, 0.2);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+.light .streamTab {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .streamTab:hover {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .streamTabActive {
+  color: #e10075 !important;
+  border-bottom-color: #e10075 !important;
+}
+
+.light .streamPreviewInner {
+  background: linear-gradient(135deg, #e8eaf0 0%, #d5d8e4 50%, #c4c8d8 100%);
+}
+
+.light .formInput,
+.light .priceInputGroup {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #1a1625;
+}
+
+.light .formInput::placeholder {
+  color: rgba(26, 22, 37, 0.35);
+}
+
+.light .formInput:focus {
+  border-color: rgba(225, 0, 117, 0.5);
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.light .pricePrefix,
+.light .currencyLabel {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .priceInput {
+  color: #1a1625;
+}
+
+.light .currencyLabel {
+  background: rgba(0, 0, 0, 0.03);
+  border-left-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .formLabel {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .formHint {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .toggleLabel {
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .toggleDesc {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .slider {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.light .startOption {
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .startOption:hover {
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.light .startOptionRadio {
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.light .startOptionTitle {
+  color: rgba(26, 22, 37, 0.85);
+}
+
+.light .startOptionDesc {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .sectionTitle {
+  color: #1a1625;
+}
+
+.light .upcomingTitle {
+  color: #1a1625;
+}
+
+.light .upcomingDate {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .upcomingCategory {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .entryPriceLabel {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .entryPriceValue {
+  color: #e10075;
+}
+
+.light .editBtn {
+  border-color: rgba(0, 0, 0, 0.12);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .editBtn:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.light .th {
+  color: rgba(26, 22, 37, 0.4);
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .tableRow:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.light .td {
+  color: rgba(26, 22, 37, 0.8);
+  border-bottom-color: rgba(0, 0, 0, 0.04);
+}
+
+.light .streamTitle {
+  color: #1a1625;
+}
+
+.light .categoryBadge {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .dateText,
+.light .durationText,
+.light .viewsText {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .actionBtn {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .actionBtn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .overviewTitle,
+.light .categoriesTitle,
+.light .topTitle,
+.light .statsTitle {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .overviewStatLabel {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .overviewStatValue {
+  color: #1a1625;
+}
+
+.light .overviewStat {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .categoryName {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .categoryCount {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .categoryPercentage {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .categoryProgressBar {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.light .topItemTitle {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .topItemCategory {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .topEarningsValue {
+  color: #10b981;
+}
+
+.light .statLabel {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .statValue {
+  color: #1a1625;
+}
+
+.light .statItem {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+/* ================= RESPONSIVE DESIGN ================= */
+@media (max-width: 1200px) {
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .rightSidebar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .overviewCard {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .pageContainer {
+    padding: 0 0 5rem 0 !important;
+    overflow-x: clip !important;
+  }
+
+  .pageHeader {
+    margin-bottom: 1rem !important;
+  }
+
+  .pageTitle {
+    font-size: 1.35rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .mainGrid {
+    gap: 1rem !important;
+    overflow: hidden !important;
+  }
+
+  .leftColumn {
+    overflow: hidden !important;
+    min-width: 0 !important;
+  }
+
+  .rightSidebar {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.75rem !important;
+    overflow: hidden !important;
+    min-width: 0 !important;
+  }
+
+  .overviewCard {
+    grid-column: 1 / -1 !important;
+  }
+
+  .streamBody {
+    grid-template-columns: 1fr !important;
+    padding: 1rem !important;
+    gap: 1rem !important;
+  }
+
+  .streamPreview {
+    order: -1;
+  }
+
+  .streamPreviewInner {
+    height: 140px;
+  }
+
+  .startOptionsSection {
+    order: 3;
+  }
+
+  .streamTab {
+    padding: 0.75rem 0.5rem !important;
+    font-size: 0.78rem !important;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .upcomingItem {
+    padding: 0.875rem !important;
+    border-radius: 12px !important;
+  }
+
+  .upcomingItemTop {
+    gap: 0.75rem;
+  }
+
+  .upcomingThumb {
+    width: 52px;
+    height: 52px;
+  }
+
+  .upcomingTitle {
+    font-size: 0.85rem !important;
+  }
+
+  .entryPriceValue {
+    font-size: 0.92rem !important;
+  }
+
+  .recentTableCard {
+    padding: 0;
+  }
+
+  .th {
+    padding: 0.75rem 0.75rem 0.5rem 0.75rem !important;
+    font-size: 0.65rem !important;
+  }
+
+  .td {
+    padding: 0.65rem 0.75rem !important;
+    font-size: 0.78rem !important;
+  }
+
+  .streamThumb {
+    width: 36px;
+    height: 36px;
+  }
+
+  .streamTitle {
+    font-size: 0.78rem !important;
+  }
+
+  .categoryBadge {
+    font-size: 0.7rem !important;
+  }
+
+  .dateText,
+  .durationText,
+  .viewsText {
+    font-size: 0.72rem !important;
+  }
+
+  .overviewCard,
+  .categoriesCard,
+  .topCard,
+  .statsCard {
+    padding: 1rem !important;
+    border-radius: 12px !important;
+  }
+
+  .overviewTitle,
+  .categoriesTitle,
+  .topTitle,
+  .statsTitle {
+    font-size: 0.82rem !important;
+  }
+
+  .overviewStatLabel {
+    font-size: 0.68rem !important;
+  }
+
+  .overviewStatValue {
+    font-size: 1.15rem !important;
+  }
+
+  .categoryItem {
+    gap: 0.5rem;
+  }
+
+  .categoryIconWrap {
+    width: 32px;
+    height: 32px;
+  }
+
+  .categoryName {
+    font-size: 0.75rem !important;
+  }
+
+  .categoryCount {
+    font-size: 0.62rem !important;
+  }
+
+  .categoryPercentage {
+    font-size: 0.72rem !important;
+  }
+
+  .categoryProgressBar {
+    width: 45px;
+  }
+
+  .topItem {
+    gap: 0.5rem;
+  }
+
+  .topItemTitle {
+    font-size: 0.78rem !important;
+  }
+
+  .topEarningsValue {
+    font-size: 0.82rem !important;
+  }
+
+  .statValue {
+    font-size: 1.1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .pageTitle {
+    font-size: 1.15rem !important;
+  }
+
+  .streamTabsRow {
+    flex-direction: column;
+  }
+
+  .streamTab {
+    border-bottom: none !important;
+    border-left: 2px solid transparent;
+  }
+
+  .streamTabActive {
+    border-left-color: #e10075 !important;
+    border-bottom-color: transparent !important;
+  }
+
+  .streamBody {
+    padding: 0.875rem !important;
+  }
+
+  .streamPreviewInner {
+    height: 120px;
+  }
+
+  .playButton {
+    width: 48px;
+    height: 48px;
+  }
+
+  .playButton svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .formInput {
+    padding: 0.6rem 0.75rem !important;
+    font-size: 0.82rem !important;
+  }
+
+  .pricePrefix {
+    padding: 0.6rem 0.6rem !important;
+    font-size: 0.82rem !important;
+  }
+
+  .priceInput {
+    font-size: 0.82rem !important;
+  }
+
+  .currencyLabel {
+    padding: 0.6rem 0.75rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  .startNowBtn {
+    padding: 0.75rem !important;
+    font-size: 0.88rem !important;
+  }
+
+  .upcomingItem {
+    padding: 0.75rem !important;
+  }
+
+  .upcomingThumb {
+    width: 44px;
+    height: 44px;
+  }
+
+  .upcomingTitle {
+    font-size: 0.82rem !important;
+  }
+
+  .scheduledBadge {
+    font-size: 0.6rem !important;
+    padding: 0.15rem 0.5rem !important;
+  }
+
+  .upcomingDate {
+    font-size: 0.72rem !important;
+  }
+
+  .upcomingCategory {
+    font-size: 0.68rem !important;
+  }
+
+  .entryPriceLabel {
+    font-size: 0.62rem !important;
+  }
+
+  .entryPriceValue {
+    font-size: 0.88rem !important;
+  }
+
+  .editBtn {
+    padding: 0.35rem 0.7rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  .recentTableCard {
+    border-radius: 12px !important;
+  }
+
+  .th {
+    padding: 0.6rem 0.6rem 0.4rem 0.6rem !important;
+    font-size: 0.6rem !important;
+  }
+
+  .td {
+    padding: 0.55rem 0.6rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  .streamThumb {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+  }
+
+  .streamTitle {
+    font-size: 0.72rem !important;
+  }
+
+  .categoryBadge {
+    font-size: 0.65rem !important;
+  }
+
+  .dateText,
+  .durationText,
+  .viewsText {
+    font-size: 0.68rem !important;
+  }
+
+  .earningsValue {
+    font-size: 0.78rem !important;
+  }
+
+  .overviewCard,
+  .categoriesCard,
+  .topCard,
+  .statsCard {
+    padding: 0.875rem !important;
+    border-radius: 10px !important;
+  }
+
+  .overviewTitle,
+  .categoriesTitle,
+  .topTitle,
+  .statsTitle {
+    font-size: 0.78rem !important;
+  }
+
+  .overviewStat {
+    padding: 0.6rem 0 !important;
+  }
+
+  .overviewStatLabel {
+    font-size: 0.65rem !important;
+  }
+
+  .overviewStatValue {
+    font-size: 1.05rem !important;
+  }
+
+  .overviewStatChange {
+    font-size: 0.6rem !important;
+  }
+
+  .categoryIconWrap {
+    width: 28px;
+    height: 28px;
+  }
+
+  .categoryIconWrap svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .categoryName {
+    font-size: 0.72rem !important;
+  }
+
+  .categoryCount {
+    font-size: 0.6rem !important;
+  }
+
+  .categoryPercentage {
+    font-size: 0.68rem !important;
+  }
+
+  .categoryProgressBar {
+    width: 40px;
+    height: 5px;
+  }
+
+  .topItemTitle {
+    font-size: 0.75rem !important;
+  }
+
+  .topItemCategory {
+    font-size: 0.62rem !important;
+  }
+
+  .topEarningsValue {
+    font-size: 0.78rem !important;
+  }
+
+  .topEarningsLabel {
+    font-size: 0.58rem !important;
+  }
+
+  .statLabel {
+    font-size: 0.65rem !important;
+  }
+
+  .statValue {
+    font-size: 1rem !important;
+  }
+
+  .statChange {
+    font-size: 0.62rem !important;
+  }
+}

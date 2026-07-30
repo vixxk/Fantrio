@@ -45,85 +45,87 @@ export const ContentPage = () => {
         <div className={styles.leftColumn}>
 
 
-          {/* Toolbar */}
-          <div className={styles.toolbar}>
-            <div className={styles.searchWrapper}>
-              <Search size={16} className={styles.searchIcon} />
-              <input
-                type="text"
-                placeholder="Search your content..."
-                className={styles.searchInput}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <div className={styles.toolbarRight}>
-              {/* Type Dropdown */}
-              <div className={styles.dropdownWrapper}>
-                <button
-                  className={styles.dropdownBtn}
-                  onClick={() => { setTypeDropdownOpen(!typeDropdownOpen); setSortDropdownOpen(false); }}
-                >
-                  {selectedType} <ChevronDown size={14} />
-                </button>
-                {typeDropdownOpen && (
-                  <div className={styles.dropdownMenu}>
-                    {contentTypes.map((type) => (
-                      <button
-                        key={type}
-                        className={`${styles.dropdownItem} ${selectedType === type ? styles.dropdownItemActive : ''}`}
-                        onClick={() => { setSelectedType(type); setTypeDropdownOpen(false); }}
-                      >
-                        {type}
-                      </button>
-                    ))}
-                  </div>
-                )}
+          <div className={styles.filterArea}>
+            {/* Toolbar */}
+            <div className={styles.toolbar}>
+              <div className={styles.searchWrapper}>
+                <Search size={16} className={styles.searchIcon} />
+                <input
+                  type="text"
+                  placeholder="Search your content..."
+                  className={styles.searchInput}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
+              <div className={styles.toolbarRight}>
+                {/* Type Dropdown */}
+                <div className={styles.dropdownWrapper}>
+                  <button
+                    className={styles.dropdownBtn}
+                    onClick={() => { setTypeDropdownOpen(!typeDropdownOpen); setSortDropdownOpen(false); }}
+                  >
+                    {selectedType} <ChevronDown size={14} />
+                  </button>
+                  {typeDropdownOpen && (
+                    <div className={styles.dropdownMenu}>
+                      {contentTypes.map((type) => (
+                        <button
+                          key={type}
+                          className={`${styles.dropdownItem} ${selectedType === type ? styles.dropdownItemActive : ''}`}
+                          onClick={() => { setSelectedType(type); setTypeDropdownOpen(false); }}
+                        >
+                          {type}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
 
-              {/* Sort Dropdown */}
-              <div className={styles.dropdownWrapper}>
-                <button
-                  className={styles.dropdownBtn}
-                  onClick={() => { setSortDropdownOpen(!sortDropdownOpen); setTypeDropdownOpen(false); }}
-                >
-                  {selectedSort} <ChevronDown size={14} />
+                {/* Sort Dropdown */}
+                <div className={styles.dropdownWrapper}>
+                  <button
+                    className={styles.dropdownBtn}
+                    onClick={() => { setSortDropdownOpen(!sortDropdownOpen); setTypeDropdownOpen(false); }}
+                  >
+                    {selectedSort} <ChevronDown size={14} />
+                  </button>
+                  {sortDropdownOpen && (
+                    <div className={styles.dropdownMenu}>
+                      {sortOptions.map((opt) => (
+                        <button
+                          key={opt}
+                          className={`${styles.dropdownItem} ${selectedSort === opt ? styles.dropdownItemActive : ''}`}
+                          onClick={() => { setSelectedSort(opt); setSortDropdownOpen(false); }}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <button className={styles.uploadImageBtn}>
+                  <Image size={14} /> Upload Image
                 </button>
-                {sortDropdownOpen && (
-                  <div className={styles.dropdownMenu}>
-                    {sortOptions.map((opt) => (
-                      <button
-                        key={opt}
-                        className={`${styles.dropdownItem} ${selectedSort === opt ? styles.dropdownItemActive : ''}`}
-                        onClick={() => { setSelectedSort(opt); setSortDropdownOpen(false); }}
-                      >
-                        {opt}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                <button className={styles.uploadVideoBtn}>
+                  <Video size={14} /> Upload Video
+                </button>
               </div>
-
-              <button className={styles.uploadImageBtn}>
-                <Image size={14} /> Upload Image
-              </button>
-              <button className={styles.uploadVideoBtn}>
-                <Video size={14} /> Upload Video
-              </button>
             </div>
-          </div>
 
-          {/* Filter Tabs - just above content */}
-          <div className={styles.tabsRow}>
-            {contentTabs.map((tab) => (
-              <button
-                key={tab}
-                className={`${styles.tab} ${activeTab === tab ? styles.activeTab : ''}`}
-                onClick={() => setActiveTab(tab)}
-              >
-                {tab}
-              </button>
-            ))}
+            {/* Filter Tabs */}
+            <div className={styles.tabsRow}>
+              {contentTabs.map((tab) => (
+                <button
+                  key={tab}
+                  className={`${styles.tab} ${activeTab === tab ? styles.activeTab : ''}`}
+                  onClick={() => setActiveTab(tab)}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Content Table */}

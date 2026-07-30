@@ -7,7 +7,7 @@
   border-right: 1px solid rgba(255, 255, 255, 0.04);
   background-color: #0a0a0a;
   color: #ffffff;
-  overflow: hidden;
+  overflow-y: auto;
   box-sizing: border-box;
 }
 

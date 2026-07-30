@@ -1,4 +1,4 @@
-/* ================= CONTENT PAGE ================= */
+/* ================= SUBSCRIBERS PAGE ================= */
 .pageContainer {
   width: 100%;
   min-height: 100%;
@@ -12,27 +12,48 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  margin-bottom: 1.5rem;
 }
 
 .headerLeft {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  width: 100%;
+  gap: 0.15rem;
 }
 
 .pageTitle {
   font-size: 1.75rem;
   font-weight: 800;
   color: #ffffff;
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 0.5rem 0;
   letter-spacing: -0.02em;
 }
 
 .pageSubtitle {
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.5);
-  margin: 0 0 1rem 0;
+  margin: 0;
+}
+
+.exportBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.65rem 1rem;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.exportBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 /* ================= MAIN GRID ================= */
@@ -51,27 +72,87 @@
 .rightSidebar {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-}
-
-.rightSidebar > div:first-child {
-  padding-top: 1.25rem;
-}
-
-.filterArea {
-  display: flex;
-  flex-direction: column;
   gap: 1.25rem;
 }
 
-@media (min-width: 769px) {
-  .filterArea .toolbar {
-    order: 1;
-  }
+.rightSidebar > div:first-child {
+  padding-top: 0;
+}
 
-  .filterArea .tabsRow {
-    order: 0;
-  }
+/* ================= STATS GRID ================= */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.statCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  transition: all 0.2s ease;
+  min-height: 80px;
+}
+
+.statCard:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.statIconWrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.statContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.statLabel {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
+.statValue {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.statChange {
+  font-size: 0.68rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.positive,
+.changePositive {
+  color: #10b981;
+}
+
+.changePeriod {
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 400;
+}
+
+.negative {
+  color: #ef4444;
 }
 
 /* ================= TABS ================= */
@@ -136,6 +217,7 @@
   font-size: 0.85rem;
   outline: none;
   transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
 .searchInput::placeholder {
@@ -153,6 +235,36 @@
   gap: 0.5rem;
 }
 
+.filterBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.6rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.filterBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.sortLabel {
+  display: inline;
+}
+
+@media (max-width: 768px) {
+  .sortLabel {
+    display: none;
+  }
+}
+
 .dropdownWrapper {
   position: relative;
 }
@@ -164,7 +276,7 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.8);
-  padding: 0.55rem 0.85rem;
+  padding: 0.6rem 0.85rem;
   border-radius: 8px;
   font-size: 0.82rem;
   font-weight: 500;
@@ -180,12 +292,12 @@
 .dropdownMenu {
   position: absolute;
   top: calc(100% + 4px);
-  left: 0;
-  background: #121212;
+  right: 0;
+  background: #0a0a0a;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 0.35rem;
-  min-width: 150px;
+  min-width: 160px;
   z-index: 100;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
@@ -214,50 +326,7 @@
   background: rgba(225, 0, 117, 0.1);
 }
 
-.uploadImageBtn {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  background: rgba(225, 0, 117, 0.1);
-  border: 1px solid rgba(225, 0, 117, 0.3);
-  color: #e10075;
-  padding: 0.55rem 0.85rem;
-  border-radius: 8px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.uploadImageBtn:hover {
-  background: rgba(225, 0, 117, 0.2);
-  border-color: #e10075;
-  transform: translateY(-1px);
-}
-
-.uploadVideoBtn {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  border: none;
-  color: #ffffff;
-  padding: 0.55rem 0.85rem;
-  border-radius: 8px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.uploadVideoBtn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-}
-
-/* ================= CONTENT TABLE ================= */
+/* ================= SUBSCRIBERS TABLE ================= */
 .tableCard {
   background: #121212;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -287,11 +356,6 @@
   white-space: nowrap;
 }
 
-.sortIcon {
-  vertical-align: middle;
-  margin-left: 0.25rem;
-}
-
 .tableRow {
   transition: background 0.2s ease;
 }
@@ -312,93 +376,99 @@
   border-bottom: none;
 }
 
-.contentInfo {
+.subscriberInfo {
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
-.contentThumb {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
+.subscriberAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   object-fit: cover;
 }
 
-.contentDetails {
+.subscriberDetails {
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
 }
 
-.contentTitle {
+.subscriberName {
   font-size: 0.88rem;
   font-weight: 600;
   color: #ffffff;
 }
 
-.contentMeta {
-  font-size: 0.75rem;
+.subscriberUsername {
+  font-size: 0.72rem;
   color: rgba(255, 255, 255, 0.4);
 }
 
-.typeIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.contentTable td:nth-child(2),
-.contentTable th:nth-child(2) {
-  text-align: center;
-  padding-left: 0.25rem;
-  padding-right: 0.25rem;
-}
-
-.statusCell {
-  display: flex;
+.planBadge {
+  display: inline-flex;
   flex-direction: column;
-  gap: 0.25rem;
+  align-items: center;
+  gap: 0.1rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  line-height: 1.3;
+}
+
+.planPriceLine {
+  font-size: 0.62rem;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.renewalDate {
+  display: block;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.renewalDays {
+  display: block;
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 0.15rem;
 }
 
 .statusBadge {
   display: inline-block;
-  padding: 0.2rem 0.6rem;
-  border-radius: 4px;
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
   font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  width: fit-content;
+  font-weight: 600;
 }
 
-.statusOpen {
+.statusActive {
   background: rgba(16, 185, 129, 0.15);
   color: #10b981;
 }
 
-.statusLocked {
-  background: rgba(225, 0, 117, 0.15);
-  color: #e10075;
+.statusExpiring {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
 }
 
-.priceTag {
-  font-size: 0.72rem;
-  color: #e10075;
+.statusExpired {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.statusCancelled {
+  background: rgba(107, 114, 128, 0.15);
+  color: #9ca3af;
+}
+
+.spentValue {
   font-weight: 600;
-}
-
-.dateTime {
-  font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.5);
-  white-space: pre-line;
-  line-height: 1.4;
-}
-
-.priceValue {
-  color: #e10075;
-  font-weight: 600;
-  font-size: 0.85rem;
+  color: #ffffff;
 }
 
 .actions {
@@ -472,56 +542,24 @@
   padding: 0 0.25rem;
 }
 
-.loadMore {
-  display: flex;
-  justify-content: center;
-  margin-top: 1rem;
-}
-
-.loadMoreBtn {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  background: transparent;
-  border: none;
-  color: #e10075;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-.loadMoreBtn:hover {
-  opacity: 0.8;
-}
-
 /* ================= RIGHT SIDEBAR CARDS ================= */
 .overviewCard,
 .breakdownCard,
-.topCard {
+.topCard,
+.insightsCard {
   background: #121212;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   padding: 1.25rem;
 }
 
-/* ================= CONTENT OVERVIEW ================= */
+/* ================= SUBSCRIBERS OVERVIEW ================= */
 .overviewHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-top: 1rem;
   margin-bottom: 1rem;
-}
-
-.overviewHeader .dropdownBtn {
-  border: none;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 0.35rem 0.65rem;
-  border-radius: 6px;
-}
-
-.overviewHeader .dropdownBtn:hover {
-  background: rgba(255, 255, 255, 0.08);
 }
 
 .overviewTitle {
@@ -531,78 +569,53 @@
   margin: 0;
 }
 
-.periodBtn {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.7);
-  padding: 0.35rem 0.65rem;
-  border-radius: 6px;
-  font-size: 0.72rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.growthSection {
+  margin-bottom: 1rem;
 }
 
-.periodBtn:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.overviewGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-}
-
-.overviewStat {
-  padding: 0.75rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.overviewStat:nth-child(odd) {
-  padding-right: 0.75rem;
-}
-
-.overviewStat:nth-child(even) {
-  padding-left: 0.75rem;
-}
-
-.overviewStatLabel {
-  display: block;
+.growthLabel {
   font-size: 0.72rem;
   color: rgba(255, 255, 255, 0.4);
-  margin-bottom: 0.35rem;
 }
 
-.overviewStatRow {
+.growthRow {
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
+  margin-top: 0.35rem;
 }
 
-.overviewStatValue {
-  font-size: 1.35rem;
-  font-weight: 700;
+.growthValue {
+  font-size: 1.75rem;
+  font-weight: 800;
   color: #ffffff;
   line-height: 1;
 }
 
-.overviewStatChange {
-  font-size: 0.68rem;
+.growthChange {
+  font-size: 0.75rem;
   font-weight: 600;
 }
 
-.overviewStatChange.positive {
-  color: #10b981;
+.miniChart {
+  margin-top: 0.5rem;
 }
 
-.overviewStatChange.negative {
-  color: #ef4444;
+.chartSvg {
+  width: 100%;
+  height: 60px;
 }
 
-/* ================= CONTENT BREAKDOWN ================= */
+.chartLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 0.5rem;
+  padding: 0 1.25rem;
+}
+
+/* ================= PLAN BREAKDOWN ================= */
 .breakdownTitle {
   font-size: 0.88rem;
   font-weight: 700;
@@ -680,12 +693,33 @@
   color: rgba(255, 255, 255, 0.4);
 }
 
-/* ================= TOP PERFORMING ================= */
+/* ================= TOP SUBSCRIBERS ================= */
+.topHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
 .topTitle {
   font-size: 0.88rem;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.8);
-  margin: 0 0 1rem 0;
+  margin: 0;
+}
+
+.viewAllLink {
+  background: transparent;
+  border: none;
+  color: #e10075;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.viewAllLink:hover {
+  opacity: 0.8;
 }
 
 .topList {
@@ -697,66 +731,99 @@
 .topItem {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.65rem;
 }
 
-.topThumb {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
+.topRank {
+  width: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.topAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   object-fit: cover;
-  flex-shrink: 0;
 }
 
 .topInfo {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.1rem;
 }
 
-.topItemTitle {
-  font-size: 0.85rem;
+.topItemName {
+  font-size: 0.82rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.8);
 }
 
-.topItemType {
+.topItemUsername {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.topSpent {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* ================= ENGAGEMENT INSIGHTS ================= */
+.insightsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.insightsTitle {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+.insightsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.insightItem {
+  padding: 0.65rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.insightItem:last-child {
+  border-bottom: none;
+}
+
+.insightLabel {
+  display: block;
   font-size: 0.72rem;
   color: rgba(255, 255, 255, 0.4);
-}  .topStats {
-    display: flex;
-    gap: 0.5rem;
-    flex-shrink: 0;
-  }
+  margin-bottom: 0.35rem;
+}
 
-  .topStat {
-    display: flex;
-    align-items: center;
-    gap: 0.2rem;
-    font-size: 0.65rem;
-    color: rgba(255, 255, 255, 0.5);
-    white-space: nowrap;
-  }  .viewAnalyticsBtn {
-    width: 100%;
-    margin-top: 1rem;
-    padding: 0.75rem;
-    background: rgba(225, 0, 117, 0.1);
-    border: 1px solid rgba(225, 0, 117, 0.3);
-    border-radius: 10px;
-    color: #e10075;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+.insightRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
 
-.viewAnalyticsBtn:hover {
-  background: rgba(225, 0, 117, 0.2);
-  border-color: #e10075;
+.insightValue {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.insightChange {
+  font-size: 0.68rem;
+  font-weight: 600;
 }
 
 /* ================= LIGHT THEME OVERRIDES ================= */
@@ -772,28 +839,46 @@
   color: rgba(26, 22, 37, 0.6);
 }
 
+.light .exportBtn {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .exportBtn:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.light .statCard,
+.light .tableCard,
 .light .overviewCard,
 .light .breakdownCard,
 .light .topCard,
-.light .tableCard {
+.light .insightsCard {
   background: #ffffff;
   border-color: rgba(0, 0, 0, 0.08);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 }
 
+.light .statCard:hover,
 .light .overviewCard:hover,
 .light .breakdownCard:hover,
-.light .topCard:hover {
+.light .topCard:hover,
+.light .insightsCard:hover {
   border-color: rgba(225, 0, 117, 0.2);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
 }
 
-.light .overviewHeader .dropdownBtn {
-  background: rgba(0, 0, 0, 0.04);
+.light .statLabel {
+  color: rgba(26, 22, 37, 0.5);
 }
 
-.light .overviewHeader .dropdownBtn:hover {
-  background: rgba(0, 0, 0, 0.06);
+.light .statValue {
+  color: #1a1625;
+}
+
+.light .changePeriod {
+  color: rgba(26, 22, 37, 0.4);
 }
 
 .light .tab {
@@ -828,15 +913,15 @@
   color: rgba(26, 22, 37, 0.4);
 }
 
-.light .dropdownBtn,
-.light .periodBtn {
+.light .filterBtn,
+.light .dropdownBtn {
   background: rgba(0, 0, 0, 0.04);
   border-color: rgba(0, 0, 0, 0.1);
   color: rgba(26, 22, 37, 0.8);
 }
 
-.light .dropdownBtn:hover,
-.light .periodBtn:hover {
+.light .filterBtn:hover,
+.light .dropdownBtn:hover {
   background: rgba(0, 0, 0, 0.06);
 }
 
@@ -855,16 +940,6 @@
   color: #1a1625;
 }
 
-.light .uploadImageBtn {
-  background: rgba(225, 0, 117, 0.08);
-  border-color: rgba(225, 0, 117, 0.25);
-  color: #e10075;
-}
-
-.light .uploadImageBtn:hover {
-  background: rgba(225, 0, 117, 0.15);
-}
-
 .light .th {
   color: rgba(26, 22, 37, 0.4);
   border-bottom-color: rgba(0, 0, 0, 0.06);
@@ -879,20 +954,24 @@
   border-bottom-color: rgba(0, 0, 0, 0.04);
 }
 
-.light .contentTitle {
+.light .subscriberName {
   color: #1a1625;
 }
 
-.light .contentMeta {
+.light .subscriberUsername {
   color: rgba(26, 22, 37, 0.5);
 }
 
-.light .typeIcon {
-  color: rgba(26, 22, 37, 0.5);
+.light .renewalDate {
+  color: rgba(26, 22, 37, 0.7);
 }
 
-.light .dateTime {
-  color: rgba(26, 22, 37, 0.5);
+.light .renewalDays {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .spentValue {
+  color: #1a1625;
 }
 
 .light .actionBtn {
@@ -914,25 +993,26 @@
   color: #1a1625;
 }
 
-.light .overviewTitle,
-.light .breakdownTitle,
-.light .topTitle {
-  color: rgba(26, 22, 37, 0.8);
-}
-
-.light .overviewStatLabel {
+.light .pageDots {
   color: rgba(26, 22, 37, 0.4);
 }
 
-.light .overviewStatValue {
+.light .overviewTitle,
+.light .breakdownTitle,
+.light .topTitle,
+.light .insightsTitle {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .growthLabel {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .growthValue {
   color: #1a1625;
 }
 
-.light .legendLabel {
-  color: rgba(26, 22, 37, 0.6);
-}
-
-.light .legendValue {
+.light .chartLabels span {
   color: rgba(26, 22, 37, 0.4);
 }
 
@@ -944,16 +1024,41 @@
   fill: rgba(26, 22, 37, 0.5);
 }
 
-.light .topItemTitle {
-  color: rgba(26, 22, 37, 0.8);
+.light .legendLabel {
+  color: rgba(26, 22, 37, 0.6);
 }
 
-.light .topItemType {
+.light .legendValue {
   color: rgba(26, 22, 37, 0.4);
 }
 
-.light .topStat {
-  color: rgba(26, 22, 37, 0.5);
+.light .topItemName {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .topItemUsername {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .topSpent {
+  color: #1a1625;
+}
+
+.light .insightLabel {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .insightValue {
+  color: #1a1625;
+}
+
+.light .insightItem {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .legendItem {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.06);
 }
 
 /* ================= MOBILE CARD VIEW ================= */
@@ -968,14 +1073,14 @@
 .mobileCards {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.5rem;
 }
 
 .mobileCard {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
-  padding: 0.6rem;
+  padding: 0.7rem;
   transition: background 0.2s ease;
 }
 
@@ -985,21 +1090,13 @@
 
 .mobileCardTop {
   display: flex;
-  gap: 0.4rem;
+  gap: 0.65rem;
 }
 
-.mobileCardThumbCol {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.3rem;
-  flex-shrink: 0;
-}
-
-.mobileCardThumb {
+.mobileCardImage {
   width: 56px;
   height: 56px;
-  border-radius: 10px;
+  border-radius: 8px;
   object-fit: cover;
   flex-shrink: 0;
 }
@@ -1008,68 +1105,60 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
+  gap: 0.15rem;
   min-width: 0;
 }
 
 .mobileCardTitleRow {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 0.35rem;
+  gap: 0.5rem;
 }
 
-.mobileCardTitle {
-  font-size: 0.88rem;
+.mobileCardName {
+  font-size: 0.85rem;
   font-weight: 600;
   color: #ffffff;
+  line-height: 1.3;
+}
+
+.mobileCardUsername {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.3;
+}
+
+.mobileCardFooter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.1rem;
+}
+
+.mobileRenewal {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  flex: 1;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.mobileCardActions {
+.mobilePriceTag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mobileActions {
   display: flex;
-  align-items: center;
-  gap: 0.15rem;
-  flex-shrink: 0;
+  gap: 0.25rem;
 }
 
-.mobileCardActions .actionBtn {
-  color: rgba(255, 255, 255, 0.3);
-  padding: 0.25rem;
-}
-
-.mobileCardMeta {
-  font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.mobileCardStatsRow {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-top: 0.15rem;
-}
-
-.mobileStatsRight {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  flex-wrap: wrap;
-}
-
-.mobileStatItem {
-  display: flex;
-  align-items: center;
-  gap: 0.2rem;
-  font-size: 0.68rem;
-  color: rgba(255, 255, 255, 0.45);
-}
-
-.mobileStatDate {
-  font-size: 0.65rem;
-  color: rgba(255, 255, 255, 0.4);
+.mobileActions .actionBtn {
+  padding: 0.3rem;
 }
 
 .light .mobileCard {
@@ -1081,34 +1170,20 @@
   background: rgba(0, 0, 0, 0.04);
 }
 
-.light .mobileCard:last-child {
-  border-bottom-color: rgba(0, 0, 0, 0.06);
-}
-
-.light .mobileCardTitle {
+.light .mobileCardName {
   color: #1a1625;
 }
 
-.light .mobileCardMeta {
+.light .mobileCardUsername {
   color: rgba(26, 22, 37, 0.5);
 }
 
-.light .mobileStatItem {
-  color: rgba(26, 22, 37, 0.5);
-}
-
-.light .mobileStatDate {
+.light .mobileRenewal {
   color: rgba(26, 22, 37, 0.4);
 }
 
-
-
-.light .mobileCardActions .actionBtn {
-  color: rgba(26, 22, 37, 0.3);
-}
-
-.light .priceValue {
-  color: #e10075;
+.light .mobileActions .actionBtn {
+  color: rgba(26, 22, 37, 0.4);
 }
 
 /* ================= RESPONSIVE DESIGN ================= */
@@ -1118,33 +1193,33 @@
   }
 
   .rightSidebar {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
   }
 
-  .overviewCard,
-  .breakdownCard,
-  .topCard {
-    flex: 1;
-    min-width: 280px;
-  }
+  .overviewCard { grid-column: 1 / -1; }
+  .breakdownCard { grid-column: 1 / 2; }
+  .insightsCard { grid-column: 2 / 3; }
+  .topCard { grid-column: 1 / -1; }
 }
 
+/* ================= RESPONSIVE ================= */
 @media (max-width: 768px) {
   .pageContainer {
-    padding: 0 0 2rem 0 !important;
+    padding: 0 0 5rem 0 !important;
     overflow-x: clip !important;
-    max-width: 100vw !important;
   }
 
   .pageHeader {
-    margin-bottom: 0 !important;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1rem !important;
   }
 
   .pageTitle {
     font-size: 1.35rem !important;
-    margin-bottom: 0.5rem !important;
+    margin-bottom: 0.25rem !important;
   }
 
   .mainGrid {
@@ -1158,43 +1233,55 @@
   }
 
   .rightSidebar {
-    flex-direction: row !important;
-    flex-wrap: wrap !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
     gap: 0.75rem !important;
     overflow: hidden !important;
     min-width: 0 !important;
   }
 
-  .overviewCard {
-    flex: 0 1 calc(50% - 0.375rem) !important;
-    min-width: 0 !important;
-    order: 2;
+  .overviewCard { grid-column: 1 / -1 !important; }
+  .breakdownCard { grid-column: 1 / 2 !important; }
+  .insightsCard { grid-column: 2 / 3 !important; }
+  .topCard { grid-column: 1 / -1 !important; }
+
+  .statsGrid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
   }
 
-  .breakdownCard {
-    flex: 0 1 calc(50% - 0.375rem) !important;
-    min-width: 0 !important;
-    order: 1;
-  }
-
-  .topCard {
-    flex: 1 1 100% !important;
-    min-width: 0 !important;
-    order: 3;
-  }
-
-  .rightSidebar > div:first-child {
-    padding-top: 1.25rem !important;
-  }
-
-  .overviewCard,
-  .breakdownCard,
-  .topCard,
-  .tableCard {
-    padding: 1rem !important;
+  .statCard {
+    padding: 0.875rem !important;
     border-radius: 12px !important;
-    overflow: hidden !important;
-    min-width: 0 !important;
+  }
+
+  .statCard {
+    padding: 0.75rem !important;
+    gap: 0.6rem !important;
+  }
+
+  .statIconWrap {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .statLabel {
+    font-size: 0.62rem !important;
+  }
+
+  .statContent {
+    overflow: hidden;
+  }
+
+  .statValue {
+    font-size: 1.05rem !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .statChange {
+    font-size: 0.58rem !important;
   }
 
   .tabsRow {
@@ -1225,44 +1312,49 @@
   .searchWrapper {
     width: 100% !important;
     min-width: 0 !important;
-    max-width: 100% !important;
   }
 
   .searchInput {
-    font-size: 0.75rem !important;
-    padding: 0.5rem 0.5rem 0.5rem 2rem !important;
+    font-size: 0.78rem !important;
+    padding: 0.55rem 0.55rem 0.55rem 2rem !important;
   }
 
   .searchIcon {
-    left: 0.6rem !important;
+    left: 0.65rem !important;
   }
 
   .toolbarRight {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     width: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.35rem;
   }
 
-  .uploadImageBtn,
-  .uploadVideoBtn,
+  .filterBtn,
   .dropdownWrapper {
-    width: 100%;
+    flex: 1;
     min-width: 0;
   }
 
-  .uploadImageBtn,
-  .uploadVideoBtn {
-    justify-content: center;
-    font-size: 0.72rem !important;
-    padding: 0.45rem 0.5rem !important;
-  }
-
+  .filterBtn,
   .dropdownBtn {
     width: 100%;
     justify-content: center;
-    font-size: 0.72rem !important;
-    padding: 0.45rem 0.5rem !important;
+    align-items: center;
+    gap: 0.3rem;
+    background: #0a0a0a;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.7);
+    padding: 0.45rem 0.5rem;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: 500;
+  }
+
+  .filterBtn:hover,
+  .dropdownBtn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.25);
   }
 
   .hideMobile {
@@ -1274,100 +1366,8 @@
   }
 
   .pagination {
-    display: none !important;
-  }
-
-  .overviewGrid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .overviewStatLabel,
-  .overviewStatChange {
-    font-size: 0.7rem;
-    white-space: nowrap;
-  }
-
-  .overviewStatValue {
-    font-size: 1.1rem;
-    white-space: nowrap;
-  }
-
-  .overviewStatRow {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.1rem;
-  }
-
-  .overviewStatChange {
-    font-size: 0.55rem;
-  }
-
-  .breakdownBody {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .breakdownTitle {
-    text-align: center;
-    margin-bottom: 0.75rem !important;
-  }
-
-  .donutContainer {
-    flex: 0 0 100px !important;
-  }
-
-  .donutChart {
-    width: 100px !important;
-    height: 100px !important;
-  }
-
-  .breakdownLegend {
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-
-  .legendItem {
-    gap: 0.35rem;
-  }
-
-  .topThumb {
-    width: 40px;
-    height: 40px;
-  }
-
-  .topItem {
-    gap: 0.6rem;
-  }
-
-  .topItemTitle {
-    font-size: 0.72rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    min-width: 0;
-  }
-
-  .topInfo {
-    min-width: 0 !important;
-    overflow: hidden !important;
-  }
-
-  .topStats {
-    gap: 0.35rem;
-    flex-shrink: 0;
-  }
-
-  .topStat {
-    font-size: 0.6rem;
-    white-space: nowrap;
-  }
-
-  .pagination {
     padding: 0.75rem;
+    gap: 0.25rem;
   }
 
   .pageBtn {
@@ -1376,26 +1376,195 @@
     font-size: 0.75rem;
   }
 
-  .mobileCardStatsRow {
-    margin-top: auto;
+  .rightSidebar > div:first-child {
+    padding-top: 0 !important;
   }
 
-  .mobileCardMeta {
-    margin-top: 0.15rem;
+  .overviewCard,
+  .breakdownCard,
+  .topCard,
+  .insightsCard {
+    padding: 1rem !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    min-width: 0 !important;
+  }
+
+  .overviewTitle,
+  .insightsTitle {
+    font-size: 0.82rem !important;
+  }
+
+  .breakdownTitle {
+    text-align: center;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .topTitle {
+    font-size: 0.82rem !important;
+  }
+
+  .growthValue {
+    font-size: 1.5rem !important;
+  }
+
+  .chartSvg {
+    height: 50px;
+  }
+
+  .chartLabels span {
+    font-size: 0.55rem !important;
+  }
+
+  .breakdownBody {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .donutContainer {
+    flex: none;
+    margin-bottom: 0;
+  }
+
+  .donutChart {
+    width: 100px !important;
+    height: 100px !important;
+  }
+
+  .breakdownLegend {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    width: 100%;
+  }
+
+  .legendItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.5rem 0.65rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  .legendInfo {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+  }
+
+  .legendLabel {
+    font-size: 0.78rem;
+  }
+
+  .legendValue {
+    font-size: 0.72rem;
+    white-space: nowrap;
+  }
+
+  .insightsCard {
+    padding: 1rem !important;
+  }
+
+  .insightsHeader {
+    margin-bottom: 0.75rem;
+  }
+
+  .insightsTitle {
+    font-size: 0.82rem !important;
+  }
+
+  .insightsList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .insightItem {
+    padding: 0.6rem 0.65rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-bottom: none;
+  }
+
+  .insightItem:last-child {
+    background: rgba(225, 0, 117, 0.06);
+    border-color: rgba(225, 0, 117, 0.15);
+  }
+
+  .insightLabel {
+    font-size: 0.68rem !important;
+    margin-bottom: 0.25rem;
+  }
+
+  .insightValue {
+    font-size: 0.95rem !important;
+  }
+
+  .insightChange {
+    font-size: 0.6rem !important;
+  }
+
+  .topAvatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .topItem {
+    gap: 0.5rem;
+  }
+
+  .topItemName {
+    font-size: 0.78rem !important;
+  }
+
+  .topSpent {
+    font-size: 0.78rem !important;
   }
 }
 
 @media (max-width: 480px) {
-  .pageContainer {
-    padding: 0 0 1.5rem 0 !important;
-  }
-
   .pageTitle {
     font-size: 1.15rem !important;
   }
 
-  .tabsRow {
-    gap: 0.15rem !important;
+  .exportBtn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.6rem !important;
+    font-size: 0.78rem !important;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  .statCard {
+    padding: 0.6rem !important;
+    gap: 0.5rem !important;
+  }
+
+  .statIconWrap {
+    width: 30px !important;
+    height: 30px !important;
+  }
+
+  .statLabel {
+    font-size: 0.65rem !important;
+  }
+
+  .statValue {
+    font-size: 0.95rem !important;
+  }
+
+  .statChange {
+    font-size: 0.55rem !important;
   }
 
   .tab {
@@ -1403,29 +1572,51 @@
     font-size: 0.65rem !important;
   }
 
-  .dropdownBtn {
-    padding: 0.45rem 0.65rem !important;
-    font-size: 0.72rem !important;
+  .toolbarRight {
+    gap: 0.4rem;
   }
 
-  .uploadImageBtn,
-  .uploadVideoBtn {
-    padding: 0.45rem 0.5rem !important;
+  .filterBtn,
+  .dropdownBtn {
+    padding: 0.35rem 0.4rem;
+    font-size: 0.65rem;
+  }
+
+  .mobileCard {
+    padding: 0.6rem !important;
+  }
+
+  .mobileCardTop {
+    gap: 0.5rem;
+  }
+
+  .mobileCardImage {
+    width: 48px;
+    height: 48px;
+  }
+
+  .mobileCardName {
+    font-size: 0.78rem !important;
+  }
+
+  .mobileCardUsername {
     font-size: 0.65rem !important;
-    justify-content: center;
-    min-width: 0;
+  }
+
+  .mobileRenewal {
+    font-size: 0.65rem !important;
+  }
+
+  .mobilePriceTag {
+    font-size: 0.65rem !important;
   }
 
   .overviewCard,
   .breakdownCard,
   .topCard,
-  .tableCard {
+  .insightsCard {
     padding: 0.75rem !important;
     border-radius: 10px !important;
-  }
-
-  .overviewHeader {
-    margin-bottom: 0.75rem;
   }
 
   .overviewTitle,
@@ -1434,97 +1625,21 @@
     font-size: 0.82rem !important;
   }
 
-  .overviewStat {
-    padding: 0.5rem 0;
+  .breakdownTitle {
+    text-align: center;
+    margin-bottom: 0.5rem !important;
   }
 
-  .overviewStat:nth-child(odd) {
-    padding-right: 0.5rem;
+  .breakdownBody {
+    gap: 0.65rem;
   }
 
-  .overviewStat:nth-child(even) {
-    padding-left: 0.5rem;
+  .legendItem {
+    gap: 0.3rem;
   }
 
-  .overviewStatLabel,
-  .overviewStatChange {
-    font-size: 0.65rem;
-    white-space: nowrap;
-  }
-
-  .overviewStatValue {
-    font-size: 1rem;
-    white-space: nowrap;
-  }
-
-  .overviewStatRow {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.08rem;
-  }
-
-  .overviewStatChange {
-    font-size: 0.5rem;
-  }
-
-  .mobileCard {
-    padding: 0.5rem;
-  }
-
-  .mobileCardThumb {
-    width: 48px;
-    height: 48px;
-    border-radius: 8px;
-  }
-
-  .mobileCardThumbCol {
-    gap: 0.2rem;
-  }
-
-  .mobileCardTitle {
-    font-size: 0.82rem;
-  }
-
-  .mobileCardMeta {
-    font-size: 0.68rem;
-  }
-
-  .mobileStatItem {
-    font-size: 0.65rem;
-  }
-
-  .mobileStatDate {
-    font-size: 0.62rem;
-  }
-
-  .topThumb {
-    width: 36px;
-    height: 36px;
-  }
-
-  .topItem {
-    gap: 0.5rem;
-  }
-
-  .topItemTitle {
-    font-size: 0.72rem;
-  }
-
-  .topItemType {
-    font-size: 0.65rem;
-  }
-
-  .topStats {
-    gap: 0.4rem;
-  }
-
-  .topStat {
-    font-size: 0.6rem;
-  }
-
-  .viewAnalyticsBtn {
-    padding: 0.45rem;
-    font-size: 0.7rem;
+  .growthValue {
+    font-size: 1.35rem !important;
   }
 
   .donutContainer {
@@ -1536,19 +1651,6 @@
     height: 80px !important;
   }
 
-  .breakdownBody {
-    gap: 0.65rem;
-  }
-
-  .breakdownTitle {
-    text-align: center;
-    margin-bottom: 0.5rem !important;
-  }
-
-  .legendItem {
-    gap: 0.3rem;
-  }
-
   .legendLabel {
     font-size: 0.68rem;
   }
@@ -1557,8 +1659,7 @@
     font-size: 0.6rem;
   }
 
-  .periodBtn {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.65rem;
+  .insightValue {
+    font-size: 1rem !important;
   }
 }

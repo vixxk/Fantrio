@@ -536,7 +536,7 @@ export const LiveCallsPage = () => {
             <div className={styles.earningsHeader}>
               <div className={styles.earningsTitleRow}>
                 <div className={styles.earningsIconWrap}>
-                  <Wallet size={14} className={styles.earningsIcon} />
+                  <Wallet size={20} className={styles.earningsIcon} />
                 </div>
                 <h3 className={styles.earningsTitle}>Today's Call Earnings</h3>
               </div>
@@ -570,83 +570,7 @@ export const LiveCallsPage = () => {
             </button>
           </section>
 
-          {/* Mobile separate audio earnings card */}
-          <section className={`${styles.sidebarCard} ${styles.mobileAudioEarningsCard}`}>
-            <div className={styles.earningsHeader}>
-              <div className={styles.earningsTitleRow}>
-                <div className={styles.earningsIconWrap}>
-                  <Phone size={14} className={styles.earningsIcon} style={{ color: '#10b981' }} />
-                </div>
-                <h3 className={styles.earningsTitle}>Today's Audio Call Earnings</h3>
-              </div>
-              <PeriodDropdown variant="text" />
-            </div>
-            <div className={styles.earningsAmount}>$185.40</div>
-            <div className={styles.earningsChange}>
-              <span className={styles.earningsUp}>↑ 18%</span>
-              <span className={styles.changeLabel}>vs last yesterday</span>
-            </div>
-            <div className={styles.earningsStats}>
-              <div className={styles.earningsStat}>
-                <span className={styles.earningsStatLabel}>Audio Minutes</span>
-                <span className={styles.earningsStatValue}>370 min</span>
-              </div>
-              <div className={styles.earningsStat}>
-                <span className={styles.earningsStatLabel}>Completed Calls</span>
-                <span className={styles.earningsStatValue}>42</span>
-              </div>
-              <div className={styles.earningsStat}>
-                <span className={styles.earningsStatLabel}>Missed Calls</span>
-                <span className={styles.earningsStatValue}>3</span>
-              </div>
-              <div className={styles.earningsStat}>
-                <span className={styles.earningsStatLabel}>Estimated Payout</span>
-                <span className={styles.earningsStatValue}>$148.00</span>
-              </div>
-            </div>
-            <button className={styles.viewEarningsBtn} type="button" onClick={() => navigateTo('/creators/dashboard')}>
-              View Earnings
-            </button>
-          </section>
 
-          {/* Mobile separate video earnings card */}
-          <section className={`${styles.sidebarCard} ${styles.mobileVideoEarningsCard}`}>
-            <div className={styles.earningsHeader}>
-              <div className={styles.earningsTitleRow}>
-                <div className={styles.earningsIconWrap}>
-                  <Video size={14} className={styles.earningsIcon} style={{ color: '#3b82f6' }} />
-                </div>
-                <h3 className={styles.earningsTitle}>Today's Video Call Earnings</h3>
-              </div>
-              <PeriodDropdown variant="text" />
-            </div>
-            <div className={styles.earningsAmount}>$227.40</div>
-            <div className={styles.earningsChange}>
-              <span className={styles.earningsUp}>↑ 32%</span>
-              <span className={styles.changeLabel}>vs last yesterday</span>
-            </div>
-            <div className={styles.earningsStats}>
-              <div className={styles.earningsStat}>
-                <span className={styles.earningsStatLabel}>Video Minutes</span>
-                <span className={styles.earningsStatValue}>880 min</span>
-              </div>
-              <div className={styles.earningsStat}>
-                <span className={styles.earningsStatLabel}>Completed Calls</span>
-                <span className={styles.earningsStatValue}>44</span>
-              </div>
-              <div className={styles.earningsStat}>
-                <span className={styles.earningsStatLabel}>Missed Calls</span>
-                <span className={styles.earningsStatValue}>2</span>
-              </div>
-              <div className={styles.earningsStat}>
-                <span className={styles.earningsStatLabel}>Estimated Payout</span>
-                <span className={styles.earningsStatValue}>$182.24</span>
-              </div>
-            </div>
-            <button className={styles.viewEarningsBtn} type="button" onClick={() => navigateTo('/creators/dashboard')}>
-              View Earnings
-            </button>
-          </section>
 
           <section className={`${styles.sidebarCard} ${styles.callPerformanceCard}`}>
             <div className={styles.sidebarHeader}>

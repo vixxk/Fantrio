@@ -1129,139 +1129,464 @@
 
 @media (max-width: 768px) {
   .pageContainer {
-    padding: 0 0 2rem 0 !important;
+    padding: 0 0 5rem 0 !important;
     overflow-x: hidden !important;
   }
 
   .mainGrid {
-    gap: 1rem !important;
+    gap: 0.75rem !important;
     display: flex;
     flex-direction: column;
   }
 
+  /* Main content first, sidebar at bottom */
   .leftColumn {
-    order: 2;
+    order: 1;
   }
 
   .rightSidebar {
-    order: 1;
-    grid-template-columns: 1fr !important;
-    gap: 0.75rem !important;
+    order: 2;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
   }
 
+  /* Compact sections */
   .settingsSection {
-    padding: 1rem !important;
+    padding: 0.875rem !important;
     border-radius: 12px !important;
   }
 
+  /* Section header - row layout */
   .sectionHeader {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .changePasswordBtn {
-    width: 100%;
-    text-align: center;
-  }
-
-  .profileContent {
-    flex-direction: column;
-    align-items: center;
-    gap: 1.25rem;
-  }
-
-  .avatarSection {
     flex-direction: row;
-    gap: 1rem;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.875rem;
   }
 
-  .avatarWrapper {
-    width: 70px;
-    height: 70px;
-  }
-
-  .profileNameInfo {
-    align-items: flex-start;
-  }
-
-  .formRow {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-
-  .payoutContent {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .bottomGrid {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-
-  .bottomGrid .settingsSection {
-    padding: 1rem !important;
+  .sectionTitleRow {
+    flex: 1;
   }
 
   .sectionTitle {
-    font-size: 0.92rem !important;
+    font-size: 0.875rem !important;
   }
 
-  .actionButtons {
+  .sectionSubtitle {
+    font-size: 0.6875rem !important;
+  }
+
+  /* Compact button */
+  .changePasswordBtn {
+    padding: 0.375rem 0.75rem !important;
+    font-size: 0.75rem !important;
+    white-space: nowrap;
+  }
+
+  /* Profile section */
+  .profileContent {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.875rem;
+  }
+
+  .avatarSection {
     flex-direction: column;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .avatarWrapper {
+    width: 52px;
+    height: 52px;
+  }
+
+  .avatar {
+    border-width: 2px;
+  }
+
+  .cameraBtn {
+    width: 20px;
+    height: 20px;
+  }
+
+  .cameraBtn svg {
+    width: 10px;
+    height: 10px;
+  }
+
+  .profileNameInfo {
+    align-items: center;
+    gap: 0.125rem;
+  }
+
+  .profileName {
+    font-size: 0.75rem !important;
+  }
+
+  .profileUsername,
+  .profileSince {
+    font-size: 0.625rem !important;
+  }
+
+  /* Compact form fields */
+  .formFields {
+    flex: 1;
+    gap: 0.5rem;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .formGroup {
+    gap: 0.25rem;
+  }
+
+  .formLabel {
+    font-size: 0.625rem !important;
+  }
+
+  .formInput,
+  .formTextarea,
+  .formSelect {
+    padding: 0.5rem 0.625rem !important;
+    font-size: 0.8125rem !important;
+    border-radius: 8px !important;
+  }
+
+  .formTextarea {
+    min-height: 52px;
+  }
+
+  .charCount {
+    font-size: 0.5625rem !important;
+  }
+
+  /* Compact payout section */
+  .payoutContent {
+    grid-template-columns: 1fr;
     gap: 0.75rem;
+  }
+
+  .connectedAccount {
+    padding: 0.75rem !important;
+    border-radius: 10px !important;
+  }
+
+  .bankIcon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .bankIcon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .bankName {
+    font-size: 0.8125rem !important;
+  }
+
+  .accountLabel,
+  .accountValue {
+    font-size: 0.6875rem !important;
+  }
+
+  .updatePayoutBtn {
+    padding: 0.5rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .inputSuffix {
+    font-size: 0.6875rem !important;
+    padding: 0 0.5rem !important;
+  }
+
+  /* Compact bottom grid */
+  .bottomGrid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .bottomGrid .settingsSection {
+    padding: 0.75rem !important;
+  }
+
+  /* Compact settings list */
+  .settingItem {
+    padding: 0.625rem 0 !important;
+  }
+
+  .settingLabel {
+    font-size: 0.75rem !important;
+  }
+
+  /* Compact toggle */
+  .toggleSwitch {
+    width: 36px;
+    height: 20px;
+  }
+
+  .toggleSlider::before {
+    width: 14px;
+    height: 14px;
+  }
+
+  .toggleSwitch input:checked + .toggleSlider::before {
+    transform: translateX(16px);
+  }
+
+  /* Compact action buttons */
+  .actionButtons {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 0.5rem;
+    padding: 0.25rem 0 !important;
   }
 
   .saveBtn,
   .cancelBtn {
-    flex: none;
-    width: 100%;
+    padding: 0.625rem !important;
+    font-size: 0.8125rem !important;
+    border-radius: 10px !important;
   }
 
-  .verificationSteps {
-    flex-direction: column;
+  /* Compact sidebar cards */
+  .sidebarCard {
+    padding: 0.75rem !important;
+    border-radius: 10px !important;
+  }
+
+  .sidebarCardTitle {
+    font-size: 0.75rem !important;
+  }
+
+  .sidebarCardHeader {
+    margin-bottom: 0.375rem !important;
+  }
+
+  .sidebarCardDescription {
+    font-size: 0.625rem !important;
+    margin-bottom: 0.5rem;
+  }
+
+  .statusBadgeActive {
+    font-size: 0.625rem !important;
+    padding: 0.125rem 0.5rem !important;
+  }
+
+  .statusGrid {
     gap: 0.5rem;
   }
 
+  .statusItemLabel {
+    font-size: 0.5625rem !important;
+  }
+
+  .statusItemValue {
+    font-size: 0.6875rem !important;
+  }
+
+  /* Compact verification steps */
+  .verificationSteps {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0;
+    padding: 0.5rem !important;
+    margin: 0.5rem 0;
+  }
+
+  .verificationStep {
+    flex: 1;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .stepIcon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .stepLabel {
+    font-size: 0.5rem !important;
+  }
+
   .stepConnector {
-    width: 2px;
-    height: 15px;
-    margin: 0;
+    flex: 0 0 auto;
+    width: 20px;
+    height: 2px;
+    margin: 10px 4px 0 4px;
+  }
+
+  .viewDetailsBtn {
+    padding: 0.4375rem !important;
+    font-size: 0.6875rem !important;
+    margin-top: 0.5rem;
+  }
+
+  /* Compact security score */
+  .securityScoreHeader {
+    margin-bottom: 0.75rem;
   }
 
   .securityScoreContent {
-    flex-direction: column;
-    text-align: center;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
   }
 
-  .scoreItems {
-    text-align: left;
+  .scoreCircle {
+    width: 56px;
+    height: 56px;
+  }
+
+  .scoreValue {
+    font-size: 12px !important;
+  }
+
+  .scoreStrength {
+    font-size: 0.75rem !important;
+  }
+
+  .scoreDescription {
+    font-size: 0.625rem !important;
+  }
+
+  .scoreItemLabel,
+  .scoreItemValue {
+    font-size: 0.5625rem !important;
+  }
+
+  .manageSecurityBtn {
+    padding: 0.4375rem !important;
+    font-size: 0.6875rem !important;
+  }
+
+  /* Compact help items */
+  .helpItem {
+    padding: 0.5rem 0 !important;
+    gap: 0.5rem !important;
+  }
+
+  .helpIcon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .helpIcon svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .helpLabel {
+    font-size: 0.75rem !important;
+  }
+
+  .helpDescription {
+    font-size: 0.625rem !important;
+  }
+
+  /* Compact quick info */
+  .quickInfoItem {
+    padding: 0.3125rem 0;
+  }
+
+  .quickInfoLabel {
+    font-size: 0.625rem !important;
+  }
+
+  .quickInfoValue {
+    font-size: 0.6875rem !important;
+  }
+
+  /* First sidebar card full width */
+  .rightSidebar > .sidebarCard:first-child {
+    grid-column: 1 / -1;
   }
 }
 
 @media (max-width: 480px) {
   .settingsSection {
     padding: 0.75rem !important;
+    border-radius: 10px !important;
   }
 
-  .avatarSection {
+  .sectionTitle {
+    font-size: 0.8125rem !important;
+  }
+
+  .profileContent {
     flex-direction: column;
-    text-align: center;
-  }
-
-  .profileNameInfo {
     align-items: center;
   }
 
+  .avatarSection {
+    flex-direction: row;
+    gap: 0.75rem;
+  }
+
+  .avatarWrapper {
+    width: 48px;
+    height: 48px;
+  }
+
+  .profileNameInfo {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
   .bottomGrid .settingsSection {
-    padding: 0.75rem !important;
+    padding: 0.625rem !important;
   }
 
   .settingItem {
-    padding: 0.6rem 0;
+    padding: 0.5rem 0;
   }
 
   .settingLabel {
-    font-size: 0.78rem;
+    font-size: 0.6875rem;
+  }
+
+  .toggleSwitch {
+    width: 32px;
+    height: 18px;
+  }
+
+  .toggleSlider::before {
+    width: 12px;
+    height: 12px;
+  }
+
+  .toggleSwitch input:checked + .toggleSlider::before {
+    transform: translateX(14px);
+  }
+
+  .actionButtons {
+    gap: 0.375rem;
+  }
+
+  .saveBtn,
+  .cancelBtn {
+    padding: 0.5rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .sidebarCard {
+    padding: 0.625rem !important;
+  }
+
+  .sidebarCardTitle {
+    font-size: 0.6875rem !important;
   }
 }

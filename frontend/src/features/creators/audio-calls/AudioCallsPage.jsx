@@ -219,7 +219,7 @@ export const AudioCallsPage = () => {
             <div className={styles.earningsHeader}>
               <div className={styles.earningsTitleRow}>
                 <div className={styles.earningsIconWrap}>
-                  <Phone size={14} className={styles.earningsIcon} />
+                  <Phone size={20} className={styles.earningsIcon} />
                 </div>
                 <h3 className={styles.earningsTitle}>Today's Audio Call Earnings</h3>
               </div>

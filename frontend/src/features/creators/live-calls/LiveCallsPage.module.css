@@ -567,11 +567,11 @@
 
 .earningsIcon {
   color: #9b51e0;
-  font-size: 14px;
+  font-size: 1.25rem;
 }
 
 .earningsTitle {
-  font-size: 0.82rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.7);
   margin: 0;
@@ -1209,23 +1209,7 @@
     display: none;
   }
 
-  /* Hide desktop combined earnings, show separate mobile cards */
-  .desktopEarningsCard {
-    display: none;
-  }
 
-  .mobileAudioEarningsCard,
-  .mobileVideoEarningsCard {
-    display: block;
-  }
-
-  .mobileAudioEarningsCard {
-    margin-bottom: 0.75rem;
-  }
-
-  .mobileVideoEarningsCard {
-    margin-bottom: 0.75rem;
-  }
 
   .liveCallsContainer {
     padding: 0 0 2rem 0 !important;
@@ -1531,31 +1515,17 @@
     margin-bottom: 0.5rem;
   }
 
-  /* Mobile audio earnings card */
-  .rightSidebar > .mobileAudioEarningsCard {
-    flex: 0 1 calc(50% - 0.375rem) !important;
-    order: 2;
-    min-width: 0;
-  }
-
-  /* Mobile video earnings card */
-  .rightSidebar > .mobileVideoEarningsCard {
-    flex: 0 1 calc(50% - 0.375rem) !important;
-    order: 3;
-    min-width: 0;
-  }
-
   /* Call Performance card - 50% width, side by side with tips */
   .rightSidebar > .callPerformanceCard {
     flex: 0 1 calc(50% - 0.375rem) !important;
-    order: 4;
+    order: 2;
     min-width: 0 !important;
   }
 
   /* Tips card - 50% width, side by side with performance */
   .rightSidebar > .tipsCard {
     flex: 0 1 calc(50% - 0.375rem) !important;
-    order: 5;
+    order: 3;
     min-width: 0 !important;
   }
 
@@ -1572,7 +1542,7 @@
   /* Top Call Hours card - full width below */
   .rightSidebar > .topCallHoursCard {
     flex: 1 1 100% !important;
-    order: 6;
+    order: 4;
     min-width: 0;
   }
 
@@ -1823,12 +1793,6 @@
   .periodTextBtn {
     font-size: 0.55rem !important;
   }
-}
-
-/* Mobile separate earnings cards - hidden on desktop */
-.mobileAudioEarningsCard,
-.mobileVideoEarningsCard {
-  display: none;
 }
 
 /* Mobile quick action cards (dashboard style) - hidden on desktop */
