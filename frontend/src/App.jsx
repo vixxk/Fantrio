@@ -289,7 +289,7 @@ const AppContent = () => {
   }
 
   return (
-    <div className={`appShell ${darkMode ? 'darkTheme' : 'lightTheme'}`}>
+    <div className={`appShell ${darkMode ? 'darkTheme' : 'lightTheme'} ${isCreatorPage ? 'creatorMode' : ''}`}>
       <svg width="0" height="0" style={{ position: 'absolute', pointerEvents: 'none' }}>
         <defs>
           <linearGradient id="activeGradient" x1="0%" y1="0%" x2="100%" y2="100%">

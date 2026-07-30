@@ -1277,9 +1277,9 @@
 
 .viewEarningsBtn {
   width: 100%;
-  background: linear-gradient(135deg, #9b51e0 0%, #e10075 50%, #ff4d6a 80%, #3b82f6 100%);
-  border: none;
-  color: #ffffff;
+  background: rgba(225, 0, 117, 0.1);
+  border: 1px solid rgba(225, 0, 117, 0.3);
+  color: #e10075;
   padding: 0.85rem 1rem;
   border-radius: 12px;
   font-size: 0.9rem;
@@ -1290,8 +1290,8 @@
 }
 
 .viewEarningsBtn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+  background: rgba(225, 0, 117, 0.2);
+  border-color: #e10075;
 }
 
 /* ================= UPCOMING STREAMS ================= */
@@ -1357,9 +1357,9 @@
 
 .viewStreamsBtn {
   width: 100%;
-  background: linear-gradient(135deg, #9b51e0 0%, #e10075 50%, #ff4d6a 80%, #3b82f6 100%);
-  border: none;
-  color: #ffffff;
+  background: rgba(225, 0, 117, 0.1);
+  border: 1px solid rgba(225, 0, 117, 0.3);
+  color: #e10075;
   padding: 0.85rem 1rem;
   border-radius: 12px;
   font-size: 0.9rem;
@@ -1370,8 +1370,8 @@
 }
 
 .viewStreamsBtn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+  background: rgba(225, 0, 117, 0.2);
+  border-color: #e10075;
 }
 
 /* ================= QUICK STATS ================= */
@@ -1663,16 +1663,21 @@
 }
 
 .light .viewEarningsBtn {
-  background: linear-gradient(135deg, #9b51e0 0%, #e10075 50%, #ff4d6a 80%, #3b82f6 100%);
+  background: rgba(225, 0, 117, 0.08);
+  border-color: rgba(225, 0, 117, 0.25);
+  color: #e10075;
 }
 
 .light .viewStreamsBtn {
-  background: linear-gradient(135deg, #9b51e0 0%, #e10075 50%, #ff4d6a 80%, #3b82f6 100%);
+  background: rgba(225, 0, 117, 0.08);
+  border-color: rgba(225, 0, 117, 0.25);
+  color: #e10075;
 }
 
 .light .viewEarningsBtn:hover,
 .light .viewStreamsBtn:hover {
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+  background: rgba(225, 0, 117, 0.15);
+  border-color: #e10075;
 }
 
 .light .statPositive {

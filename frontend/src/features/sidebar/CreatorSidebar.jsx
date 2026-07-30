@@ -62,7 +62,8 @@ export const CreatorSidebar = ({ onClose }) => {
     { name: 'Creator Earnings', label: 'Earnings', icon: DollarSign, tab: 'Creator Earnings' },
     { name: 'Creator Analytics', label: 'Analytics', icon: BarChart3, tab: 'Creator Analytics' },
     { name: 'Creator Store', label: 'Store', icon: ShoppingBag, tab: 'Creator Store' },
-    { name: 'Creator Settings', label: 'Settings', icon: Settings, tab: 'Creator Settings' }
+    { name: 'Creator Settings', label: 'Settings', icon: Settings, tab: 'Creator Settings' },
+    { name: 'User Dashboard', label: 'User', icon: Home, tab: 'User Dashboard', href: '/discover' }
   ];
 
   const handleItemClick = (tab) => {
@@ -139,6 +140,28 @@ export const CreatorSidebar = ({ onClose }) => {
 
           const Icon = item.icon;
           const isActive = activeTab === item.tab;
+
+          if (item.href) {
+            return (
+              <a
+                key={item.tab}
+                href={item.href}
+                className={`${styles.navItem} ${isActive ? styles.active : ''}`}
+                onClick={() => { if (onClose) onClose(); }}
+              >
+                <div className={styles.navItemLeft}>
+                  <Icon size={20} className={styles.navIcon} />
+                  <span className={styles.navLabel}>{item.label}</span>
+                </div>
+                {item.badge && (
+                  <span className={styles.countBadge}>
+                    {item.badge}
+                  </span>
+                )}
+              </a>
+            );
+          }
+
           return (
             <button
               key={item.tab}

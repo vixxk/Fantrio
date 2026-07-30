@@ -43,7 +43,7 @@ export const Sidebar = ({ onClose }) => {
     { name: 'Buy Coins', icon: Landmark, badge: null },
     { name: 'Settings', icon: Settings, badge: null },
     { name: 'More', icon: LayoutGrid, badge: null },
-    { name: 'Creator', icon: Briefcase, badge: 'New', href: '/creators/analytics' }
+    { name: 'Creator', icon: Briefcase, badge: 'New', href: '/creators/dashboard' }
   ];
 
   if (user && user.role === 'admin') {
@@ -89,6 +89,7 @@ export const Sidebar = ({ onClose }) => {
                 key={item.name}
                 href={item.href}
                 className={`${styles.navItem} ${isActive ? styles.active : ''} ${styles.creatorLink}`}
+                onClick={() => { if (onClose) onClose(); }}
               >
                 <div className={styles.navItemLeft}>
                   <Icon size={20} className={styles.navIcon} />
@@ -115,7 +116,7 @@ export const Sidebar = ({ onClose }) => {
             <button
               key={item.name}
               className={`${styles.navItem} ${isActive ? styles.active : ''}`}
-              onClick={() => setActiveTab(item.name)}
+              onClick={() => { setActiveTab(item.name); if (onClose) onClose(); }}
             >
               <div className={styles.navItemLeft}>
                 {item.name === 'Buy Coins' ? (

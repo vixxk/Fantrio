@@ -285,14 +285,11 @@ html, body, #root {
   }
   
   .bottomActive span {
-    background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%) !important;
-    -webkit-background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
-    display: inline-block;
+    color: #e10075 !important;
   }
   
   .bottomActive svg {
-    stroke: url(#activeGradient) !important;
+    stroke: #e10075 !important;
   }
   
   .mobileLiveNavIcon {
@@ -323,4 +320,17 @@ html, body, #root {
   display: flex;
   flex-direction: column;
   min-height: 0;
+}
+
+/* Pink scrollbar for creator pages */
+.creatorMode ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(225, 0, 117, 0.5) 0%, rgba(225, 0, 117, 0.7) 100%) !important;
+}
+
+.creatorMode ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(225, 0, 117, 0.8) 0%, rgba(225, 0, 117, 1) 100%) !important;
+}
+
+.creatorMode * {
+  scrollbar-color: rgba(225, 0, 117, 0.5) rgba(11, 8, 19, 0.3) !important;
 }

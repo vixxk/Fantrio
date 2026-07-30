@@ -113,19 +113,17 @@
 }
 
 .active {
-  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
-  color: #ffffff !important;
-  box-shadow: 0 4px 15px rgba(225, 0, 117, 0.25);
+  background: rgba(225, 0, 117, 0.12);
+  color: #e10075 !important;
 }
 
 .groupActive {
-  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
-  box-shadow: 0 4px 15px rgba(225, 0, 117, 0.25);
+  background: rgba(225, 0, 117, 0.12);
 }
 
 .groupActive .navItem,
 .groupActive .chevronBtn {
-  color: #ffffff !important;
+  color: #e10075 !important;
 }
 
 .groupActive .navItem:hover,
@@ -134,7 +132,7 @@
 }
 
 .countBadge {
-  background: #7e00f3;
+  background: #e10075;
   color: #ffffff;
   font-size: 0.7rem;
   font-weight: 700;
@@ -300,7 +298,7 @@
 }
 
 .switch input:checked + .slider {
-  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
+  background: #e10075;
 }
 
 .switch input:checked + .slider:before {
@@ -435,16 +433,19 @@
   color: rgba(26, 22, 37, 0.6);
 }
 
-.light .active,
+.light .active {
+  background: rgba(225, 0, 117, 0.1);
+  color: #e10075 !important;
+}
+
 .light .active .navLabel,
 .light .active .navIcon,
 .light .active svg {
-  color: #ffffff !important;
+  color: #e10075 !important;
 }
 
 .light .groupActive {
-  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
-  box-shadow: 0 4px 15px rgba(225, 0, 117, 0.25);
+  background: rgba(225, 0, 117, 0.1);
 }
 
 .light .groupActive .navItem,
@@ -452,7 +453,7 @@
 .light .groupActive .navLabel,
 .light .groupActive .navIcon,
 .light .groupActive .navItem svg {
-  color: #ffffff !important;
+  color: #e10075 !important;
 }
 
 .light .groupHeader:hover {
