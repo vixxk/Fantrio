@@ -240,90 +240,85 @@
   background: #121212;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  padding: 0.9rem;
+  padding: 1rem;
   display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  justify-content: center;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  align-items: center;
+  gap: 0.85rem;
+  min-height: 80px;
+  transition: all 0.2s ease;
+  position: relative;
 }
 
 .statCard:hover {
-  border-color: rgba(225, 0, 117, 0.3);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.statLabelRow {
-  margin-bottom: 0.15rem;
-}
-
-.statValueRow {
+.statIconWrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  margin-bottom: 0.15rem;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.statContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
 }
 
 .statLabel {
   font-size: 0.72rem;
   color: rgba(255, 255, 255, 0.5);
   font-weight: 500;
-  display: block;
 }
 
 .statValue {
   font-size: 1.35rem;
-  line-height: 1;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-}
-
-.statValueCol {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
 }
 
 .statChange {
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.15rem;
-  font-size: 0.85rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.statPeriod {
-  font-size: 0.62rem;
-  color: rgba(255, 255, 255, 0.4);
-  display: block;
-}
-
-.statSub {
   font-size: 0.68rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.42);
-  margin-left: 0.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .statPeriod {
-  font-size: 0.62rem;
   color: rgba(255, 255, 255, 0.4);
-  display: block;
+  font-weight: 400;
+}
+
+.statSubtitle {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .statLink {
-  width: fit-content;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0;
-  border: none;
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
   color: #f6a51a;
-  background: transparent;
-  font-size: 0.7rem;
+  font-size: 0.62rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  white-space: nowrap;
+}
+
+.statLink:hover {
+  color: #fbbf24;
 }
 
 .positive {
@@ -1098,9 +1093,20 @@
 }
 
 .light .loadMoreBtn,
-.light .statLink,
 .light .viewAllTipsBtn {
   color: #e10075;
+}
+
+.light .statLink {
+  color: #d97706;
+  background: rgba(217, 119, 6, 0.06);
+  border-color: rgba(217, 119, 6, 0.2);
+}
+
+.light .statLink:hover {
+  background: rgba(217, 119, 6, 0.12);
+  border-color: rgba(217, 119, 6, 0.35);
+  color: #b45309;
 }
 
 .light .fanName {

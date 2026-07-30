@@ -392,20 +392,18 @@ export const LiveCallsPage = () => {
               const changeNum = stat.change ? stat.change.replace(/[+\-]/g, '') : '';
               return (
                 <div key={stat.id} className={`${styles.statCard} ${stat.id === 'missed' ? styles.missedStatMobile : ''}`}>
-                  <div className={styles.statLabelRow}>
-                    <span className={styles.statLabel}>{stat.label}</span>
+                  <div className={styles.statIconWrap} style={{ background: `${stat.color}20` }}>
+                    <Icon size={20} style={{ color: stat.color }} fill={stat.icon === 'earnings' || stat.icon === 'phone' ? 'none' : stat.color} />
                   </div>
-                  <div className={styles.statValueRow}>
-                    <Icon size={24} style={{ color: stat.color }} fill={stat.icon === 'earnings' || stat.icon === 'phone' ? 'none' : stat.color} />
-                    <div className={styles.statValueCol}>
-                      <span className={styles.statValue}>{stat.value}</span>
-                      {stat.period && <span className={styles.statPeriod}>{stat.period}</span>}
-                    </div>
-                    {stat.change && (
+                  <div className={styles.statContent}>
+                    <span className={styles.statLabel}>{stat.label}</span>
+                    <span className={styles.statValue}>{stat.value}</span>
+                    {stat.change ? (
                       <span className={`${styles.statChange} ${stat.changeType === 'positive' ? styles.positive : styles.negative}`}>
-                        {stat.changeType === 'positive' ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
-                        {changeNum}
+                        ↑ {changeNum} <span className={styles.statPeriod}>{stat.period}</span>
                       </span>
+                    ) : (
+                      <span className={styles.statSubtitle}>{stat.period}</span>
                     )}
                   </div>
                   {stat.link && (
