@@ -40,9 +40,9 @@ export const storeStats = [
 ];
 
 export const storeTabs = [
-  { id: 'all', label: 'All Products', count: 18 },
-  { id: 'active', label: 'Active', count: 15 },
-  { id: 'draft', label: 'Draft', count: 2 },
+  { id: 'all', label: 'All Products', count: 8 },
+  { id: 'active', label: 'Active', count: 7 },
+  { id: 'draft', label: 'Draft', count: 0 },
   { id: 'outOfStock', label: 'Out of Stock', count: 1 },
 ];
 
@@ -124,6 +124,32 @@ export const products = [
     revenue: '$50.00',
     status: 'Active',
     thumbnail: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=100&h=100&fit=crop',
+  },
+  {
+    id: 7,
+    name: 'Digital Music Album',
+    description: 'Exclusive EP release',
+    price: '$12.00',
+    currency: 'USD',
+    inventory: null,
+    inventoryStatus: 'Unlimited',
+    sold: 45,
+    revenue: '$540.00',
+    status: 'Active',
+    thumbnail: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=100&h=100&fit=crop',
+  },
+  {
+    id: 8,
+    name: 'VIP Meet & Greet Pass',
+    description: 'Exclusive fan experience',
+    price: '$99.00',
+    currency: 'USD',
+    inventory: 15,
+    inventoryStatus: 'In Stock',
+    sold: 8,
+    revenue: '$792.00',
+    status: 'Active',
+    thumbnail: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=100&h=100&fit=crop',
   },
 ];
 

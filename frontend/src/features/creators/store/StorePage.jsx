@@ -3,7 +3,7 @@ import { useApp } from '../../../context/AppContext';
 import {
   DollarSign, ShoppingCart, Package, Archive,
   ExternalLink, Plus, Filter, ChevronDown,
-  MoreVertical, ChevronLeft, ChevronRight
+  MoreVertical, ArrowLeft, ArrowRight
 } from 'lucide-react';
 import {
   storeStats, storeTabs, products, storeOverview,
@@ -23,6 +23,7 @@ export const StorePage = () => {
   const { darkMode, navigateTo } = useApp();
   const [activeTab, setActiveTab] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = 5;
 
   const filteredProducts = products.filter(product => {
     if (activeTab === 'active') return product.status === 'Active';
@@ -34,34 +35,33 @@ export const StorePage = () => {
   return (
     <div className={`${styles.pageContainer} ${!darkMode ? styles.light : ''}`}>
       <div className={styles.mainGrid}>
-        {/* Left Column - Main Content */}
-        <div className={styles.leftColumn}>
-          {/* Stats Row */}
-          <div className={styles.statsRow}>
-            {storeStats.map((stat, idx) => {
-              const Icon = iconMap[stat.icon];
-              return (
-                <div key={idx} className={styles.statCard}>
-                  <div className={styles.statIconWrap} style={{ background: `${stat.color}20` }}>
-                    <Icon size={20} style={{ color: stat.color }} />
-                  </div>
-                  <div className={styles.statContent}>
-                    <span className={styles.statLabel}>{stat.label}</span>
-                    <span className={styles.statValue}>{stat.value}</span>
-                    {stat.change ? (
-                      <span className={`${styles.statChange} ${stat.changeType === 'positive' ? styles.changePositive : ''}`}>
-                        ↑ {stat.change} <span className={styles.changePeriod}>{stat.period}</span>
-                      </span>
-                    ) : (
-                      <span className={styles.statSubtitle}>{stat.subtitle}</span>
-                    )}
-                  </div>
+        {/* Stats Row - standalone at top */}
+        <div className={styles.statsRow}>
+          {storeStats.map((stat, idx) => {
+            const Icon = iconMap[stat.icon];
+            return (
+              <div key={idx} className={styles.statCard}>
+                <div className={styles.statIconWrap} style={{ background: `${stat.color}20` }}>
+                  <Icon size={20} style={{ color: stat.color }} />
                 </div>
-              );
-            })}
-          </div>
+                <div className={styles.statContent}>
+                  <span className={styles.statLabel}>{stat.label}</span>
+                  <span className={styles.statValue}>{stat.value}</span>
+                  {stat.change ? (
+                    <span className={`${styles.statChange} ${stat.changeType === 'positive' ? styles.changePositive : ''}`}>
+                      ↑ {stat.change} <span className={styles.changePeriod}>{stat.period}</span>
+                    </span>
+                  ) : (
+                    <span className={styles.statSubtitle}>{stat.subtitle}</span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
-          {/* Products Section */}
+        {/* Left Column - Products Section */}
+        <div className={styles.leftColumn}>
           <section className={styles.productsSection}>
             <div className={styles.productsHeader}>
               <div className={styles.productsTitleRow}>
@@ -75,6 +75,17 @@ export const StorePage = () => {
                 <button className={styles.addProductBtn}>
                   <Plus size={14} /> Add Product
                 </button>
+              </div>
+              <div className={styles.mobileFilterRow}>
+                <button className={styles.filterBtn}>
+                  <Filter size={14} /> Filter
+                </button>
+                <div className={styles.sortDropdown}>
+                  <span className={styles.sortLabel}>Sort By:</span>
+                  <button className={styles.sortBtn}>
+                    Newest <ChevronDown size={12} />
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -131,7 +142,7 @@ export const StorePage = () => {
                           </div>
                         </td>
                         <td className={`${styles.td} ${styles.price}`}>
-                          {product.price}<br /><span className={styles.currency}>{product.currency}</span>
+                          {product.price}
                         </td>
                         <td className={styles.td}>
                           {product.inventory !== null ? (
@@ -204,40 +215,45 @@ export const StorePage = () => {
 
               {/* Pagination */}
               <div className={styles.pagination}>
-                <span className={styles.paginationInfo}>Showing 1 to {filteredProducts.length} of {filteredProducts.length} products</span>
-                <div className={styles.paginationButtons}>
+                <button
+                  className={styles.pageBtn}
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                >
+                  <ArrowLeft size={14} />
+                </button>
+                {[1, 2, 3].map((page) => (
                   <button
-                    className={styles.pageBtn}
-                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                    disabled={currentPage === 1}
+                    key={page}
+                    className={`${styles.pageBtn} ${currentPage === page ? styles.pageBtnActive : ''}`}
+                    onClick={() => setCurrentPage(page)}
                   >
-                    <ChevronLeft size={14} />
+                    {page}
                   </button>
-                  {[1, 2, 3].map((page) => (
-                    <button
-                      key={page}
-                      className={`${styles.pageBtn} ${currentPage === page ? styles.pageBtnActive : ''}`}
-                      onClick={() => setCurrentPage(page)}
-                    >
-                      {page}
-                    </button>
-                  ))}
-                  <button
-                    className={styles.pageBtn}
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                  >
-                    <ChevronRight size={14} />
-                  </button>
-                </div>
+                ))}
+                <span className={styles.pageDots}>...</span>
+                <button
+                  className={styles.pageBtn}
+                  onClick={() => setCurrentPage(totalPages)}
+                >
+                  {totalPages}
+                </button>
+                <button
+                  className={styles.pageBtn}
+                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                >
+                  <ArrowRight size={14} />
+                </button>
               </div>
             </div>
           </section>
         </div>
 
-        {/* Right Sidebar */}
+        {/* Right Sidebar containing all sidebar cards */}
         <div className={styles.rightSidebar}>
           {/* Store Overview */}
-          <div className={styles.sidebarCard}>
+          <div className={`${styles.sidebarCard} ${styles.storeOverviewCard}`}>
             <div className={styles.sidebarCardHeader}>
               <h3 className={styles.sidebarCardTitle}>Store Overview</h3>
               <PeriodDropdown variant="text" />
@@ -258,7 +274,7 @@ export const StorePage = () => {
                 </div>
               </div>
               <div className={styles.overviewItem}>
-                <span className={styles.overviewLabel}>Average Order Value</span>
+                <span className={styles.overviewLabel}>Avg. Order Value</span>
                 <div className={styles.overviewValueRow}>
                   <span className={styles.overviewValue}>{storeOverview.averageOrderValue}</span>
                   <span className={`${styles.overviewChange} ${styles.changePositive}`}>↑ {storeOverview.aovChange}</span>
@@ -280,8 +296,28 @@ export const StorePage = () => {
             </button>
           </div>
 
+          {/* Recent Orders */}
+          <div className={`${styles.sidebarCard} ${styles.recentOrdersCard}`}>
+            <div className={styles.sidebarCardHeader}>
+              <h3 className={styles.sidebarCardTitle}>Recent Orders</h3>
+              <button className={styles.viewAllBtn}>View All</button>
+            </div>
+            <div className={styles.ordersList}>
+              {recentOrders.map((order) => (
+                <div key={order.id} className={styles.orderItem}>
+                  <img src={order.avatar} alt={order.customer} className={styles.orderAvatar} />
+                  <div className={styles.orderInfo}>
+                    <span className={styles.orderCustomer}>{order.customer}</span>
+                    <span className={styles.orderDate}>{order.date}</span>
+                  </div>
+                  <span className={styles.orderAmount}>{order.amount}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Top Selling Products */}
-          <div className={styles.sidebarCard}>
+          <div className={`${styles.sidebarCard} ${styles.topProductsCard}`}>
             <div className={styles.sidebarCardHeader}>
               <h3 className={styles.sidebarCardTitle}>Top Selling Products</h3>
               <button className={styles.viewAllBtn}>View All</button>
@@ -303,28 +339,8 @@ export const StorePage = () => {
             </div>
           </div>
 
-          {/* Recent Orders */}
-          <div className={styles.sidebarCard}>
-            <div className={styles.sidebarCardHeader}>
-              <h3 className={styles.sidebarCardTitle}>Recent Orders</h3>
-              <button className={styles.viewAllBtn}>View All</button>
-            </div>
-            <div className={styles.ordersList}>
-              {recentOrders.map((order) => (
-                <div key={order.id} className={styles.orderItem}>
-                  <img src={order.avatar} alt={order.customer} className={styles.orderAvatar} />
-                  <div className={styles.orderInfo}>
-                    <span className={styles.orderCustomer}>{order.customer}</span>
-                    <span className={styles.orderDate}>{order.date}</span>
-                  </div>
-                  <span className={styles.orderAmount}>{order.amount}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
           {/* Quick Stats */}
-          <div className={styles.sidebarCard}>
+          <div className={`${styles.sidebarCard} ${styles.quickStatsCard}`}>
             <div className={styles.sidebarCardHeader}>
               <h3 className={styles.sidebarCardTitle}>Quick Stats</h3>
               <PeriodDropdown variant="text" />
