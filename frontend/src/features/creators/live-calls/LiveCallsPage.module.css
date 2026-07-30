@@ -1474,13 +1474,13 @@
   }
 
   .hoursChart {
-    height: 180px !important;
+    height: 160px !important;
     border-left: none !important;
     padding-left: 0 !important;
   }
 
   .hoursYAxis {
-    height: 180px !important;
+    height: 160px !important;
     padding-top: 8px !important;
     padding-bottom: 8px !important;
     justify-content: space-between !important;
@@ -1489,6 +1489,16 @@
 
   .hoursChartWrapper {
     display: flex !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+  }
+
+  .hoursBar {
+    gap: 2px;
+  }
+
+  .hoursBarLabel {
+    font-size: 0.55rem !important;
   }
 
   .tipsHeader {
@@ -1533,25 +1543,18 @@
     min-width: 0;
   }
 
-  /* Call Performance card */
+  /* Call Performance card - 50% width, side by side with tips */
   .rightSidebar > .callPerformanceCard {
-    flex: 1 1 100% !important;
+    flex: 0 1 calc(50% - 0.375rem) !important;
     order: 4;
-    margin-top: 0.5rem;
+    min-width: 0 !important;
   }
 
-  /* Top Call Hours card */
-  .rightSidebar > .topCallHoursCard {
+  /* Tips card - 50% width, side by side with performance */
+  .rightSidebar > .tipsCard {
     flex: 0 1 calc(50% - 0.375rem) !important;
     order: 5;
-    min-width: 0;
-  }
-
-  /* Tips card */
-  .rightSidebar > .tipsCard {
-    flex: 1 1 100% !important;
-    order: 6;
-    margin-top: 0.5rem;
+    min-width: 0 !important;
   }
 
   .rightSidebar > .tipsCard .tipsHeader {
@@ -1562,6 +1565,18 @@
     font-size: 0.55rem !important;
     padding: 0.15rem 0 !important;
     gap: 0.25rem;
+  }
+
+  /* Top Call Hours card - full width below */
+  .rightSidebar > .topCallHoursCard {
+    flex: 1 1 100% !important;
+    order: 6;
+    min-width: 0;
+  }
+
+  .topCallHoursCard .hoursChart {
+    min-width: 0;
+    width: 100%;
   }
 }
 
@@ -1763,19 +1778,23 @@
   }
 
   .hoursChart {
-    height: 90px !important;
+    height: 120px !important;
     border-left: none !important;
     padding-left: 0 !important;
   }
 
   .hoursYAxis {
-    height: 90px !important;
+    height: 120px !important;
     justify-content: space-between !important;
     gap: 4px !important;
   }
 
+  .hoursBarLabel {
+    font-size: 0.48rem !important;
+  }
+
   .hoursYLabel {
-    font-size: 0.55rem !important;
+    font-size: 0.48rem !important;
   }
 
   .tipsHeader {

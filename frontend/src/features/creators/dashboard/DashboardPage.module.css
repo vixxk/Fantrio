@@ -1123,7 +1123,7 @@
 }
 
 .recentPrice {
-  font-size: 0.72rem;
+  font-size: 0.88rem;
   color: #e10075;
   font-weight: 600;
   flex-shrink: 0;
@@ -2057,7 +2057,7 @@
   }
 
   .recentPrice {
-    font-size: 0.5rem !important;
+    font-size: 0.78rem !important;
   }
 
   .recentStat {
@@ -2365,7 +2365,7 @@
   }
 
   .recentPrice {
-    font-size: 0.45rem !important;
+    font-size: 0.72rem !important;
   }
 
   .recentStat {

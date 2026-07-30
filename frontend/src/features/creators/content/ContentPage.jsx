@@ -43,22 +43,7 @@ export const ContentPage = () => {
       <div className={styles.mainGrid}>
         {/* Left Column */}
         <div className={styles.leftColumn}>
-          {/* Page Header */}
-          <div className={styles.pageHeader}>
-            <div className={styles.headerLeft}>
-              <div className={styles.tabsRow}>
-                {contentTabs.map((tab) => (
-                  <button
-                    key={tab}
-                    className={`${styles.tab} ${activeTab === tab ? styles.activeTab : ''}`}
-                    onClick={() => setActiveTab(tab)}
-                  >
-                    {tab}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
+
 
           {/* Toolbar */}
           <div className={styles.toolbar}>
@@ -126,6 +111,19 @@ export const ContentPage = () => {
                 <Video size={14} /> Upload Video
               </button>
             </div>
+          </div>
+
+          {/* Filter Tabs - just above content */}
+          <div className={styles.tabsRow}>
+            {contentTabs.map((tab) => (
+              <button
+                key={tab}
+                className={`${styles.tab} ${activeTab === tab ? styles.activeTab : ''}`}
+                onClick={() => setActiveTab(tab)}
+              >
+                {tab}
+              </button>
+            ))}
           </div>
 
           {/* Content Table */}
