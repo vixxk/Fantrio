@@ -69,7 +69,7 @@ export const recentStreams = [
     title: 'Workout Time 💪',
     thumbnail: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=100&h=100&fit=crop',
     category: 'Workout & Fitness',
-    categoryColor: '#10b981',
+    categoryColor: '#f97316',
     date: 'May 24, 2024',
     duration: '1h 02m',
     views: '2.4K',
@@ -100,10 +100,10 @@ export const recentStreams = [
 ];
 
 export const streamCategories = [
-  { label: 'Just Chatting', count: 6, percentage: 50, color: '#e10075' },
-  { label: 'Music', count: 3, percentage: 25, color: '#3b82f6' },
-  { label: 'Workout & Fitness', count: 2, percentage: 17, color: '#10b981' },
-  { label: 'Other', count: 1, percentage: 8, color: '#6b7280' },
+  { label: 'Just Chatting', count: 6, percentage: 50, color: '#e10075', icon: 'MessageSquare' },
+  { label: 'Music', count: 3, percentage: 25, color: '#3b82f6', icon: 'Music' },
+  { label: 'Workout & Fitness', count: 2, percentage: 17, color: '#f97316', icon: 'Dumbbell' },
+  { label: 'Other', count: 1, percentage: 8, color: '#6b7280', icon: 'MoreHorizontal' },
 ];
 
 export const topStreamers = [

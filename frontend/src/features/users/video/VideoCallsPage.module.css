@@ -562,7 +562,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  z-index: 99;
+  z-index: 2000;
   box-sizing: border-box;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
 }
@@ -1193,7 +1193,7 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 10px;
     padding: 0.35rem;
-    z-index: 1001;
+    z-index: 2000;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;

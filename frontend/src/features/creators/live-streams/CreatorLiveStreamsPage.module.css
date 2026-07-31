@@ -430,18 +430,27 @@
 }
 
 /* ================= UPCOMING STREAMS ================= */
+.upcomingCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
 .upcomingList {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0;
 }
 
 .upcomingItem {
-  background: #121212;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
   padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.upcomingItem:last-child {
+  border-bottom: none;
 }
 
 .upcomingItem:hover {
@@ -453,7 +462,15 @@
 .upcomingItemTop {
   display: flex;
   gap: 1rem;
-  align-items: flex-start;
+  align-items: center;
+}
+
+.upcomingPrice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: 70px;
 }
 
 .upcomingThumb {
@@ -515,20 +532,23 @@
 
 .upcomingRight {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.25rem;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
 }
 
 .entryPriceLabel {
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+  white-space: nowrap;
 }
 
 .entryPriceValue {
   font-size: 1rem;
   font-weight: 700;
   color: #e10075;
+  white-space: nowrap;
 }
 
 .editBtn {
@@ -548,16 +568,42 @@
   border-color: rgba(255, 255, 255, 0.25);
 }
 
+.upcomingActions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.moreBtn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 0.4rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.moreBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.8);
+}
+
 .viewAllLink {
   display: block;
   text-align: center;
   background: transparent;
   border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
   color: #e10075;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  padding: 0.85rem;
+  padding: 1rem 0.85rem 1.25rem;
+  width: 100%;
   transition: opacity 0.2s ease;
 }
 
@@ -674,6 +720,238 @@
 .actionBtn:hover {
   background: rgba(255, 255, 255, 0.06);
   color: rgba(255, 255, 255, 0.8);
+}
+
+/* ================= MOBILE RECENT STREAMS CARDS ================= */
+.hideMobile {
+  display: block;
+}
+
+.showMobile {
+  display: none !important;
+}
+
+.mobileRecentList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.5rem;
+}
+
+.mobileRecentCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 0.6rem;
+  transition: background 0.2s ease;
+}
+
+.mobileRecentCard:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.mobileRecentTop {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.mobileRecentThumbCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.mobileRecentThumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.mobileRecentMetaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.mobileRecentCategory {
+  font-size: 0.62rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobileRecentContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.mobileRecentTitleRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.35rem;
+}
+
+.mobileRecentTitle {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobileRecentActions {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  flex-shrink: 0;
+}
+
+.mobileRecentActions .actionBtn {
+  color: rgba(255, 255, 255, 0.3);
+  padding: 0.25rem;
+}
+
+.mobileRecentMeta {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.mobileRecentStatsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.15rem;
+}
+
+.mobileRecentStats {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mobileStatItem {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.mobileRecentEarnings {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #10b981;
+  white-space: nowrap;
+}
+
+/* ================= MOBILE UPCOMING STREAMS CARDS ================= */
+.upcomingMobileList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.5rem;
+}
+
+.mobileUpcomingCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 0.6rem;
+  transition: background 0.2s ease;
+}
+
+.mobileUpcomingCard:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.mobileUpcomingTop {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.mobileUpcomingThumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.mobileUpcomingContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+  justify-content: space-between;
+}
+
+.mobileUpcomingTitleRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.35rem;
+}
+
+.mobileUpcomingTitle {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobileUpcomingFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mobileUpcomingPrice {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.mobileUpcomingPriceLabel {
+  font-size: 0.58rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.mobileUpcomingPriceValue {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #e10075;
+  white-space: nowrap;
+}
+
+.mobileUpcomingActions {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  flex-shrink: 0;
+}
+
+.mobileUpcomingActions .actionBtn {
+  color: rgba(255, 255, 255, 0.3);
+  padding: 0.25rem;
 }
 
 /* ================= RIGHT SIDEBAR CARDS ================= */
@@ -984,44 +1262,39 @@
 
 .statsGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 0;
 }
 
 .statItem {
-  padding: 0.65rem 0;
+  padding: 0.65rem 0.35rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+  text-align: center;
 }
 
-.statItem:nth-child(odd) {
-  padding-right: 0.75rem;
-}
-
-.statItem:nth-child(even) {
-  padding-left: 0.75rem;
-}
-
-.statItem:nth-last-child(-n+2) {
+.statItem:nth-child(-n+3) {
   border-bottom: none;
 }
 
 .statLabel {
-  font-size: 0.7rem;
+  font-size: 0.62rem;
   color: rgba(255, 255, 255, 0.4);
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .statRow {
   display: flex;
   align-items: baseline;
-  gap: 0.4rem;
+  gap: 0.25rem;
+  justify-content: center;
 }
 
 .statValue {
-  font-size: 1.2rem;
+  font-size: 0.95rem;
   font-weight: 800;
   color: #ffffff;
   line-height: 1;
@@ -1029,7 +1302,7 @@
 }
 
 .statChange {
-  font-size: 0.68rem;
+  font-size: 0.58rem;
   font-weight: 600;
 }
 
@@ -1052,6 +1325,7 @@
 .light .categoriesCard,
 .light .topCard,
 .light .statsCard,
+.light .upcomingCard,
 .light .upcomingItem {
   background: #ffffff;
   border-color: rgba(0, 0, 0, 0.08);
@@ -1225,6 +1499,60 @@
   color: rgba(26, 22, 37, 0.8);
 }
 
+.light .mobileRecentCard {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .mobileRecentCard:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.light .mobileRecentTitle {
+  color: #1a1625;
+}
+
+.light .mobileRecentMeta {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .mobileStatItem {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .mobileRecentActions .actionBtn {
+  color: rgba(26, 22, 37, 0.3);
+}
+
+.light .mobileUpcomingCard {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .mobileUpcomingCard:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.light .mobileUpcomingTitle {
+  color: #1a1625;
+}
+
+.light .mobileUpcomingPriceLabel {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .mobileUpcomingPriceValue {
+  color: #e10075;
+}
+
+.light .mobileUpcomingFooter {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .mobileUpcomingActions .actionBtn {
+  color: rgba(26, 22, 37, 0.3);
+}
+
 .light .overviewTitle,
 .light .categoriesTitle,
 .light .topTitle,
@@ -1304,43 +1632,48 @@
 @media (max-width: 768px) {
   .pageContainer {
     padding: 0 0 5rem 0 !important;
-    overflow-x: clip !important;
-  }
-
-  .pageHeader {
-    margin-bottom: 1rem !important;
-  }
-
-  .pageTitle {
-    font-size: 1.35rem !important;
-    margin-bottom: 0.25rem !important;
+    overflow-x: hidden !important;
   }
 
   .mainGrid {
-    gap: 1rem !important;
+    gap: 0.75rem !important;
     overflow: hidden !important;
   }
 
   .leftColumn {
     overflow: hidden !important;
     min-width: 0 !important;
+    gap: 0.75rem !important;
   }
 
   .rightSidebar {
+    display: grid !important;
     grid-template-columns: 1fr 1fr !important;
-    gap: 0.75rem !important;
+    gap: 0.5rem !important;
     overflow: hidden !important;
     min-width: 0 !important;
   }
 
-  .overviewCard {
-    grid-column: 1 / -1 !important;
+  /* Stream Card */
+  .streamCard {
+    border-radius: 12px !important;
+    overflow: hidden !important;
+  }
+
+  .streamTabsRow {
+    display: none !important;
+  }
+
+  .streamTab {
+    padding: 0.6rem 0.5rem !important;
+    font-size: 0.72rem !important;
   }
 
   .streamBody {
     grid-template-columns: 1fr !important;
-    padding: 1rem !important;
-    gap: 1rem !important;
+    padding: 0.75rem !important;
+    gap: 0.6rem !important;
+    border-radius: 0 !important;
   }
 
   .streamPreview {
@@ -1348,149 +1681,596 @@
   }
 
   .streamPreviewInner {
-    height: 140px;
+    height: 100px !important;
+    border-radius: 8px !important;
+  }
+
+  .liveBadge {
+    font-size: 0.5rem !important;
+    padding: 0.15rem 0.35rem !important;
+  }
+
+  .playButton {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .playButton svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .streamForm {
+    gap: 0.5rem !important;
+  }
+
+  .formGroup {
+    gap: 0.2rem !important;
+  }
+
+  .formLabel {
+    font-size: 0.6rem !important;
+  }
+
+  .formInput {
+    padding: 0.5rem 0.6rem !important;
+    font-size: 0.68rem !important;
+    border-radius: 8px !important;
+  }
+
+  .priceInputGroup {
+    border-radius: 8px !important;
+  }
+
+  .pricePrefix {
+    padding: 0.5rem 0.5rem !important;
+    font-size: 0.68rem !important;
+  }
+
+  .priceInput {
+    font-size: 0.68rem !important;
+  }
+
+  .currencyLabel {
+    padding: 0.5rem 0.6rem !important;
+    font-size: 0.58rem !important;
+  }
+
+  .formHint {
+    font-size: 0.52rem !important;
+  }
+
+  .toggleLabel {
+    font-size: 0.6rem !important;
+  }
+
+  .toggleDesc {
+    font-size: 0.5rem !important;
+  }
+
+  .switch {
+    width: 36px !important;
+    height: 20px !important;
+  }
+
+  .slider::before {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .switch input:checked + .slider::before {
+    transform: translateX(16px) !important;
   }
 
   .startOptionsSection {
     order: 3;
+    gap: 0.35rem !important;
   }
 
-  .streamTab {
-    padding: 0.75rem 0.5rem !important;
-    font-size: 0.78rem !important;
+  .startOptions {
+    gap: 0.4rem !important;
+    flex-direction: row !important;
   }
 
+  .startOption {
+    padding: 0.4rem !important;
+    gap: 0.3rem !important;
+    border-radius: 6px !important;
+    flex: 1 1 calc(50% - 0.2rem) !important;
+    min-width: 0 !important;
+  }
+
+  .startOptionRadio {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .startOptionTitle {
+    font-size: 0.58rem !important;
+    gap: 0.2rem !important;
+  }
+
+  .startOptionTitle svg {
+    width: 10px !important;
+    height: 10px !important;
+  }
+
+  .startOptionDesc {
+    font-size: 0.48rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .startNowBtn {
+    padding: 0.45rem 0.75rem !important;
+    font-size: 0.62rem !important;
+    border-radius: 8px !important;
+    margin-top: 0.25rem !important;
+    grid-column: 1 / -1;
+  }
+
+  /* Section Headers */
   .sectionHeader {
-    flex-direction: column;
-    align-items: flex-start;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     gap: 0.5rem;
+    margin-bottom: 0.6rem !important;
+    flex-wrap: nowrap;
+  }
+
+  .sectionTitle {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.82rem !important;
+    margin-bottom: 0 !important;
+  }
+
+.viewCalendarBtn,
+.viewAllBtn {
+  font-size: 0.62rem !important;
+  white-space: nowrap;
+}
+
+.upcomingActions {
+  gap: 0.3rem !important;
+}
+
+  /* Upcoming Streams */
+  .upcomingCard {
+    border-radius: 12px !important;
+    overflow: hidden !important;
   }
 
   .upcomingItem {
-    padding: 0.875rem !important;
-    border-radius: 12px !important;
+    padding: 0.7rem !important;
   }
 
   .upcomingItemTop {
-    gap: 0.75rem;
+    gap: 0.6rem !important;
   }
 
   .upcomingThumb {
-    width: 52px;
-    height: 52px;
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 8px !important;
   }
 
   .upcomingTitle {
-    font-size: 0.85rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  .scheduledBadge {
+    font-size: 0.5rem !important;
+    padding: 0.15rem 0.4rem !important;
+    border-radius: 3px !important;
+  }
+
+  .upcomingDate {
+    font-size: 0.58rem !important;
+  }
+
+  .upcomingCategory {
+    font-size: 0.55rem !important;
+  }
+
+  .upcomingRight {
+    gap: 0.5rem !important;
+  }
+
+  .entryPriceLabel {
+    font-size: 0.5rem !important;
   }
 
   .entryPriceValue {
-    font-size: 0.92rem !important;
+    font-size: 0.78rem !important;
   }
 
+  .editBtn {
+    padding: 0.3rem 0.6rem !important;
+    font-size: 0.62rem !important;
+    border-radius: 6px !important;
+  }
+
+  .moreBtn {
+    padding: 0.25rem !important;
+  }
+
+  .viewAllLink {
+    padding: 0.7rem 0.6rem 0.9rem !important;
+    font-size: 0.68rem !important;
+  }
+
+  /* Recent Streams Table */
   .recentTableCard {
-    padding: 0;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+  }
+
+  .hideMobile {
+    display: none !important;
+  }
+
+  .showMobile {
+    display: block !important;
+  }
+
+  .mobileRecentList,
+  .upcomingMobileList {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.35rem;
   }
 
   .th {
-    padding: 0.75rem 0.75rem 0.5rem 0.75rem !important;
-    font-size: 0.65rem !important;
+    padding: 0.6rem 0.6rem 0.4rem 0.6rem !important;
+    font-size: 0.55rem !important;
   }
 
   .td {
-    padding: 0.65rem 0.75rem !important;
-    font-size: 0.78rem !important;
+    padding: 0.55rem 0.6rem !important;
+    font-size: 0.65rem !important;
+  }
+
+  .streamInfo {
+    gap: 0.5rem !important;
   }
 
   .streamThumb {
-    width: 36px;
-    height: 36px;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 6px !important;
   }
 
   .streamTitle {
-    font-size: 0.78rem !important;
+    font-size: 0.68rem !important;
   }
 
   .categoryBadge {
-    font-size: 0.7rem !important;
+    font-size: 0.58rem !important;
+  }
+
+  .categoryDot {
+    width: 6px !important;
+    height: 6px !important;
   }
 
   .dateText,
   .durationText,
   .viewsText {
-    font-size: 0.72rem !important;
+    font-size: 0.58rem !important;
   }
 
+  .earningsValue {
+    font-size: 0.65rem !important;
+  }
+
+  .actionBtn {
+    padding: 0.3rem !important;
+  }
+
+  /* Sidebar Cards */
   .overviewCard,
   .categoriesCard,
   .topCard,
   .statsCard {
-    padding: 1rem !important;
-    border-radius: 12px !important;
+    padding: 0.6rem !important;
+    border-radius: 10px !important;
+  }
+
+  /* Mobile grid: overview + stats side-by-side on row 1, categories on row 2, top on row 3 */
+  .overviewCard {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+  }
+
+  .statsCard {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+  }
+
+  .categoriesCard {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+  }
+
+  .topCard {
+    grid-column: 1 / -1 !important;
+    grid-row: 3 !important;
+  }
+
+  /* Compact Overview for mobile */
+  .overviewCard {
+    padding: 0.5rem !important;
+  }
+
+  .overviewCard .overviewHeader {
+    margin-bottom: 0.3rem !important;
+  }
+
+  .overviewCard .overviewTitle {
+    font-size: 0.58rem !important;
+  }
+
+  .overviewCard .overviewStat {
+    padding: 0.2rem 0 !important;
+  }
+
+  .overviewCard .overviewStat:nth-child(odd) {
+    padding-right: 0.4rem !important;
+  }
+
+  .overviewCard .overviewStat:nth-child(even) {
+    padding-left: 0.4rem !important;
+  }
+
+  .overviewCard .overviewStatLabel {
+    font-size: 0.38rem !important;
+    margin-bottom: 0.05rem !important;
+  }
+
+  .overviewCard .overviewStatValue {
+    font-size: 0.65rem !important;
+  }
+
+  .overviewCard .overviewStatChange {
+    font-size: 0.35rem !important;
+  }
+
+  .overviewCard .viewAnalyticsBtn {
+    padding: 0.3rem !important;
+    font-size: 0.48rem !important;
+    margin-top: 0.3rem !important;
+    border-radius: 5px !important;
+  }
+
+  /* Quick Stats for mobile */
+  .statsCard {
+    padding: 0.6rem !important;
+  }
+
+  .statsCard .statsHeader {
+    margin-bottom: 0.5rem !important;
+  }
+
+  .statsCard .statsTitle {
+    font-size: 0.65rem !important;
+  }
+
+  .statsCard .statsGrid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.6rem 0.3rem !important;
+  }
+
+  .statsCard .statItem {
+    padding: 0.4rem 0 !important;
+    gap: 0.25rem !important;
+  }
+
+  .statsCard .statLabel {
+    font-size: 0.5rem !important;
+  }
+
+  .statsCard .statValue {
+    font-size: 0.82rem !important;
+  }
+
+  .statsCard .statChange {
+    font-size: 0.45rem !important;
+  }
+
+  /* Quick Stats - 2 per row, 3rd centered */
+  .statsGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem 0.3rem;
+  }
+
+  .statItem:nth-child(3) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: 50%;
+  }
+
+  .overviewHeader,
+  .categoriesHeader,
+  .topHeader,
+  .statsHeader {
+    margin-bottom: 0.5rem !important;
   }
 
   .overviewTitle,
   .categoriesTitle,
   .topTitle,
   .statsTitle {
-    font-size: 0.82rem !important;
-  }
-
-  .overviewStatLabel {
     font-size: 0.68rem !important;
   }
 
-  .overviewStatValue {
-    font-size: 1.15rem !important;
+  .periodDropdown {
+    font-size: 0.55rem !important;
   }
 
-  .categoryItem {
-    gap: 0.5rem;
+  /* Overview Stats - compact */
+  .overviewHeader {
+    margin-bottom: 0.4rem !important;
   }
 
-  .categoryIconWrap {
-    width: 32px;
-    height: 32px;
-  }
-
-  .categoryName {
-    font-size: 0.75rem !important;
-  }
-
-  .categoryCount {
+  .overviewTitle {
     font-size: 0.62rem !important;
   }
 
-  .categoryPercentage {
+  .overviewGrid {
+    gap: 0 !important;
+  }
+
+  .overviewStat {
+    padding: 0.3rem 0 !important;
+  }
+
+  .overviewStatLabel {
+    font-size: 0.42rem !important;
+    margin-bottom: 0.1rem !important;
+  }
+
+  .overviewStatRow {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.05rem !important;
+  }
+
+  .overviewStatValue {
     font-size: 0.72rem !important;
   }
 
+  .overviewStatChange {
+    font-size: 0.4rem !important;
+  }
+
+  .viewAnalyticsBtn {
+    padding: 0.4rem !important;
+    font-size: 0.55rem !important;
+    border-radius: 6px !important;
+    margin-top: 0.4rem !important;
+  }
+
+  /* Categories */
+  .categoriesList {
+    gap: 0.5rem !important;
+  }
+
+  .categoryItem {
+    gap: 0.4rem !important;
+  }
+
+  .categoryIconWrap {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 7px !important;
+  }
+
+  .categoryIconWrap svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .categoryName {
+    font-size: 0.62rem !important;
+  }
+
+  .categoryCount {
+    font-size: 0.48rem !important;
+  }
+
+  .categoryPercentage {
+    font-size: 0.58rem !important;
+  }
+
   .categoryProgressBar {
-    width: 45px;
+    width: 35px !important;
+    height: 4px !important;
+  }
+
+  /* Top Streamers */
+  .topList {
+    gap: 0.5rem !important;
   }
 
   .topItem {
-    gap: 0.5rem;
+    gap: 0.4rem !important;
+  }
+
+  .topRank {
+    font-size: 0.62rem !important;
+    width: 16px !important;
   }
 
   .topItemTitle {
-    font-size: 0.78rem !important;
+    font-size: 0.62rem !important;
+  }
+
+  .topItemCategory {
+    font-size: 0.48rem !important;
+  }
+
+  .topEarningsLabel {
+    font-size: 0.45rem !important;
   }
 
   .topEarningsValue {
-    font-size: 0.82rem !important;
+    font-size: 0.65rem !important;
+  }
+
+  .viewAllStreamsBtn {
+    padding: 0.5rem !important;
+    font-size: 0.62rem !important;
+    border-radius: 8px !important;
+    margin-top: 0.5rem !important;
+  }
+
+  /* Quick Stats */
+  .statsGrid {
+    gap: 0 !important;
+  }
+
+  .statItem {
+    padding: 0.4rem 0 !important;
+  }
+
+  .statLabel {
+    font-size: 0.48rem !important;
   }
 
   .statValue {
-    font-size: 1.1rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .statChange {
+    font-size: 0.45rem !important;
   }
 }
 
 @media (max-width: 480px) {
-  .pageTitle {
-    font-size: 1.15rem !important;
+  .mainGrid {
+    gap: 0.6rem !important;
   }
 
+  /* Section Headers */
+  .sectionHeader {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.4rem;
+    flex-wrap: nowrap;
+  }
+
+  .sectionTitle {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Stream Card */
   .streamTabsRow {
     flex-direction: column;
   }
@@ -1498,6 +2278,8 @@
   .streamTab {
     border-bottom: none !important;
     border-left: 2px solid transparent;
+    padding: 0.55rem 0.5rem !important;
+    font-size: 0.68rem !important;
   }
 
   .streamTabActive {
@@ -1506,207 +2288,261 @@
   }
 
   .streamBody {
-    padding: 0.875rem !important;
+    padding: 0.6rem !important;
+    gap: 0.5rem !important;
   }
 
   .streamPreviewInner {
-    height: 120px;
+    height: 80px !important;
   }
 
   .playButton {
-    width: 48px;
-    height: 48px;
+    width: 32px !important;
+    height: 32px !important;
   }
 
   .playButton svg {
-    width: 24px;
-    height: 24px;
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .liveBadge {
+    font-size: 0.45rem !important;
+    padding: 0.1rem 0.3rem !important;
   }
 
   .formInput {
-    padding: 0.6rem 0.75rem !important;
-    font-size: 0.82rem !important;
-  }
-
-  .pricePrefix {
-    padding: 0.6rem 0.6rem !important;
-    font-size: 0.82rem !important;
-  }
-
-  .priceInput {
-    font-size: 0.82rem !important;
-  }
-
-  .currencyLabel {
-    padding: 0.6rem 0.75rem !important;
-    font-size: 0.72rem !important;
-  }
-
-  .startNowBtn {
-    padding: 0.75rem !important;
-    font-size: 0.88rem !important;
-  }
-
-  .upcomingItem {
-    padding: 0.75rem !important;
-  }
-
-  .upcomingThumb {
-    width: 44px;
-    height: 44px;
-  }
-
-  .upcomingTitle {
-    font-size: 0.82rem !important;
-  }
-
-  .scheduledBadge {
-    font-size: 0.6rem !important;
-    padding: 0.15rem 0.5rem !important;
-  }
-
-  .upcomingDate {
-    font-size: 0.72rem !important;
-  }
-
-  .upcomingCategory {
-    font-size: 0.68rem !important;
-  }
-
-  .entryPriceLabel {
+    padding: 0.45rem 0.5rem !important;
     font-size: 0.62rem !important;
   }
 
+  .pricePrefix {
+    padding: 0.45rem 0.4rem !important;
+    font-size: 0.62rem !important;
+  }
+
+  .priceInput {
+    font-size: 0.62rem !important;
+  }
+
+  .currencyLabel {
+    padding: 0.45rem 0.5rem !important;
+    font-size: 0.52rem !important;
+  }
+
+  .startNowBtn {
+    padding: 0.5rem !important;
+    font-size: 0.65rem !important;
+  }
+
+  /* Upcoming Streams */
+  .upcomingItem {
+    padding: 0.6rem !important;
+  }
+
+  .upcomingThumb {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 6px !important;
+  }
+
+  .upcomingTitle {
+    font-size: 0.65rem !important;
+  }
+
+  .scheduledBadge {
+    font-size: 0.45rem !important;
+    padding: 0.1rem 0.35rem !important;
+  }
+
+  .upcomingDate {
+    font-size: 0.52rem !important;
+  }
+
+  .upcomingCategory {
+    font-size: 0.5rem !important;
+  }
+
+  .entryPriceLabel {
+    font-size: 0.45rem !important;
+  }
+
   .entryPriceValue {
-    font-size: 0.88rem !important;
+    font-size: 0.68rem !important;
   }
 
   .editBtn {
-    padding: 0.35rem 0.7rem !important;
-    font-size: 0.72rem !important;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.55rem !important;
   }
 
-  .recentTableCard {
-    border-radius: 12px !important;
+  .viewCalendarBtn,
+  .viewAllBtn {
+    font-size: 0.55rem !important;
   }
 
+  .viewAllLink {
+    padding: 0.6rem 0.5rem 0.75rem !important;
+    font-size: 0.62rem !important;
+  }
+
+  /* Recent Streams Table */
   .th {
-    padding: 0.6rem 0.6rem 0.4rem 0.6rem !important;
-    font-size: 0.6rem !important;
+    padding: 0.5rem !important;
+    font-size: 0.5rem !important;
   }
 
   .td {
-    padding: 0.55rem 0.6rem !important;
-    font-size: 0.72rem !important;
+    padding: 0.45rem 0.5rem !important;
+    font-size: 0.58rem !important;
   }
 
   .streamThumb {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
+    width: 30px !important;
+    height: 30px !important;
   }
 
   .streamTitle {
-    font-size: 0.72rem !important;
+    font-size: 0.6rem !important;
   }
 
   .categoryBadge {
-    font-size: 0.65rem !important;
+    font-size: 0.52rem !important;
   }
 
   .dateText,
   .durationText,
   .viewsText {
-    font-size: 0.68rem !important;
+    font-size: 0.52rem !important;
   }
 
   .earningsValue {
+    font-size: 0.58rem !important;
+  }
+
+  .mobileRecentCard,
+  .mobileUpcomingCard {
+    padding: 0.5rem !important;
+  }
+
+  .mobileRecentThumb,
+  .mobileUpcomingThumb {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 8px !important;
+  }
+
+  .mobileRecentCategory {
+    font-size: 0.55rem !important;
+  }
+
+  .mobileRecentTitle,
+  .mobileUpcomingTitle {
     font-size: 0.78rem !important;
   }
 
+  .mobileRecentMeta {
+    font-size: 0.62rem !important;
+  }
+
+  .mobileRecentEarnings {
+    font-size: 0.7rem !important;
+  }
+
+  .mobileUpcomingPriceValue {
+    font-size: 0.75rem !important;
+  }
+
+  .mobileUpcomingPriceLabel {
+    font-size: 0.5rem !important;
+  }
+
+  /* Sidebar Cards */
   .overviewCard,
   .categoriesCard,
   .topCard,
   .statsCard {
-    padding: 0.875rem !important;
-    border-radius: 10px !important;
+    padding: 0.5rem !important;
+    border-radius: 8px !important;
   }
 
   .overviewTitle,
   .categoriesTitle,
   .topTitle,
   .statsTitle {
-    font-size: 0.78rem !important;
-  }
-
-  .overviewStat {
-    padding: 0.6rem 0 !important;
+    font-size: 0.62rem !important;
   }
 
   .overviewStatLabel {
-    font-size: 0.65rem !important;
+    font-size: 0.45rem !important;
   }
 
   .overviewStatValue {
-    font-size: 1.05rem !important;
-  }
-
-  .overviewStatChange {
-    font-size: 0.6rem !important;
-  }
-
-  .categoryIconWrap {
-    width: 28px;
-    height: 28px;
-  }
-
-  .categoryIconWrap svg {
-    width: 14px;
-    height: 14px;
-  }
-
-  .categoryName {
     font-size: 0.72rem !important;
   }
 
+  .overviewStatChange {
+    font-size: 0.42rem !important;
+  }
+
+  .viewAnalyticsBtn {
+    padding: 0.4rem !important;
+    font-size: 0.55rem !important;
+  }
+
+  .categoryIconWrap {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  .categoryIconWrap svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  .categoryName {
+    font-size: 0.55rem !important;
+  }
+
   .categoryCount {
-    font-size: 0.6rem !important;
+    font-size: 0.42rem !important;
   }
 
   .categoryPercentage {
-    font-size: 0.68rem !important;
+    font-size: 0.5rem !important;
   }
 
   .categoryProgressBar {
-    width: 40px;
-    height: 5px;
+    width: 28px !important;
+    height: 3px !important;
   }
 
   .topItemTitle {
-    font-size: 0.75rem !important;
+    font-size: 0.55rem !important;
   }
 
   .topItemCategory {
-    font-size: 0.62rem !important;
+    font-size: 0.42rem !important;
   }
 
   .topEarningsValue {
-    font-size: 0.78rem !important;
-  }
-
-  .topEarningsLabel {
     font-size: 0.58rem !important;
   }
 
+  .viewAllStreamsBtn {
+    padding: 0.4rem !important;
+    font-size: 0.55rem !important;
+  }
+
   .statLabel {
-    font-size: 0.65rem !important;
+    font-size: 0.42rem !important;
   }
 
   .statValue {
-    font-size: 1rem !important;
+    font-size: 0.65rem !important;
   }
 
   .statChange {
-    font-size: 0.62rem !important;
+    font-size: 0.4rem !important;
   }
 }

@@ -65,7 +65,7 @@
   padding: 0.35rem;
   display: flex;
   flex-direction: column;
-  z-index: 30;
+  z-index: 2000;
   min-width: 150px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useApp } from '../../../context/AppContext';
 import {
   Radio, Calendar, Play, Eye, TrendingUp, BarChart3, Users, Clock,
-  Edit2, MoreVertical, Zap, Check, ChevronDown, ChevronRight
+  Edit2, MoreVertical, Zap, Check, ChevronDown, ChevronRight,
+  MessageSquare, Music, Dumbbell, MoreHorizontal
 } from 'lucide-react';
 import {
   streamStats, upcomingStreams, recentStreams,
@@ -10,6 +11,14 @@ import {
 } from './mockData';
 import { PeriodDropdown } from '../analytics/PeriodDropdown';
 import styles from './CreatorLiveStreamsPage.module.css';
+
+const categoryIconMap = {
+  MessageSquare,
+  Music,
+  Dumbbell,
+  MoreHorizontal,
+  Radio,
+};
 
 export const CreatorLiveStreamsPage = () => {
   const { darkMode, navigateTo } = useApp();
@@ -20,14 +29,6 @@ export const CreatorLiveStreamsPage = () => {
 
   return (
     <div className={`${styles.pageContainer} ${!darkMode ? styles.light : ''}`}>
-      {/* Page Header */}
-      <div className={styles.pageHeader}>
-        <div className={styles.headerLeft}>
-          <h1 className={styles.pageTitle}>Live Streams</h1>
-          <p className={styles.pageSubtitle}>Go live now or schedule your next stream.</p>
-        </div>
-      </div>
-
       {/* Main Content Grid */}
       <div className={styles.mainGrid}>
         {/* Left Column */}
@@ -157,32 +158,73 @@ export const CreatorLiveStreamsPage = () => {
               <h2 className={styles.sectionTitle}>Upcoming Streams</h2>
               <button className={styles.viewCalendarBtn}>View Calendar</button>
             </div>
-            <div className={styles.upcomingList}>
-              {upcomingStreams.map((stream) => (
-                <div key={stream.id} className={styles.upcomingItem}>
-                  <div className={styles.upcomingItemTop}>
-                    <img src={stream.thumbnail} alt={stream.title} className={styles.upcomingThumb} />
-                    <div className={styles.upcomingInfo}>
-                      <div className={styles.upcomingTitleRow}>
-                        <span className={styles.upcomingTitle}>{stream.title}</span>
-                        <span className={styles.scheduledBadge}>{stream.status}</span>
+            <div className={styles.upcomingCard}>
+              <div className={`${styles.upcomingList} ${styles.hideMobile}`}>
+                {upcomingStreams.map((stream) => (
+                  <div key={stream.id} className={styles.upcomingItem}>
+                    <div className={styles.upcomingItemTop}>
+                      <img src={stream.thumbnail} alt={stream.title} className={styles.upcomingThumb} />
+                      <div className={styles.upcomingInfo}>
+                        <div className={styles.upcomingTitleRow}>
+                          <span className={styles.upcomingTitle}>{stream.title}</span>
+                          <span className={styles.scheduledBadge}>{stream.status}</span>
+                        </div>
+                        <span className={styles.upcomingDate}>{stream.date}</span>
+                        <span className={styles.upcomingCategory}>
+                          <span className={styles.categoryDot} style={{ background: stream.categoryColor }} />
+                          {stream.category}
+                        </span>
                       </div>
-                      <span className={styles.upcomingDate}>{stream.date}</span>
-                      <span className={styles.upcomingCategory}>
-                        <span className={styles.categoryDot} style={{ background: stream.categoryColor }} />
-                        {stream.category}
-                      </span>
-                    </div>
-                    <div className={styles.upcomingRight}>
-                      <div className={styles.entryPriceLabel}>Entry Price</div>
-                      <div className={styles.entryPriceValue}>{stream.entryPrice}</div>
-                      <button className={styles.editBtn}>Edit</button>
+                      <div className={styles.upcomingRight}>
+                        <div className={styles.upcomingPrice}>
+                          <div className={styles.entryPriceLabel}>Entry Price</div>
+                          <div className={styles.entryPriceValue}>{stream.entryPrice}</div>
+                        </div>
+                        <div className={styles.upcomingActions}>
+                          <button className={styles.editBtn}>Edit</button>
+                          <button className={styles.moreBtn}><MoreVertical size={14} /></button>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+
+              {/* Mobile Upcoming Streams Cards */}
+              <div className={`${styles.upcomingMobileList} ${styles.showMobile}`}>
+                {upcomingStreams.map((stream) => (
+                  <article key={stream.id} className={styles.mobileUpcomingCard}>
+                    <div className={styles.mobileUpcomingTop}>
+                      <img src={stream.thumbnail} alt={stream.title} className={styles.mobileUpcomingThumb} />
+                      <div className={styles.mobileUpcomingContent}>
+                        <div className={styles.mobileUpcomingTitleRow}>
+                          <span className={styles.mobileUpcomingTitle}>{stream.title}</span>
+                          <span className={styles.scheduledBadge}>{stream.status}</span>
+                        </div>
+                        <div className={styles.mobileRecentMetaRow}>
+                          <span className={styles.mobileRecentMeta}>{stream.date}</span>
+                          <span className={styles.mobileRecentCategory} style={{ color: stream.categoryColor }}>
+                            {stream.category}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className={styles.mobileUpcomingFooter}>
+                      <div className={styles.mobileUpcomingPrice}>
+                        <span className={styles.mobileUpcomingPriceLabel}>Entry Price</span>
+                        <span className={styles.mobileUpcomingPriceValue}>{stream.entryPrice}</span>
+                      </div>
+                      <div className={styles.mobileUpcomingActions}>
+                        <button className={styles.actionBtn}><Edit2 size={13} /></button>
+                        <button className={styles.actionBtn}><MoreVertical size={13} /></button>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+
+              <button className={styles.viewAllLink}>View All Upcoming Streams</button>
             </div>
-            <button className={styles.viewAllLink}>View All Upcoming Streams</button>
           </div>
 
           {/* Recent Streams */}
@@ -192,7 +234,7 @@ export const CreatorLiveStreamsPage = () => {
               <button className={styles.viewAllBtn}>View All</button>
             </div>
             <div className={styles.recentTableCard}>
-              <div className={styles.tableContainer}>
+              <div className={`${styles.tableContainer} ${styles.hideMobile}`}>
                 <table className={styles.contentTable}>
                   <thead>
                     <tr>
@@ -243,8 +285,48 @@ export const CreatorLiveStreamsPage = () => {
                   </tbody>
                 </table>
               </div>
+
+              {/* Mobile Recent Streams Cards */}
+              <div className={`${styles.mobileRecentList} ${styles.showMobile}`}>
+                {recentStreams.map((stream) => (
+                  <article key={stream.id} className={styles.mobileRecentCard}>
+                    <div className={styles.mobileRecentTop}>
+                      <div className={styles.mobileRecentThumbCol}>
+                        <img src={stream.thumbnail} alt={stream.title} className={styles.mobileRecentThumb} />
+                      </div>
+                      <div className={styles.mobileRecentContent}>
+                        <div className={styles.mobileRecentTitleRow}>
+                          <span className={styles.mobileRecentTitle}>{stream.title}</span>
+                          <div className={styles.mobileRecentActions}>
+                            <button className={styles.actionBtn}><TrendingUp size={13} /></button>
+                            <button className={styles.actionBtn}><MoreVertical size={13} /></button>
+                          </div>
+                        </div>
+                        <div className={styles.mobileRecentMetaRow}>
+                          <span className={styles.mobileRecentMeta}>
+                            {stream.duration} • {stream.date}
+                          </span>
+                          <span className={styles.mobileRecentCategory} style={{ color: stream.categoryColor }}>
+                            {stream.category}
+                          </span>
+                        </div>
+                        <div className={styles.mobileRecentStatsRow}>
+                          <div className={styles.mobileRecentStats}>
+                            <div className={styles.mobileStatItem}>
+                              <Eye size={11} />
+                              <span>{stream.views} views</span>
+                            </div>
+                          </div>
+                          <span className={styles.mobileRecentEarnings}>{stream.earnings}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+
+              <button className={styles.viewAllLink}>View All Recent Streams</button>
             </div>
-            <button className={styles.viewAllLink}>View All Recent Streams</button>
           </div>
         </div>
 
@@ -291,7 +373,7 @@ export const CreatorLiveStreamsPage = () => {
                 <div key={idx} className={styles.categoryItem}>
                   <div className={styles.categoryItemLeft}>
                     <div className={styles.categoryIconWrap} style={{ background: `${cat.color}20` }}>
-                      <Radio size={16} style={{ color: cat.color }} />
+                      {(() => { const Icon = categoryIconMap[cat.icon] || Radio; return <Icon size={16} style={{ color: cat.color }} />; })()}
                     </div>
                     <div className={styles.categoryInfo}>
                       <span className={styles.categoryName}>{cat.label}</span>
@@ -356,6 +438,7 @@ export const CreatorLiveStreamsPage = () => {
               ))}
             </div>
           </div>
+
         </div>
       </div>
     </div>

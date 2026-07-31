@@ -10,7 +10,7 @@
   border-radius: var(--dropdown-radius, 1.2vw);
   padding: var(--dropdown-padding-container, 1.5vw);
   box-shadow: 0 1vw 3vw rgba(0, 0, 0, 0.6);
-  z-index: 1000;
+  z-index: 2000;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
