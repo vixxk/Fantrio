@@ -1,0 +1,1359 @@
+/* ================= EARNINGS PAGE ================= */
+.pageContainer {
+  width: 100%;
+  min-height: calc(100vh - 80px);
+  padding: 0 0 2rem 0;
+  box-sizing: border-box;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ================= STATS ROW ================= */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.statCard {
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  transition: all 0.2s ease;
+  min-height: 80px;
+  overflow: hidden;
+}
+
+.statCard:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.statIconWrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.statContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.statLabel {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
+.statValue {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.statChange {
+  font-size: 0.68rem;
+  font-weight: 500;
+}
+
+.changePositive {
+  color: #10b981;
+}
+
+.changeInfo {
+  color: #f59e0b;
+}
+
+/* ================= MAIN GRID ================= */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.5rem;
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.rightSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ================= SECTIONS ================= */
+.section {
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+/* ================= REVENUE BREAKDOWN ================= */
+.revenueGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.revenueCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 1rem;
+  transition: all 0.2s ease;
+}
+
+.revenueCard:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.revenueCardTop {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.revenueIconWrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.revenueSource {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+}
+
+.revenueCardMiddle {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.revenueAmount {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.revenueChange {
+  font-size: 0.65rem;
+  font-weight: 500;
+}
+
+.revenueBarWrap {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 0.35rem;
+}
+
+.revenueBar {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+.revenuePercentage {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ================= MONTHLY CHART ================= */
+.periodTabs {
+  display: flex;
+  gap: 0.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.25rem;
+  border-radius: 8px;
+}
+
+.periodTab {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.periodTab:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.periodTabActive {
+  background: #e10075;
+  color: #ffffff;
+}
+
+.chartContainer {
+  padding: 1rem 0;
+}
+
+.chartBars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 180px;
+  gap: 0.75rem;
+}
+
+.chartBarGroup {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.chartBarWrap {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.chartBar {
+  width: 100%;
+  max-width: 48px;
+  border-radius: 6px 6px 2px 2px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 0.5rem;
+  transition: height 0.5s ease;
+  min-height: 20px;
+}
+
+.chartBarValue {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.chartBarLabel {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 0.5rem;
+}
+
+/* ================= TABS ================= */
+.tabsRow {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tabsRow::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 0.75rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  margin-bottom: -1px;
+}
+
+.tab:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.activeTab {
+  color: #e10075 !important;
+  border-bottom-color: #e10075 !important;
+  font-weight: 600;
+}
+
+/* ================= TABLE ================= */
+.tableCard {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+.tableContainer {
+  overflow-x: auto;
+}
+
+.contentTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.th {
+  text-align: left;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  white-space: nowrap;
+}
+
+.tableRow {
+  transition: background 0.2s ease;
+}
+
+.tableRow:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.td {
+  padding: 0.75rem 1rem;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.8);
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.tableRow:last-child .td {
+  border-bottom: none;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.userAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.userName {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.txDescription {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.sourceBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.dateInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.txDate {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.txTime {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.amountPositive {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.amountNegative {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+.statusCompleted {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+/* ================= PAGINATION ================= */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 1.25rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.pageBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pageBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.pageBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.pageBtnActive {
+  background: #e10075 !important;
+  border-color: #e10075 !important;
+  color: #ffffff !important;
+}
+
+.pageDots {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.82rem;
+  padding: 0 0.25rem;
+}
+
+/* ================= HEADER ACTIONS ================= */
+.headerActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.exportBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.exportBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+/* ================= SIDEBAR CARDS ================= */
+.sidebarCard {
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.sidebarCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.sidebarCardTitle {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.viewAllBtn {
+  background: transparent;
+  border: none;
+  color: #e10075;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.viewAllBtn:hover {
+  color: #ff6b9d;
+}
+
+/* ================= PAYOUT INFO ================= */
+.payoutInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.payoutMain {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.payoutLabel {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.payoutAmount {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #10b981;
+}
+
+.payoutDate {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.payoutMethod {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.payoutMethodIcon {
+  width: 36px;
+  height: 36px;
+  background: rgba(139, 92, 246, 0.15);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b5cf6;
+}
+
+.payoutMethodInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.payoutMethodLabel {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+.payoutMethodValue {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.viewPayoutsBtn {
+  width: 100%;
+  background: rgba(225, 0, 117, 0.1);
+  border: 1px solid rgba(225, 0, 117, 0.3);
+  color: #e10075;
+  padding: 0.65rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 1rem;
+}
+
+.viewPayoutsBtn:hover {
+  background: rgba(225, 0, 117, 0.2);
+  border-color: #e10075;
+}
+
+/* ================= SUBSCRIBERS LIST ================= */
+.subscribersList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.subscriberItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.subscriberItem:last-child {
+  border-bottom: none;
+}
+
+.rankBadge {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.rankBadge[data-rank="1"] {
+  background: linear-gradient(135deg, #e10075 0%, #ff6b9d 100%);
+  color: #ffffff;
+}
+
+.rankBadge[data-rank="2"] {
+  background: rgba(139, 92, 246, 0.2);
+  color: #8b5cf6;
+}
+
+.rankBadge[data-rank="3"] {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+}
+
+.subscriberAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.subscriberInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.subscriberName {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.subscriberPlan {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.subscriberSpent {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #10b981;
+}
+
+/* ================= PAYOUT LIST ================= */
+.payoutList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.payoutItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.payoutItem:last-child {
+  border-bottom: none;
+}
+
+.payoutItemIcon {
+  width: 32px;
+  height: 32px;
+  background: rgba(16, 185, 129, 0.15);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #10b981;
+}
+
+.payoutItemInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.payoutItemAmount {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.payoutItemDate {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.payoutItemStatus {
+  font-size: 0.68rem;
+  font-weight: 500;
+}
+
+/* ================= QUICK STATS ================= */
+.quickStatsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.quickStatItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.quickStatLabel {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.quickStatValue {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* ================= LIGHT THEME ================= */
+.light {
+  color: #1a1625;
+}
+
+.light .statCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.light .statCard:hover {
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.light .statLabel {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .statValue {
+  color: #1a1625;
+}
+
+.light .changePositive {
+  color: #059669;
+}
+
+.light .changeInfo {
+  color: #d97706;
+}
+
+.light .section {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.light .sectionTitle {
+  color: #1a1625;
+}
+
+.light .revenueCard {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .revenueCard:hover {
+  border-color: rgba(0, 0, 0, 0.12);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.light .revenueSource {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .revenueAmount {
+  color: #1a1625;
+}
+
+.light .revenueBarWrap {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.light .revenuePercentage {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .periodTab {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .periodTab:hover {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .chartBarValue {
+  color: #1a1625;
+}
+
+.light .chartBarLabel {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .tabsRow {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .tab {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .tab:hover {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .activeTab {
+  color: #e10075 !important;
+  border-bottom-color: #e10075 !important;
+}
+
+.light .th {
+  color: rgba(26, 22, 37, 0.4);
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .tableRow:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.light .td {
+  color: rgba(26, 22, 37, 0.8);
+  border-bottom-color: rgba(0, 0, 0, 0.04);
+}
+
+.light .userName {
+  color: #1a1625;
+}
+
+.light .txDescription {
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .sourceBadge {
+  background: rgba(0, 0, 0, 0.06);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .txDate {
+  color: #1a1625;
+}
+
+.light .txTime {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .amountPositive {
+  color: #059669;
+}
+
+.light .amountNegative {
+  color: #dc2626;
+}
+
+.light .pageBtn {
+  border-color: rgba(0, 0, 0, 0.1);
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .pageBtn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.04);
+  color: #1a1625;
+}
+
+.light .exportBtn {
+  border-color: rgba(0, 0, 0, 0.15);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .exportBtn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.25);
+  color: #1a1625;
+}
+
+.light .sidebarCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.light .sidebarCardTitle {
+  color: #1a1625;
+}
+
+.light .payoutLabel {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .payoutAmount {
+  color: #059669;
+}
+
+.light .payoutDate {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .payoutMethodLabel {
+  color: #1a1625;
+}
+
+.light .payoutMethodValue {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .subscriberItem {
+  border-bottom-color: rgba(0, 0, 0, 0.04);
+}
+
+.light .rankBadge {
+  background: rgba(0, 0, 0, 0.08);
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .subscriberName {
+  color: #1a1625;
+}
+
+.light .subscriberPlan {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .subscriberSpent {
+  color: #059669;
+}
+
+.light .payoutItem {
+  border-bottom-color: rgba(0, 0, 0, 0.04);
+}
+
+.light .payoutItemAmount {
+  color: #1a1625;
+}
+
+.light .payoutItemDate {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .quickStatLabel {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .quickStatValue {
+  color: #1a1625;
+}
+
+/* ================= RESPONSIVE - TABLET ================= */
+@media (max-width: 1200px) {
+  .mainGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .rightSidebar {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .rightSidebar > .sidebarCard:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .revenueGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ================= RESPONSIVE - MOBILE ================= */
+@media (max-width: 768px) {
+  .pageContainer {
+    display: flex;
+    flex-direction: column;
+    padding: 0 0 5rem 0 !important;
+    gap: 0;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  .statsRow {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+    margin-bottom: 1rem;
+  }
+
+  .statCard {
+    padding: 0.75rem !important;
+    gap: 0.6rem !important;
+  }
+
+  .statIconWrap {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .statLabel {
+    font-size: 0.62rem !important;
+  }
+
+  .statContent {
+    overflow: hidden;
+  }
+
+  .statValue {
+    font-size: 1.05rem !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .statChange {
+    font-size: 0.58rem !important;
+  }
+
+  .mainGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .rightSidebar {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .rightSidebar > .sidebarCard:last-child {
+    grid-column: auto;
+  }
+
+  .section {
+    padding: 1rem !important;
+    border-radius: 10px;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .sectionTitle {
+    font-size: 0.92rem !important;
+  }
+
+  .revenueGrid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  .revenueCard {
+    padding: 0.875rem !important;
+  }
+
+  .chartBars {
+    height: 140px;
+  }
+
+  .chartBar {
+    max-width: 36px;
+  }
+
+  .chartBarValue {
+    font-size: 0.6rem;
+  }
+
+  .tabsRow {
+    margin: 0 -1rem;
+    padding: 0 1rem;
+  }
+
+  .tab {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  /* Table becomes cards on mobile */
+  .tableContainer {
+    overflow: visible;
+  }
+
+  .contentTable,
+  .contentTable thead,
+  .contentTable tbody,
+  .contentTable tr,
+  .contentTable th,
+  .contentTable td {
+    display: block;
+  }
+
+  .contentTable thead {
+    display: none;
+  }
+
+  .contentTable tr {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 0.875rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .contentTable td {
+    padding: 0.25rem 0;
+    border: none;
+  }
+
+  .contentTable .td:first-child {
+    padding-top: 0;
+  }
+
+  .td:nth-child(1) {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .userAvatar {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .td:nth-child(2) {
+    font-size: 0.78rem !important;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.35rem;
+  }
+
+  .td:nth-child(3) {
+    display: inline-block;
+    margin-right: 0.5rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .td:nth-child(4) {
+    display: inline-block;
+    margin-bottom: 0.5rem;
+  }
+
+  .td:nth-child(5) {
+    display: inline-block;
+    font-size: 1rem !important;
+    font-weight: 700;
+  }
+
+  .td:nth-child(6) {
+    display: inline-block;
+    float: right;
+  }
+
+  .pagination {
+    padding: 1rem 0.5rem !important;
+  }
+
+  .pageBtn {
+    min-width: 30px !important;
+    height: 30px !important;
+    font-size: 0.75rem !important;
+  }
+
+  .sidebarCard {
+    padding: 1rem !important;
+    border-radius: 10px;
+  }
+
+  .sidebarCardHeader {
+    margin-bottom: 0.875rem;
+  }
+
+  .sidebarCardTitle {
+    font-size: 0.85rem !important;
+  }
+
+  .payoutAmount {
+    font-size: 1.25rem !important;
+  }
+
+  .subscriberItem {
+    padding: 0.5rem 0;
+  }
+
+  .subscriberAvatar {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .subscriberName {
+    font-size: 0.78rem !important;
+  }
+
+  .subscriberSpent {
+    font-size: 0.72rem !important;
+  }
+
+  .quickStatsGrid {
+    gap: 0.75rem;
+  }
+
+  .quickStatValue {
+    font-size: 0.92rem !important;
+  }
+
+  .periodTabs {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ================= RESPONSIVE - SMALL MOBILE ================= */
+@media (max-width: 480px) {
+  .statsRow {
+    gap: 0.4rem !important;
+  }
+
+  .statCard {
+    padding: 0.6rem !important;
+    gap: 0.5rem !important;
+  }
+
+  .statIconWrap {
+    width: 30px !important;
+    height: 30px !important;
+  }
+
+  .statValue {
+    font-size: 0.95rem !important;
+  }
+
+  .section {
+    padding: 0.875rem !important;
+  }
+
+  .chartBars {
+    height: 120px;
+  }
+
+  .chartBar {
+    max-width: 32px;
+  }
+
+  .contentTable tr {
+    padding: 0.75rem !important;
+  }
+
+  .userAvatar {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .td:nth-child(5) {
+    font-size: 0.92rem !important;
+  }
+
+  .subscriberItem {
+    gap: 0.5rem;
+  }
+
+  .rankBadge {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 0.65rem !important;
+  }
+
+  .payoutItem {
+    gap: 0.5rem;
+  }
+
+  .payoutItemIcon {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .viewPayoutsBtn {
+    padding: 0.5rem !important;
+    font-size: 0.78rem !important;
+  }
+}

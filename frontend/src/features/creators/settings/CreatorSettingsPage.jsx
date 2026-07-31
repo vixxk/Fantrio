@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { useApp } from '../../../context/AppContext';
 import {
   Camera, ChevronRight, HelpCircle,
-  Phone, AlertTriangle, Check, CreditCard
+  Phone, AlertTriangle, Check, Landmark
 } from 'lucide-react';
 import {
   profileData, accountStatus, verificationProgress, securityScore,
   payoutSettings, notifications, privacySettings, creatorPreferences,
-  helpLinks, quickInfo
+  helpLinks
 } from './mockData';
 import { PeriodDropdown } from '../analytics/PeriodDropdown';
 import styles from './CreatorSettingsPage.module.css';
@@ -82,7 +82,7 @@ export const CreatorSettingsPage = () => {
                   </div>
                   <div className={styles.formGroup}>
                     <label className={styles.formLabel}>Username</label>
-                    <input type="text" className={styles.formInput} defaultValue={profileData.username} />
+                    <input type="text" className={`${styles.formInput} ${styles.usernameInput}`} defaultValue={profileData.username} />
                   </div>
                 </div>
                 <div className={styles.formRow}>
@@ -116,17 +116,17 @@ export const CreatorSettingsPage = () => {
             <div className={styles.payoutContent}>
               <div className={styles.payoutLeft}>
                 <div className={styles.connectedAccount}>
-                  <div className={styles.connectedHeader}>
-                    <span className={styles.connectedLabel}>Connected Account</span>
-                    {payoutSettings.verified && (
-                      <span className={styles.verifiedBadge}>Verified</span>
-                    )}
-                  </div>
                   <div className={styles.bankInfo}>
                     <div className={styles.bankIcon}>
-                      <CreditCard size={20} />
+                      <Landmark size={28} />
                     </div>
                     <div className={styles.bankDetails}>
+                      <div className={styles.connectedHeader}>
+                        <span className={styles.connectedLabel}>Connected Account</span>
+                        {payoutSettings.verified && (
+                          <span className={styles.verifiedBadge}>Verified</span>
+                        )}
+                      </div>
                       <span className={styles.bankName}>Bank Transfer (**** 5678)</span>
                     </div>
                   </div>
@@ -181,7 +181,7 @@ export const CreatorSettingsPage = () => {
                 </div>
                 <div className={styles.payoutNote}>
                   <span className={styles.noteIcon}>ℹ️</span>
-                  <span className={styles.noteText}>Payouts are processed every Monday. Ensure your payout details are accurate to avoid delays.</span>
+                  <span className={styles.noteText}>Payouts are processed every Monday. Ensure your payout details are accurate.</span>
                 </div>
               </div>
             </div>
@@ -281,12 +281,6 @@ export const CreatorSettingsPage = () => {
               </div>
             </section>
           </div>
-
-          {/* Action Buttons */}
-          <div className={styles.actionButtons}>
-            <button className={styles.cancelBtn}>Cancel</button>
-            <button className={styles.saveBtn}>Save Changes</button>
-          </div>
         </div>
 
         {/* Right Sidebar */}
@@ -354,42 +348,55 @@ export const CreatorSettingsPage = () => {
             <div className={styles.securityScoreContent}>
               <div className={styles.scoreCircle}>
                 <svg viewBox="0 0 100 100" className={styles.scoreSvg}>
+                  <defs>
+                    <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#10b981" />
+                      <stop offset="100%" stopColor="#e10075" />
+                    </linearGradient>
+                  </defs>
                   <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="8" />
                   <circle
                     cx="50" cy="50" r="42"
                     fill="none"
-                    stroke="#10b981"
+                    stroke="url(#scoreGradient)"
                     strokeWidth="8"
                     strokeDasharray={`${(securityScore.score / 100) * 264} 264`}
                     strokeLinecap="round"
                     transform="rotate(-90 50 50)"
                   />
-                  <text x="50" y="50" textAnchor="middle" className={styles.scoreValue}>{securityScore.score}%</text>
+                  <text x="50" y="50" dy="0.35em" textAnchor="middle" className={styles.scoreValue}>{securityScore.score}%</text>
                 </svg>
               </div>
               <div className={styles.scoreDetails}>
                 <div className={styles.scoreTitleRow}>
                   <span className={styles.scoreStrength}>{securityScore.strength}</span>
                 </div>
-                <p className={styles.scoreDescription}>{securityScore.description}</p>
-                <div className={styles.scoreItems}>
+                <p className={styles.scoreDescription}>{securityScore.description}</p>                <div className={styles.scoreItems}>
                   <div className={styles.scoreItem}>
-                    <span className={`${styles.scoreItemIcon} ${styles.itemGreen}`}>●</span>
+                    <div className={styles.scoreItemIconWrap}>
+                      <Check size={8} strokeWidth={3} />
+                    </div>
                     <span className={styles.scoreItemLabel}>Password Strength</span>
                     <span className={styles.scoreItemValue}>{securityScore.passwordStrength}</span>
                   </div>
                   <div className={styles.scoreItem}>
-                    <span className={`${styles.scoreItemIcon} ${styles.itemGreen}`}>●</span>
+                    <div className={styles.scoreItemIconWrap}>
+                      <Check size={8} strokeWidth={3} />
+                    </div>
                     <span className={styles.scoreItemLabel}>Two-Factor Auth</span>
                     <span className={styles.scoreItemValue}>{securityScore.twoFactorAuth}</span>
                   </div>
                   <div className={styles.scoreItem}>
-                    <span className={`${styles.scoreItemIcon} ${styles.itemGreen}`}>●</span>
+                    <div className={styles.scoreItemIconWrap}>
+                      <Check size={8} strokeWidth={3} />
+                    </div>
                     <span className={styles.scoreItemLabel}>Email Verified</span>
                     <span className={styles.scoreItemValue}>{securityScore.emailVerified}</span>
                   </div>
                   <div className={styles.scoreItem}>
-                    <span className={`${styles.scoreItemIcon} ${styles.itemYellow}`}>●</span>
+                    <div className={styles.scoreItemIconWrap}>
+                      <Check size={8} strokeWidth={3} />
+                    </div>
                     <span className={styles.scoreItemLabel}>Active Sessions</span>
                     <span className={styles.scoreItemValue}>{securityScore.activeSessions}</span>
                   </div>
@@ -415,25 +422,6 @@ export const CreatorSettingsPage = () => {
                   <ChevronRight size={16} className={styles.helpArrow} />
                 </button>
               ))}
-            </div>
-          </div>
-
-          {/* Quick Info */}
-          <div className={styles.sidebarCard}>
-            <h3 className={styles.sidebarCardTitle}>Quick Info</h3>
-            <div className={styles.quickInfoList}>
-              <div className={styles.quickInfoItem}>
-                <span className={styles.quickInfoLabel}>Username</span>
-                <span className={styles.quickInfoValue}>{quickInfo.username}</span>
-              </div>
-              <div className={styles.quickInfoItem}>
-                <span className={styles.quickInfoLabel}>Email</span>
-                <span className={styles.quickInfoValue}>{quickInfo.email}</span>
-              </div>
-              <div className={styles.quickInfoItem}>
-                <span className={styles.quickInfoLabel}>Timezone</span>
-                <span className={styles.quickInfoValue}>{quickInfo.timezone}</span>
-              </div>
             </div>
           </div>
         </div>
