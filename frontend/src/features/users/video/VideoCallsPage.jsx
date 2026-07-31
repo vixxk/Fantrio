@@ -729,6 +729,7 @@ export const VideoCallsPage = () => {
           <div className={styles.sliderHeader}>
             <span className={styles.sliderMinText}>5 Coins</span>
             <span className={styles.sliderValText}>{priceRange} Coins</span>
+            <span className={styles.sliderMaxText}>50 Coins</span>
           </div>
           <input
             type="range"

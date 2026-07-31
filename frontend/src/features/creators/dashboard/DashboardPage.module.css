@@ -120,10 +120,13 @@
 }
 
 .quickActionTitle {
-  font-size: 0.92rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: #ffffff;
   margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .quickActionRate {
@@ -151,6 +154,10 @@
   font-size: 0.68rem;
   font-weight: 700;
   z-index: 1;
+}
+
+.light .quickActionBadge {
+  color: #ffffff;
 }
 
 .quickActionDesc {
@@ -1372,6 +1379,34 @@
 .viewStreamsBtn:hover {
   background: rgba(225, 0, 117, 0.2);
   border-color: #e10075;
+}
+
+.streamMoreBtn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 0.25rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.streamMoreBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.light .streamMoreBtn {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .streamMoreBtn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: rgba(26, 22, 37, 0.7);
 }
 
 /* ================= QUICK STATS ================= */

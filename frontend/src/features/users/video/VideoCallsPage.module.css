@@ -448,11 +448,16 @@
 .sliderHeader {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-size: 0.85rem;
   font-weight: 600;
 }
 
 .sliderMinText {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.sliderMaxText {
   color: rgba(255, 255, 255, 0.5);
 }
 
@@ -939,8 +944,13 @@
   border-color: rgba(0, 0, 0, 0.2);
 }
 
-.light .sliderMinText {
+.light .sliderMinText,
+.light .sliderMaxText {
   color: rgba(26, 22, 37, 0.5);
+}
+
+.light .sliderValText {
+  color: #e10075;
 }
 
 .light .priceOptionBtn {

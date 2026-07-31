@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import {
   earningsOverviewStats, revenueBreakdown, earningsTabs,
-  transactionHistory, monthlyEarnings, topSubscribers,
+  transactionHistory, topSubscribers,
   payoutHistory, quickStats
 } from './mockData';
 import { PeriodDropdown } from '../analytics/PeriodDropdown';
@@ -43,7 +43,7 @@ export const EarningsPage = () => {
   const { darkMode, navigateTo } = useApp();
   const [activeTab, setActiveTab] = useState('All Transactions');
   const [currentPage, setCurrentPage] = useState(1);
-  const [activePeriod, setActivePeriod] = useState('monthly');
+  const pageSize = 10;
 
   const filteredTransactions = transactionHistory.filter((tx) => {
     if (activeTab === 'All Transactions') return true;
@@ -56,6 +56,33 @@ export const EarningsPage = () => {
     if (activeTab === 'Store') return tx.type === 'store';
     return true;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / pageSize));
+  const currentTransactions = filteredTransactions.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setCurrentPage(1);
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+      return pages;
+    }
+    pages.push(1);
+    if (currentPage > 3) pages.push('start-ellipsis');
+    const start = Math.max(2, currentPage - 1);
+    const end = Math.min(totalPages - 1, currentPage + 1);
+    for (let i = start; i <= end; i++) pages.push(i);
+    if (currentPage < totalPages - 2) pages.push('end-ellipsis');
+    pages.push(totalPages);
+    return pages;
+  };
 
   return (
     <div className={`${styles.pageContainer} ${!darkMode ? styles.light : ''}`}>
@@ -86,7 +113,7 @@ export const EarningsPage = () => {
         {/* Left Column */}
         <div className={styles.leftColumn}>
           {/* Revenue Breakdown */}
-          <div className={styles.section}>
+          <div className={`${styles.section} ${styles.revenueSection}`}>
             <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>Revenue Breakdown</h2>
               <PeriodDropdown variant="text" />
@@ -124,63 +151,8 @@ export const EarningsPage = () => {
             </div>
           </div>
 
-          {/* Monthly Earnings Chart */}
-          <div className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>Monthly Earnings</h2>
-              <div className={styles.periodTabs}>
-                <button
-                  className={`${styles.periodTab} ${activePeriod === 'weekly' ? styles.periodTabActive : ''}`}
-                  onClick={() => setActivePeriod('weekly')}
-                >
-                  Weekly
-                </button>
-                <button
-                  className={`${styles.periodTab} ${activePeriod === 'monthly' ? styles.periodTabActive : ''}`}
-                  onClick={() => setActivePeriod('monthly')}
-                >
-                  Monthly
-                </button>
-                <button
-                  className={`${styles.periodTab} ${activePeriod === 'yearly' ? styles.periodTabActive : ''}`}
-                  onClick={() => setActivePeriod('yearly')}
-                >
-                  Yearly
-                </button>
-              </div>
-            </div>
-            <div className={styles.chartContainer}>
-              <div className={styles.chartBars}>
-                {monthlyEarnings.map((item, idx) => {
-                  const maxAmount = Math.max(...monthlyEarnings.map((m) => m.amount));
-                  const height = (item.amount / maxAmount) * 100;
-                  return (
-                    <div key={idx} className={styles.chartBarGroup}>
-                      <div className={styles.chartBarWrap}>
-                        <div
-                          className={styles.chartBar}
-                          style={{
-                            height: `${height}%`,
-                            background: idx === monthlyEarnings.length - 1
-                              ? 'linear-gradient(180deg, #e10075 0%, #ff6b9d 100%)'
-                              : 'rgba(225, 0, 117, 0.3)',
-                          }}
-                        >
-                          <span className={styles.chartBarValue}>
-                            ${(item.amount / 1000).toFixed(1)}k
-                          </span>
-                        </div>
-                      </div>
-                      <span className={styles.chartBarLabel}>{item.month}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
           {/* Transaction History */}
-          <div className={styles.section}>
+          <div className={`${styles.section} ${styles.transactionSection}`}>
             <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>Transaction History</h2>
               <div className={styles.headerActions}>
@@ -196,7 +168,7 @@ export const EarningsPage = () => {
                 <button
                   key={tab}
                   className={`${styles.tab} ${activeTab === tab ? styles.activeTab : ''}`}
-                  onClick={() => setActiveTab(tab)}
+                  onClick={() => handleTabChange(tab)}
                 >
                   {tab}
                 </button>
@@ -218,7 +190,7 @@ export const EarningsPage = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredTransactions.map((tx) => {
+                    {currentTransactions.map((tx) => {
                       const TypeIcon = typeIconMap[tx.type];
                       return (
                         <tr key={tx.id} className={styles.tableRow}>
@@ -267,26 +239,23 @@ export const EarningsPage = () => {
                 >
                   <ChevronLeft size={16} />
                 </button>
-                {[1, 2, 3].map((page) => (
-                  <button
-                    key={page}
-                    className={`${styles.pageBtn} ${currentPage === page ? styles.pageBtnActive : ''}`}
-                    onClick={() => setCurrentPage(page)}
-                  >
-                    {page}
-                  </button>
-                ))}
-                <span className={styles.pageDots}>...</span>
+                {getPageNumbers().map((page, idx) =>
+                  typeof page === 'number' ? (
+                    <button
+                      key={page}
+                      className={`${styles.pageBtn} ${currentPage === page ? styles.pageBtnActive : ''}`}
+                      onClick={() => setCurrentPage(page)}
+                    >
+                      {page}
+                    </button>
+                  ) : (
+                    <span key={idx} className={styles.pageDots}>...</span>
+                  )
+                )}
                 <button
                   className={styles.pageBtn}
-                  onClick={() => setCurrentPage(8)}
-                >
-                  8
-                </button>
-                <button
-                  className={styles.pageBtn}
-                  onClick={() => setCurrentPage(Math.min(8, currentPage + 1))}
-                  disabled={currentPage === 8}
+                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
                 >
                   <ChevronRight size={16} />
                 </button>
@@ -298,9 +267,9 @@ export const EarningsPage = () => {
         {/* Right Sidebar */}
         <div className={styles.rightSidebar}>
           {/* Payout Info */}
-          <div className={styles.sidebarCard}>
+          <div className={`${styles.sidebarCard} ${styles.payoutInfoCard}`}>
             <div className={styles.sidebarCardHeader}>
-              <h3 className={styles.sidebarCardTitle}>Payout Information</h3>
+              <h3 className={styles.sidebarCardTitle}>Payout <span className={styles.payoutTitleInfo}>Information</span></h3>
               <button className={styles.viewAllBtn}>View All</button>
             </div>
             <div className={styles.payoutInfo}>
@@ -320,12 +289,13 @@ export const EarningsPage = () => {
               </div>
             </div>
             <button className={styles.viewPayoutsBtn} onClick={() => navigateTo('/creators/settings')}>
-              Manage Payout Settings
+              <span className={styles.desktopBtnText}>Manage Payout Settings</span>
+              <span className={styles.mobileBtnText}>Manage Payout</span>
             </button>
           </div>
 
           {/* Top Subscribers */}
-          <div className={styles.sidebarCard}>
+          <div className={`${styles.sidebarCard} ${styles.subscribersCard}`}>
             <div className={styles.sidebarCardHeader}>
               <h3 className={styles.sidebarCardTitle}>Top Subscribers</h3>
               <button className={styles.viewAllBtn}>View All</button>
@@ -348,7 +318,7 @@ export const EarningsPage = () => {
           </div>
 
           {/* Payout History */}
-          <div className={styles.sidebarCard}>
+          <div className={`${styles.sidebarCard} ${styles.payoutHistoryCard}`}>
             <div className={styles.sidebarCardHeader}>
               <h3 className={styles.sidebarCardTitle}>Payout History</h3>
               <button className={styles.viewAllBtn}>View All</button>
@@ -372,7 +342,7 @@ export const EarningsPage = () => {
           </div>
 
           {/* Quick Stats */}
-          <div className={styles.sidebarCard}>
+          <div className={`${styles.sidebarCard} ${styles.quickStatsCard}`}>
             <div className={styles.sidebarCardHeader}>
               <h3 className={styles.sidebarCardTitle}>Quick Stats</h3>
             </div>

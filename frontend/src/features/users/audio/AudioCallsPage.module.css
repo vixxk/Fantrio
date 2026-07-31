@@ -833,6 +833,55 @@
   transform: rotate(135deg);
 }
 
+/* Slider styles */
+.sliderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.sliderMinText {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.sliderMaxText {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.sliderValText {
+  color: #ff007f;
+  font-weight: 700;
+}
+
+.filterSlider {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 99px;
+  outline: none;
+  cursor: pointer;
+}
+
+.filterSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #ff007f;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.filterSlider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
 /* Light Theme Overrides (using AllCreators classes where applicable) */
 .light .title {
   color: #1a1625;
@@ -880,6 +929,15 @@
 
 .light .filterSectionLabel {
   color: rgba(26, 22, 37, 0.8);
+}
+
+.light .sliderMinText,
+.light .sliderMaxText {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .sliderValText {
+  color: #e10075;
 }
 
 .light .checkboxLabel {

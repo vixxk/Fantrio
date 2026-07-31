@@ -507,9 +507,13 @@
 }
 
 .pageDots {
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 0.82rem;
-  padding: 0 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.1rem;
 }
 
 /* ================= SIDEBAR CARDS ================= */
@@ -1027,7 +1031,7 @@
 }
 
 .light .pageDots {
-  color: rgba(26, 22, 37, 0.4);
+  color: rgba(26, 22, 37, 0.6);
 }
 
 .light .overviewLabel {

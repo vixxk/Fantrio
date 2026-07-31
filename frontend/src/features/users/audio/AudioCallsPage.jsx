@@ -740,12 +740,12 @@ export const AudioCallsPage = () => {
           </div>
         </div>
 
-        {/* Price Range */}
-        <div className={styles.filterSection}>
+        {/* Price Range */}          <div className={styles.filterSection}>
           <h4 className={styles.filterSectionLabel}>Price Per Minute</h4>
           <div className={styles.sliderHeader}>
             <span className={styles.sliderMinText}>5 Coins</span>
             <span className={styles.sliderValText}>{priceRange} Coins</span>
+            <span className={styles.sliderMaxText}>50 Coins</span>
           </div>
           <input
             type="range"

@@ -1113,22 +1113,6 @@ export const MessagesPage = () => {
             <h2 className={styles.chatsTitle}>
               {showArchived ? 'Archived' : 'Messages'}
             </h2>
-            <div className={styles.headerRightActions}>
-              <button 
-                type="button"
-                className={`${styles.archiveHeaderBtn} ${showArchived ? styles.archiveHeaderActive : ''}`} 
-                onClick={() => {
-                  setShowArchived(!showArchived);
-                  navigateTo('/messages');
-                }}
-                title={showArchived ? "Back to Messages" : "Archived Chats"}
-              >
-                <GradientArchiveIcon size={22} />
-              </button>
-              <button className={styles.composeBtn} title="New Message">
-                <img src="/compose.png" alt="Compose" className={styles.composeIconImg} />
-              </button>
-            </div>
           </div>
 
           {/* Search Input */}

@@ -1006,8 +1006,16 @@
    LIGHT THEME OVERRIDES
    ========================================================================== */
 
+.light .messagesContainer {
+  background: #ffffff !important;
+}
+
 .light .messagesShell {
   background: #ffffff;
+}
+
+.light .chatsHeader {
+  display: none;
 }
 
 .light .chatsSidebar {

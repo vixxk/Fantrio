@@ -354,13 +354,13 @@ export const CreatorSettingsPage = () => {
                       <stop offset="100%" stopColor="#e10075" />
                     </linearGradient>
                   </defs>
-                  <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="8" />
+                  <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="8" strokeDasharray="237.6 264" strokeLinecap="round" transform="rotate(-90 50 50)" />
                   <circle
                     cx="50" cy="50" r="42"
                     fill="none"
                     stroke="url(#scoreGradient)"
                     strokeWidth="8"
-                    strokeDasharray={`${(securityScore.score / 100) * 264} 264`}
+                    strokeDasharray={`${(securityScore.score / 100) * 237.6} 264`}
                     strokeLinecap="round"
                     transform="rotate(-90 50 50)"
                   />

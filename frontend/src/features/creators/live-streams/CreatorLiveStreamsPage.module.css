@@ -1184,8 +1184,12 @@
 }
 
 .topRank {
-  width: 20px;
-  font-size: 0.82rem;
+  width: 24px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.4);
 }
@@ -1462,6 +1466,15 @@
   background: rgba(0, 0, 0, 0.04);
 }
 
+.light .moreBtn {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .moreBtn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: rgba(26, 22, 37, 0.7);
+}
+
 .light .th {
   color: rgba(26, 22, 37, 0.4);
   border-bottom-color: rgba(0, 0, 0, 0.06);
@@ -1590,6 +1603,10 @@
 
 .light .topItemTitle {
   color: rgba(26, 22, 37, 0.8);
+}
+
+.light .topRank {
+  color: rgba(26, 22, 37, 0.4);
 }
 
 .light .topItemCategory {

@@ -335,15 +335,17 @@
 .unreadBadge {
   background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%);
   color: #ffffff;
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 99px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(225, 0, 117, 0.3);
 }
 
 /* Archive Footer */
@@ -1553,6 +1555,34 @@
   background: linear-gradient(#ffffff, #ffffff) padding-box,
               linear-gradient(90deg, #e10075, #7e00f3) border-box;
   color: #1a1625;
+}
+
+.light .emptyTitle {
+  color: rgba(0, 0, 0, 0.75);
+}
+
+.light .emptyText {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.light .emptyProfileState {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.light .emptyIcon {
+  color: rgba(126, 0, 243, 0.5);
+}
+
+.light .ratingRow {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.light .onlineDot {
+  border-color: #fdfdfd;
+}
+
+.light .unreadBadge {
+  box-shadow: 0 2px 8px rgba(126, 0, 243, 0.25);
 }
 
 /* Light Mode Overrides for Action Buttons */

@@ -90,15 +90,6 @@ export const revenueBreakdown = [
     change: '+15.8%',
     changeType: 'positive',
   },
-  {
-    source: 'Store Sales',
-    amount: '$760.00',
-    percentage: 1,
-    color: '#06b6d4',
-    icon: 'shopping',
-    change: '+2.1%',
-    changeType: 'positive',
-  },
 ];
 
 // Tabs for filtering

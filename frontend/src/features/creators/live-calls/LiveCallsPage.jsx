@@ -18,22 +18,6 @@ import {
 import { PeriodDropdown } from '../analytics/PeriodDropdown';
 import styles from './LiveCallsPage.module.css';
 
-const GradientBadgeCheck = ({ size = 14 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, display: 'inline-block', verticalAlign: 'middle' }}>
-    <defs>
-      <linearGradient id="badgeGradLive" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#e10075" />
-        <stop offset="100%" stopColor="#7e00f3" />
-      </linearGradient>
-    </defs>
-    <path 
-      d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76z" 
-      fill="url(#badgeGradLive)" 
-    />
-    <path d="m9 12 2 2 4-4" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
 const iconMap = {
   phone: Clock,
   earnings: Wallet,
@@ -457,7 +441,6 @@ export const LiveCallsPage = () => {
                             <div className={styles.fanDetails}>
                               <span className={styles.fanName}>
                                 {row.fan.name}
-                                {row.fan.isVerified && <GradientBadgeCheck size={18} />}
                               </span>
                             </div>
                           </div>

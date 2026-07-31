@@ -420,6 +420,9 @@ export const DashboardPage = () => {
                   <span className={`${styles.streamPrice} ${stream.price === 'Free' ? styles.streamPriceFree : ''}`}>
                     {stream.price}
                   </span>
+                  <button className={styles.streamMoreBtn}>
+                    <MoreVertical size={16} />
+                  </button>
                 </div>
               ))}
             </div>

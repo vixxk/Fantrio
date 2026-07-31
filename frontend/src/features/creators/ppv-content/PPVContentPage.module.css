@@ -127,7 +127,7 @@
 }
 
 .statCard {
-  background: #1a1a1a;
+  background: #121212;
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
   padding: 1rem;
@@ -193,7 +193,7 @@
 
 /* ================= TABLE CARD ================= */
 .tableCard {
-  background: #1a1a1a;
+  background: #121212;
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
   grid-column: 1 / -1;
@@ -291,6 +291,11 @@
 .typeCell {
   display: flex;
   align-items: center;
+}
+
+.typeCell svg {
+  width: 22px;
+  height: 22px;
 }
 
 .price {
@@ -413,9 +418,13 @@
 }
 
 .pageDots {
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 0.82rem;
-  padding: 0 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.1rem;
 }
 
 /* ================= LIGHT THEME ================= */
@@ -587,6 +596,10 @@
   color: #1a1625;
 }
 
+.light .pageDots {
+  color: rgba(26, 22, 37, 0.6);
+}
+
 /* ================= RESPONSIVE ================= */
 @media (max-width: 1200px) {
   .statsRow {
@@ -599,6 +612,11 @@
 }
 
 @media (max-width: 768px) {
+  .typeCell svg {
+    width: 16px;
+    height: 16px;
+  }
+
   .pageContainer {
     display: flex;
     flex-direction: column;
@@ -736,7 +754,7 @@
     display: grid;
     grid-template-columns: 1fr auto;
     gap: 0.05rem 0.6rem;
-    background: #1a1a1a;
+    background: #121212;
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 12px;
     padding: 0.75rem;
