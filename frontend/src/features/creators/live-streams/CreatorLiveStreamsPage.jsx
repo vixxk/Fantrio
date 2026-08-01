@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useApp } from '../../../context/AppContext';
 import {
-  Radio, Calendar, Play, Eye, TrendingUp, BarChart3, Users, Clock,
+  Radio, Calendar, Plus, Eye, TrendingUp, BarChart3, Users, Clock,
   Edit2, MoreVertical, Zap, Check, ChevronDown, ChevronRight,
   MessageSquare, Music, Dumbbell, MoreHorizontal
 } from 'lucide-react';
@@ -26,6 +26,15 @@ export const CreatorLiveStreamsPage = () => {
   const [streamTitle, setStreamTitle] = useState('');
   const [entryPrice, setEntryPrice] = useState('5.00');
   const [freeForSubs, setFreeForSubs] = useState(false);
+  const [thumbnail, setThumbnail] = useState(null);
+  const thumbnailInputRef = useRef(null);
+
+  const handleThumbnailClick = () => thumbnailInputRef.current?.click();
+
+  const handleThumbnailChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) setThumbnail(URL.createObjectURL(file));
+  };
 
   return (
     <div className={`${styles.pageContainer} ${!darkMode ? styles.light : ''}`}>
@@ -52,21 +61,36 @@ export const CreatorLiveStreamsPage = () => {
             </div>
 
             <div className={styles.streamBody}>
-              {/* Stream Preview */}
+              {/* Stream Preview / Thumbnail Upload */}
               <div className={styles.streamPreview}>
-                <div className={styles.streamPreviewInner}>
+                <button
+                  type="button"
+                  className={styles.streamPreviewInner}
+                  onClick={handleThumbnailClick}
+                  title="Upload thumbnail"
+                >
+                  {thumbnail && (
+                    <img src={thumbnail} alt="Thumbnail preview" className={styles.thumbnailPreviewImg} />
+                  )}
                   <div className={styles.liveBadge}>
                     <Radio size={10} /> LIVE
                   </div>
                   <div className={styles.playButton}>
-                    <Play size={28} fill="white" />
+                    <Plus size={28} />
                   </div>
-                </div>
+                </button>
+                <input
+                  ref={thumbnailInputRef}
+                  type="file"
+                  accept="image/*"
+                  className={styles.thumbnailInput}
+                  onChange={handleThumbnailChange}
+                />
               </div>
 
               {/* Stream Form */}
               <div className={styles.streamForm}>
-                <div className={styles.formGroup}>
+                <div className={`${styles.formGroup} ${styles.titleField}`}>
                   <label className={styles.formLabel}>Stream Title</label>
                   <input
                     type="text"
@@ -76,7 +100,7 @@ export const CreatorLiveStreamsPage = () => {
                     onChange={(e) => setStreamTitle(e.target.value)}
                   />
                 </div>
-                <div className={styles.formGroup}>
+                <div className={`${styles.formGroup} ${styles.priceField}`}>
                   <label className={styles.formLabel}>Entry Price</label>
                   <div className={styles.priceInputGroup}>
                     <span className={styles.pricePrefix}>$</span>
@@ -110,7 +134,10 @@ export const CreatorLiveStreamsPage = () => {
               <div className={styles.startOptionsSection}>
                 <label className={styles.formLabel}>Start</label>
                 <div className={styles.startOptions}>
-                  <div className={`${styles.startOption} ${activeTab === 'goLive' ? styles.startOptionActive : ''}`}>
+                  <div
+                    className={`${styles.startOption} ${activeTab === 'goLive' ? styles.startOptionActive : ''}`}
+                    onClick={() => setActiveTab('goLive')}
+                  >
                     <div className={`${styles.startOptionRadio} ${activeTab === 'goLive' ? styles.startOptionRadioActive : ''}`}>
                       {activeTab === 'goLive' && <Check size={14} />}
                     </div>
@@ -122,7 +149,10 @@ export const CreatorLiveStreamsPage = () => {
                       <span className={styles.startOptionDesc}>{streamOptions.startGoLiveDesc}</span>
                     </div>
                   </div>
-                  <div className={`${styles.startOption} ${activeTab === 'schedule' ? styles.startOptionActive : ''}`}>
+                  <div
+                    className={`${styles.startOption} ${activeTab === 'schedule' ? styles.startOptionActive : ''}`}
+                    onClick={() => setActiveTab('schedule')}
+                  >
                     <div className={`${styles.startOptionRadio} ${activeTab === 'schedule' ? styles.startOptionRadioActive : ''}`}>
                       {activeTab === 'schedule' && <Check size={14} />}
                     </div>

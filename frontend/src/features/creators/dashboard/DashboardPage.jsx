@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useApp } from '../../../context/AppContext';
 import {
   Phone, Video, MessageSquareText, Lock, Globe, CircleDot, FolderOpen,
-  ChevronDown, ChevronUp, Play, ArrowRight, Eye, Heart, MoreVertical,
+  ChevronDown, ChevronUp, Plus, ArrowRight, Eye, Heart, MoreVertical,
   Zap, Calendar, Radio, Check
 } from 'lucide-react';
 import {
@@ -25,6 +25,15 @@ export const DashboardPage = () => {
   const [freeForSubs, setFreeForSubs] = useState(false);
   const [showSchedulePopup, setShowSchedulePopup] = useState(false);
   const [selectedScheduleType, setSelectedScheduleType] = useState('');
+  const [thumbnail, setThumbnail] = useState(null);
+  const thumbnailInputRef = useRef(null);
+
+  const handleThumbnailClick = () => thumbnailInputRef.current?.click();
+
+  const handleThumbnailChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) setThumbnail(URL.createObjectURL(file));
+  };
 
   const filteredRecent = recentContent.filter((item) => {
     if (activeContentTab === 'All') return true;
@@ -103,21 +112,36 @@ export const DashboardPage = () => {
             </div>
 
             <div className={styles.streamBody}>
-              {/* Stream Preview */}
+              {/* Stream Preview / Thumbnail Upload */}
               <div className={styles.streamPreview}>
-                <div className={styles.streamPreviewInner}>
+                <button
+                  type="button"
+                  className={styles.streamPreviewInner}
+                  onClick={handleThumbnailClick}
+                  title="Upload thumbnail"
+                >
+                  {thumbnail && (
+                    <img src={thumbnail} alt="Thumbnail preview" className={styles.thumbnailPreviewImg} />
+                  )}
                   <div className={styles.liveBadge}>
                     <Radio size={10} /> LIVE
                   </div>
                   <div className={styles.playButton}>
-                    <Play size={28} fill="white" />
+                    <Plus size={28} />
                   </div>
-                </div>
+                </button>
+                <input
+                  ref={thumbnailInputRef}
+                  type="file"
+                  accept="image/*"
+                  className={styles.thumbnailInput}
+                  onChange={handleThumbnailChange}
+                />
               </div>
 
               {/* Stream Form */}
               <div className={styles.streamForm}>
-                <div className={styles.formGroup}>
+                <div className={`${styles.formGroup} ${styles.titleField}`}>
                   <label className={styles.formLabel}>Stream Title</label>
                   <input
                     type="text"
@@ -125,7 +149,7 @@ export const DashboardPage = () => {
                     placeholder={streamOptions.defaultTitle}
                   />
                 </div>
-                <div className={styles.formGroup}>
+                <div className={`${styles.formGroup} ${styles.priceField}`}>
                   <label className={styles.formLabel}>Entry Price</label>
                   <div className={styles.priceInputGroup}>
                     <span className={styles.pricePrefix}>$</span>

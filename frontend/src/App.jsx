@@ -101,7 +101,7 @@ const AppContent = () => {
     };
   }, []);
 
-  const isChatOpen = (activeTab === 'Messages' || activeTab === 'Creator Messages') && currentPath && currentPath.split('/').filter(Boolean).length > 1;
+  const isChatOpen = (activeTab === 'Messages' || activeTab === 'Creator Messages') && currentPath && currentPath.split('/').filter(Boolean).length > 2;
 
   const renderTabContent = () => {
     switch (activeTab) {

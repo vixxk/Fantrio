@@ -291,6 +291,19 @@ html, body, #root {
   .bottomActive svg {
     stroke: #e10075 !important;
   }
+
+  /* Users panel: gradient active state (creators keeps solid color) */
+  .appShell:not(.creatorMode) .bottomActive span {
+    color: transparent !important;
+    background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .appShell:not(.creatorMode) .bottomActive svg {
+    stroke: url(#activeGradient) !important;
+  }
   
   .mobileLiveNavIcon {
     width: 20px;

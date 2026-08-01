@@ -603,11 +603,14 @@
 
 .miniChart {
   margin-top: 0.5rem;
+  padding: 0 0.75rem;
 }
 
 .chartSvg {
   width: 100%;
   height: 60px;
+  overflow: visible;
+  display: block;
 }
 
 .chartLabels {
@@ -616,7 +619,6 @@
   font-size: 0.65rem;
   color: rgba(255, 255, 255, 0.4);
   margin-top: 0.5rem;
-  padding: 0 1.25rem;
 }
 
 /* ================= PLAN BREAKDOWN ================= */
@@ -1390,7 +1392,6 @@
   .insightsCard {
     padding: 1rem !important;
     border-radius: 12px !important;
-    overflow: hidden !important;
     min-width: 0 !important;
   }
 
@@ -1494,11 +1495,6 @@
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.04);
     border-bottom: none;
-  }
-
-  .insightItem:last-child {
-    background: rgba(225, 0, 117, 0.06);
-    border-color: rgba(225, 0, 117, 0.15);
   }
 
   .insightLabel {

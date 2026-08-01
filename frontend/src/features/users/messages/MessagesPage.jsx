@@ -3,7 +3,7 @@ import { useApp } from '../../../context/AppContext';
 import { api } from '../../../services/api';
 import { 
   Search, Edit, BadgeCheck, Phone, Video, Heart, MoreVertical,
-  Lock, Smile, Image as ImageIcon, Send, Plus, Archive, Star,
+  Lock, Smile, Image as ImageIcon, Send, Plus, Star,
   X, Check, MessageSquare, User, ChevronLeft, SlidersHorizontal
 } from 'lucide-react';
 import styles from './MessagesPage.module.css';
@@ -22,21 +22,6 @@ const GradientBadgeCheck = ({ size = 15 }) => (
       fill="url(#badgeGrad)" 
     />
     <path d="m9 12 2 2 4-4" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
-// Custom Gradient Archive Icon
-const GradientArchiveIcon = ({ size = 16 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, display: 'inline-block', verticalAlign: 'middle' }}>
-    <defs>
-      <linearGradient id="archiveGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#e10075" />
-        <stop offset="100%" stopColor="#7e00f3" />
-      </linearGradient>
-    </defs>
-    <rect width="20" height="5" x="2" y="3" rx="1" stroke="url(#archiveGrad)" strokeWidth="2" />
-    <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" stroke="url(#archiveGrad)" strokeWidth="2" />
-    <path d="M10 12h4" stroke="url(#archiveGrad)" strokeWidth="2" strokeLinecap="round" />
   </svg>
 );
 
@@ -595,22 +580,6 @@ export const MessagesPage = () => {
                     {showArchived ? 'Archived' : 'Chats'}
                   </h1>
                 </div>
-              </div>
-              <div className={styles.mobileHeaderActions} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem' }}>
-                <button 
-                  type="button"
-                  className={`${styles.mobileArchiveBtn} ${showArchived ? styles.archiveActive : ''}`} 
-                  onClick={() => {
-                    setShowArchived(!showArchived);
-                    navigateTo('/messages');
-                  }}
-                  title={showArchived ? "Back to Messages" : "Archived Chats"}
-                >
-                  <GradientArchiveIcon size={20} />
-                </button>
-                <button className={styles.mobileComposeBtn} title="New Message">
-                  <img src="/compose.png" alt="Compose" className={styles.composeIconImg} />
-                </button>
               </div>
             </div>
 

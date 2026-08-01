@@ -244,7 +244,7 @@ export const AudioCallsPage = () => {
               <div className={styles.donutContainer}>
                 <div className={styles.donutChart}>
                   <svg viewBox="0 0 100 100" className={styles.donutSvg}>
-                    <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="12" />
+                    <circle cx="50" cy="50" r="40" fill="none" className={styles.donutBg} strokeWidth="12" />
                     <circle
                       cx="50" cy="50" r="40"
                       fill="none"

@@ -1482,7 +1482,7 @@
 }
 
 .mobileFilterActive {
-  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%) !important;
+  background: #e10075 !important;
   color: #ffffff !important;
   border-color: transparent !important;
   box-shadow: 0 4px 15px rgba(225, 0, 117, 0.2);
@@ -1684,6 +1684,53 @@
   background: #ffffff;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   color: #1a1625;
+}
+
+/* Light theme overrides for mobile list view elements */
+.lightMobile .convName {
+  color: #111111;
+}
+
+.lightMobile .convTime {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.lightMobile .convPreviewText {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.lightMobile .onlineDot {
+  border-color: #faf8fc;
+}
+
+.lightMobile .convItem:hover {
+  background: rgba(126, 0, 243, 0.04);
+}
+
+.lightMobile .convSelected {
+  background: rgba(225, 0, 117, 0.08);
+  border-color: rgba(225, 0, 117, 0.2);
+}
+
+.lightMobile .unreadBadge {
+  background: #e10075;
+  color: #ffffff;
+}
+
+.lightMobile .emptyIcon {
+  color: rgba(225, 0, 117, 0.3);
+}
+
+.lightMobile .emptyTitle {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.lightMobile .emptyText {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.lightMobile .mobileConvList::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
 }
 
 /* ==========================================================================

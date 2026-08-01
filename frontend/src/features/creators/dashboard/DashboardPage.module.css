@@ -626,6 +626,23 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.thumbnailPreviewImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbnailInput {
+  display: none;
 }
 
 .liveBadge {
@@ -655,6 +672,9 @@
   cursor: pointer;
   transition: all 0.2s ease;
   backdrop-filter: blur(4px);
+  color: #ffffff;
+  border: none;
+  padding: 0;
 }
 
 .playButton:hover {
@@ -2135,19 +2155,24 @@
   }
 
   .streamBody {
-    grid-template-columns: 1fr !important;
-    gap: 0.5rem !important;
+    grid-template-columns: 96px minmax(0, 1fr) !important;
+    gap: 0.6rem !important;
     padding: 0.75rem !important;
     border-radius: 12px !important;
     overflow-x: hidden !important;
   }
 
   .streamPreview {
-    max-width: 100% !important;
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    align-self: center;
   }
 
   .streamPreviewInner {
-    height: 80px !important;
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 8px !important;
   }
 
   .playButton {
@@ -2161,9 +2186,12 @@
   }
 
   .liveBadge {
-    font-size: 0.5rem !important;
-    padding: 0.15rem 0.35rem !important;
-    gap: 0.2rem !important;
+    font-size: 0.42rem !important;
+    padding: 0.12rem 0.3rem !important;
+    gap: 0.18rem !important;
+    top: 6px !important;
+    right: 6px !important;
+    border-radius: 4px !important;
   }
 
   .liveBadge svg {
@@ -2172,7 +2200,27 @@
   }
 
   .streamForm {
-    gap: 0.5rem !important;
+    display: contents;
+  }
+
+  .titleField {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .priceField {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .streamBody .toggleRow {
+    grid-column: 1 / span 2;
+    grid-row: 3;
+  }
+
+  .streamBody .startOptionsSection {
+    grid-column: 1 / span 2;
+    grid-row: 4;
   }
 
   .formGroup {
@@ -2470,5 +2518,37 @@
   .streamThumb {
     width: 28px !important;
     height: 28px !important;
+  }
+
+  .streamBody {
+    grid-template-columns: 80px minmax(0, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  .streamPreviewInner {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+  }
+
+  .playButton {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .playButton svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .liveBadge {
+    font-size: 0.36rem !important;
+    padding: 0.08rem 0.25rem !important;
+    gap: 0.15rem !important;
+  }
+
+  .liveBadge svg {
+    width: 7px !important;
+    height: 7px !important;
   }
 }

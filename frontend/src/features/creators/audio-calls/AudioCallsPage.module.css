@@ -695,6 +695,10 @@
   height: 100%;
 }
 
+.donutBg {
+  stroke: rgba(255, 255, 255, 0.06);
+}
+
 .donutValue {
   fill: #ffffff;
   font-size: 16px;
@@ -1099,6 +1103,7 @@
 .light .changeLabel,
 .light .creatorHandle,
 .light .earningsTitle,
+.light .performanceTitle,
 .light .peakTitle,
 .light .tipsTitle {
   color: rgba(26, 22, 37, 0.7);
@@ -1293,6 +1298,27 @@
 
 .light .statLink:hover {
   color: #b45309;
+}
+
+/* Light theme donut chart overrides */
+.light .donutBg {
+  stroke: rgba(0, 0, 0, 0.08);
+}
+
+.light .donutValue {
+  fill: #1a1625;
+}
+
+.light .donutLabel {
+  fill: rgba(26, 22, 37, 0.5);
+}
+
+.light .legendLabel {
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .legendValue {
+  color: rgba(26, 22, 37, 0.5);
 }
 
 /* ================= RESPONSIVE DESIGN ================= */
@@ -1627,7 +1653,7 @@
   .peakChart {
     height: 120px !important;
     border-left: none !important;
-    padding-left: 0 !important;
+    padding: 0 0 16px 0 !important;
     background-image: none !important;
     min-width: 0 !important;
     flex: 1 !important;
@@ -1646,6 +1672,7 @@
     height: 120px !important;
     justify-content: space-between !important;
     gap: 6px !important;
+    padding-bottom: 16px !important;
   }
 
   .peakYLabel {
@@ -1654,6 +1681,7 @@
 
   .peakBar {
     min-width: 0 !important;
+    position: relative !important;
   }
 
   .peakBarFill {
@@ -1663,6 +1691,11 @@
 
   .peakBarLabel {
     font-size: 0.48rem !important;
+    position: absolute !important;
+    bottom: -16px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    margin-top: 0 !important;
   }
 
   .peakTime,
@@ -1893,14 +1926,6 @@
     font-size: 0.62rem !important;
   }
 
-  .hideMobile {
-    display: none !important;
-  }
-
-  .tableTitle {
-    font-size: 0.72rem !important;
-  }
-
   .fanAvatar {
     width: 24px !important;
     height: 24px !important;
@@ -1915,149 +1940,59 @@
   }
 
   .td {
-    padding: 0.35rem 0.25rem 0.35rem 0 !important;
-    font-size: 0.6rem !important;
+    padding: 0.4rem 0.25rem 0.4rem 0 !important;
+    font-size: 0.62rem !important;
   }
 
   .th {
-    padding: 0 0.25rem 0.35rem 0 !important;
+    padding: 0 0.25rem 0.3rem 0 !important;
     font-size: 0.52rem !important;
   }
 
-  .callsTableCard {
-    padding: 0.5rem !important;
-  }
-
   .earningsAmount {
-    font-size: 1rem !important;
+    font-size: 1.1rem !important;
   }
 
-  .earningsTitle,
-  .peakTitle,
-  .tipsTitle {
-    font-size: 0.6rem !important;
+  .earningsCard {
+    padding: 0.55rem !important;
   }
 
   .earningsTitle {
-    font-size: 0.85rem !important;
+    font-size: 0.82rem !important;
   }
 
   .earningsStat {
-    padding: 0.35rem 0 !important;
+    padding: 0.4rem 0 !important;
   }
 
-  .earningsCard > .earningsHeader {
-    margin-bottom: 0.35rem !important;
+  .earningsStatLabel {
+    font-size: 0.68rem !important;
   }
 
-  .earningsCard > .earningsChange {
-    margin-bottom: 0 !important;
-  }
-
-  .earningsCard > .viewEarningsBtn {
-    margin-top: 0.5rem !important;
-  }
-
-  .earningsStatLabel,
   .earningsStatValue {
-    font-size: 0.62rem !important;
+    font-size: 0.72rem !important;
   }
 
   .viewEarningsBtn {
     padding: 0.4rem 0.6rem !important;
     font-size: 0.68rem !important;
+    margin-top: 0.5rem !important;
   }
 
-  .tipItem {
-    font-size: 0.62rem !important;
-    gap: 0.3rem !important;
-  }
-
-  .loadMoreBtn {
-    font-size: 0.62rem !important;
-  }
-
-  .tableContainer {
-    overflow-x: hidden !important;
-  }
-
-  .callsTable {
-    table-layout: fixed !important;
-  }
-
-  .callsTable th:nth-child(1),
-  .callsTable td:nth-child(1) {
-    width: 38% !important;
-  }
-
-  .callsTable th:nth-child(2),
-  .callsTable td:nth-child(2) {
-    width: 26% !important;
-  }
-
-  .callsTable th:nth-child(3),
-  .callsTable td:nth-child(3) {
-    width: 14% !important;
-  }
-
-  .callsTable th:nth-child(4),
-  .callsTable td:nth-child(4) {
-    width: 14% !important;
-  }
-
-  .callsTable th:nth-child(6),
-  .callsTable td:nth-child(6) {
-    width: 8% !important;
-  }
-
-  .td {
-    overflow: hidden !important;
-  }
-
-  .fanName {
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-  }
-
-  .peakChartWrapper {
-    overflow-x: visible !important;
+  .peakTitle {
+    font-size: 0.58rem !important;
   }
 
   .peakChart {
-    height: 90px !important;
-    border-left: none !important;
-    padding-left: 0 !important;
-    background-image: none !important;
-    min-width: 0 !important;
-    flex: 1 !important;
-    gap: 2px !important;
-  }
-
-  .peakBar:not(:has(.peakBarLabel)) {
-    flex: 0 0 0 !important;
-    min-width: 0 !important;
-    width: 0 !important;
-    overflow: hidden !important;
-    margin: 0 !important;
+    height: 100px !important;
+    gap: 1.5px !important;
   }
 
   .peakYAxis {
-    height: 90px !important;
-    justify-content: space-between !important;
-    gap: 4px !important;
-  }
-
-  .peakYLabel {
-    font-size: 0.55rem !important;
-  }
-
-  .peakBar {
-    min-width: 0 !important;
+    height: 100px !important;
   }
 
   .peakBarFill {
-    width: 100% !important;
     max-width: 8px !important;
   }
 
@@ -2065,7 +2000,55 @@
     font-size: 0.42rem !important;
   }
 
-  .periodTextBtn {
+  .peakYLabel {
+    font-size: 0.5rem !important;
+  }
+
+  .peakTime,
+  .peakBoost {
     font-size: 0.55rem !important;
+  }
+
+  .peakLegendDot {
+    width: 6px !important;
+    height: 6px !important;
+  }
+
+  .peakLegendText {
+    font-size: 0.58rem !important;
+  }
+
+  .tipsCard {
+    padding: 0.55rem !important;
+  }
+
+  .tipsTitle {
+    font-size: 0.58rem !important;
+  }
+
+  .tipItem {
+    font-size: 0.58rem !important;
+    gap: 0.4rem !important;
+  }
+
+  .tipCheckIcon {
+    font-size: 12px !important;
+  }
+
+  .viewAllTipsBtn {
+    font-size: 0.58rem !important;
+  }
+
+  .statusBadge {
+    padding: 0.2rem 0.5rem !important;
+    font-size: 0.6rem !important;
+  }
+
+  .loadMoreBtn {
+    font-size: 0.65rem !important;
+  }
+
+  .callsTableCard {
+    padding: 0.55rem !important;
   }
 }

@@ -272,7 +272,7 @@ export const SubscribersPage = () => {
               </div>
             </div>
             <div className={styles.miniChart}>
-              <svg viewBox="0 0 200 60" className={styles.chartSvg}>
+              <svg viewBox="0 0 200 60" preserveAspectRatio="none" className={styles.chartSvg}>
                 <defs>
                   <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                     <stop offset="0%" stopColor="#e10075" stopOpacity="0.3" />
@@ -287,18 +287,18 @@ export const SubscribersPage = () => {
                   const range = maxVal - minVal || 1;
                   const width = 200;
                   const height = 60;
-                  const padding = 5;
+                  const paddingY = 5;
                   const points = data.map((d, i) => {
                     const x = (i / (data.length - 1)) * width;
-                    const y = height - padding - ((d.value - minVal) / range) * (height - padding * 2);
+                    const y = height - paddingY - ((d.value - minVal) / range) * (height - paddingY * 2);
                     return { x, y };
                   });
                   const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
-                  const areaPath = `${linePath} L${width},${height} L0,${height} Z`;
+                  const areaPath = `${linePath} L${points[points.length - 1].x},${height} L${points[0].x},${height} Z`;
                   return (
                     <>
                       <path d={areaPath} fill="url(#chartGradient)" />
-                      <path d={linePath} fill="none" stroke="#e10075" strokeWidth="2" />
+                      <path d={linePath} fill="none" stroke="#e10075" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
                     </>
                   );
                 })()}
