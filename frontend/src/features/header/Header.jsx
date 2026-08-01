@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Search, Bell, MessageCircle, Plus, Menu, ChevronDown, HelpCircle } from 'lucide-react';
+import { Search, Bell, MessageCircle, Plus, Menu, ChevronDown } from 'lucide-react';
 import { ProfileDropdown } from './ProfileDropdown';
 import styles from './Header.module.css';
 
@@ -182,14 +182,7 @@ export const Header = ({ onMenuToggle }) => {
       )}
 
       <div className={styles.rightActions}>
-        {isCreatorPage && (
-          <button className={styles.helpCenterBtn} onClick={() => alert('Help Center coming soon!')}>
-            <HelpCircle size={18} />
-            <span>HelpCentre</span>
-          </button>
-        )}
-
-        <button className={styles.iconButton}>
+        <button className={`${styles.iconButton} ${styles.bellButton}`}>
           <div className={styles.iconWrapper}>
             <Bell size={20} />
             <span className={styles.badge}>3</span>

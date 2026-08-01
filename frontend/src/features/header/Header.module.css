@@ -305,28 +305,6 @@
   margin: 0;
 }
 
-.helpCenterBtn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 99px;
-  padding: 0.45rem 1rem;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 0.82rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: inherit;
-}
-
-.helpCenterBtn:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.25);
-  color: #ffffff;
-}
-
 .creatorProfileDropdown {
   background-color: transparent !important;
   border-color: transparent !important;
@@ -367,17 +345,6 @@
 
 .light .creatorHeaderSubtitle {
   color: rgba(26, 22, 37, 0.5);
-}
-
-.light .helpCenterBtn {
-  border-color: rgba(0, 0, 0, 0.15);
-  color: rgba(26, 22, 37, 0.8);
-}
-
-.light .helpCenterBtn:hover {
-  background-color: rgba(0, 0, 0, 0.04);
-  border-color: rgba(0, 0, 0, 0.25);
-  color: #1a1625;
 }
 
 .light .profileName {
@@ -428,6 +395,10 @@
   
   .iconButton {
     display: none;
+  }
+
+  .iconButton.bellButton {
+    display: flex;
   }
   
   .rightActions {
@@ -491,17 +462,6 @@
 
   .creatorHeaderSubtitle {
     display: none;
-  }
-
-  .helpCenterBtn {
-    font-size: 0.7rem;
-    padding: 0.25rem 0.6rem;
-    gap: 0.3rem;
-  }
-
-  .helpCenterBtn svg {
-    width: 14px;
-    height: 14px;
   }
 
   .profileMeta {
