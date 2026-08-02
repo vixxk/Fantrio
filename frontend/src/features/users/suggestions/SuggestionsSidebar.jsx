@@ -7,8 +7,6 @@ import {
   MessageSquare, 
   Radio, 
   BadgeCheck, 
-  Flame, 
-  TrendingUp, 
   Sparkles 
 } from 'lucide-react';
 import styles from './SuggestionsSidebar.module.css';
@@ -16,7 +14,6 @@ import styles from './SuggestionsSidebar.module.css';
 export const SuggestionsSidebar = () => {
   const { darkMode, setActiveTab, refreshBalance } = useApp();
   const [topCreators, setTopCreators] = useState([]);
-  const [hashtags, setHashtags] = useState([]);
   const [suggestedCreators, setSuggestedCreators] = useState([]);
 
   // Countdown timer state
@@ -86,23 +83,7 @@ export const SuggestionsSidebar = () => {
         ]);
       }
 
-      // 2. Fetch Trending Hashtags
-      try {
-        const res = await api.get('/posts/hashtags');
-        if (res.status === 'success') {
-          setHashtags(res.hashtags);
-        }
-      } catch (err) {
-        console.error('Failed to fetch hashtags:', err);
-        setHashtags([
-          { tag: 'hot', postCount: '12.5K posts' },
-          { tag: 'bikini', postCount: '12.5K posts' },
-          { tag: 'fitness', postCount: '12.5K posts' },
-          { tag: 'booty', postCount: '12.5K posts' }
-        ]);
-      }
-
-      // 3. Fetch Suggested Creators
+      // 2. Fetch Suggested Creators
       try {
         const res = await api.get('/creators/suggested');
         if (res.status === 'success') {
@@ -240,22 +221,7 @@ export const SuggestionsSidebar = () => {
         </div>
       </div>
 
-      {/* 4. Trending Hashtags */}
-      <div className={styles.sectionContainer}>
-        <div className={styles.sectionHeader}>
-          <h4 className={styles.sectionHeading}>Trending Hastags</h4>
-        </div>
-        <div className={styles.hashtagList}>
-          {hashtags.map((h, i) => (
-            <div key={i} className={styles.hashtagRow}>
-              <span className={styles.hashtagName}>#{h.tag}</span>
-              <span className={styles.hashtagCount}>{h.postCount}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 5. Suggested For You */}
+      {/* 4. Suggested For You */}
       <div className={styles.sectionContainer}>
         <div className={styles.sectionHeader}>
           <h4 className={styles.sectionHeading}>Suggested For You</h4>

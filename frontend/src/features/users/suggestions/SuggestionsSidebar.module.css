@@ -290,33 +290,6 @@
   color: rgba(255, 255, 255, 0.5);
 }
 
-/* Hashtag List */
-.hashtagList {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.hashtagRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.hashtagName {
-  font-size: 0.85rem;
-  font-weight: 600;
-  background: linear-gradient(90deg, #e10075, #7e00f3);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.hashtagCount {
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.45);
-}
-
 /* Suggested For You */
 .suggestedList {
   display: flex;
@@ -405,7 +378,7 @@
   color: #1a1625;
 }
 
-.light .username, .light .rankNum, .light .statVal, .light .hashtagCount {
+.light .username, .light .rankNum, .light .statVal {
   color: rgba(26, 22, 37, 0.5);
 }
 
