@@ -11,6 +11,7 @@ router.get('/trending', protectOptional, creatorController.getTrending);
 router.get('/stories', protectOptional, creatorController.getStories);
 router.get('/live', protectOptional, creatorController.getLiveStreams);
 router.get('/profile/:username', protectOptional, creatorController.getPublicProfile);
+router.get('/by-user/:userId', protectOptional, creatorController.getProfileByUserId);
 
 // Protected routes
 router.use(protect);

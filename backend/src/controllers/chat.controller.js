@@ -2,6 +2,7 @@ const Message = require('../models/Message');
 const Subscription = require('../models/Subscription');
 const User = require('../models/User');
 const CreatorProfile = require('../models/CreatorProfile');
+const CallLog = require('../models/CallLog');
 const walletService = require('../services/wallet.service');
 const awsService = require('../services/aws.service');
 const ApiError = require('../utils/apiError');
@@ -98,6 +99,15 @@ exports.getConversations = catchAsync(async (req, res, next) => {
   const profileMap = {};
   profiles.forEach((p) => { profileMap[String(p.userId)] = p; });
 
+  // Fans don't have a CreatorProfile — their presence lives on the User record
+  // (kept in sync by the Socket.io presence layer), so the creator's messages
+  // page can show whether each fan is online.
+  const users = await User.find({ _id: { $in: peerIds } })
+    .select('isOnline lastSeenAt')
+    .lean();
+  const userPresenceMap = {};
+  users.forEach((u) => { userPresenceMap[String(u._id)] = u; });
+
   // The viewer's active subscription with each peer (so the UI can show the
   // real plan + renewal date instead of placeholder data).
   const activeSubs = await Subscription.find({
@@ -111,6 +121,20 @@ exports.getConversations = catchAsync(async (req, res, next) => {
   const subMap = {};
   activeSubs.forEach((s) => { subMap[String(s.creatorId)] = s; });
 
+  // Which peers are currently on an active call, so the chat UI can surface a
+  // "busy" state and disable the call buttons while they're on another call.
+  const activeCalls = peerIds.length
+    ? await CallLog.find({
+        status: 'active',
+        $or: [{ callerId: { $in: peerIds } }, { receiverId: { $in: peerIds } }]
+      }).select('callerId receiverId').lean()
+    : [];
+  const busyIds = new Set();
+  activeCalls.forEach((c) => {
+    busyIds.add(c.callerId.toString());
+    busyIds.add(c.receiverId.toString());
+  });
+
   populated.forEach((c) => {
     const peerId = String(c._id && c._id._id ? c._id._id : c._id);
     c.unreadCount = unreadMap[peerId] || 0;
@@ -118,8 +142,19 @@ exports.getConversations = catchAsync(async (req, res, next) => {
     // Respect the creator's "Show Online Status" preference for presence dots
     if (profile) {
       profile.isOnline = profile.showOnlineStatus !== false && !!profile.isOnline;
+      profile.isBusy = busyIds.has(peerId);
+      c.profile = profile;
+    } else {
+      // Fan peer: derive presence from the live User record.
+      const u = userPresenceMap[peerId] || null;
+      c.profile = u
+        ? {
+            isOnline: !!u.isOnline,
+            isBusy: busyIds.has(peerId),
+            lastSeenAt: u.lastSeenAt || null
+          }
+        : null;
     }
-    c.profile = profile;
     c.subscription = subMap[peerId]
       ? { status: 'active', plan: subMap[peerId].plan || 'Premium', renewalDate: subMap[peerId].expiryDate || null }
       : null;

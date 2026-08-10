@@ -140,12 +140,15 @@ export const ContentPage = () => {
   const [uploadCaption, setUploadCaption] = useState('');
   const [uploadPrice, setUploadPrice] = useState('');
   const [uploadFile, setUploadFile] = useState(null);
+  const [uploadThumbFile, setUploadThumbFile] = useState(null);
+  const [uploadIsBlurred, setUploadIsBlurred] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadMsg, setUploadMsg] = useState(null);
   // When editing an existing post we keep the original media and expose it
   // as read-only. Store the media url/type so the UI can render the disabled preview.
   const [editingItem, setEditingItem] = useState(null);
   const fileInputRef = useRef(null);
+  const thumbFileInputRef = useRef(null);
   const [openMenuId, setOpenMenuId] = useState(null);
   const filterRef = useRef(null);
   // Delete flow — shared confirm dialog state machine
@@ -186,6 +189,8 @@ export const ContentPage = () => {
     setUploadCaption(item.title || '');
     setUploadPrice(String(item.priceCoins || 0));
     setUploadFile(null);
+    setUploadThumbFile(null);
+    setUploadIsBlurred(item.isBlurred !== undefined ? item.isBlurred : true);
     setUploadMsg(null);
     setUploadOpen(true);
   };
@@ -262,6 +267,8 @@ export const ContentPage = () => {
     setUploadCaption('');
     setUploadPrice('');
     setUploadFile(null);
+    setUploadThumbFile(null);
+    setUploadIsBlurred(true);
     setUploadOpen(true);
     setUploadMsg(null);
   };
@@ -291,15 +298,22 @@ export const ContentPage = () => {
     try {
       const postType = uploadPrice && Number(uploadPrice) > 0 ? 'ppv' : 'free';
 
-      // Editing an existing post: keep the original media untouched, only
-      // update the caption and price.
+      // Editing an existing post: update caption, price and blur toggle
       if (editingItem) {
         const id = editingItem._id || editingItem.id;
         if (!id) throw new Error('Missing post id');
+        let updatedMedia = editingItem.media;
+        if (Array.isArray(updatedMedia)) {
+          updatedMedia = updatedMedia.map((m) => ({
+            ...m,
+            isBlurred: uploadIsBlurred
+          }));
+        }
         const payload = {
           content: uploadCaption.trim(),
           postType,
-          coinPrice: postType === 'ppv' ? Number(uploadPrice) : 0
+          coinPrice: postType === 'ppv' ? Number(uploadPrice) : 0,
+          ...(updatedMedia ? { media: updatedMedia } : {})
         };
         await api.put(`/posts/${id}`, payload);
         setUploadMsg({ type: 'success', text: 'Content updated successfully!' });
@@ -333,6 +347,26 @@ export const ContentPage = () => {
         return;
       }
 
+      // Handle optional custom thumbnail upload for video
+      let customThumbUrl = null;
+      if (uploadType === 'video' && uploadThumbFile) {
+        const thumbFileType = uploadThumbFile.type || 'image/jpeg';
+        const thumbRes = await api.post('/posts/upload-url', {
+          fileName: (uploadThumbFile.name || 'thumb.jpg').replace(/[^a-zA-Z0-9._-]/g, '_'),
+          fileType: thumbFileType
+        });
+        if (thumbRes.status === 'success') {
+          const thumbPut = await fetch(thumbRes.uploadUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': thumbFileType },
+            body: uploadThumbFile
+          });
+          if (thumbPut.ok) {
+            customThumbUrl = thumbRes.fileUrl;
+          }
+        }
+      }
+
       // Stories: publish a 24-hour story (expiry is handled server-side).
       if (uploadType === 'story') {
         await api.post('/creators/stories', {
@@ -351,8 +385,9 @@ export const ContentPage = () => {
         media: [{
           url: res.fileUrl,
           type: uploadType,
-          thumbnailUrl: uploadType === 'video' ? '/video-thumb.png' : res.fileUrl,
-          isLocked: postType === 'ppv'
+          thumbnailUrl: customThumbUrl || (uploadType === 'video' ? '/video-thumb.png' : res.fileUrl),
+          isLocked: postType === 'ppv',
+          isBlurred: uploadIsBlurred
         }],
         postType,
         coinPrice: postType === 'ppv' ? Number(uploadPrice) : 0
@@ -360,6 +395,7 @@ export const ContentPage = () => {
       await api.post('/posts', payload);
       setUploadMsg({ type: 'success', text: 'Content published successfully!' });
       setUploadFile(null);
+      setUploadThumbFile(null);
       setUploadCaption('');
       setUploadOpen(false);
       loadContent();
@@ -798,6 +834,27 @@ export const ContentPage = () => {
                         ? 'Choose an image or video (disappears in 24h)'
                         : `Choose ${uploadType === 'video' ? 'video' : 'image'} file`}
                   </button>
+
+                  {uploadType === 'video' && (
+                    <div className={styles.uploadField} style={{ marginTop: '0.75rem' }}>
+                      <span className={styles.uploadFieldLabel}>Video Thumbnail (Optional):</span>
+                      <input
+                        ref={thumbFileInputRef}
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={(e) => setUploadThumbFile(e.target.files?.[0] || null)}
+                      />
+                      <button
+                        type="button"
+                        className={styles.uploadPickBtn}
+                        onClick={() => thumbFileInputRef.current?.click()}
+                        style={{ background: 'rgba(255, 255, 255, 0.04)', borderColor: 'rgba(255, 255, 255, 0.12)' }}
+                      >
+                        {uploadThumbFile ? uploadThumbFile.name : 'Upload Custom Video Thumbnail (Optional)'}
+                      </button>
+                    </div>
+                  )}
                 </>
               )}
               {uploadType !== 'story' && (
@@ -829,6 +886,22 @@ export const ContentPage = () => {
                       className={styles.uploadInput}
                     />
                   </div>
+                </div>
+              )}
+              {uploadType !== 'story' && (
+                <div className={styles.toggleRow}>
+                  <div className={styles.toggleInfo}>
+                    <span className={styles.toggleLabel}>Blur thumbnail preview for locked content</span>
+                    <span className={styles.toggleDesc}>Keep thumbnail blurred until unlocked, or turn off to show clear preview.</span>
+                  </div>
+                  <label className={styles.switch}>
+                    <input
+                      type="checkbox"
+                      checked={uploadIsBlurred}
+                      onChange={(e) => setUploadIsBlurred(e.target.checked)}
+                    />
+                    <span className={styles.slider} />
+                  </label>
                 </div>
               )}
               {uploadMsg && (

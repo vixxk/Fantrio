@@ -43,7 +43,7 @@ export const AppProvider = ({ children }) => {
     '1:1 Video Calls': '/video-calls',
     'My Subscription': '/subscriptions',
     'Messages': '/messages',
-    'Listener Profile': '/listener-profile',
+    'Public Creator Profile': '/creator-profile',
     'Buy Coins': '/buy-coins',
     'Transaction History': '/transactions',
     'Settings': '/settings',
@@ -82,25 +82,41 @@ export const AppProvider = ({ children }) => {
   };
 
   const getTabFromPath = (path) => {
-    if (path.startsWith('/admin')) return 'Admin Panel';
-    if (path.startsWith('/listener-profile')) return 'Listener Profile';
-    if (path.startsWith('/messages')) return 'Messages';
-    if (path.startsWith('/creators/profile')) return 'Creator Profile';
-    if (path.startsWith('/creators/live-calls')) return 'Creator Live Calls';
-    if (path.startsWith('/creators/audio-calls')) return 'Creator Audio Calls';
-    if (path.startsWith('/creators/video-calls')) return 'Creator Video Calls';
-    if (path.startsWith('/creators/analytics')) return 'Creator Analytics';
-    if (path.startsWith('/creators/dashboard')) return 'Creator Dashboard';
-    if (path.startsWith('/creators/messages')) return 'Creator Messages';
-    if (path.startsWith('/creators/ppv-content')) return 'Creator PPV Content';
-    if (path.startsWith('/creators/content')) return 'Creator Content';
-    if (path.startsWith('/creators/subscribers')) return 'Creator Subscribers';
-    if (path.startsWith('/creators/live-streams')) return 'Creator Live Streams';
-    if (path.startsWith('/creators/earnings')) return 'Creator Earnings';
-    if (path.startsWith('/creators/store')) return 'Creator Store';
-    if (path.startsWith('/creators/settings')) return 'Creator Settings';
-    if (path.startsWith('/transactions')) return 'Transaction History';
-    return pathToTab[path] || 'Discover Feed';
+    // Strip query string for tab resolution (e.g. /subscriptions?highlight=xyz)
+    const pathname = path.split('?')[0];
+    if (pathname.startsWith('/admin')) return 'Admin Panel';
+    if (pathname.startsWith('/listener-profile') || pathname.startsWith('/creator-profile')) return 'Public Creator Profile';
+    if (pathname.startsWith('/messages')) return 'Messages';
+    if (pathname.startsWith('/creators/profile')) return 'Creator Profile';
+    if (pathname.startsWith('/creators/live-calls')) return 'Creator Live Calls';
+    if (pathname.startsWith('/creators/audio-calls')) return 'Creator Audio Calls';
+    if (pathname.startsWith('/creators/video-calls')) return 'Creator Video Calls';
+    if (pathname.startsWith('/creators/analytics')) return 'Creator Analytics';
+    if (pathname.startsWith('/creators/dashboard')) return 'Creator Dashboard';
+    if (pathname.startsWith('/creators/messages')) return 'Creator Messages';
+    if (pathname.startsWith('/creators/ppv-content')) return 'Creator PPV Content';
+    if (pathname.startsWith('/creators/content')) return 'Creator Content';
+    if (pathname.startsWith('/creators/subscribers')) return 'Creator Subscribers';
+    if (pathname.startsWith('/creators/live-streams')) return 'Creator Live Streams';
+    if (pathname.startsWith('/creators/earnings')) return 'Creator Earnings';
+    if (pathname.startsWith('/creators/store')) return 'Creator Store';
+    if (pathname.startsWith('/creators/settings')) return 'Creator Settings';
+    if (pathname.startsWith('/post/')) return 'Post Detail';
+    if (pathname.startsWith('/transactions')) return 'Transaction History';
+    if (pathname.startsWith('/subscriptions')) return 'My Subscription';
+    if (pathname.startsWith('/live')) return 'Live Streams';
+    if (pathname.startsWith('/audio-calls')) return '1:1 Audio Calls';
+    if (pathname.startsWith('/video-calls')) return '1:1 Video Calls';
+    if (pathname.startsWith('/buy-coins')) return 'Buy Coins';
+    if (pathname.startsWith('/settings')) return 'Settings';
+    if (pathname.startsWith('/more')) return 'More';
+    if (pathname.startsWith('/help-centre') || pathname.startsWith('/faq')) return 'Settings';
+    if (pathname.startsWith('/support-tickets') || pathname.startsWith('/tickets')) return 'More';
+    if (pathname.startsWith('/contact-support') || pathname.startsWith('/contact')) return 'More';
+    if (pathname.startsWith('/community-guidelines')) return 'Settings';
+    if (pathname.startsWith('/creators')) return 'All Creators';
+    if (pathname === '/' || pathname.startsWith('/discover')) return 'Discover Feed';
+    return pathToTab[pathname] || 'Discover Feed';
   };
 
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
@@ -187,13 +203,17 @@ export const AppProvider = ({ children }) => {
   // Listen to popstate event (back/forward navigation)
   useEffect(() => {
     const handlePopState = () => {
-      const currentPath = window.location.pathname;
-      const requestedTab = getTabFromPath(currentPath);
+      const nowPath = window.location.pathname;
+      const requestedTab = getTabFromPath(nowPath);
       const matchingTab = resolveAccessibleTab(requestedTab, roleRef.current);
       if (matchingTab !== requestedTab) {
         const homePath = tabToPath[matchingTab];
         window.history.replaceState(null, '', homePath);
         setCurrentPath(homePath);
+      } else {
+        // Always sync currentPath so downstream components (e.g. MessagesPage)
+        // can parse the full path including conversation IDs
+        setCurrentPath(nowPath);
       }
       setActiveTabState(matchingTab);
     };
@@ -342,7 +362,7 @@ try {
     const res = await api.post('/auth/register', {
       email,
       password,
-      role: role || 'user',
+      role: (role === 'user' || !role) ? 'fan' : role,
       username,
       displayName
     });
@@ -372,7 +392,12 @@ try {
   }
 
   const refreshBalance = async () => {
-    if (token) {
+    // Gate on the authenticated user rather than the `token` state: auth is
+    // cookie-based, and after a session restore (page refresh) `token` state
+    // is empty even though the user is logged in — using it here would
+    // silently skip the refresh and leave the header balance stale after
+    // spending coins (e.g. sending a gift).
+    if (user) {
       try {
         const balanceRes = await api.get('/wallet/balance');
         setBalance(balanceRes.balanceCoins);

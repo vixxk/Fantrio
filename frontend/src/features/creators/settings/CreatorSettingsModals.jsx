@@ -435,12 +435,49 @@ export const BlockedUsersModal = ({ darkMode, onClose, onChanged }) => {
 export const AvatarModal = ({ darkMode, currentAvatar, onClose, onSaved }) => {
   const [url, setUrl] = useState('');
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [status, setStatus] = useState({ type: '', text: '' });
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setStatus({ type: '', text: '' });
+    try {
+      const presignedRes = await api.post('/settings/presigned-upload', {
+        fileName: file.name,
+        fileType: file.type
+      });
+      if (presignedRes.status === 'success' && presignedRes.uploadUrl) {
+        const s3Response = await fetch(presignedRes.uploadUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': file.type },
+          body: file
+        });
+        if (s3Response.ok || s3Response.status === 200) {
+          setUrl(presignedRes.fileUrl);
+          setStatus({ type: 'success', text: 'Image uploaded to AWS S3! Click Update Picture to save.' });
+        } else {
+          const reader = new FileReader();
+          reader.onload = (evt) => setUrl(evt.target.result);
+          reader.readAsDataURL(file);
+          setStatus({ type: 'success', text: 'Image selected. Click Update Picture to save.' });
+        }
+      }
+    } catch (err) {
+      const reader = new FileReader();
+      reader.onload = (evt) => setUrl(evt.target.result);
+      reader.readAsDataURL(file);
+      setStatus({ type: 'success', text: 'Image selected. Click Update Picture to save.' });
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!url.trim()) {
-      setStatus({ type: 'error', text: 'Please enter an image URL.' });
+      setStatus({ type: 'error', text: 'Please upload an image or enter a URL.' });
       return;
     }
     setSaving(true);
@@ -448,7 +485,7 @@ export const AvatarModal = ({ darkMode, currentAvatar, onClose, onSaved }) => {
     try {
       const res = await api.put('/creators/panel/settings', { avatarUrl: url.trim() });
       if (res.status === 'success') {
-        setStatus({ type: 'success', text: 'Profile picture updated.' });
+        setStatus({ type: 'success', text: 'Profile picture updated successfully.' });
         if (onSaved) onSaved();
       }
     } catch (err) {
@@ -459,14 +496,24 @@ export const AvatarModal = ({ darkMode, currentAvatar, onClose, onSaved }) => {
   };
 
   return (
-    <Modal darkMode={darkMode} title="Profile Picture" subtitle="Paste the URL of your new profile picture." onClose={onClose}>
+    <Modal darkMode={darkMode} title="Profile Picture" subtitle="Upload an image file directly to AWS S3 or provide an image URL." onClose={onClose}>
       <StatusMsg type={status.type} text={status.text} />
       <div className={styles.avatarModalPreview}>
         <img src={url.trim() || currentAvatar || ''} alt="Preview" className={styles.avatarModalImg} />
       </div>
       <form onSubmit={handleSubmit} className={styles.modalForm}>
         <div className={styles.formGroup}>
-          <label className={styles.formLabel}>Image URL</label>
+          <label className={styles.formLabel}>Upload Image File (AWS S3)</label>
+          <input
+            type="file"
+            accept="image/*"
+            className={styles.formInput}
+            onChange={handleFileUpload}
+            disabled={uploading}
+          />
+        </div>
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel}>Or Image URL</label>
           <input
             type="url"
             className={styles.formInput}
@@ -475,13 +522,14 @@ export const AvatarModal = ({ darkMode, currentAvatar, onClose, onSaved }) => {
             onChange={(e) => setUrl(e.target.value)}
           />
         </div>
-        <button type="submit" disabled={saving} className={`${styles.modalBtn} ${styles.modalBtnPrimary}`}>
-          {saving ? 'Saving...' : 'Update Picture'}
+        <button type="submit" disabled={saving || uploading} className={`${styles.modalBtn} ${styles.modalBtnPrimary}`}>
+          {saving ? 'Saving...' : uploading ? 'Uploading to S3...' : 'Update Picture'}
         </button>
       </form>
     </Modal>
   );
 };
+
 
 /* ------------------------------ Help Centre (FAQ) ------------------------------ */
 
@@ -612,7 +660,7 @@ export const ReportIssueModal = ({ darkMode, onClose }) => {
 
   useEffect(() => {
     if (targetType === 'creator' && creators.length === 0) {
-      api.get('/creators')
+      api.get('/more/creators')
         .then((res) => { if (res.status === 'success') setCreators(res.creators || []); })
         .catch(() => {});
     }

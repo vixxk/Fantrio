@@ -87,10 +87,10 @@ exports.register = catchAsync(async (req, res, next) => {
     const newUser = await User.create({
       email,
       password,
-      role: role || 'user',
+      role: (role === 'user' || !role) ? 'fan' : role,
       isVerified: true,
-      username: username || `user_${suffix}`,
-      displayName: displayName || `User ${suffix.slice(0, 4)}`
+      username: username || `fan_${suffix}`,
+      displayName: displayName || `Fan ${suffix.slice(0, 4)}`
     });
 
     // Initialize wallet
@@ -123,7 +123,7 @@ exports.register = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     email,
     password,
-    role: role || 'user',
+    role: (role === 'user' || !role) ? 'fan' : role,
     isVerified: false,
     otp: {
       code: otpCode,
@@ -172,8 +172,8 @@ exports.verifyOtp = catchAsync(async (req, res, next) => {
   
   if (!user.username) {
     const suffix = user._id.toString().slice(-6);
-    user.username = user.role === 'creator' ? `creator_${suffix}` : `user_${suffix}`;
-    user.displayName = user.role === 'creator' ? `Creator ${user._id.toString().slice(-4)}` : `User ${user._id.toString().slice(-4)}`;
+    user.username = user.role === 'creator' ? `creator_${suffix}` : `fan_${suffix}`;
+    user.displayName = user.role === 'creator' ? `Creator ${user._id.toString().slice(-4)}` : `Fan ${user._id.toString().slice(-4)}`;
   }
   await user.save();
 

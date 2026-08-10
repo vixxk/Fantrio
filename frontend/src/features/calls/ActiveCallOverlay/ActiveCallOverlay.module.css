@@ -1,0 +1,305 @@
+/* ==========================================================================
+   ActiveCallOverlay — full-screen 1:1 call UI
+   Consolidated from AudioCallsPage.module.css / VideoCallsPage.module.css.
+   ========================================================================== */
+
+.callModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(7, 5, 11, 0.92);
+  backdrop-filter: blur(12px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.callModalContent {
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.2rem;
+  position: relative;
+}
+
+/* ========== video surfaces (video calls only) ========== */
+.videoArea {
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #000;
+  z-index: 0;
+}
+
+.remoteVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.localVideo {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 120px;
+  height: 160px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  z-index: 3;
+  background: #111;
+}
+
+.waitingRemote {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2;
+}
+
+/* ========== caller card ========== */
+.callAvatarWrapper {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin-bottom: 1rem;
+  z-index: 2;
+}
+
+.callAvatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #ff007f;
+  z-index: 2;
+  position: relative;
+}
+
+.pulseRing {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border: 4px solid #ff007f;
+  border-radius: 50%;
+  animation: pulseRingAnim 2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+  opacity: 0;
+  z-index: 1;
+}
+
+.ringDelayed {
+  animation-delay: 1s;
+}
+
+@keyframes pulseRingAnim {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+.callName {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  z-index: 2;
+}
+
+.callUsername {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: -0.5rem;
+  z-index: 2;
+}
+
+.callStatusBox {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.statusBlink {
+  font-size: 1rem;
+  color: #ff007f;
+  font-weight: 700;
+  animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.activeCallMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.duration {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 2px;
+}
+
+.billingRate {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ========== controls ========== */
+.callControls {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 2rem;
+  z-index: 2;
+}
+
+.controlBtn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.controlBtn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.controlBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.controlActive {
+  background: #ff007f;
+  border-color: #ff007f;
+}
+
+.hangupBtn {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: #ff1744;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(255, 23, 68, 0.4);
+  transition: all 0.2s;
+}
+
+.hangupBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 28px rgba(255, 23, 68, 0.5);
+}
+
+.hangupIcon {
+  color: #ffffff;
+  transform: rotate(135deg);
+}
+
+/* ========== top balance bar ========== */
+.callTopBar {
+  position: absolute;
+  top: 24px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 10;
+}
+
+.callBalanceChip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 6px 8px 6px 12px;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 800;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+}
+
+.callCoinImg {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.callRechargeBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(90deg, #ff007f, #7e00f3);
+  border: none;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.callRechargeBtn:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+}
+
+.callRechargeBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ========== specialized control variants ========== */
+.controlBtnGift {
+  background: linear-gradient(135deg, rgba(225, 0, 117, 0.35), rgba(126, 0, 243, 0.35));
+  border-color: rgba(255, 0, 127, 0.45);
+  color: #ff7ab8;
+}
+
+.controlBtnGift:hover {
+  background: linear-gradient(135deg, rgba(225, 0, 117, 0.55), rgba(126, 0, 243, 0.55));
+  color: #fff;
+}
+
+.controlBtnCoins {
+  background: rgba(255, 215, 102, 0.12);
+  border-color: rgba(255, 215, 102, 0.4);
+  color: #ffd166;
+}
+
+.controlBtnCoins:hover {
+  background: rgba(255, 215, 102, 0.22);
+  color: #fff;
+}

@@ -48,7 +48,7 @@ exports.getTransactions = catchAsync(async (req, res, next) => {
     query.type = type;
   }
 
-  const [transactions, total, summary] = await Promise.all([
+  const [transactions, total, summary, spendingByType] = await Promise.all([
     Transaction.find(query)
       .populate('senderId', 'username displayName avatarUrl')
       .populate('receiverId', 'username displayName avatarUrl')
@@ -77,6 +77,23 @@ exports.getTransactions = catchAsync(async (req, res, next) => {
           }
         }
       }
+    ]),
+    // Coins spent per category (drives the Spending Breakdown donut on the
+    // transactions page). Deposits carry senderId null, so they never appear.
+    Transaction.aggregate([
+      {
+        $match: {
+          status: 'completed',
+          senderId: req.user._id
+        }
+      },
+      {
+        $group: {
+          _id: '$type',
+          coins: { $sum: '$amountCoins' }
+        }
+      },
+      { $sort: { coins: -1 } }
     ])
   ]);
 
@@ -87,7 +104,8 @@ exports.getTransactions = catchAsync(async (req, res, next) => {
     page,
     totalPages: Math.max(1, Math.ceil(total / limit)),
     limit,
-    summary: summary[0] ? { totalIn: summary[0].totalIn, totalOut: summary[0].totalOut } : { totalIn: 0, totalOut: 0 }
+    summary: summary[0] ? { totalIn: summary[0].totalIn, totalOut: summary[0].totalOut } : { totalIn: 0, totalOut: 0 },
+    spendingBreakdown: spendingByType.map((s) => ({ type: s._id, coins: s.coins }))
   });
 });
 
@@ -273,12 +291,52 @@ exports.redeemPromo = catchAsync(async (req, res, next) => {
       wallet = newWallet;
     }
 
+    // Atomically claim this redemption slot. The $elemMatch guard re-validates
+    // active / expiry / redemption-limit / duplicate inside the same update, so
+    // two concurrent requests (double-click, multiple tabs, or two fans racing
+    // for the last slot) can never both be granted — MongoDB serializes writes
+    // to the document and the second writer either fails the guard or hits a
+    // write conflict and aborts.
+    const claimed = await SystemSetting.findOneAndUpdate(
+      {
+        _id: settings._id,
+        promoCodes: {
+          $elemMatch: {
+            _id: promo._id,
+            isActive: true,
+            redeemedBy: { $ne: req.user._id },
+            ...(promo.maxRedemptions != null ? { redemptionCount: { $lt: promo.maxRedemptions } } : {}),
+            $or: [{ expiresAt: null }, { expiresAt: { $gt: new Date() } }]
+          }
+        }
+      },
+      { $inc: { 'promoCodes.$.redemptionCount': 1 } },
+      { session, new: true }
+    );
+
+    if (!claimed) {
+      await session.abortTransaction();
+      session.endSession();
+      const alreadyUsed = promo.redeemedBy.some((u) => String(u) === String(req.user._id));
+      return next(
+        new ApiError(
+          400,
+          alreadyUsed
+            ? 'You have already used this promo code.'
+            : 'This promo code is no longer available.'
+        )
+      );
+    }
+
+    // Record the redeemer (idempotent $addToSet — can never create duplicates).
+    await SystemSetting.updateOne(
+      { _id: claimed._id, 'promoCodes._id': promo._id },
+      { $addToSet: { 'promoCodes.$.redeemedBy': req.user._id } },
+      { session }
+    );
+
     wallet.balanceCoins = Number((wallet.balanceCoins + bonusCoins).toFixed(2));
     await wallet.save({ session, validateBeforeSave: false });
-
-    promo.redemptionCount += 1;
-    promo.redeemedBy.push(req.user._id);
-    await settings.save({ session, validateBeforeSave: false });
 
     const [transaction] = await Transaction.create(
       [
@@ -311,6 +369,21 @@ exports.redeemPromo = catchAsync(async (req, res, next) => {
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
+    // A concurrent redemption won the write race — surface a friendly message
+    // instead of a generic 500 (the transaction itself stays safe).
+    const isTransientWriteConflict =
+      (typeof error.hasErrorLabel === 'function' && error.hasErrorLabel('TransientTransactionError')) ||
+      (error.errorLabels && error.errorLabels.includes('TransientTransactionError')) ||
+      error.codeName === 'TransientTransactionError' ||
+      (error.message && error.message.includes('WriteConflict'));
+    if (isTransientWriteConflict) {
+      const fresh = await SystemSetting.findOne();
+      const freshPromo = fresh ? fresh.promoCodes.id(promo._id) : null;
+      if (freshPromo && freshPromo.redeemedBy.some((u) => String(u) === String(req.user._id))) {
+        return next(new ApiError(400, 'You have already used this promo code.'));
+      }
+      return next(new ApiError(400, 'This promo code has reached its redemption limit.'));
+    }
     throw error;
   }
 });

@@ -70,6 +70,15 @@ exports.subscribeToCreator = catchAsync(async (req, res, next) => {
 
   const { name: planName, priceCoins: price } = resolvePlan(creatorProfile, plan);
 
+  // Helper to rank subscription plan tiers for upgrade/degradation check
+  const getPlanRank = (pName) => {
+    const name = (pName || '').toLowerCase();
+    if (name.includes('vip') || name.includes('ultimate')) return 3;
+    if (name.includes('premium') || name.includes('pro')) return 2;
+    if (name.includes('basic') || name.includes('starter')) return 1;
+    return 1;
+  };
+
   // Check if active subscription already exists (any plan)
   const existingSub = await Subscription.findOne({
     userId: req.user._id,
@@ -79,11 +88,38 @@ exports.subscribeToCreator = catchAsync(async (req, res, next) => {
   });
 
   if (existingSub) {
+    const existingRank = getPlanRank(existingSub.plan);
+    const requestedRank = getPlanRank(planName);
+    const existingPrice = existingSub.priceCoins || 0;
+
+    if (existingSub.plan === planName) {
+      return res.status(200).json({
+        status: 'success',
+        message: `You are already actively subscribed to the ${planName} plan`,
+        subscription: existingSub,
+        alreadySubscribed: true
+      });
+    }
+
+    if (requestedRank < existingRank || (requestedRank === existingRank && price <= existingPrice)) {
+      return next(new ApiError(400, `Plan degradation is not allowed. You are currently on the ${existingSub.plan} plan.`));
+    }
+
+    // Upgradation: charge upgrade difference (or full price if lower)
+    const upgradeCost = price > existingPrice ? price - existingPrice : price;
+    if (upgradeCost > 0) {
+      await walletService.transferCoins(req.user._id, creatorId, upgradeCost, 'subscription');
+    }
+
+    existingSub.plan = planName;
+    existingSub.priceCoins = price;
+    await existingSub.save();
+
     return res.status(200).json({
       status: 'success',
-      message: 'You are already actively subscribed to this creator',
+      message: `Subscription successfully upgraded to ${planName}!`,
       subscription: existingSub,
-      alreadySubscribed: true
+      upgraded: true
     });
   }
 
@@ -335,7 +371,7 @@ exports.getGiftCatalog = catchAsync(async (req, res, next) => {
 // animation plays in real time for the sender, the receiver, and every
 // viewer in the live stream room.
 exports.sendGift = catchAsync(async (req, res, next) => {
-  const { giftId, streamId, callRoomId } = req.body;
+  const { giftId, streamId, callRoomId, postId } = req.body;
   const { receiverId } = req.params;
   const { getGiftById } = require('../utils/gifts');
 
@@ -375,6 +411,28 @@ exports.sendGift = catchAsync(async (req, res, next) => {
     0.20,
     { callRoomId: callRoomId || null }
   );
+
+  // If gift was sent for a post, attach a gift comment card to the post
+  if (postId && mongoose.Types.ObjectId.isValid(postId)) {
+    try {
+      const postObj = await Post.findById(postId);
+      if (postObj) {
+        postObj.comments.push({
+          userId: req.user._id,
+          text: `Sent ${gift.name}`,
+          isGift: true,
+          giftEmoji: gift.emoji,
+          giftName: gift.name,
+          giftTier: gift.tier || 1,
+          giftCoins: gift.coins || 0,
+          createdAt: new Date()
+        });
+        await postObj.save();
+      }
+    } catch (e) {
+      console.error('Failed to attach gift comment to post:', e);
+    }
+  }
 
   // Broadcast the animation payload to everyone who should see it:
   //  - the sender (their own optimistic event is deduped by eventId)

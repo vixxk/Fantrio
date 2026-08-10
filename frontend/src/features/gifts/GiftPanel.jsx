@@ -3,6 +3,7 @@ import { X, Check, Zap } from 'lucide-react';
 import { api } from '../../services/api';
 import { GIFTS as LOCAL_GIFTS, GIFT_TIERS } from './giftCatalog';
 import { useToast } from '../../components/Toast/Toast';
+import { useApp } from '../../context/AppContext';
 import styles from './GiftPanel.module.css';
 
 const TIER_STYLES = {
@@ -17,14 +18,18 @@ const TIER_STYLES = {
  * screens. The catalog is fetched from the backend (/monetization/gifts) so
  * the UI always reflects the authoritative server list; the bundled mirror is
  * only a fallback for instant first paint or offline render.
- * Tapping a gift sends it immediately (great for rapid gifting). When the
- * wallet can't cover the cost, the recharge modal is opened instead.
  */
-export const GiftPanel = ({ receiverName = 'this creator', balance, onSendGift, onRecharge, onClose }) => {
+export const GiftPanel = ({ receiverName = 'this creator', balance = 0, onSendGift, onRecharge, onClose }) => {
   const { toast } = useToast();
+  const app = useApp?.() || {};
+  const darkMode = app.darkMode !== undefined ? app.darkMode : true;
+
   const [sendingId, setSendingId] = useState(null);
   const [sentId, setSentId] = useState(null);
   const [gifts, setGifts] = useState(LOCAL_GIFTS);
+  const [confirmGift, setConfirmGift] = useState(null);
+
+  const safeBalance = typeof balance === 'number' ? balance : Number(balance) || 0;
 
   // Load the authoritative gift catalog from the backend on mount.
   useEffect(() => {
@@ -43,15 +48,23 @@ export const GiftPanel = ({ receiverName = 'this creator', balance, onSendGift, 
     return () => { mounted = false; };
   }, []);
 
-  const handleSend = async (gift) => {
-    if (balance < gift.coins) {
+  const handleGiftClick = (gift) => {
+    const coinPrice = typeof gift.coins === 'number' ? gift.coins : Number(gift.coins) || 0;
+    if (safeBalance < coinPrice) {
       onRecharge();
       return;
     }
-    setSendingId(gift.id);
+    setConfirmGift(gift);
+  };
+
+  const handleConfirmSend = async () => {
+    if (!confirmGift) return;
+    const targetGift = confirmGift;
+    setConfirmGift(null);
+    setSendingId(targetGift.id);
     try {
-      await onSendGift(gift);
-      setSentId(gift.id);
+      await onSendGift(targetGift);
+      setSentId(targetGift.id);
       setTimeout(() => setSentId(null), 900);
     } catch (err) {
       toast.error(err.message || 'Failed to send gift');
@@ -61,7 +74,7 @@ export const GiftPanel = ({ receiverName = 'this creator', balance, onSendGift, 
   };
 
   return (
-    <div className={styles.backdrop} onClick={onClose}>
+    <div className={`${styles.backdrop} ${!darkMode ? styles.light : styles.dark}`} onClick={onClose}>
       <div className={styles.sheet} onClick={(e) => e.stopPropagation()}>
         <div className={styles.handle} />
 
@@ -73,7 +86,7 @@ export const GiftPanel = ({ receiverName = 'this creator', balance, onSendGift, 
           <div className={styles.headerRight}>
             <span className={styles.balanceChip}>
               <img src="/coin.png" alt="Coin" className={styles.coinImg} />
-              {balance.toLocaleString()}
+              {safeBalance.toLocaleString()}
             </span>
             <button className={styles.closeBtn} onClick={onClose} aria-label="Close">
               <X size={18} />
@@ -83,7 +96,8 @@ export const GiftPanel = ({ receiverName = 'this creator', balance, onSendGift, 
 
         <div className={styles.grid}>
           {gifts.map((gift) => {
-            const affordable = balance >= gift.coins;
+            const coinPrice = typeof gift.coins === 'number' ? gift.coins : Number(gift.coins) || 0;
+            const affordable = safeBalance >= coinPrice;
             const sending = sendingId === gift.id;
             const sent = sentId === gift.id;
             return (
@@ -91,13 +105,13 @@ export const GiftPanel = ({ receiverName = 'this creator', balance, onSendGift, 
                 key={gift.id}
                 type="button"
                 className={`${styles.giftCard} ${!affordable ? styles.giftCardLocked : ''} ${sent ? styles.giftCardSent : ''}`}
-                onClick={() => handleSend(gift)}
+                onClick={() => handleGiftClick(gift)}
                 disabled={sending}
               >
                 <span className={styles.giftEmoji}>{gift.emoji}</span>
                 <span className={styles.giftName}>{gift.name}</span>
                 <span className={`${styles.tierBadge} ${TIER_STYLES[gift.tier]}`}>
-                  {GIFT_TIERS[gift.tier].label}
+                  {GIFT_TIERS[gift.tier]?.label || 'Tier 1'}
                 </span>
                 <span className={styles.giftPrice}>
                   {sending ? (
@@ -107,7 +121,7 @@ export const GiftPanel = ({ receiverName = 'this creator', balance, onSendGift, 
                   ) : (
                     <>
                       <img src="/coin.png" alt="Coin" className={styles.coinImgSm} />
-                      {gift.coins.toLocaleString()}
+                      {coinPrice.toLocaleString()}
                     </>
                   )}
                 </span>
@@ -119,10 +133,43 @@ export const GiftPanel = ({ receiverName = 'this creator', balance, onSendGift, 
         <div className={styles.footer}>
           <Zap size={13} className={styles.footerIcon} />
           <span>
-            Bigger gifts unlock fancier animations. Need more coins?{' '}
+            Bigger gifts unlock bigger attractions. Need more coins?{' '}
             <button className={styles.rechargeLink} onClick={onRecharge}>Recharge</button>
           </span>
         </div>
+
+        {/* Gift Confirmation Modal */}
+        {confirmGift && (
+          <div className={styles.confirmBackdrop} onClick={() => setConfirmGift(null)}>
+            <div className={styles.confirmBox} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.confirmEmoji}>{confirmGift.emoji}</div>
+              <h4 className={styles.confirmTitle}>Send {confirmGift.name}?</h4>
+              <p className={styles.confirmText}>
+                Send <strong>{confirmGift.name}</strong> to <strong>{receiverName}</strong> for{' '}
+                <span className={styles.confirmCoins}>
+                  <img src="/coin.png" alt="Coin" className={styles.coinImgSm} />
+                  {(typeof confirmGift.coins === 'number' ? confirmGift.coins : Number(confirmGift.coins) || 0).toLocaleString()} coins
+                </span>?
+              </p>
+              <div className={styles.confirmActions}>
+                <button
+                  type="button"
+                  className={styles.confirmCancelBtn}
+                  onClick={() => setConfirmGift(null)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className={styles.confirmSendBtn}
+                  onClick={handleConfirmSend}
+                >
+                  Confirm & Send
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

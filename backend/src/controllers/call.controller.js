@@ -52,6 +52,15 @@ exports.initiateCall = catchAsync(async (req, res, next) => {
     return next(new ApiError(400, `This creator has disabled ${type} calls`));
   }
 
+  // Receiver must be online to accept calls. Uses the same presence expression
+  // as getCallableCreators and the chat conversations (respects the creator's
+  // "show online status" preference), so the frontend's disabled buttons and
+  // this guard can never disagree.
+  const receiverOnline = creatorProfile.showOnlineStatus !== false && !!creatorProfile.isOnline;
+  if (!receiverOnline) {
+    return next(new ApiError(400, 'This creator is currently offline and cannot take calls.'));
+  }
+
   const rate = type === 'video'
     ? (creatorProfile.rates.videoCallPerMin || 50)
     : (creatorProfile.rates.audioCallPerMin || 30);
@@ -460,7 +469,7 @@ exports.getCallableCreators = catchAsync(async (req, res, next) => {
     // Must stay in sync with the fallbacks used in initiateCall so the rate
     // shown to the listener matches what is actually charged per minute.
     rate: type === 'video' ? (p.rates.videoCallPerMin || 50) : (p.rates.audioCallPerMin || 30),
-    isTopRated: (p.rating || 0) >= 4.8 && (p.ratingCount || 0) >= 100,
+    isTopRated: p.isTopRated !== undefined ? p.isTopRated : ((p.rating || 0) >= 4.8 && (p.ratingCount || 0) >= 100),
     category: p.categories && p.categories[0] ? p.categories[0] : '',
     categories: p.categories,
     language: p.language,

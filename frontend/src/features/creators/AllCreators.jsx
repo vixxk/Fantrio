@@ -37,8 +37,8 @@ export const AllCreators = () => {
   const [contentType, setContentType] = useState('All'); // All, Photos, Videos, PPV
   const [country, setCountry] = useState('All Countries');
   const [language, setLanguage] = useState('All Languages');
-  const [followerRange, setFollowerRange] = useState(1000000); // Up to 1M
-  const [sliderValue, setSliderValue] = useState(1000000);
+  const [followerRange, setFollowerRange] = useState(100000); // Up to 100K+
+  const [sliderValue, setSliderValue] = useState(100000);
 
   // Dropdown open states
   const [categoryOpen, setCategoryOpen] = useState(false);
@@ -115,9 +115,8 @@ export const AllCreators = () => {
 
       // Status filters
       if (statusFilter === 'online') queryParams.append('isOnline', 'true');
-      if (statusFilter === 'live') queryParams.append('isLive', 'true');
-      if (statusFilter === 'audio') queryParams.append('audioAvailable', 'true');
-      if (statusFilter === 'video') queryParams.append('videoAvailable', 'true');
+      if (statusFilter === 'subscribed') queryParams.append('isSubscribed', 'true');
+      if (statusFilter === 'following') queryParams.append('isFollowing', 'true');
       if (statusFilter === 'new') queryParams.append('sortBy', 'newest');
       else queryParams.append('sortBy', sortBy);
 
@@ -162,8 +161,8 @@ export const AllCreators = () => {
     setContentType('All');
     setCountry('All Countries');
     setLanguage('All Languages');
-    setFollowerRange(1000000);
-    setSliderValue(1000000);
+    setFollowerRange(100000);
+    setSliderValue(100000);
     setSearchQuery('');
     setSortBy('popularity');
     setPage(1);
@@ -172,15 +171,10 @@ export const AllCreators = () => {
     setLanguageOpen(false);
   };
 
-  const handleSubscribe = async (creator) => {
-    try {
-      const res = await api.post(`/creators/follow/${creator.userId?._id || creator._id}`);
-      if (res.status === 'success') {
-        toast.success(res.following ? 'Subscribed successfully!' : 'Unsubscribed.');
-        fetchCreators();
-      }
-    } catch (err) {
-      toast.error(err.message || 'Subscription failed');
+  const handleSubscribe = (creator) => {
+    const username = creator?.username;
+    if (username) {
+      navigateTo(`/creator-profile/${username}`);
     }
   };
 
@@ -245,7 +239,7 @@ export const AllCreators = () => {
   };
 
   const handleViewProfile = (username) => {
-    navigateTo(`/listener-profile/${username}`);
+    navigateTo(`/creator-profile/${username}`);
   };
 
   return (
@@ -319,31 +313,23 @@ export const AllCreators = () => {
               Online Now
             </button>
             <button 
-              className={`${styles.pill} ${statusFilter === 'audio' ? styles.activePill : ''} ${styles.desktopOnlyPill}`}
-              onClick={() => { setStatusFilter('audio'); setPage(1); }}
+              className={`${styles.pill} ${statusFilter === 'subscribed' ? styles.activePill : ''}`}
+              onClick={() => { setStatusFilter('subscribed'); setPage(1); }}
             >
-              <Phone size={14} />
-              Audio Available
+              <Star size={14} />
+              Subscribed
             </button>
             <button 
-              className={`${styles.pill} ${statusFilter === 'video' ? styles.activePill : ''} ${styles.desktopOnlyPill}`}
-              onClick={() => { setStatusFilter('video'); setPage(1); }}
+              className={`${styles.pill} ${statusFilter === 'following' ? styles.activePill : ''}`}
+              onClick={() => { setStatusFilter('following'); setPage(1); }}
             >
-              <Video size={14} />
-              Video Available
-            </button>
-            <button 
-              className={`${styles.pill} ${statusFilter === 'live' ? styles.activePill : ''} ${styles.desktopOnlyPill}`}
-              onClick={() => { setStatusFilter('live'); setPage(1); }}
-            >
-              <Radio size={14} />
-              Live Now
+              <Users size={14} />
+              Following
             </button>
             <button 
               className={`${styles.pill} ${statusFilter === 'new' ? styles.activePill : ''}`}
               onClick={() => { setStatusFilter('new'); setPage(1); }}
             >
-              <span className={styles.newBadge}>NEW</span>
               New
             </button>
           </div>
@@ -535,9 +521,9 @@ export const AllCreators = () => {
                       </button>
                       <button 
                         onClick={() => handleSubscribe(creator)} 
-                        className={styles.subscribeCardBtn}
+                        className={`${styles.subscribeCardBtn} ${(creator.isFollowing || creator.isSubscribed) ? styles.dimmedSubscribedBtn : ''}`}
                       >
-                        {creator.isFollowing ? 'Subscribed' : 'Subscribe'}
+                        {(creator.isFollowing || creator.isSubscribed) ? 'Subscribed' : 'Subscribe'}
                       </button>
                     </div>
                   </div>
@@ -614,31 +600,22 @@ export const AllCreators = () => {
                   Online Now
                 </span>
               </div>
-              <div className={styles.checkboxWrapper} onClick={() => setStatusFilter(statusFilter === 'audio' ? 'all' : 'audio')}>
-                <div className={`${styles.customCheckbox} ${statusFilter === 'audio' ? styles.checkboxChecked : ''}`}>
+              <div className={styles.checkboxWrapper} onClick={() => setStatusFilter(statusFilter === 'subscribed' ? 'all' : 'subscribed')}>
+                <div className={`${styles.customCheckbox} ${statusFilter === 'subscribed' ? styles.checkboxChecked : ''}`}>
                   <Check size={12} strokeWidth={3} />
                 </div>
                 <span className={styles.checkboxLabel}>
-                  <Phone size={13} className={styles.sidebarIconAudio} />
-                  Audio Available
+                  <Star size={13} style={{ color: '#e10075' }} />
+                  Subscribed
                 </span>
               </div>
-              <div className={styles.checkboxWrapper} onClick={() => setStatusFilter(statusFilter === 'video' ? 'all' : 'video')}>
-                <div className={`${styles.customCheckbox} ${statusFilter === 'video' ? styles.checkboxChecked : ''}`}>
+              <div className={styles.checkboxWrapper} onClick={() => setStatusFilter(statusFilter === 'following' ? 'all' : 'following')}>
+                <div className={`${styles.customCheckbox} ${statusFilter === 'following' ? styles.checkboxChecked : ''}`}>
                   <Check size={12} strokeWidth={3} />
                 </div>
                 <span className={styles.checkboxLabel}>
-                  <Video size={13} className={styles.sidebarIconVideo} />
-                  Video Available
-                </span>
-              </div>
-              <div className={styles.checkboxWrapper} onClick={() => setStatusFilter(statusFilter === 'live' ? 'all' : 'live')}>
-                <div className={`${styles.customCheckbox} ${statusFilter === 'live' ? styles.checkboxChecked : ''}`}>
-                  <Check size={12} strokeWidth={3} />
-                </div>
-                <span className={styles.checkboxLabel}>
-                  <span className={styles.sidebarLiveDot}></span>
-                  Live Now
+                  <Users size={13} style={{ color: '#8b5cf6' }} />
+                  Following
                 </span>
               </div>
             </div>
@@ -744,19 +721,19 @@ export const AllCreators = () => {
             <div className={styles.sliderHeader}>
               <span className={styles.sliderMinText}>Any</span>
               <span className={styles.sliderValText}>
-                {sliderValue === 1000000 ? '1M' : `${(sliderValue/1000).toFixed(0)}K`}
+                {sliderValue === 100000 ? '100K+' : `${(sliderValue/1000).toFixed(0)}K`}
               </span>
             </div>
             <input 
               type="range" 
-              min="1000" 
-              max="1000000" 
+              min="0" 
+              max="100000" 
               step="5000"
               value={sliderValue} 
               onChange={(e) => setSliderValue(Number(e.target.value))}
               className={styles.filterSlider}
               style={{
-                background: `linear-gradient(to right, #e10075 0%, #7e00f3 ${((sliderValue - 1000) / 999000) * 100}%, ${darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'} ${((sliderValue - 1000) / 999000) * 100}%)`
+                background: `linear-gradient(to right, #e10075 0%, #7e00f3 ${(sliderValue / 100000) * 100}%, ${darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'} ${(sliderValue / 100000) * 100}%)`
               }}
             />
           </div>
@@ -804,31 +781,22 @@ export const AllCreators = () => {
                         Online Now
                       </span>
                     </div>
-                    <div className={styles.checkboxWrapper} onClick={() => setStatusFilter(statusFilter === 'audio' ? 'all' : 'audio')}>
-                      <div className={`${styles.customCheckbox} ${statusFilter === 'audio' ? styles.checkboxChecked : ''}`}>
+                    <div className={styles.checkboxWrapper} onClick={() => setStatusFilter(statusFilter === 'subscribed' ? 'all' : 'subscribed')}>
+                      <div className={`${styles.customCheckbox} ${statusFilter === 'subscribed' ? styles.checkboxChecked : ''}`}>
                         <Check size={12} strokeWidth={3} />
                       </div>
                       <span className={styles.checkboxLabel}>
-                        <Phone size={13} className={styles.sidebarIconAudio} />
-                        Audio Available
+                        <Star size={13} style={{ color: '#e10075' }} />
+                        Subscribed
                       </span>
                     </div>
-                    <div className={styles.checkboxWrapper} onClick={() => setStatusFilter(statusFilter === 'video' ? 'all' : 'video')}>
-                      <div className={`${styles.customCheckbox} ${statusFilter === 'video' ? styles.checkboxChecked : ''}`}>
+                    <div className={styles.checkboxWrapper} onClick={() => setStatusFilter(statusFilter === 'following' ? 'all' : 'following')}>
+                      <div className={`${styles.customCheckbox} ${statusFilter === 'following' ? styles.checkboxChecked : ''}`}>
                         <Check size={12} strokeWidth={3} />
                       </div>
                       <span className={styles.checkboxLabel}>
-                        <Video size={13} className={styles.sidebarIconVideo} />
-                        Video Available
-                      </span>
-                    </div>
-                    <div className={styles.checkboxWrapper} onClick={() => setStatusFilter(statusFilter === 'live' ? 'all' : 'live')}>
-                      <div className={`${styles.customCheckbox} ${statusFilter === 'live' ? styles.checkboxChecked : ''}`}>
-                        <Check size={12} strokeWidth={3} />
-                      </div>
-                      <span className={styles.checkboxLabel}>
-                        <span className={styles.sidebarLiveDot}></span>
-                        Live Now
+                        <Users size={13} style={{ color: '#8b5cf6' }} />
+                        Following
                       </span>
                     </div>
                   </div>
@@ -934,19 +902,19 @@ export const AllCreators = () => {
                   <div className={styles.sliderHeader}>
                     <span className={styles.sliderMinText}>Any</span>
                     <span className={styles.sliderValText}>
-                      {sliderValue === 1000000 ? '1M' : `${(sliderValue/1000).toFixed(0)}K`}
+                      {sliderValue === 100000 ? '100K+' : `${(sliderValue/1000).toFixed(0)}K`}
                     </span>
                   </div>
                   <input 
                     type="range" 
-                    min="1000" 
-                    max="1000000" 
+                    min="0" 
+                    max="100000" 
                     step="5000"
                     value={sliderValue} 
                     onChange={(e) => setSliderValue(Number(e.target.value))}
                     className={styles.filterSlider}
                     style={{
-                      background: `linear-gradient(to right, #e10075 0%, #7e00f3 ${((sliderValue - 1000) / 999000) * 100}%, ${darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'} ${((sliderValue - 1000) / 999000) * 100}%)`
+                      background: `linear-gradient(to right, #e10075 0%, #7e00f3 ${(sliderValue / 100000) * 100}%, ${darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)'} ${(sliderValue / 100000) * 100}%)`
                     }}
                   />
                 </div>

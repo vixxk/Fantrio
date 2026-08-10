@@ -52,80 +52,197 @@
 /* Search results dropdown */
 .searchDropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 10px);
   left: 0;
-  right: 0;
-  background-color: #17111f;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 14px;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  min-width: 360px;
+  background: rgba(18, 14, 28, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(225, 0, 117, 0.15);
   overflow: hidden;
-  z-index: 1000;
-  max-height: 320px;
+  z-index: 2000;
+  max-height: 380px;
   overflow-y: auto;
+  padding: 0.4rem;
+  box-sizing: border-box;
 }
 
 .searchResultItem {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.8rem;
   width: 100%;
-  padding: 0.6rem 0.85rem;
+  padding: 0.65rem 0.85rem;
   background: transparent;
   border: none;
+  border-radius: 12px;
   cursor: pointer;
   text-align: left;
-  transition: background-color 0.15s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
 }
 
 .searchResultItem:hover {
-  background-color: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.07);
+  transform: translateX(2px);
 }
 
 .searchResultAvatar {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
+  border: 1.5px solid rgba(225, 0, 117, 0.4);
 }
 
 .searchResultMeta {
   display: flex;
   flex-direction: column;
+  flex: 1;
   min-width: 0;
 }
 
 .searchResultName {
   color: #ffffff;
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+.searchResultHandle {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.78rem;
+  font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.searchResultHandle {
-  color: rgba(255, 255, 255, 0.45);
-  font-size: 0.8rem;
+.searchResultArrow {
+  color: rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.searchResultItem:hover .searchResultArrow {
+  color: #ff007f;
+  transform: translateX(3px);
 }
 
 .searchDropdownEmpty {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.85rem;
-  padding: 0.9rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 1.5rem 1rem;
   text-align: center;
 }
 
-/* Light handlers for search dropdown */
+.emptySearchIcon {
+  color: rgba(255, 255, 255, 0.25);
+  margin-bottom: 0.2rem;
+}
+
+.emptyTitle {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.searchGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.searchGroup:not(:last-child) {
+  margin-bottom: 0.35rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.searchSectionHeader {
+  padding: 0.4rem 0.85rem 0.25rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #ff007f;
+  text-transform: uppercase;
+}
+
+.searchPostIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(225, 0, 117, 0.12);
+  color: #ff007f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.searchSettingIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(126, 0, 243, 0.14);
+  color: #a855f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+  color: #ff007f;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.emptySubtext {
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* Light mode search dropdown overrides */
+.light .searchGroup:not(:last-child) {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .searchSectionHeader {
+  color: #e10075;
+}
+
+.light .searchPostIcon {
+  background: rgba(225, 0, 117, 0.08);
+  color: #e10075;
+}
+
+.light .searchSettingIcon {
+  background: rgba(126, 0, 243, 0.08);
+  color: #7e00f3;
+}
+
+/* Light mode search dropdown overrides */
 .light .searchDropdown {
-  background-color: #ffffff;
+  background: rgba(255, 255, 255, 0.96);
   border-color: rgba(0, 0, 0, 0.1);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.15);
 }
 
 .light .searchResultItem:hover {
-  background-color: rgba(0, 0, 0, 0.04);
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .light .searchResultName {
@@ -136,7 +253,19 @@
   color: rgba(26, 22, 37, 0.5);
 }
 
-.light .searchDropdownEmpty {
+.light .searchResultArrow {
+  color: rgba(26, 22, 37, 0.3);
+}
+
+.light .emptySearchIcon {
+  color: rgba(26, 22, 37, 0.3);
+}
+
+.light .emptyTitle {
+  color: #1a1625;
+}
+
+.light .emptySubtext {
   color: rgba(26, 22, 37, 0.5);
 }
 
@@ -485,6 +614,71 @@
     flex: 1;
     margin: 0 0.25rem 0 0.5rem;
     max-width: none;
+    position: relative;
+  }
+
+  .searchDropdown {
+    position: fixed !important;
+    top: 54px !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    min-width: unset !important;
+    max-width: calc(100vw - 24px) !important;
+    border-radius: 14px !important;
+    padding: 0.25rem !important;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(225, 0, 117, 0.25) !important;
+    z-index: 9999 !important;
+    max-height: 280px !important;
+  }
+
+  .searchSectionHeader {
+    padding: 0.25rem 0.5rem 0.15rem !important;
+    font-size: 0.58rem !important;
+    letter-spacing: 0.05em !important;
+  }
+
+  .searchResultItem {
+    padding: 0.35rem 0.5rem !important;
+    gap: 0.5rem !important;
+    border-radius: 8px !important;
+  }
+
+  .searchResultAvatar {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .searchPostIcon,
+  .searchSettingIcon {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 8px !important;
+  }
+
+  .searchResultName {
+    font-size: 0.72rem !important;
+  }
+
+  .searchResultHandle {
+    font-size: 0.62rem !important;
+  }
+
+  .searchResultArrow {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .searchDropdownEmpty {
+    padding: 1rem 0.5rem !important;
+  }
+
+  .emptyTitle {
+    font-size: 0.75rem !important;
+  }
+
+  .emptySubtext {
+    font-size: 0.65rem !important;
   }
 
   .searchInput {

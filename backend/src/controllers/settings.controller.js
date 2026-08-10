@@ -6,6 +6,8 @@ const ApiError = require('../utils/apiError');
 const catchAsync = require('../utils/catchAsync');
 const emailService = require('../services/email.service');
 
+const awsService = require('../services/aws.service');
+
 // ==========================================
 // PROFILE
 // ==========================================
@@ -24,6 +26,17 @@ exports.getProfile = catchAsync(async (req, res, next) => {
       createdAt: req.user.createdAt
     }
   });
+});
+
+exports.getPresignedUpload = catchAsync(async (req, res, next) => {
+  const { fileName, fileType } = req.body;
+  if (!fileName || !fileType) return next(new ApiError(400, 'Please provide fileName and fileType'));
+  const fileKey = `avatars/${req.user._id}/${Date.now()}_${fileName.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+  const uploadUrl = await awsService.getPresignedUploadUrl(fileKey, fileType);
+  const bucketName = process.env.AWS_S3_BUCKET_NAME || 'fantrio';
+  const region = process.env.AWS_REGION || 'us-east-1';
+  const fileUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${fileKey}`;
+  res.status(200).json({ status: 'success', uploadUrl, key: fileKey, fileUrl });
 });
 
 // ==========================================

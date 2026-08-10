@@ -145,12 +145,12 @@
 }
 .light .toastInfo .toastIcon { background: rgba(225, 0, 117, 0.12); }
 
-/* Mobile: full-width toasts at the bottom, above the bottom nav */
+/* Mobile: full-width toasts at top of screen below top header */
 @media (max-width: 768px) {
   .toastContainer {
-    top: auto;
+    top: 70px;
+    bottom: auto;
     right: 12px;
-    bottom: 84px;
     left: 12px;
     max-width: none;
     align-items: center;
@@ -159,14 +159,14 @@
   .toast {
     width: 100%;
     max-width: 420px;
-    animation-name: toastSlideUp;
+    animation-name: toastSlideDown;
   }
 }
 
-@keyframes toastSlideUp {
+@keyframes toastSlideDown {
   from {
     opacity: 0;
-    transform: translateY(16px) scale(0.97);
+    transform: translateY(-16px) scale(0.97);
   }
   to {
     opacity: 1;

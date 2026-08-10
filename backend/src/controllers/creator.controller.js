@@ -18,6 +18,9 @@ const catchAsync = require('../utils/catchAsync');
 const { getHiddenUserIds } = require('../utils/blockFilter');
 const { getHiddenByVisibility } = require('./feed.controller');
 
+// In-memory cache for profile view deduplication (10s cooldown per viewer/IP per profile)
+const profileViewCooldowns = new Map();
+
 // Compute date boundaries for a dashboard earnings period.
 // Returns { start, prevStart, prevEnd } where `start` is inclusive and
 // prevStart/prevEnd bound the previous equivalent window (for change %).
@@ -163,9 +166,13 @@ exports.updateProfile = catchAsync(async (req, res, next) => {
 // Fetch SEO-optimized public profile
 exports.getPublicProfile = catchAsync(async (req, res, next) => {
   const { username } = req.params;
+  const isObjId = mongoose.Types.ObjectId.isValid(username);
 
-  const profile = await CreatorProfile.findOne({ username: username.toLowerCase() })
-    .populate('userId', 'email isVerified');
+  const profile = await CreatorProfile.findOne(
+    isObjId
+      ? { $or: [{ username: username.toLowerCase() }, { userId: username }, { _id: username }] }
+      : { username: username.toLowerCase() }
+  ).populate('userId', 'email isVerified');
 
   if (!profile) {
     return next(new ApiError(404, 'Creator profile not found.'));
@@ -181,21 +188,35 @@ exports.getPublicProfile = catchAsync(async (req, res, next) => {
   }
 
   // Track real profile views (analytics) — skip counting the owner viewing themselves
+  // and deduplicate requests within a 10s cooldown window (prevents double-counting from React StrictMode or rapid double fetches)
   if (!viewer || (profile.userId && viewer._id.toString() !== profile.userId._id.toString())) {
-    profile.profileViews = (profile.profileViews || 0) + 1;
-    await profile.save({ validateBeforeSave: false });
+    const viewerKey = viewer ? viewer._id.toString() : (req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'guest');
+    const dedupeKey = `${profile._id}_${viewerKey}`;
+    const now = Date.now();
+    const lastViewedAt = profileViewCooldowns.get(dedupeKey);
+
+    if (!lastViewedAt || (now - lastViewedAt > 10000)) {
+      profileViewCooldowns.set(dedupeKey, now);
+      profile.profileViews = (profile.profileViews || 0) + 1;
+      await profile.save({ validateBeforeSave: false });
+    }
   }
 
   // Whether the requesting viewer holds an active subscription to this creator.
   // Drives the frontend teaser banner / subscribe CTA on the public profile.
   let isSubscribed = false;
+  let subscribedPlan = null;
   if (viewer && profile.userId && !isOwner) {
-    isSubscribed = !!(await Subscription.findOne({
+    const activeSub = await Subscription.findOne({
       userId: viewer._id,
       creatorId: profile.userId._id,
       status: 'active',
       expiryDate: { $gt: new Date() }
-    }));
+    });
+    if (activeSub) {
+      isSubscribed = true;
+      subscribedPlan = activeSub.plan || 'Premium';
+    }
   }
 
   // Generate structured SEO metadata tags
@@ -216,6 +237,7 @@ exports.getPublicProfile = catchAsync(async (req, res, next) => {
     status: 'success',
     creator: profile,
     isSubscribed,
+    subscribedPlan,
     seoTags: {
       title: (profile.seoTags && profile.seoTags.metaTitle) || `${profile.displayName || profile.username} (@${profile.username}) | Fantrio`,
       description: (profile.seoTags && profile.seoTags.metaDescription) || profile.bio || `Check out ${profile.displayName || profile.username}'s exclusive content.`,
@@ -223,6 +245,51 @@ exports.getPublicProfile = catchAsync(async (req, res, next) => {
       ogDescription,
       ogImage
     }
+  });
+});
+
+// Discover and search creators
+exports.getProfileByUserId = catchAsync(async (req, res, next) => {
+  const { userId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    return next(new ApiError(400, 'Invalid user ID'));
+  }
+
+  const profile = await CreatorProfile.findOne({ userId }).populate('userId', 'email isVerified');
+  if (!profile) {
+    return next(new ApiError(404, 'Creator profile not found'));
+  }
+
+  // Whether this creator is currently on an active call — drives the disabled
+  // call buttons / "Busy" state in the chat UI for direct-navigation routes.
+  const activeCall = await CallLog.findOne({
+    status: 'active',
+    $or: [{ callerId: userId }, { receiverId: userId }]
+  });
+
+  let isSubscribed = false;
+  let subscribedPlan = null;
+  const viewer = req.user;
+  if (viewer && profile.userId && viewer._id.toString() !== profile.userId._id.toString()) {
+    const activeSub = await Subscription.findOne({
+      userId: viewer._id,
+      creatorId: profile.userId._id,
+      status: 'active',
+      expiryDate: { $gt: new Date() }
+    });
+    if (activeSub) {
+      isSubscribed = true;
+      subscribedPlan = activeSub.plan || 'Premium';
+    }
+  }
+
+  res.status(200).json({
+    status: 'success',
+    creator: profile,
+    isSubscribed,
+    subscribedPlan,
+    isBusy: !!activeCall
   });
 });
 
@@ -261,11 +328,43 @@ exports.discoverCreators = catchAsync(async (req, res, next) => {
     filter.categories = req.query.category;
   }
 
-  // Availability filters (creators who hide their online status are excluded
+  // Availability & relationship filters (creators who hide their online status are excluded
   // from online-only results so the preference is honored end-to-end)
   if (req.query.isOnline === 'true') {
     filter.isOnline = true;
     filter.showOnlineStatus = { $ne: false };
+  }
+  if (req.query.isFollowing === 'true') {
+    if (req.user) {
+      const me = await User.findById(req.user._id, 'following');
+      const followingIds = me && me.following ? me.following : [];
+      if (filter.userId && filter.userId.$nin) {
+        const allowed = followingIds.filter((id) => !filter.userId.$nin.map((x) => x.toString()).includes(id.toString()));
+        filter.userId = { $in: allowed };
+      } else {
+        filter.userId = { $in: followingIds };
+      }
+    } else {
+      filter.userId = { $in: [] };
+    }
+  }
+  if (req.query.isSubscribed === 'true') {
+    if (req.user) {
+      const subs = await Subscription.find({
+        userId: req.user._id,
+        status: 'active',
+        expiryDate: { $gt: new Date() }
+      }).select('creatorId');
+      const subCreatorIds = subs.map((s) => s.creatorId);
+      if (filter.userId && filter.userId.$nin) {
+        const allowed = subCreatorIds.filter((id) => !filter.userId.$nin.map((x) => x.toString()).includes(id.toString()));
+        filter.userId = { $in: allowed };
+      } else {
+        filter.userId = { $in: subCreatorIds };
+      }
+    } else {
+      filter.userId = { $in: [] };
+    }
   }
   if (req.query.isLive === 'true') {
     filter.isLive = true;
@@ -320,12 +419,23 @@ exports.discoverCreators = catchAsync(async (req, res, next) => {
     CreatorProfile.countDocuments(filter)
   ]);
 
-  // Annotate with follow state for the current user (single query, no N+1)
+  // Annotate with follow & subscription state for the current user
   let followingSet = null;
+  let subscribedSet = null;
   if (req.user) {
-    const me = await User.findById(req.user._id, 'following');
+    const [me, subs] = await Promise.all([
+      User.findById(req.user._id, 'following'),
+      Subscription.find({
+        userId: req.user._id,
+        status: 'active',
+        expiryDate: { $gt: new Date() }
+      }).select('creatorId')
+    ]);
     if (me && me.following) {
       followingSet = new Set(me.following.map((id) => id.toString()));
+    }
+    if (subs) {
+      subscribedSet = new Set(subs.map((s) => s.creatorId.toString()));
     }
   }
 
@@ -333,6 +443,7 @@ exports.discoverCreators = catchAsync(async (req, res, next) => {
     const doc = c.toObject();
     const userIdStr = doc.userId && (doc.userId._id || doc.userId).toString();
     doc.isFollowing = followingSet ? followingSet.has(userIdStr) : false;
+    doc.isSubscribed = subscribedSet ? subscribedSet.has(userIdStr) : false;
     return doc;
   });
 
@@ -835,7 +946,7 @@ exports.markStoryViewed = catchAsync(async (req, res, next) => {
 
 // Fetch Active Live Streams (public fan-facing listing)
 exports.getLiveStreams = catchAsync(async (req, res, next) => {
-  const { category, language, sortBy, availability, tab } = req.query;
+  const { category, language, sortBy, availability, tab, search } = req.query;
 
   const hiddenIds = req.user ? await getHiddenUserIds(req.user._id) : [];
 
@@ -900,6 +1011,15 @@ exports.getLiveStreams = catchAsync(async (req, res, next) => {
 
   let streams = mappedDbStreams;
 
+  if (search && search.trim()) {
+    const q = search.trim().toLowerCase();
+    streams = streams.filter(s =>
+      (s.streamTitle && s.streamTitle.toLowerCase().includes(q)) ||
+      (s.displayName && s.displayName.toLowerCase().includes(q)) ||
+      (s.username && s.username.toLowerCase().includes(q))
+    );
+  }
+
   // Filter logic (mirrors the fan page controls)
   if (category && category !== 'All Categories') {
     streams = streams.filter(s => s.category.toLowerCase() === category.toLowerCase());
@@ -915,10 +1035,10 @@ exports.getLiveStreams = catchAsync(async (req, res, next) => {
     streams = streams.filter(s => s.isUpcoming);
   }
 
-  if (tab === 'trending') {
-    streams.sort((a, b) => b.viewerCount - a.viewerCount);
-  } else if (tab === 'liveNow') {
+  if (tab === 'liveNow') {
     streams = streams.filter(s => s.isLive);
+  } else if (tab === 'upcoming') {
+    streams = streams.filter(s => s.isUpcoming);
   } else if (tab === 'topRated') {
     streams.sort((a, b) => b.rating - a.rating);
   } else if (tab === 'new') {

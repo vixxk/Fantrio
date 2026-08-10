@@ -103,9 +103,31 @@ export const IncomingCallProvider = ({ children }) => {
     endingRef.current = false;
   }, [cleanupTimers, ag, refreshBalance]);
 
+  const checkMediaPermissions = async (callType) => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return true;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: callType === 'video'
+      });
+      stream.getTracks().forEach((track) => track.stop());
+      return true;
+    } catch (err) {
+      console.error('Media permission denied or error:', err);
+      return false;
+    }
+  };
+
   const acceptCall = useCallback(async () => {
     if (!incoming) return;
     const { callLogId, roomId, type, caller, rate, receiverToken } = incoming;
+
+    const hasPermission = await checkMediaPermissions(type);
+    if (!hasPermission) {
+      toast.error(`Microphone ${type === 'video' ? 'and Camera ' : ''}permission is required to join ${type} calls. Please allow permission in your browser settings.`);
+      return;
+    }
+
     setActive({
       callLogId,
       roomId,
@@ -172,11 +194,19 @@ export const IncomingCallProvider = ({ children }) => {
     }
   }, [remoteStream]);
 
-  // If the provider unmounts mid-call (e.g. logout / tab switch), clean up the
+  // If the provider unmounts mid-call (e.g. logout / tab switch / going back), clean up the
   // Agora session, billing heartbeat and backend session so no orphaned call
   // lingers and the other party isn't left hanging.
   useEffect(() => {
+    const handlePopState = () => {
+      if (activeRef.current) {
+        endActiveCall();
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+
     return () => {
+      window.removeEventListener('popstate', handlePopState);
       cleanupTimers();
       const cur = activeRef.current;
       if (cur && cur.roomId) {
@@ -184,8 +214,7 @@ export const IncomingCallProvider = ({ children }) => {
       }
       ag.endCall();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [endActiveCall, cleanupTimers, ag]);
 
   // Attach local preview once active
   useEffect(() => {
@@ -280,6 +309,7 @@ export const IncomingCallProvider = ({ children }) => {
                   <button
                     className={`${styles.controlBtn} ${styles.controlBtnGift}`}
                     onClick={() => setGiftOpen(true)}
+                    disabled={activeStatus !== 'active'}
                     aria-label="Send a gift"
                   >
                     <Gift size={22} />
@@ -287,6 +317,7 @@ export const IncomingCallProvider = ({ children }) => {
                   <button
                     className={`${styles.controlBtn} ${isMuted ? styles.controlActive : ''}`}
                     onClick={toggleMute}
+                    disabled={activeStatus !== 'active'}
                   >
                     {isMuted ? <MicOff size={22} /> : <Mic size={22} />}
                   </button>
@@ -294,6 +325,7 @@ export const IncomingCallProvider = ({ children }) => {
                     <button
                       className={`${styles.controlBtn} ${isCameraOff ? styles.controlActive : ''}`}
                       onClick={toggleCamera}
+                      disabled={activeStatus !== 'active'}
                     >
                       {isCameraOff ? <VideoOff size={22} /> : <Video size={22} />}
                     </button>
@@ -304,6 +336,7 @@ export const IncomingCallProvider = ({ children }) => {
                   <button
                     className={`${styles.controlBtn} ${styles.controlBtnCoins}`}
                     onClick={() => setRechargeOpen(true)}
+                    disabled={activeStatus !== 'active'}
                     aria-label="Recharge coins"
                   >
                     <Coins size={22} />

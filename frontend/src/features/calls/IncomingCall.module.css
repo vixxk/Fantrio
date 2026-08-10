@@ -243,12 +243,12 @@
 /* Gift + recharge controls inside the active call overlay */
 .callTopBar {
   position: absolute;
-  top: 14px;
+  top: 24px;
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
-  z-index: 4;
+  z-index: 10;
 }
 
 .callBalanceChip {
@@ -290,6 +290,18 @@
 .callRechargeBtn:hover {
   opacity: 0.9;
   transform: scale(1.05);
+}
+
+.callRechargeBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.controlBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .controlBtnGift {

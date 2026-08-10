@@ -36,6 +36,7 @@ export const ConfirmDeleteDialog = ({
   if (!open) return null;
 
   const isSuccess = variant === 'success';
+  const isPremium = variant === 'premium';
 
   return (
     <div
@@ -43,7 +44,7 @@ export const ConfirmDeleteDialog = ({
       onClick={() => { if (!deleting) onCancel(); }}
     >
       <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
-        <div className={`${styles.iconWrap} ${isSuccess ? styles.iconWrapSuccess : ''}`}>
+        <div className={`${styles.iconWrap} ${isSuccess ? styles.iconWrapSuccess : ''} ${isPremium ? styles.iconWrapPremium : ''}`}>
           {icon}
         </div>
         <h3 className={styles.title}>{title}</h3>
@@ -58,7 +59,7 @@ export const ConfirmDeleteDialog = ({
           <button className={styles.cancelBtn} onClick={onCancel} disabled={deleting}>
             Cancel
           </button>
-          <button className={`${styles.confirmBtn} ${isSuccess ? styles.confirmBtnSuccess : ''}`} onClick={onConfirm} disabled={deleting}>
+          <button className={`${styles.confirmBtn} ${isSuccess ? styles.confirmBtnSuccess : ''} ${isPremium ? styles.confirmBtnPremium : ''}`} onClick={onConfirm} disabled={deleting}>
             {deleting ? (
               <span><Loader2 size={14} className={styles.spin} /> {busyLabel}</span>
             ) : confirmLabel}

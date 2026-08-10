@@ -40,8 +40,8 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['user', 'creator', 'admin'],
-      default: 'user'
+      enum: ['user', 'fan', 'creator', 'admin'],
+      default: 'fan'
     },
     otp: {
       code: { type: String },
@@ -57,6 +57,18 @@ const userSchema = new mongoose.Schema(
     },
     lastLogin: {
       type: Date
+    },
+    // Real-time presence, kept in sync by the Socket.io layer (server.js).
+    // Fans don't have a CreatorProfile, so their online state lives here;
+    // creators get the same flag mirrored onto their CreatorProfile so every
+    // presence consumer (calls, conversations, discover) stays consistent.
+    isOnline: {
+      type: Boolean,
+      default: false
+    },
+    lastSeenAt: {
+      type: Date,
+      default: null
     },
     twoFactorEnabled: {
       type: Boolean,

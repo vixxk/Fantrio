@@ -1,0 +1,1790 @@
+.pageContainer {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Main Content Area */
+.mainFeed {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.headerTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.headerVideoIcon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 8px rgba(255, 0, 127, 0.4));
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+.sortWrapper {
+  position: relative;
+}
+
+.sortButton {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  color: #ffffff;
+  padding: 0.65rem 1.2rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sortButton:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.sortDropdown {
+  position: absolute;
+  top: 110%;
+  right: 0;
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  z-index: 2000;
+  min-width: 180px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.sortDropdown button {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: 8px;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.sortDropdown button:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.activeSortOption {
+  color: #ff007f !important;
+  font-weight: 700;
+}
+
+/* Pills sorting row */
+.pillsRow {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.pillBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 100px;
+  padding: 0.6rem 1.2rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pillBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.pillActive {
+  background: linear-gradient(90deg, #ff007f, #7e00f3);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+.pillGreenDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00e676;
+}
+
+/* Search bar & count row */
+.searchLayoutRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.searchInputWrapper {
+  flex: 1;
+  position: relative;
+  max-width: 400px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 0.95rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.searchInput {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 0.65rem 1rem 0.65rem 2.4rem;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.85rem;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.searchInput:focus {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.creatorsCountText {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 500;
+}
+
+.light .searchInput {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #1a1625;
+}
+
+.light .searchInput:focus {
+  border-color: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.light .searchIcon {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .creatorsCountText {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+/* Creators Grid & Card Layout (Reusing AllCreators.module.css layout) */
+.creatorsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+.creatorCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  height: 380px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s;
+}
+
+.creatorCard:hover {
+  transform: translateY(-4px);
+  border-color: rgba(225, 0, 117, 0.4);
+}
+
+.cardHeaderStatus {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 3;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.onlineBadge {
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  border-radius: 99px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.onlineBadge .dot {
+  width: 6px;
+  height: 6px;
+  background-color: #22c55e;
+  border-radius: 50%;
+}
+
+.busyBadge {
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  border-radius: 99px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.busyBadge .dot {
+  width: 6px;
+  height: 6px;
+  background-color: #ffb800;
+  border-radius: 50%;
+}
+
+.topRatedBadge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: #e10075;
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  z-index: 3;
+}
+
+.cardImageWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+  background: #000000;
+}
+
+.creatorAvatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cardBody {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 2;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.75) 45%, rgba(0, 0, 0, 0.95) 100%);
+  padding: 2.2rem 0.95rem 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.nameBlock {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.displayName {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.verifiedIcon {
+  color: #0b0813;
+  fill: #ffffff;
+  flex-shrink: 0;
+}
+
+.statsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ratingInfo {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #ffb800;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.coinRateInfo {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.coinIconSmall {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+.actionsRow {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.actionBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem;
+  border-radius: 12px;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnVideoIcon {
+  flex-shrink: 0;
+}
+
+.callBtn {
+  background: linear-gradient(90deg, #ff007f, #7e00f3);
+  color: #ffffff;
+}
+
+.callBtn:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.busyBtn {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: rgba(255, 255, 255, 0.75) !important;
+  cursor: not-allowed;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.busyBtn .btnVideoIcon {
+  opacity: 0.75;
+}
+
+.offlineBtn {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+  cursor: not-allowed;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.offlineBtn .btnVideoIcon {
+  opacity: 0.4;
+}
+
+/* Filters Sidebar (Reusing AllCreators.module.css styles) */
+.filtersSidebar {
+  width: 24%;
+  min-width: 250px;
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  padding: 1.5rem;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  box-sizing: border-box;
+}
+
+.filtersHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 1rem;
+}
+
+.filtersTitle {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+
+.resetBtn {
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: linear-gradient(90deg, #e10075, #7e00f3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: opacity 0.2s;
+}
+
+.resetBtn:hover {
+  opacity: 0.8;
+}
+
+.filterSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.filterSectionLabel {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+.checkboxList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.checkboxWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  cursor: pointer;
+}
+
+.customCheckbox {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  color: transparent;
+  box-sizing: border-box;
+}
+
+.checkboxChecked {
+  background: linear-gradient(135deg, #e10075, #7e00f3) !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+}
+
+.checkboxLabel {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.sidebarOnlineDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+}
+
+.sidebarBusyDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffb800;
+}
+
+/* Slider (AllCreators styles) */
+.sliderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.sliderMinText {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.sliderMaxText {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.sliderValText {
+  color: #ff007f;
+  font-weight: 700;
+}
+
+.filterSlider {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 99px;
+  outline: none;
+  cursor: pointer;
+}
+
+.filterSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #ff007f;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.filterSlider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+/* Price Option Grid styling instead of range slider */
+.priceOptionGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.priceOptionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  padding: 0.6rem 0.25rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.priceOptionBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.priceOptionActive {
+  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%) !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 12px rgba(225, 0, 117, 0.3);
+}
+
+/* Dropdowns (AllCreators styles) */
+.dropdownWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.dropdownButton {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.dropdownButton:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  width: 100%;
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  z-index: 2000;
+  box-sizing: border-box;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.dropdownMenu button {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: 8px;
+  width: 100%;
+}
+
+.dropdownMenu button:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.applyFiltersBtn {
+  width: 100%;
+  background: linear-gradient(90deg, #e10075, #7e00f3);
+  border: none;
+  border-radius: 12px;
+  color: #ffffff;
+  padding: 0.85rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin-top: 0.5rem;
+}
+
+.applyFiltersBtn:hover {
+  opacity: 0.9;
+}
+
+/* How Video Calls Work Card */
+.howItWorksCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  padding: 1.5rem;
+}
+
+.howItWorksTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 1.25rem 0;
+}
+
+.howItWorksList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.howStep {
+  display: flex;
+  gap: 0.85rem;
+  align-items: center;
+}
+
+.howStepIconVideo {
+  width: 20px;
+  height: 20px;
+  color: rgba(255, 255, 255, 0.75);
+  flex-shrink: 0;
+}
+
+.howStepIconPhone {
+  width: 20px;
+  height: 20px;
+  color: rgba(255, 255, 255, 0.75);
+  flex-shrink: 0;
+}
+
+.howStepIconCoin {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.howStepIconLock {
+  width: 20px;
+  height: 20px;
+  color: rgba(255, 255, 255, 0.75);
+  flex-shrink: 0;
+}
+
+.howStepText {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.65);
+  margin: 0;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+/* Loading & Empty States */
+.loaderContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 2rem;
+  gap: 1rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #ff007f;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.emptyContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6rem 2rem;
+  gap: 1rem;
+}
+
+.emptyText {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.95rem;
+}
+
+.resetBtnInline {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  padding: 0.6rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.resetBtnInline:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Call Modal Screen Overlay */
+.callModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(7, 5, 11, 0.92);
+  backdrop-filter: blur(12px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.callModalContent {
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.2rem;
+  position: relative;
+}
+
+.videoArea {
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #000;
+  z-index: 0;
+}
+
+.remoteVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.localVideo {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 120px;
+  height: 160px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  z-index: 3;
+  background: #111;
+}
+
+.waitingRemote {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2;
+}
+
+.callAvatarWrapper {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin-bottom: 1rem;
+  z-index: 2;
+}
+
+.callAvatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #ff007f;
+  z-index: 2;
+  position: relative;
+}
+
+.pulseRing {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border: 4px solid #ff007f;
+  border-radius: 50%;
+  animation: pulseRingAnim 2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+  opacity: 0;
+  z-index: 1;
+}
+
+.ringDelayed {
+  animation-delay: 1s;
+}
+
+@keyframes pulseRingAnim {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+.callName {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  z-index: 2;
+}
+
+.callUsername {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: -0.5rem;
+  z-index: 2;
+}
+
+.callStatusBox {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.statusBlink {
+  font-size: 1rem;
+  color: #ff007f;
+  font-weight: 700;
+  animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.activeCallMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.duration {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 2px;
+}
+
+.billingRate {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.callControls {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 2rem;
+  z-index: 2;
+}
+
+.controlBtn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.controlBtn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.controlActive {
+  background: #ff007f;
+  border-color: #ff007f;
+}
+
+.hangupBtn {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: #ff1744;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(255, 23, 68, 0.4);
+  transition: all 0.2s;
+}
+
+.hangupBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 28px rgba(255, 23, 68, 0.5);
+}
+
+.hangupIcon {
+  color: #ffffff;
+  transform: rotate(135deg);
+}
+
+/* Light Theme Overrides (using AllCreators classes where applicable) */
+.light .title {
+  color: #1a1625;
+}
+
+.light .subtitle {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .pillBtn {
+  background: #f0edf8;
+  border-color: rgba(0, 0, 0, 0.05);
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .pillBtn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #1a1625;
+}
+
+.light .pillActive {
+  background: linear-gradient(90deg, #ff007f, #7e00f3);
+  color: #ffffff;
+}
+
+.light .resultText {
+  color: #1a1625;
+}
+
+.light .creatorCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.05);
+}
+
+.light .filtersSidebar {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.05);
+}
+
+.light .filtersTitle {
+  color: #1a1625;
+}
+
+.light .filterSectionLabel {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .checkboxLabel {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .customCheckbox {
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.light .sliderMinText,
+.light .sliderMaxText {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .sliderValText {
+  color: #e10075;
+}
+
+.light .priceOptionBtn {
+  background: #f7f6fb;
+  border-color: rgba(26, 22, 37, 0.08);
+  color: #1a1625;
+}
+
+.light .priceOptionBtn:hover {
+  background: #ededf5;
+  border-color: rgba(26, 22, 37, 0.15);
+}
+
+.light .priceOptionActive {
+  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%) !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+}
+
+.light .dropdownButton {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.05);
+  color: #1a1625;
+}
+
+.light .dropdownButton:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.light .dropdownMenu {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .dropdownMenu button {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .dropdownMenu button:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #1a1625;
+}
+
+.light .howItWorksCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.05);
+}
+
+.light .howItWorksTitle {
+  color: #1a1625;
+}
+
+
+.light .howStepIconVideo {
+  color: rgba(26, 22, 37, 0.65);
+}
+
+.light .howStepIconPhone {
+  color: rgba(26, 22, 37, 0.65);
+}
+
+.light .howStepIconLock {
+  color: rgba(26, 22, 37, 0.65);
+}
+
+.light .howStepText {
+  color: rgba(26, 22, 37, 0.65);
+}
+
+.light .emptyText {
+  color: rgba(26, 22, 37, 0.55);
+}
+
+.light .resetBtnInline {
+  background: #f0edf8;
+  border-color: rgba(0, 0, 0, 0.05);
+  color: #1a1625;
+}
+
+.light .resetBtnInline:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* Pagination display */
+.paginationRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.pageArrow {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pageArrow:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.pageArrow:not(:disabled):hover {
+  color: #ffffff;
+}
+
+.pageNumBtn {
+  background: #181424;
+  border: none;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.pageNumBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.activePage {
+  background: linear-gradient(135deg, #e10075, #7e00f3) !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(225, 0, 117, 0.25);
+}
+
+.pageEllipsis {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0 0.35rem;
+  letter-spacing: 1px;
+}
+
+/* Light theme overrides */
+.light .pageNumBtn {
+  background: #f0edf8;
+  color: rgba(26, 22, 37, 0.9);
+}
+
+.light .pageNumBtn:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.light .pageArrow {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .pageArrow:not(:disabled):hover {
+  color: #1a1625;
+}
+
+.light .pageEllipsis {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.controlsRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mobileFilterToggleBtn {
+  display: none;
+}
+
+/* Responsive / Screen width percentages */
+@media (max-width: 1200px) {
+  .creatorsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .pageContainer {
+    flex-direction: column;
+  }
+  .filtersSidebar {
+    display: none !important;
+  }
+  .creatorsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .searchLayoutRow {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.4rem !important;
+    order: 2 !important;
+    margin-bottom: 0.3rem !important;
+  }
+  .searchInputWrapper {
+    max-width: 100% !important;
+  }
+  .searchInput {
+    padding: 0.45rem 0.75rem 0.45rem 2.1rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 10px !important;
+  }
+  .searchIcon {
+    left: 0.75rem !important;
+    width: 14px !important;
+    height: 14px !important;
+  }
+  
+  .title {
+    font-size: 1.25rem !important;
+  }
+  .subtitle {
+    font-size: 0.88rem !important;
+    color: rgba(255, 255, 255, 0.5) !important;
+    line-height: 1.4 !important;
+  }
+  
+  .creatorsCountText {
+    display: none !important;
+  }
+  
+  .pillsRow {
+    display: none !important;
+  }
+
+  .header {
+    display: contents !important;
+  }
+  .mainFeed {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.4rem !important;
+  }
+  .headerTitleBlock,
+  .headerTitleArea {
+    order: 1 !important;
+    margin-bottom: 0 !important;
+  }
+  .searchLayoutRow {
+    order: 2 !important;
+    margin-bottom: 0 !important;
+  }
+  .controlsRow {
+    order: 3 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+    box-sizing: border-box;
+    margin-bottom: 0.35rem !important;
+  }
+  .creatorsGrid {
+    order: 4 !important;
+  }
+  .paginationRow {
+    order: 5 !important;
+  }
+  .howItWorksSection {
+    order: 6 !important;
+  }
+  
+  .sortWrapper {
+    flex: 1 !important;
+    display: block !important;
+  }
+  
+  .sortButton {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 0.45rem 0.75rem;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .mobileFilterToggleBtn {
+    display: block !important;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    padding: 0.45rem 0.75rem;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .light .sortButton,
+  .light .mobileFilterToggleBtn {
+    background: rgba(26, 22, 37, 0.04);
+    border-color: rgba(26, 22, 37, 0.1);
+    color: #1a1625;
+  }
+  .light .sortButton {
+    background: rgba(26, 22, 37, 0.04);
+    border-color: rgba(26, 22, 37, 0.1);
+    color: #1a1625;
+  }
+  
+  .sortDropdown {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    width: 100%;
+    background: #0d0c12;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 0.35rem;
+    z-index: 2000;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  }
+  .light .sortDropdown {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.08);
+  }
+  
+  .sortDropdown button {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 6px;
+    width: 100%;
+  }
+  .light .sortDropdown button {
+    color: rgba(26, 22, 37, 0.7);
+  }
+  
+  .sortDropdown button:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+  }
+  .light .sortDropdown button:hover {
+    background: rgba(0, 0, 0, 0.04);
+    color: #1a1625;
+  }
+  
+  .activeSortOption {
+    background: rgba(225, 0, 117, 0.1) !important;
+    color: #e10075 !important;
+    font-weight: 600 !important;
+  }
+
+  .mobileFilterToggleBtn {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 0.6rem 1rem;
+    color: #ffffff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .light .mobileFilterToggleBtn {
+    background: rgba(26, 22, 37, 0.04);
+    border-color: rgba(26, 22, 37, 0.1);
+    color: #1a1625;
+  }
+
+  .mobileFiltersModalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: flex;
+    align-items: flex-end;
+  }
+  
+  .mobileFiltersModal {
+    background-color: #0d0c12;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    width: 100%;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s ease-out;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    box-sizing: border-box;
+  }
+  .light .mobileFiltersModal {
+    background-color: #ffffff;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+  }
+  
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  
+  .mobileFiltersModalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .light .mobileFiltersModalHeader {
+    border-bottom-color: rgba(0, 0, 0, 0.06);
+  }
+  
+  .mobileFiltersModalHeader h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .light .mobileFiltersModalHeader h3 {
+    color: #1a1625;
+  }
+  
+  .closeFiltersModalBtn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .light .closeFiltersModalBtn {
+    color: rgba(26, 22, 37, 0.6);
+  }
+  
+  .mobileFiltersModalBody {
+    padding: 1rem 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .filterSectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .mobileResetBtn {
+    display: block !important;
+    background: transparent;
+    border: none;
+    background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.2s;
+  }
+  
+  .mobileResetBtn:hover {
+    opacity: 0.8;
+  }
+  
+  .mobileFiltersModalFooter {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    justify-content: stretch;
+  }
+  .light .mobileFiltersModalFooter {
+    border-top-color: rgba(0, 0, 0, 0.06);
+  }
+  
+  .mobileApplyFiltersBtn {
+    width: 100%;
+    background: linear-gradient(90deg, #e10075, #7e00f3);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    padding: 0.85rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-align: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .creatorsGrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+  
+  .creatorCard {
+    height: auto !important;
+    aspect-ratio: 0.72 !important;
+    border-radius: 12px !important;
+  }
+  
+  .cardBody {
+    padding: 1.5rem 0.5rem 0.5rem !important;
+    gap: 0.25rem !important;
+  }
+  
+  .displayName {
+    font-size: 0.8rem !important;
+  }
+  
+  .verifiedIcon {
+    width: 12px !important;
+    height: 12px !important;
+  }
+  
+  .statsRow {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.2rem !important;
+  }
+  
+  .ratingInfo, .coinRateInfo {
+    font-size: 0.65rem !important;
+  }
+  
+  .onlineBadge, .topRatedBadge, .busyBadge {
+    font-size: 0.55rem !important;
+    padding: 0.15rem 0.3rem !important;
+    border-radius: 4px !important;
+  }
+  
+  .coinIconSmall {
+    width: 10px !important;
+    height: 10px !important;
+  }
+
+  .actionsRow {
+    gap: 0.25rem !important;
+    margin-top: 0.5rem !important;
+  }
+  
+  .actionBtn {
+    padding: 0.35rem 0.15rem !important;
+    font-size: 0.58rem !important;
+    border-radius: 6px !important;
+    white-space: nowrap !important;
+  }
+  
+  .btnPhoneIcon, .btnVideoIcon {
+    width: 12px !important;
+    height: 12px !important;
+  }
+}
+
+/* Gift + recharge controls inside the active call overlay */
+.callTopBar {
+  position: absolute;
+  top: 24px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 10;
+}
+
+.callBalanceChip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 6px 8px 6px 12px;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 800;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+}
+
+.callCoinImg {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.callRechargeBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(90deg, #ff007f, #7e00f3);
+  border: none;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.callRechargeBtn:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+}
+
+.callRechargeBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.controlBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.controlBtnGift {
+  background: linear-gradient(135deg, rgba(225, 0, 117, 0.35), rgba(126, 0, 243, 0.35));
+  border-color: rgba(255, 0, 127, 0.45);
+  color: #ff7ab8;
+}
+
+.controlBtnGift:hover {
+  background: linear-gradient(135deg, rgba(225, 0, 117, 0.55), rgba(126, 0, 243, 0.55));
+  color: #fff;
+}
+
+.controlBtnCoins {
+  background: rgba(255, 215, 102, 0.12);
+  border-color: rgba(255, 215, 102, 0.4);
+  color: #ffd166;
+}
+
+.controlBtnCoins:hover {
+  background: rgba(255, 215, 102, 0.22);
+  color: #fff;
+}

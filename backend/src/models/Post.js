@@ -29,6 +29,10 @@ const postSchema = new mongoose.Schema(
         thumbnailUrl: {
           type: String,
           default: null
+        },
+        isBlurred: {
+          type: Boolean,
+          default: true
         }
       }
     ],
@@ -59,6 +63,26 @@ const postSchema = new mongoose.Schema(
           type: String,
           required: true,
           trim: true
+        },
+        isGift: {
+          type: Boolean,
+          default: false
+        },
+        giftEmoji: {
+          type: String,
+          default: null
+        },
+        giftName: {
+          type: String,
+          default: null
+        },
+        giftTier: {
+          type: Number,
+          default: 1
+        },
+        giftCoins: {
+          type: Number,
+          default: 0
         },
         createdAt: {
           type: Date,

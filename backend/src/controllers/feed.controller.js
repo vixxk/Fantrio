@@ -68,9 +68,9 @@ const formatPostForUser = async (user, post, creatorDisplayMap, giftCounts) => {
             console.error(`[AWS S3] Error generating download URL for key ${key}:`, err);
           }
         }
-        return { _id: item._id, url: signedUrl, thumbnailUrl: item.thumbnailUrl || item.url, type: item.type, isLocked: false };
+        return { _id: item._id, url: signedUrl, thumbnailUrl: item.thumbnailUrl || item.url, type: item.type, isLocked: false, isBlurred: item.isBlurred !== undefined ? item.isBlurred : true };
       }
-      return { _id: item._id, url: null, thumbnailUrl: item.thumbnailUrl || item.url, type: item.type, isLocked: true };
+      return { _id: item._id, url: null, thumbnailUrl: item.thumbnailUrl || item.url, type: item.type, isLocked: true, isBlurred: item.isBlurred !== undefined ? item.isBlurred : true };
     })
   );
 
@@ -80,6 +80,11 @@ const formatPostForUser = async (user, post, creatorDisplayMap, giftCounts) => {
     _id: c._id,
     text: c.text,
     createdAt: c.createdAt,
+    isGift: c.isGift || false,
+    giftEmoji: c.giftEmoji || null,
+    giftName: c.giftName || null,
+    giftTier: c.giftTier || 1,
+    giftCoins: c.giftCoins || 0,
     userId: c.userId
       ? { _id: c.userId._id, username: c.userId.username, displayName: c.userId.displayName || c.userId.username, avatarUrl: c.userId.avatarUrl || '' }
       : null
@@ -166,7 +171,7 @@ const canInteractWithCreator = async (user, creatorId) => {
 
 exports.getHiddenByVisibility = getHiddenByVisibility;
 
-const buildFeedQuery = async (user) => {
+const buildFeedQuery = async (user, search = null) => {
   const hiddenIds = await getHiddenUserIds(user._id);
   const visibilityHidden = await getHiddenByVisibility(user);
   const allHidden = [...new Set([...hiddenIds, ...visibilityHidden])];
@@ -175,6 +180,9 @@ const buildFeedQuery = async (user) => {
   query.postType = { $ne: 'subscription' };
   if (allHidden.length > 0) {
     query.creatorId = { $nin: allHidden };
+  }
+  if (search && typeof search === 'string' && search.trim()) {
+    query.content = { $regex: search.trim(), $options: 'i' };
   }
   return query;
 };
@@ -234,8 +242,9 @@ exports.markSeen = catchAsync(async (req, res, next) => {
 exports.getFeed = catchAsync(async (req, res, next) => {
   const limit = parseInt(req.query.limit || '10', 10);
   const nextCursor = req.query.nextCursor;
+  const search = req.query.search;
 
-  const query = await buildFeedQuery(req.user);
+  const query = await buildFeedQuery(req.user, search);
   if (nextCursor) query._id = { $lt: nextCursor };
 
   const poolSize = limit * 3;
@@ -301,6 +310,28 @@ exports.getMediaFeed = catchAsync(async (req, res, next) => {
   const nextCursorVal = hasMore && lastPost ? lastPost._id : null;
 
   res.status(200).json({ status: 'success', posts: formattedPosts, nextCursor: nextCursorVal });
+});
+
+exports.getPostById = catchAsync(async (req, res, next) => {
+  const { postId } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(postId)) {
+    return next(new ApiError(400, 'Invalid Post ID'));
+  }
+  const post = await Post.findById(postId).populate('creatorId', 'username displayName avatarUrl');
+  if (!post) {
+    return next(new ApiError(404, 'Post not found'));
+  }
+  const hiddenError = rejectIfHidden(req, post);
+  if (hiddenError) return next(hiddenError);
+
+  const creatorIds = [post.creatorId._id.toString()];
+  const [creatorDisplayMap, giftCounts] = await Promise.all([
+    getCreatorDisplayMap(creatorIds),
+    getGiftCounts(creatorIds)
+  ]);
+
+  const formattedPost = await formatPostForUser(req.user, post, creatorDisplayMap, giftCounts);
+  res.status(200).json({ status: 'success', post: formattedPost });
 });
 
 exports.getPostMedia = catchAsync(async (req, res, next) => {

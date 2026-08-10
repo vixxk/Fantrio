@@ -46,6 +46,10 @@ const creatorProfileSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
+    isTopRated: {
+      type: Boolean,
+      default: true
+    },
     verificationStatus: {
       type: String,
       enum: ['pending', 'approved', 'rejected'],

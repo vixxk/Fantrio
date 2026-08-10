@@ -76,6 +76,39 @@ export const useOutgoingCall = ({ type }) => {
     endingRef.current = false;
   }, [clearCall, refreshBalance]);
 
+  // Automatically end call for both fan and creator if user goes back, leaves page, or unmounts
+  useEffect(() => {
+    const handlePopState = () => {
+      if (activeCallRef.current) {
+        endCall();
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      if (activeCallRef.current) {
+        endCall();
+      }
+    };
+  }, [endCall]);
+
+  const checkMediaPermissions = async (callType) => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return true;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: callType === 'video'
+      });
+      stream.getTracks().forEach((track) => track.stop());
+      return true;
+    } catch (err) {
+      console.error('Media permission denied or error:', err);
+      return false;
+    }
+  };
+
   const startCall = useCallback(async (creator) => {
     const rate = creator.rate || creator[videoCall ? 'videoCallPerMin' : 'audioCallPerMin'] || 0;
     if (creator.isBusy) {
@@ -84,6 +117,13 @@ export const useOutgoingCall = ({ type }) => {
     }
     if (balance < rate) {
       toast.error(`Insufficient coins! You need at least ${rate} coins to initiate this call.`);
+      return;
+    }
+
+    // Explicitly prompt for Camera / Microphone permissions before starting call trial
+    const hasPermission = await checkMediaPermissions(type);
+    if (!hasPermission) {
+      toast.error(`Microphone ${videoCall ? 'and Camera ' : ''}permission is required for ${type} calls. Please allow permission in your browser settings.`);
       return;
     }
 

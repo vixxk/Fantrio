@@ -737,14 +737,17 @@ export const CreatorMessagesPage = () => {
                     <h3 className={styles.profileName}>
                       {selectedConv.user.displayName}
                       {selectedConv.user.isVerified && <GradientBadgeCheck size={16} />}
-                    </h3>
-                    <span className={styles.profileUsername}>@{selectedConv.user.username}</span>
-                    {selectedConv.user.isTopFan && (
-                      <div className={styles.topFanBadge}>
-                        <TopFanBadge size={12} />
-                        <span>Top Fan</span>
+                    </h3>                      <span className={styles.profileUsername}>@{selectedConv.user.username}</span>
+                      <div className={`${styles.profileStatus} ${selectedConv.user.isOnline ? styles.profileStatusOnline : ''}`}>
+                        <span className={styles.profileStatusDot} />
+                        {selectedConv.user.isOnline ? 'Online' : 'Offline'}
                       </div>
-                    )}
+                      {selectedConv.user.isTopFan && (
+                        <div className={styles.topFanBadge}>
+                          <TopFanBadge size={12} />
+                          <span>Top Fan</span>
+                        </div>
+                      )}
                   </div>
                 </div>
               </div>
@@ -986,6 +989,10 @@ export const CreatorMessagesPage = () => {
                       {selectedConv.user.displayName}
                       {selectedConv.user.isVerified && <GradientBadgeCheck size={15} />}
                     </div>
+                    <span className={`${styles.roomStatus} ${selectedConv.user.isOnline ? styles.roomStatusOnline : ''}`}>
+                      <span className={styles.roomStatusDot} />
+                      {selectedConv.user.isOnline ? 'Online' : 'Offline'}
+                    </span>
                     {selectedConv.user.isTopFan && (
                       <div className={styles.topFanTag}>
                         <TopFanBadge size={12} />
@@ -1155,14 +1162,17 @@ export const CreatorMessagesPage = () => {
                     <h3 className={styles.profileName}>
                       {selectedConv.user.displayName}
                       {selectedConv.user.isVerified && <GradientBadgeCheck size={16} />}
-                    </h3>
-                    <span className={styles.profileUsername}>@{selectedConv.user.username}</span>
-                    {selectedConv.user.isTopFan && (
-                      <div className={styles.topFanBadge}>
-                        <TopFanBadge size={12} />
-                        <span>Top Fan</span>
+                    </h3>                      <span className={styles.profileUsername}>@{selectedConv.user.username}</span>
+                      <div className={`${styles.profileStatus} ${selectedConv.user.isOnline ? styles.profileStatusOnline : ''}`}>
+                        <span className={styles.profileStatusDot} />
+                        {selectedConv.user.isOnline ? 'Online' : 'Offline'}
                       </div>
-                    )}
+                      {selectedConv.user.isTopFan && (
+                        <div className={styles.topFanBadge}>
+                          <TopFanBadge size={12} />
+                          <span>Top Fan</span>
+                        </div>
+                      )}
                   </div>
                 </div>
               </div>

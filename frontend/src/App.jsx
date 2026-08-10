@@ -3,12 +3,13 @@ import { AppProvider, useApp } from './context/AppContext';
 import { Sidebar } from './features/sidebar/Sidebar';
 import { CreatorSidebar } from './features/sidebar/CreatorSidebar';
 import { Header } from './features/header/Header';
-import { Stories } from './features/users/stories/Stories';
-import { LiveStreams } from './features/users/live/LiveStreams';
-import { LiveStreamsPage } from './features/users/live/LiveStreamsPage';
-import { Feed } from './features/users/feed/Feed';
-import { SuggestionsSidebar } from './features/users/suggestions/SuggestionsSidebar';
-import { Banner } from './features/users/banner/Banner';
+import { Stories } from './features/fans/stories/Stories';
+import { LiveStreams } from './features/fans/live/LiveStreams';
+import { LiveStreamsPage } from './features/fans/live/LiveStreamsPage';
+import { Feed } from './features/fans/feed/Feed';
+import { PostDetailPage } from './features/fans/posts/PostDetailPage';
+import { SuggestionsSidebar } from './features/fans/suggestions/SuggestionsSidebar';
+import { Banner } from './features/fans/banner/Banner';
 import { AllCreators } from './features/creators/AllCreators';
 import { AnalyticsPage } from './features/creators/analytics/AnalyticsPage';
 import { LiveCallsPage as CreatorLiveCallsPage } from './features/creators/live-calls/LiveCallsPage';
@@ -25,16 +26,16 @@ import { CreatorLiveStreamsPage } from './features/creators/live-streams/Creator
 import { EarningsPage } from './features/creators/earnings/EarningsPage';
 import { StorePage } from './features/creators/store/StorePage';
 import { CreatorSettingsPage } from './features/creators/settings/CreatorSettingsPage';
-import { AudioCallsPage } from './features/users/audio/AudioCallsPage';
-import { VideoCallsPage } from './features/users/video/VideoCallsPage';
-import { SubscriptionsPage } from './features/users/subscriptions/SubscriptionsPage';
-import { MessagesPage } from './features/users/messages/MessagesPage';
-import { ListenerProfilePage } from './features/users/profile/ListenerProfilePage';
-import { MobileChatPage } from './features/users/messages/MobileChatPage';
-import { BuyCoinsPage } from './features/users/coins/BuyCoinsPage';
-import { TransactionHistoryPage } from './features/users/transactions/TransactionHistoryPage';
-import { SettingsPage } from './features/users/settings/SettingsPage';
-import { MorePage } from './features/users/more/MorePage';
+import { AudioCallsPage } from './features/fans/audio/AudioCallsPage';
+import { VideoCallsPage } from './features/fans/video/VideoCallsPage';
+import { SubscriptionsPage } from './features/fans/subscriptions/SubscriptionsPage';
+import { MessagesPage } from './features/fans/messages/MessagesPage';
+import { CreatorProfilePage } from './features/fans/profile/CreatorProfilePage';
+import { MobileChatPage } from './features/fans/messages/MobileChatPage';
+import { BuyCoinsPage } from './features/fans/coins/BuyCoinsPage';
+import { TransactionHistoryPage } from './features/fans/transactions/TransactionHistoryPage';
+import { SettingsPage } from './features/fans/settings/SettingsPage';
+import { MorePage } from './features/fans/more/MorePage';
 import { AdminPage } from './features/admin/AdminPage';
 import { AdminLogin } from './features/admin/AdminLogin';
 import { LoginPage } from './features/auth/LoginPage';
@@ -48,7 +49,7 @@ import './App.css';
 const AppContent = () => {
   const { darkMode, activeTab, setActiveTab, currentPath, user, loading, navigateTo, replacePath } = useApp();
   const isCreatorPage = activeTab.startsWith('Creator');
-  const isFullScreenPage = activeTab === 'Listener Profile';
+  const isFullScreenPage = activeTab === 'Public Creator Profile' || activeTab === 'Listener Profile';
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showBottomNav, setShowBottomNav] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -111,7 +112,13 @@ const AppContent = () => {
     };
   }, []);
 
-  const isChatOpen = (activeTab === 'Messages' || activeTab === 'Creator Messages') && currentPath && currentPath.split('/').filter(Boolean).length > 2;
+  // Hide the mobile bottom nav while viewing an open conversation thread:
+  // fan chats use /messages/:id (2 path segments) while creator chats use
+  // /creators/messages/:id (3 segments), so each role needs its own depth.
+  const pathSegmentCount = (p) => (p ? p.split('/').filter(Boolean).length : 0);
+  const isChatOpen =
+    (activeTab === 'Messages' && pathSegmentCount(currentPath) > 1) ||
+    (activeTab === 'Creator Messages' && pathSegmentCount(currentPath) > 2);
 
   // Auth page routes: canonical (/login, /signup) + aliases (/auth/login, /auth/signup)
   const isAuthPath = (path) =>
@@ -156,6 +163,12 @@ const AppContent = () => {
             <div className="rightSidebarContainer">
               <SuggestionsSidebar />
             </div>
+          </div>
+        );
+      case 'Post Detail':
+        return (
+          <div className="tabPostDetail">
+            <PostDetailPage />
           </div>
         );
       case 'Live Streams':
@@ -284,10 +297,11 @@ const AppContent = () => {
             <MessagesPage />
           </div>
         );
+      case 'Public Creator Profile':
       case 'Listener Profile':
         return (
           <div className="tabMessages">
-            <ListenerProfilePage key={currentPath} />
+            <CreatorProfilePage key={currentPath} />
           </div>
         );
       case 'Buy Coins':

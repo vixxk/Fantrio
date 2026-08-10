@@ -120,21 +120,47 @@ exports.getWithdrawals = catchAsync(async (req, res, next) => {
   });
 });
 
-// List promo codes
+// List promo codes (with the fans who redeemed each one)
 exports.getPromoCodes = catchAsync(async (req, res, next) => {
-  const settings = await SystemSetting.findOne();
+  const settings = await SystemSetting.findOne().populate('promoCodes.redeemedBy', 'username displayName');
   res.status(200).json({
     status: 'success',
     promoCodes: settings ? settings.promoCodes : []
   });
 });
 
+// Coerce a value to a positive integer, or return null for "not set".
+// Returns { value } on success or { error } with a message.
+const parsePositiveInt = (value, label) => {
+  if (value === undefined || value === null || value === '') return { value: null };
+  const n = Math.floor(Number(value));
+  if (!Number.isFinite(n) || n < 1) {
+    return { error: `${label} must be a positive number` };
+  }
+  return { value: n };
+};
+
 // Create a promo code
 exports.createPromoCode = catchAsync(async (req, res, next) => {
   const { code, bonusCoins, description, maxRedemptions, expiresAt, isActive } = req.body;
 
-  if (!code || !bonusCoins) {
-    return next(new ApiError(400, 'Code and bonusCoins are required'));
+  if (!code || !String(code).trim()) {
+    return next(new ApiError(400, 'Code is required'));
+  }
+
+  const bonus = parsePositiveInt(bonusCoins, 'Bonus coins');
+  if (bonus.error) return next(new ApiError(400, bonus.error));
+  if (bonus.value === null) return next(new ApiError(400, 'Bonus coins is required'));
+
+  const maxRed = parsePositiveInt(maxRedemptions, 'Max redemptions');
+  if (maxRed.error) return next(new ApiError(400, maxRed.error));
+
+  let expiry = null;
+  if (expiresAt) {
+    expiry = new Date(expiresAt);
+    if (Number.isNaN(expiry.getTime())) {
+      return next(new ApiError(400, 'Expiry date is invalid'));
+    }
   }
 
   let settings = await SystemSetting.findOne();
@@ -151,10 +177,10 @@ exports.createPromoCode = catchAsync(async (req, res, next) => {
 
   settings.promoCodes.push({
     code: String(code).trim().toUpperCase(),
-    bonusCoins,
+    bonusCoins: bonus.value,
     description: description || '',
-    maxRedemptions: maxRedemptions != null ? maxRedemptions : null,
-    expiresAt: expiresAt ? new Date(expiresAt) : null,
+    maxRedemptions: maxRed.value,
+    expiresAt: expiry,
     isActive: isActive !== undefined ? isActive : true
   });
   await settings.save();
@@ -179,10 +205,24 @@ exports.updatePromoCode = catchAsync(async (req, res, next) => {
   }
 
   const { bonusCoins, description, maxRedemptions, expiresAt, isActive } = req.body;
-  if (bonusCoins !== undefined) promo.bonusCoins = bonusCoins;
+  if (bonusCoins !== undefined) {
+    const bonus = parsePositiveInt(bonusCoins, 'Bonus coins');
+    if (bonus.error) return next(new ApiError(400, bonus.error));
+    if (bonus.value === null) return next(new ApiError(400, 'Bonus coins is required'));
+    promo.bonusCoins = bonus.value;
+  }
   if (description !== undefined) promo.description = description;
-  if (maxRedemptions !== undefined) promo.maxRedemptions = maxRedemptions;
-  if (expiresAt !== undefined) promo.expiresAt = expiresAt ? new Date(expiresAt) : null;
+  if (maxRedemptions !== undefined) {
+    const maxRed = parsePositiveInt(maxRedemptions, 'Max redemptions');
+    if (maxRed.error) return next(new ApiError(400, maxRed.error));
+    promo.maxRedemptions = maxRed.value;
+  }
+  if (expiresAt !== undefined) {
+    promo.expiresAt = expiresAt ? new Date(expiresAt) : null;
+    if (promo.expiresAt && Number.isNaN(promo.expiresAt.getTime())) {
+      return next(new ApiError(400, 'Expiry date is invalid'));
+    }
+  }
   if (isActive !== undefined) promo.isActive = isActive;
 
   await settings.save();

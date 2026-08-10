@@ -11,6 +11,7 @@ router.use(protect);
 // Profile
 router.get('/profile', settingsController.getProfile);
 router.patch('/profile', authController.updateMe);
+router.post('/presigned-upload', settingsController.getPresignedUpload);
 
 // Security
 router.get('/security', settingsController.getSecurity);

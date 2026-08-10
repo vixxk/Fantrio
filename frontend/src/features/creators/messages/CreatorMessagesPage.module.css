@@ -346,6 +346,33 @@
   font-weight: 600;
 }
 
+/* Fan presence in the chat header */
+.roomStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.roomStatusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
+}
+
+.roomStatusOnline {
+  color: #22c55e;
+}
+
+.roomStatusOnline .roomStatusDot {
+  background: #22c55e;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
+}
+
 .roomActions {
   display: flex;
   align-items: center;
@@ -703,6 +730,34 @@
   color: #eab308;
   font-size: 0.75rem;
   font-weight: 700;
+}
+
+/* Fan presence in the profile card */
+.profileStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 0.1rem;
+}
+
+.profileStatusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
+}
+
+.profileStatusOnline {
+  color: #22c55e;
+}
+
+.profileStatusOnline .profileStatusDot {
+  background: #22c55e;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
 }
 
 /* Stats Card */
@@ -1111,6 +1166,25 @@
   color: #111111;
 }
 
+.light .roomStatus {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.light .roomStatusDot {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.light .roomStatusOnline,
+.light .profileStatusOnline {
+  color: #16a34a;
+}
+
+.light .roomStatusOnline .roomStatusDot,
+.light .profileStatusOnline .profileStatusDot {
+  background: #16a34a;
+  box-shadow: none;
+}
+
 .light .roomActionBtn {
   border-color: rgba(0, 0, 0, 0.1);
   color: rgba(0, 0, 0, 0.5);
@@ -1209,6 +1283,14 @@
 
 .light .profileUsername {
   color: rgba(0, 0, 0, 0.4);
+}
+
+.light .profileStatus {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.light .profileStatusDot {
+  background: rgba(0, 0, 0, 0.25);
 }
 
 .light .statLabel,

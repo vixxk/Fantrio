@@ -71,7 +71,6 @@ export const Sidebar = ({ onClose }) => {
   };
 
   const formattedBalance = balance.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-  const usdValue = (balance / 100).toFixed(2);
 
   return (
     <aside className={`${styles.sidebar} ${darkMode ? styles.dark : styles.light}`}>
@@ -176,7 +175,6 @@ export const Sidebar = ({ onClose }) => {
             <img src="/coin.png" alt="Coin" className={styles.coinIcon} />
             <div className={styles.balanceInfo}>
               <span className={styles.balanceAmount}>{formattedBalance} Coins</span>
-              <span className={styles.balanceUsd}>(${usdValue} USD)</span>
             </div>
           </div>
           <button className={styles.addCoinsButton} onClick={() => setActiveTab('Buy Coins')}>
