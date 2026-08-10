@@ -1,12 +1,26 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { api } from '../../../services/api';
+import { getSocket, joinSocketRoom } from '../../../services/socket';
 import { 
-  Search, Edit, BadgeCheck, Phone, Video, Heart, MoreVertical,
-  Lock, Smile, Image as ImageIcon, Send, Plus, Star,
+  Search, BadgeCheck, Phone, Video, Heart, MoreVertical,
+  Lock, Image as ImageIcon, Send, Plus, Star,
   X, Check, MessageSquare, User, ChevronLeft, SlidersHorizontal
 } from 'lucide-react';
 import styles from './MessagesPage.module.css';
+import { ChatFiltersSheet } from '../../../components/ChatFiltersSheet/ChatFiltersSheet';
+import {
+  DEFAULT_CHAT_FILTERS,
+  matchesChatFilters,
+  sortConversationsByFilter,
+  countActiveChatFilters
+} from '../../../components/ChatFiltersSheet/chatFilters';
+import { ChatThreadSkeleton, ChatScreenSkeleton } from '../../../components/ChatThreadSkeleton/ChatThreadSkeleton';
+import { ChatComposerExtras } from '../../../components/ChatComposerExtras/ChatComposerExtras';
+import { insertEmojiAtCaret } from '../../../components/ChatComposerExtras/chatComposerUtils';
+import { useToast } from '../../../components/Toast/Toast';
+import { GiftPanel } from '../../../features/gifts/GiftPanel';
+import { QuickRecharge } from '../../../features/gifts/QuickRecharge';
 
 // Custom Gradient Verification Badge
 const GradientBadgeCheck = ({ size = 15 }) => (
@@ -25,343 +39,6 @@ const GradientBadgeCheck = ({ size = 15 }) => (
   </svg>
 );
 
-const INITIAL_CONVERSATIONS = [
-  {
-    id: 'conv1',
-    user: {
-      id: 'usr1',
-      displayName: 'Molly Jane',
-      username: 'mollyjane',
-      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
-      isVerified: true,
-      isOnline: true,
-      rating: 4.9,
-      ratingCount: 125,
-      subscriptionPlan: 'Monthly',
-      renewalDate: '5, July 2026',
-      audioRate: 10,
-      videoRate: 10,
-      followers: '12.5K',
-      posts: 234,
-      country: 'United States 🇺🇸',
-      language: 'English'
-    },
-    lastMessage: 'Hey babe!',
-    time: 'New',
-    unreadCount: 3,
-    isNew: true
-  },
-  {
-    id: 'conv2',
-    user: {
-      id: 'usr2',
-      displayName: 'Khushi',
-      username: 'khushi_official',
-      avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80',
-      isVerified: true,
-      isOnline: true,
-      rating: 4.8,
-      ratingCount: 98,
-      subscriptionPlan: 'Monthly',
-      renewalDate: '12, Aug 2026',
-      audioRate: 15,
-      videoRate: 20,
-      followers: '45.2K',
-      posts: 512,
-      country: 'India 🇮🇳',
-      language: 'Hindi, English'
-    },
-    lastMessage: 'New video uploaded!',
-    time: '5 Min',
-    unreadCount: 3,
-    isNew: false
-  },
-  {
-    id: 'conv3',
-    user: {
-      id: 'usr3',
-      displayName: 'Angelina',
-      username: 'angelinajolie',
-      avatarUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=300&q=80',
-      isVerified: false,
-      isOnline: true,
-      rating: 4.7,
-      ratingCount: 64,
-      subscriptionPlan: 'Yearly',
-      renewalDate: '01, Jan 2027',
-      audioRate: 12,
-      videoRate: 18,
-      followers: '8.9K',
-      posts: 104,
-      country: 'United Kingdom 🇬🇧',
-      language: 'English'
-    },
-    lastMessage: 'thanks for the tip!',
-    time: '5 Min',
-    unreadCount: 0,
-    isNew: false
-  },
-  {
-    id: 'conv4',
-    user: {
-      id: 'usr4',
-      displayName: 'Sonam',
-      username: 'sonam_k',
-      avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80',
-      isVerified: true,
-      isOnline: false,
-      rating: 4.9,
-      ratingCount: 310,
-      subscriptionPlan: 'Monthly',
-      renewalDate: '18, Jul 2026',
-      audioRate: 20,
-      videoRate: 25,
-      followers: '89.4K',
-      posts: 640,
-      country: 'India 🇮🇳',
-      language: 'Hindi, English'
-    },
-    lastMessage: 'Lorem ipsum dolor sit...',
-    time: '5 Min',
-    unreadCount: 0,
-    isNew: false
-  },
-  {
-    id: 'conv5',
-    user: {
-      id: 'usr5',
-      displayName: 'Shanvi',
-      username: 'shanvi_s',
-      avatarUrl: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=300&q=80',
-      isVerified: false,
-      isOnline: false,
-      rating: 4.6,
-      ratingCount: 42,
-      subscriptionPlan: 'Monthly',
-      renewalDate: '24, Jun 2026',
-      audioRate: 10,
-      videoRate: 15,
-      followers: '5.1K',
-      posts: 88,
-      country: 'India 🇮🇳',
-      language: 'English'
-    },
-    lastMessage: 'Lorem ipsum dolor sit...',
-    time: '5 Min',
-    unreadCount: 0,
-    isNew: false
-  },
-  {
-    id: 'conv6',
-    user: {
-      id: 'usr6',
-      displayName: 'Roshni Kumari',
-      username: 'roshni_k',
-      avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80',
-      isVerified: true,
-      isOnline: true,
-      rating: 4.9,
-      ratingCount: 180,
-      subscriptionPlan: 'Monthly',
-      renewalDate: '10, Aug 2026',
-      audioRate: 15,
-      videoRate: 22,
-      followers: '32.1K',
-      posts: 310,
-      country: 'India 🇮🇳',
-      language: 'Hindi'
-    },
-    lastMessage: 'Lorem ipsum dolor sit...',
-    time: '5 Min',
-    unreadCount: 0,
-    isNew: false
-  },
-  {
-    id: 'conv7',
-    user: {
-      id: 'usr7',
-      displayName: 'Riya Singh',
-      username: 'riya_s',
-      avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
-      isVerified: false,
-      isOnline: false,
-      rating: 4.5,
-      ratingCount: 29,
-      subscriptionPlan: 'Monthly',
-      renewalDate: '02, Jul 2026',
-      audioRate: 8,
-      videoRate: 12,
-      followers: '3.4K',
-      posts: 45,
-      country: 'India 🇮🇳',
-      language: 'English'
-    },
-    lastMessage: 'Lorem ipsum dolor sit...',
-    time: '5 Min',
-    unreadCount: 0,
-    isNew: false
-  },
-  {
-    id: 'conv8',
-    user: {
-      id: 'usr8',
-      displayName: 'Sweta Singh',
-      username: 'sweta_s',
-      avatarUrl: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=crop&w=300&q=80',
-      isVerified: true,
-      isOnline: true,
-      rating: 4.8,
-      ratingCount: 145,
-      subscriptionPlan: 'Monthly',
-      renewalDate: '15, Aug 2026',
-      audioRate: 18,
-      videoRate: 25,
-      followers: '28.9K',
-      posts: 275,
-      country: 'India 🇮🇳',
-      language: 'English, Hindi'
-    },
-    lastMessage: 'Lorem ipsum dolor sit...',
-    time: '5 Min',
-    unreadCount: 0,
-    isNew: false
-  }
-];
-
-const ARCHIVED_CONVERSATIONS = [
-  {
-    id: 'conv_arch1',
-    user: {
-      id: 'usr_arch1',
-      displayName: 'Riya Singh',
-      username: 'riya_s',
-      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
-      isVerified: false,
-      isOnline: false,
-      rating: 4.5,
-      ratingCount: 29,
-      subscriptionPlan: 'Monthly',
-      renewalDate: '02, Jul 2026',
-      audioRate: 8,
-      videoRate: 12,
-      followers: '3.4K',
-      posts: 45,
-      country: 'India 🇮🇳',
-      language: 'English'
-    },
-    lastMessage: "Let's catch up later! (Archived)",
-    time: '2 Weeks',
-    unreadCount: 0,
-    isNew: false
-  },
-  {
-    id: 'conv_arch2',
-    user: {
-      id: 'usr_arch2',
-      displayName: 'Sweta Singh',
-      username: 'sweta_s',
-      avatarUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=300&q=80',
-      isVerified: true,
-      isOnline: false,
-      rating: 4.8,
-      ratingCount: 145,
-      subscriptionPlan: 'Monthly',
-      renewalDate: '15, Aug 2026',
-      audioRate: 18,
-      videoRate: 25,
-      followers: '28.9K',
-      posts: 275,
-      country: 'India 🇮🇳',
-      language: 'English, Hindi'
-    },
-    lastMessage: 'This conversation is archived.',
-    time: '3 Weeks',
-    unreadCount: 0,
-    isNew: false
-  }
-];
-
-const INITIAL_MESSAGES = [
-  { 
-    id: 'm1', 
-    sender: 'user', 
-    text: 'This is the main chat template', 
-    time: '9:40 AM' 
-  },
-  { 
-    id: 'm2', 
-    sender: 'user', 
-    text: 'This is the main chat template', 
-    time: '9:40 AM' 
-  },
-  { 
-    id: 'm3', 
-    sender: 'creator', 
-    text: 'Oh?', 
-    time: '9:41 AM' 
-  },
-  { 
-    id: 'm4', 
-    sender: 'creator', 
-    text: 'How does it work?', 
-    time: '9:41 AM' 
-  },
-  { 
-    id: 'm5', 
-    sender: 'user', 
-    text: 'Simple', 
-    time: '9:42 AM' 
-  },
-  { 
-    id: 'm6', 
-    sender: 'user', 
-    text: "You just edit any text to type in the conversation you want to show, and delete any bubbles you don't want to use", 
-    time: '9:43 AM' 
-  },
-  { 
-    id: 'm7', 
-    sender: 'user', 
-    text: 'Boom', 
-    time: '9:43 AM' 
-  },
-  { 
-    id: 'm8', 
-    sender: 'creator', 
-    isPaywall: true, 
-    isLocked: true, 
-    coinPrice: 34, 
-    title: 'Jessica sent you an image', 
-    mediaType: 'Exclusive Image', 
-    textSub: 'This image is locked', 
-    previewUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80', 
-    time: '9:44 AM' 
-  },
-  { 
-    id: 'm9', 
-    sender: 'creator', 
-    text: 'Hmmm', 
-    time: '9:44 AM' 
-  },
-  { 
-    id: 'm10', 
-    sender: 'creator', 
-    text: 'I think I get it', 
-    time: '9:45 AM' 
-  },
-  { 
-    id: 'm11', 
-    sender: 'creator', 
-    isPaywall: true, 
-    isLocked: true, 
-    coinPrice: 34, 
-    title: 'Jessica sent you an image', 
-    mediaType: 'Exclusive Image', 
-    textSub: 'This image is locked', 
-    previewUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80', 
-    time: '9:45 AM' 
-  }
-];
-
 const parseMessagesPath = (pathname) => {
   if (!pathname.startsWith('/messages')) {
     return { convId: null, msgId: null };
@@ -372,8 +49,77 @@ const parseMessagesPath = (pathname) => {
   return { convId, msgId };
 };
 
+const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80';
+
+const formatTime = (iso) => {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const diff = Date.now() - d.getTime();
+  if (diff < 60000) return 'Just now';
+  if (diff < 3600000) return `${Math.floor(diff / 60000)}m`;
+  if (diff < 86400000) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  if (diff < 172800000) return 'Yesterday';
+  return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+};
+
+const mapConversation = (conv) => {
+  const peer = conv._id || {};
+  const profile = conv.profile || {};
+  const rates = profile.rates || {};
+  const lastMsg = conv.lastMessage || {};
+  // Subscription info comes from the backend when the viewer has an active
+  // subscription with this creator; otherwise nothing is shown (no fake data).
+  const sub = conv.subscription || null;
+  return {
+    id: String(peer._id || conv._id),
+    user: {
+      displayName: peer.displayName || peer.username || 'Creator',
+      username: peer.username || '',
+      avatarUrl: peer.avatarUrl || DEFAULT_AVATAR,
+      isVerified: !!profile.isVerifiedBadge,
+      isOnline: !!profile.isOnline,
+      rating: profile.rating || 0,
+      ratingCount: profile.ratingCount || 0,
+      subscriptionPlan: sub && sub.plan ? sub.plan : '—',
+      renewalDate: sub && sub.renewalDate ? new Date(sub.renewalDate).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : '—',
+      hasSubscription: !!sub,
+      audioRate: rates.audioCallPerMin || 0,
+      videoRate: rates.videoCallPerMin || 0,
+      followers: profile.followerCount || 0,
+      posts: '—',
+      country: profile.country || '—',
+      language: profile.language || '—'
+    },
+    lastMessage: lastMsg.content || (lastMsg.isPaywall ? `🔒 ${lastMsg.mediaType || 'Media'}` : '📎 Media'),
+    time: formatTime(lastMsg.createdAt),
+    lastMessageAt: lastMsg.createdAt ? new Date(lastMsg.createdAt).getTime() : 0,
+    unreadCount: conv.unreadCount || 0
+  };
+};
+
+const mapMessage = (m, currentUserId) => {
+  const isUser = String(m.senderId) === String(currentUserId);
+  const mediaType = m.mediaType || 'media';
+  return {
+    id: String(m._id),
+    sender: isUser ? 'user' : 'creator',
+    text: m.content || '',
+    time: formatTime(m.createdAt),
+    isPaywall: !!m.isPaywall,
+    isLocked: !!m.isLocked,
+    coinPrice: m.coinPrice || 0,
+    mediaType,
+    mediaUrl: m.mediaUrl || '',
+    title: mediaType === 'image' ? 'Exclusive Photo' : mediaType === 'video' ? 'Premium Video' : 'Exclusive Media',
+    textSub: m.isPaywall ? (isUser ? 'Unlocked media you sent' : 'Unlock to view this exclusive content') : '',
+    previewUrl: m.mediaUrl || '',
+    createdAt: m.createdAt
+  };
+};
+
 export const MessagesPage = () => {
-  const { darkMode, balance, addCoins, setActiveTab, currentPath, navigateTo } = useApp();
+  const { darkMode, balance, setActiveTab, currentPath, navigateTo, user, refreshBalance } = useApp();
+  const { toast } = useToast();
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [showProfileSheet, setShowProfileSheet] = useState(false);
 
@@ -383,26 +129,25 @@ export const MessagesPage = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const [conversations, setConversations] = useState(INITIAL_CONVERSATIONS);
+  const [conversations, setConversations] = useState([]);
+  const [loadingConversations, setLoadingConversations] = useState(true);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const currentUserId = user?.id || null;
+  const convIdsRef = useRef(new Set());
   
   const { convId: selectedConvId, msgId: selectedMsgId } = parseMessagesPath(currentPath);
 
   const [filter, setFilter] = useState('all');
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
+  const [chatFilters, setChatFilters] = useState(DEFAULT_CHAT_FILTERS);
+  const activeFilterCount = countActiveChatFilters(chatFilters);
   const [searchQuery, setSearchQuery] = useState('');
   const [showArchived, setShowArchived] = useState(false);
-  const [messagesMap, setMessagesMap] = useState({ 
-    conv1: INITIAL_MESSAGES,
-    conv_arch1: [
-      { id: 'archm1', sender: 'user', text: 'Hey Riya, did you see my message?', time: '2 weeks ago' },
-      { id: 'archm2', sender: 'creator', text: "Hey! Yes, let's catch up later!", time: '2 weeks ago' }
-    ],
-    conv_arch2: [
-      { id: 'archm3', sender: 'creator', text: 'This conversation has been archived.', time: '3 weeks ago' }
-    ]
-  });
+  const [messagesMap, setMessagesMap] = useState({});
   const [inputText, setInputText] = useState('');
+  const chatInputRef = useRef(null);
   const [showTipModal, setShowTipModal] = useState(false);
-  const [tipAmount, setTipAmount] = useState(50);
+  const [rechargeOpen, setRechargeOpen] = useState(false);
   const [mobileView, setMobileView] = useState(() => {
     const { convId } = parseMessagesPath(window.location.pathname);
     return convId ? 'chat' : 'list';
@@ -421,10 +166,15 @@ export const MessagesPage = () => {
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, []);
 
-  const selectedConv = (showArchived ? ARCHIVED_CONVERSATIONS : conversations).find(c => c.id === selectedConvId) || null;
-  const currentMessages = selectedConvId ? (messagesMap[selectedConvId] || [
-    { id: 'default1', sender: 'creator', text: `Hi! Welcome to my chat feed.`, time: 'Just now' }
-  ]) : [];
+  const selectedConv = conversations.find(c => c.id === selectedConvId) || null;
+  const currentMessages = useMemo(
+    () => (selectedConvId ? (messagesMap[selectedConvId] || []) : []),
+    [selectedConvId, messagesMap]
+  );
+  const chatDateLabel = currentMessages[0]?.createdAt
+    ? new Date(currentMessages[0].createdAt).toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+    : 'Today';
+  const unreadConversationCount = conversations.filter(c => c.unreadCount > 0).length;
 
   // Auto scroll to bottom of messages when selected conversation, messages, or mobileView change
   useEffect(() => {
@@ -436,17 +186,14 @@ export const MessagesPage = () => {
     }
   }, [selectedConvId, currentMessages, mobileView]);
 
-  useEffect(() => {
-    if (selectedConvId) {
-      if (mobileView === 'list') {
-        setMobileView('chat');
-      }
-    } else {
-      setMobileView('list');
-    }
-  }, [selectedConvId]);
+  // Auto-sync mobileView with URL — adjusted during render
+  const [prevConvId, setPrevConvId] = useState(selectedConvId);
+  if (selectedConvId !== prevConvId) {
+    setPrevConvId(selectedConvId);
+    setMobileView(selectedConvId ? 'chat' : 'list');
+  }
 
-  const selectMessage = (msgId) => {
+  const selectMessage = () => {
     if (selectedConvId) {
       navigateTo(`/messages/${selectedConvId}`);
     }
@@ -466,95 +213,222 @@ export const MessagesPage = () => {
   }, [selectedMsgId]);
 
   // Filter conversations
-  const conversationsToFilter = showArchived ? ARCHIVED_CONVERSATIONS : conversations;
-  const filteredConversations = conversationsToFilter.filter(c => {
-    const matchesSearch = c.user.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          c.lastMessage.toLowerCase().includes(searchQuery.toLowerCase());
-    if (!matchesSearch) return false;
-    if (filter === 'unread') return c.unreadCount > 0;
-    if (filter === 'subscribed') return true;
-    return true;
-  });
+  const conversationsToFilter = useMemo(() => (showArchived ? [] : conversations), [showArchived, conversations]);
 
-  const handleSendMessage = (e) => {
+  // ---- Real data loading (chat API) ----
+  const loadConversations = useCallback(async () => {
+    try {
+      const res = await api.get('/chat/conversations');
+      if (res.conversations) {
+        setConversations(res.conversations.map(mapConversation));
+      }
+    } catch (err) {
+      console.error('Failed to load conversations:', err);
+    } finally {
+      setLoadingConversations(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    Promise.resolve().then(() => {
+      loadConversations();
+    });
+  }, [loadConversations]);
+
+  useEffect(() => {
+    convIdsRef.current = new Set(conversations.map(c => c.id));
+  }, [conversations]);
+
+  useEffect(() => {
+    if (!selectedConvId) return;
+    let cancelled = false;
+    Promise.resolve().then(() => setLoadingMessages(true));
+    const loadMessages = async () => {
+      try {
+        const res = await api.get(`/chat/messages/${selectedConvId}`);
+        if (!cancelled && res.messages) {
+          setMessagesMap(prev => ({
+            ...prev,
+            [selectedConvId]: res.messages.map(m => mapMessage(m, currentUserId))
+          }));
+          setConversations(prev => prev.map(c => (c.id === selectedConvId ? { ...c, unreadCount: 0 } : c)));
+        }
+      } catch (err) {
+        console.error('Failed to load messages:', err);
+      } finally {
+        if (!cancelled) setLoadingMessages(false);
+      }
+    };
+    loadMessages();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedConvId]);
+
+  // Real-time delivery via Socket.io
+  useEffect(() => {
+    if (!currentUserId) return;
+    let socket = null;
+    try {
+      socket = getSocket();
+      joinSocketRoom(currentUserId);
+      const onNewMessage = (msg) => {
+        const otherId = String(msg.senderId) === String(currentUserId)
+          ? String(msg.receiverId)
+          : String(msg.senderId);
+        const uiMsg = mapMessage(msg, currentUserId);
+        if (selectedConvId && otherId === selectedConvId) {
+          setMessagesMap(prev => ({
+            ...prev,
+            [selectedConvId]: [...(prev[selectedConvId] || []), uiMsg]
+          }));
+        }
+        if (!convIdsRef.current.has(otherId)) {
+          loadConversations();
+        }
+        setConversations(prev => {
+          const idx = prev.findIndex(c => c.id === otherId);
+          if (idx === -1) return prev;
+          const next = [...prev];
+          next[idx] = { ...next[idx], lastMessage: msg.content || '📎 Media', time: 'Just now' };
+          return next;
+        });
+      };
+      socket.on('new_message', onNewMessage);
+      return () => { socket.off('new_message', onNewMessage); };
+    } catch (err) {
+      console.error('Socket init failed:', err);
+    }
+  }, [selectedConvId, currentUserId, loadConversations]);
+  const filteredConversations = useMemo(() => {
+    const base = conversationsToFilter.filter((c) => {
+      const matchesSearch = c.user.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            c.lastMessage.toLowerCase().includes(searchQuery.toLowerCase());
+      if (!matchesSearch) return false;
+      if (chatFilters.type === 'subscribed') return true; // placeholder: subscription data not exposed in this view
+      return matchesChatFilters(c, chatFilters, {});
+    });
+    return sortConversationsByFilter(base, chatFilters);
+  }, [conversationsToFilter, searchQuery, chatFilters]);
+
+  const setTypeFilter = (type) => {
+    setFilter(type);
+    setChatFilters((prev) => ({ ...prev, type }));
+  };
+
+  const handleApplyFilters = (f) => {
+    setChatFilters(f);
+    setFilter(f.type === 'unread' || f.type === 'subscribed' ? f.type : 'all');
+  };
+
+  const filterSheetProps = {
+    open: filterSheetOpen,
+    onClose: () => setFilterSheetOpen(false),
+    onApply: handleApplyFilters,
+    initialFilters: chatFilters,
+    variant: 'user',
+    conversations: conversations,
+    dark: darkMode,
+    desktop: !isMobile
+  };
+
+  const handleSendMessage = async (e) => {
     e?.preventDefault();
     if (!inputText.trim() || !selectedConvId) return;
 
-    const newMsg = {
-      id: `msg_${Date.now()}`,
-      sender: 'user',
-      text: inputText.trim(),
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-
-    setMessagesMap(prev => ({
-      ...prev,
-      [selectedConvId]: [...(prev[selectedConvId] || []), newMsg]
-    }));
-
-    setConversations(prev => prev.map(c => {
-      if (c.id === selectedConvId) {
-        return { ...c, lastMessage: inputText.trim(), time: 'Just now' };
+    const content = inputText.trim();
+    try {
+      const res = await api.post('/chat/message', { receiverId: selectedConvId, content });
+      if (res.status === 'success' && res.message) {
+        const uiMsg = mapMessage(res.message, currentUserId);
+        setMessagesMap(prev => ({
+          ...prev,
+          [selectedConvId]: [...(prev[selectedConvId] || []), uiMsg]
+        }));
       }
-      return c;
-    }));
+      setConversations(prev => prev.map(c => {
+        if (c.id === selectedConvId) {
+          return { ...c, lastMessage: content, time: 'Just now' };
+        }
+        return c;
+      }));
+      setInputText('');
+    } catch (err) {
+      console.error('Failed to send message:', err);
+      toast.error('Failed to send message. Please try again.');
+    }
+  };
 
-    setInputText('');
+  // Insert a picked emoji at the caret position of the chat input
+  const handlePickEmoji = (emoji) => {
+    setInputText((prev) => insertEmojiAtCaret(prev, emoji, chatInputRef.current));
   };
 
   const handleUnlockMedia = async (msgId, price) => {
     if (balance < price) {
-      alert(`Insufficient coins! You need ${price} Coins to unlock this image.`);
+      toast.error(`Insufficient coins! You need ${price} Coins to unlock this media.`);
       return;
     }
 
     try {
-      await addCoins(-price);
-
-      setMessagesMap(prev => ({
-        ...prev,
-        [selectedConvId]: (prev[selectedConvId] || []).map(m => {
-          if (m.id === msgId) {
-            return { ...m, isLocked: false };
-          }
-          return m;
-        })
-      }));
+      const res = await api.post(`/chat/message/${msgId}/unlock`);
+      if (res.status === 'success') {
+        const updated = res.message ? mapMessage(res.message, currentUserId) : null;
+        setMessagesMap(prev => ({
+          ...prev,
+          [selectedConvId]: (prev[selectedConvId] || []).map(m => {
+            if (m.id === msgId) {
+              return updated || { ...m, isLocked: false };
+            }
+            return m;
+          })
+        }));
+        refreshBalance();
+      }
     } catch (err) {
       console.error('Failed to unlock message:', err);
+      toast.error(err.message || 'Failed to unlock. Please try again.');
     }
   };
 
-  const handleSendTip = async () => {
+  const handleSendGiftInChat = async (gift) => {
     if (!selectedConv) return;
-    if (balance < tipAmount) {
-      alert(`Insufficient balance! You have ${balance} Coins.`);
+    if (balance < gift.coins) {
+      setShowTipModal(false);
+      setRechargeOpen(true);
       return;
     }
 
     try {
-      await addCoins(-tipAmount);
-      setShowTipModal(false);
+      const res = await api.post(`/monetization/gift/${selectedConv.id}`, { giftId: gift.id });
+      if (res.status === 'success') {
+        refreshBalance();
+        setShowTipModal(false);
 
-      const tipMsg = {
-        id: `tip_${Date.now()}`,
-        sender: 'user',
-        text: `❤️ Sent a tip of ${tipAmount} Coins to ${selectedConv.user.displayName}!`,
-        time: 'Just now',
-        isTip: true
-      };
+        const giftMsg = {
+          id: res.eventId || `gift_${Date.now()}`,
+          sender: 'user',
+          text: `${gift.emoji} Sent ${gift.name} (${gift.coins.toLocaleString()} Coins) to ${selectedConv.user.displayName}!`,
+          time: 'Just now',
+          isTip: true,
+          gift: res.gift || gift
+        };
 
-      setMessagesMap(prev => ({
-        ...prev,
-        [selectedConvId]: [...(prev[selectedConvId] || []), tipMsg]
-      }));
+        setMessagesMap(prev => ({
+          ...prev,
+          [selectedConvId]: [...(prev[selectedConvId] || []), giftMsg]
+        }));
+        toast.success(`${gift.name} sent!`);
+      }
     } catch (err) {
-      console.error('Failed to send tip:', err);
+      console.error('Failed to send gift:', err);
+      toast.error(err.message || 'Failed to send gift. Please try again.');
+      throw err;
     }
   };
 
   if (isMobile) {
     return (
+      <>
       <div className={`${styles.mobileContainer} ${!darkMode ? styles.lightMobile : ''}`}>
         
         {/* ================= VIEW 1: CHATS LIST ================= */}
@@ -593,8 +467,13 @@ export const MessagesPage = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={styles.mobileSearchInput}
               />
-              <button className={styles.mobileFilterBtn}>
+              <button
+                className={`${styles.mobileFilterBtn} ${activeFilterCount > 0 ? styles.mobileFilterBtnActive : ''}`}
+                onClick={() => setFilterSheetOpen(true)}
+                aria-label="Open filters"
+              >
                 <SlidersHorizontal size={16} />
+                {activeFilterCount > 0 && <span className={styles.filterBadge} />}
               </button>
             </div>
 
@@ -602,19 +481,19 @@ export const MessagesPage = () => {
             <div className={styles.mobileFilterPills}>
               <button 
                 className={`${styles.mobileFilterPill} ${filter === 'all' ? styles.mobileFilterActive : ''}`}
-                onClick={() => setFilter('all')}
+                onClick={() => setTypeFilter('all')}
               >
                 All
               </button>
               <button 
                 className={`${styles.mobileFilterPill} ${filter === 'unread' ? styles.mobileFilterActive : ''}`}
-                onClick={() => setFilter('unread')}
+                onClick={() => setTypeFilter('unread')}
               >
                 Unread
               </button>
               <button 
                 className={`${styles.mobileFilterPill} ${filter === 'subscribed' ? styles.mobileFilterActive : ''}`}
-                onClick={() => setFilter('subscribed')}
+                onClick={() => setTypeFilter('subscribed')}
               >
                 Subscribed
               </button>
@@ -761,87 +640,93 @@ export const MessagesPage = () => {
 
             {/* Chat Messages Body */}
             <div className={styles.mobileChatBody}>
-              <div className={styles.dateSeparator}>
-                <span>Nov 30, 2023, 9:41 AM</span>
-              </div>
+              {loadingMessages && currentMessages.length === 0 ? (
+                <ChatThreadSkeleton light={!darkMode} />
+              ) : (
+                <>
+                  <div className={styles.dateSeparator}>
+                    <span>{chatDateLabel}</span>
+                  </div>
 
-              {currentMessages.map((msg) => {
-                const isUser = msg.sender === 'user';
+                  {currentMessages.map((msg) => {
+                    const isUser = msg.sender === 'user';
 
-                if (msg.isPaywall) {
-                  return (
-                    <div 
-                      key={msg.id} 
-                      id={msg.id}
-                      className={`${styles.msgRow} ${styles.msgRowLeft}`}
-                      onClick={() => selectMessage(msg.id)}
-                    >
-                      <div className={`${styles.paywallWrapper} ${selectedMsgId === msg.id ? styles.paywallSelected : ''}`}>
-                        <span className={styles.paywallNoticeTitle}>{msg.title}</span>
-                        
-                        <div className={styles.paywallCard}>
-                          <div className={styles.paywallMediaFrame}>
-                            <img src={msg.previewUrl} alt="Locked" className={`${styles.paywallImg} ${msg.isLocked ? styles.blurred : ''}`} />
-                            {msg.isLocked && (
-                              <div className={styles.lockOverlay}>
-                                <Lock size={18} className={styles.lockIcon} />
+                    if (msg.isPaywall) {
+                      return (
+                        <div 
+                          key={msg.id} 
+                          id={msg.id}
+                          className={`${styles.msgRow} ${styles.msgRowLeft}`}
+                          onClick={() => selectMessage(msg.id)}
+                        >
+                          <div className={`${styles.paywallWrapper} ${selectedMsgId === msg.id ? styles.paywallSelected : ''}`}>
+                            <span className={styles.paywallNoticeTitle}>{msg.title}</span>
+                            
+                            <div className={styles.paywallCard}>
+                              <div className={styles.paywallMediaFrame}>
+                                {msg.previewUrl ? <img src={msg.previewUrl} alt="Locked" className={`${styles.paywallImg} ${msg.isLocked ? styles.blurred : ''}`} /> : <div className={`${styles.paywallImg} ${msg.isLocked ? styles.blurred : ''}`} style={{ background: 'linear-gradient(135deg, #1a1a2e, #e10075)' }} />}
+                                {msg.isLocked && (
+                                  <div className={styles.lockOverlay}>
+                                    <Lock size={18} className={styles.lockIcon} />
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className={styles.paywallContentBlock}>
+                                <h4 className={styles.paywallMediaTitle}>{msg.mediaType}</h4>
+                                <p className={styles.paywallSubtext}>{msg.textSub}</p>
+                              </div>
+                            </div>
+
+                            {/* Unlock Action Row */}
+                            {msg.isLocked ? (
+                              <div className={styles.paywallUnlockBar}>
+                                <div className={styles.coinPriceTag}>
+                                  <img src="/coin.png" alt="Coin" className={styles.coinIcon} />
+                                  <span>{msg.coinPrice} Coins</span>
+                                </div>
+                                <button 
+                                  className={styles.unlockBtn}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleUnlockMedia(msg.id, msg.coinPrice);
+                                  }}
+                                >
+                                  Unlock
+                                </button>
+                              </div>
+                            ) : (
+                              <div className={styles.unlockedNotice}>
+                                <Check size={14} /> Unlocked
                               </div>
                             )}
                           </div>
+                        </div>
+                      );
+                    }
 
-                          <div className={styles.paywallContentBlock}>
-                            <h4 className={styles.paywallMediaTitle}>{msg.mediaType}</h4>
-                            <p className={styles.paywallSubtext}>{msg.textSub}</p>
+                    return (
+                      <div 
+                        key={msg.id} 
+                        id={msg.id}
+                        className={`${styles.msgRow} ${isUser ? styles.msgRowRight : styles.msgRowLeft}`}
+                        onClick={() => selectMessage(msg.id)}
+                      >
+                        <div className={styles.msgContentWrapper}>
+                          <div className={`${styles.msgBubble} ${isUser ? styles.bubbleUser : styles.bubbleCreator} ${msg.isTip ? styles.bubbleTip : ''} ${selectedMsgId === msg.id ? styles.bubbleSelected : ''}`}>
+                            {msg.text && <p className={styles.msgText}>{msg.text}</p>}
+                          </div>
+                          <div className={`${styles.msgTimestampInline} ${isUser ? styles.timestampRight : styles.timestampLeft}`}>
+                            <span className={styles.msgTimestamp}>{msg.time}</span>
                           </div>
                         </div>
-
-                        {/* Unlock Action Row */}
-                        {msg.isLocked ? (
-                          <div className={styles.paywallUnlockBar}>
-                            <div className={styles.coinPriceTag}>
-                              <img src="/coin.png" alt="Coin" className={styles.coinIcon} />
-                              <span>{msg.coinPrice} Coins</span>
-                            </div>
-                            <button 
-                              className={styles.unlockBtn}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleUnlockMedia(msg.id, msg.coinPrice);
-                              }}
-                            >
-                              Unlock
-                            </button>
-                          </div>
-                        ) : (
-                          <div className={styles.unlockedNotice}>
-                            <Check size={14} /> Unlocked
-                          </div>
-                        )}
                       </div>
-                    </div>
-                  );
-                }
+                    );
+                  })}
 
-                return (
-                  <div 
-                    key={msg.id} 
-                    id={msg.id}
-                    className={`${styles.msgRow} ${isUser ? styles.msgRowRight : styles.msgRowLeft}`}
-                    onClick={() => selectMessage(msg.id)}
-                  >
-                    <div className={styles.msgContentWrapper}>
-                      <div className={`${styles.msgBubble} ${isUser ? styles.bubbleUser : styles.bubbleCreator} ${msg.isTip ? styles.bubbleTip : ''} ${selectedMsgId === msg.id ? styles.bubbleSelected : ''}`}>
-                        <p className={styles.msgText}>{msg.text}</p>
-                      </div>
-                      <div className={`${styles.msgTimestampInline} ${isUser ? styles.timestampRight : styles.timestampLeft}`}>
-                        <span className={styles.msgTimestamp}>{msg.time}</span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-
-              <div ref={messagesEndRef} />
+                  <div ref={messagesEndRef} />
+                </>
+              )}
             </div>
 
             {/* Chat Input Bar */}
@@ -851,6 +736,7 @@ export const MessagesPage = () => {
               </button>
 
               <input 
+                ref={chatInputRef}
                 type="text"
                 placeholder="Enter your message..."
                 value={inputText}
@@ -859,9 +745,11 @@ export const MessagesPage = () => {
               />
 
               <div className={styles.inputRightIcons}>
-                <button type="button" className={styles.inputIconButton} title="Emoji">
-                  <Smile size={19} />
-                </button>
+                <ChatComposerExtras
+                  dark={darkMode}
+                  anchor="right"
+                  onPickEmoji={handlePickEmoji}
+                />
                 <button type="button" className={styles.inputIconButton} title="Attach Image">
                   <ImageIcon size={19} />
                 </button>
@@ -914,10 +802,12 @@ export const MessagesPage = () => {
 
                     {/* Subscription Info Card */}
                     <div className={styles.sidebarCard}>
-                      <div className={styles.cardHeaderRow}>
-                        <span className={styles.cardHeaderTitle}>Subscription</span>
+                    <div className={styles.cardHeaderRow}>
+                      <span className={styles.cardHeaderTitle}>Subscription</span>
+                      {selectedConv.user.hasSubscription && (
                         <span className={styles.statusActiveTag}>Active</span>
-                      </div>
+                      )}
+                    </div>
 
                       <div className={styles.detailRow}>
                         <span className={styles.detailLabel}>Plan</span>
@@ -982,7 +872,7 @@ export const MessagesPage = () => {
                       <button 
                         className={styles.viewProfileBtn}
                         onClick={() => {
-                          setActiveTab('All Creators');
+                          navigateTo(`/listener-profile/${selectedConv.user.username}`);
                           setShowProfileSheet(false);
                         }}
                       >
@@ -996,77 +886,35 @@ export const MessagesPage = () => {
           </div>
         )}
 
-        {/* Send Tip Modal (reused in mobile view) */}
-        {showTipModal && selectedConv && (
-          <div className={styles.modalOverlay} onClick={() => setShowTipModal(false)}>
-            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-              <button className={styles.closeModalBtn} onClick={() => setShowTipModal(false)} aria-label="Close">
-                <X size={20} />
-              </button>
-
-              <div className={styles.modalCreatorHeader}>
-                <div className={styles.modalAvatarContainer}>
-                  <img src={selectedConv.user.avatarUrl} alt={selectedConv.user.displayName} className={styles.modalCreatorAvatar} />
-                  <div className={styles.modalHeartBadge}>
-                    <Heart size={14} fill="#ffffff" color="#ff007f" />
-                  </div>
-                </div>
-                <h3 className={styles.modalTitle}>
-                  Support {selectedConv.user.displayName}
-                  {selectedConv.user.isVerified && <BadgeCheck className={styles.verifiedIcon} size={16} />}
-                </h3>
-                <p className={styles.modalSubtext}>Tipping is a great way to support creators and get noticed!</p>
-              </div>
-
-              <div className={styles.balanceInfo}>
-                <span className={styles.balanceLabel}>Your Balance:</span>
-                <div className={styles.balanceValue}>
-                  <img src="/coin.png" alt="Coin" className={styles.coinIconSmall} />
-                  <span className={styles.balanceAmount}>{balance.toLocaleString()} Coins</span>
-                </div>
-              </div>
-
-              <div className={styles.tipPresets}>
-                {[20, 50, 100, 250].map((amt) => (
-                  <button 
-                    key={amt}
-                    className={`${styles.presetBtn} ${tipAmount === amt ? styles.presetActive : ''}`}
-                    onClick={() => setTipAmount(amt)}
-                    type="button"
-                  >
-                    <img src="/coin.png" alt="Coin" className={styles.coinIconSmall} />
-                    <span>{amt}</span>
-                  </button>
-                ))}
-              </div>
-
-              <div className={styles.customTipRow}>
-                <span className={styles.customTipLabel}>Custom Amount:</span>
-                <div className={styles.customInputWrapper}>
-                  <img src="/coin.png" alt="Coin" className={styles.customCoinIcon} />
-                  <input 
-                    type="number"
-                    value={tipAmount}
-                    onChange={(e) => setTipAmount(Math.max(1, Number(e.target.value)))}
-                    min="1"
-                    className={styles.customTipInput}
-                  />
-                </div>
-              </div>
-
-              <div className={styles.modalActions}>
-                <button className={styles.cancelBtn} onClick={() => setShowTipModal(false)} type="button">
-                  Cancel
-                </button>
-                <button className={styles.confirmTipBtn} onClick={handleSendTip} type="button">
-                  Send Tip ({tipAmount} Coins)
-                </button>
-              </div>
-            </div>
+        {/* ================= VIEW 2b: CHAT LOADING (direct URL) ================= */}
+        {mobileView === 'chat' && !selectedConv && (loadingConversations || loadingMessages) && (
+          <div className={styles.mobileChatScreen}>
+            <ChatScreenSkeleton light={!darkMode} />
           </div>
         )}
 
+        {/* Send Gift Panel Modal */}
+        {showTipModal && selectedConv && (
+          <GiftPanel
+            receiverName={selectedConv.user.displayName}
+            balance={balance}
+            onSendGift={handleSendGiftInChat}
+            onRecharge={() => {
+              setShowTipModal(false);
+              setRechargeOpen(true);
+            }}
+            onClose={() => setShowTipModal(false)}
+          />
+        )}
+        {rechargeOpen && (
+          <QuickRecharge onClose={() => setRechargeOpen(false)} />
+        )}
+
       </div>
+
+      {/* Chat Filters Sheet */}
+      <ChatFiltersSheet {...filterSheetProps} />
+      </>
     );
   }
 
@@ -1094,25 +942,33 @@ export const MessagesPage = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               className={styles.searchInput}
             />
+            <button
+              className={`${styles.filterBtn} ${activeFilterCount > 0 ? styles.filterBtnActive : ''}`}
+              onClick={() => setFilterSheetOpen(true)}
+              aria-label="Open filters"
+            >
+              <SlidersHorizontal size={16} />
+              {activeFilterCount > 0 && <span className={styles.filterBadge} />}
+            </button>
           </div>
 
           {/* Filter Tabs */}
           <div className={styles.filterPills}>
             <button 
               className={`${styles.filterPill} ${filter === 'all' ? styles.filterActive : ''}`}
-              onClick={() => setFilter('all')}
+              onClick={() => setTypeFilter('all')}
             >
               All
             </button>
             <button 
               className={`${styles.filterPill} ${filter === 'unread' ? styles.filterActive : ''}`}
-              onClick={() => setFilter('unread')}
+              onClick={() => setTypeFilter('unread')}
             >
-              Unread (12)
+              Unread ({unreadConversationCount})
             </button>
             <button 
               className={`${styles.filterPill} ${filter === 'subscribed' ? styles.filterActive : ''}`}
-              onClick={() => setFilter('subscribed')}
+              onClick={() => setTypeFilter('subscribed')}
             >
               Subscribed
             </button>
@@ -1155,6 +1011,12 @@ export const MessagesPage = () => {
                 </div>
               );
             })}
+            {filteredConversations.length === 0 && (
+              <div className={styles.mobileEmptyState}>
+                <MessageSquare size={40} className={styles.emptyIcon} />
+                <p>{loadingConversations ? 'Loading conversations...' : showArchived ? 'No archived conversations' : 'No conversations yet'}</p>
+              </div>
+            )}
           </div>
 
 
@@ -1214,7 +1076,7 @@ export const MessagesPage = () => {
                     <Phone size={16} />
                     <div className={styles.btnTextCol}>
                       <span className={styles.btnLabel}>Audio Call</span>
-                      <span className={styles.btnSub}>10 Coins/min</span>
+                      <span className={styles.btnSub}>{selectedConv.user.audioRate} Coins/min</span>
                     </div>
                   </button>
 
@@ -1226,7 +1088,7 @@ export const MessagesPage = () => {
                     <Video size={16} />
                     <div className={styles.btnTextCol}>
                       <span className={styles.btnLabel}>Video Call</span>
-                      <span className={styles.btnSub}>10 Coins/min</span>
+                      <span className={styles.btnSub}>{selectedConv.user.videoRate} Coins/min</span>
                     </div>
                   </button>
 
@@ -1261,7 +1123,7 @@ export const MessagesPage = () => {
                           <Phone size={16} className={styles.dropdownIcon} />
                           <div className={styles.dropdownItemText}>
                             <span className={styles.dropdownItemLabel}>Audio Call</span>
-                            <span className={styles.dropdownItemSub}>10 Coins/min</span>
+                            <span className={styles.dropdownItemSub}>{selectedConv.user.audioRate} Coins/min</span>
                           </div>
                         </button>
                         
@@ -1276,7 +1138,7 @@ export const MessagesPage = () => {
                           <Video size={16} className={styles.dropdownIcon} />
                           <div className={styles.dropdownItemText}>
                             <span className={styles.dropdownItemLabel}>Video Call</span>
-                            <span className={styles.dropdownItemSub}>10 Coins/min</span>
+                            <span className={styles.dropdownItemSub}>{selectedConv.user.videoRate} Coins/min</span>
                           </div>
                         </button>
                       </div>
@@ -1287,91 +1149,96 @@ export const MessagesPage = () => {
 
               {/* Messages Body */}
               <div className={styles.messagesBody}>
-                
-                {/* Date Separator */}
-                <div className={styles.dateSeparator}>
-                  <span>Nov 30, 2023, 9:41 AM</span>
-                </div>
+                {loadingMessages && currentMessages.length === 0 ? (
+                  <ChatThreadSkeleton light={!darkMode} />
+                ) : (
+                  <>
+                    {/* Date Separator */}
+                    <div className={styles.dateSeparator}>
+                      <span>{chatDateLabel}</span>
+                    </div>
 
-                {currentMessages.map((msg) => {
-                  const isUser = msg.sender === 'user';
+                    {currentMessages.map((msg) => {
+                      const isUser = msg.sender === 'user';
 
-                  if (msg.isPaywall) {
-                    return (
-                      <div 
-                        key={msg.id} 
-                        id={msg.id}
-                        className={`${styles.msgRow} ${styles.msgRowLeft}`}
-                        onClick={() => selectMessage(msg.id)}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        <div className={`${styles.paywallWrapper} ${selectedMsgId === msg.id ? styles.paywallSelected : ''}`}>
-                          <span className={styles.paywallNoticeTitle}>{msg.title}</span>
-                          
-                          <div className={styles.paywallCard}>
-                            <div className={styles.paywallMediaFrame}>
-                              <img src={msg.previewUrl} alt="Locked" className={`${styles.paywallImg} ${msg.isLocked ? styles.blurred : ''}`} />
-                              {msg.isLocked && (
-                                <div className={styles.lockOverlay}>
-                                  <Lock size={20} className={styles.lockIcon} />
+                      if (msg.isPaywall) {
+                        return (
+                          <div 
+                            key={msg.id} 
+                            id={msg.id}
+                            className={`${styles.msgRow} ${styles.msgRowLeft}`}
+                            onClick={() => selectMessage(msg.id)}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            <div className={`${styles.paywallWrapper} ${selectedMsgId === msg.id ? styles.paywallSelected : ''}`}>
+                              <span className={styles.paywallNoticeTitle}>{msg.title}</span>
+                              
+                              <div className={styles.paywallCard}>
+                                <div className={styles.paywallMediaFrame}>
+                                  {msg.previewUrl ? <img src={msg.previewUrl} alt="Locked" className={`${styles.paywallImg} ${msg.isLocked ? styles.blurred : ''}`} /> : <div className={`${styles.paywallImg} ${msg.isLocked ? styles.blurred : ''}`} style={{ background: 'linear-gradient(135deg, #1a1a2e, #e10075)' }} />}
+                                  {msg.isLocked && (
+                                    <div className={styles.lockOverlay}>
+                                      <Lock size={20} className={styles.lockIcon} />
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div className={styles.paywallContentBlock}>
+                                  <h4 className={styles.paywallMediaTitle}>{msg.mediaType}</h4>
+                                  <p className={styles.paywallSubtext}>{msg.textSub}</p>
+                                </div>
+                              </div>
+
+                              {/* Unlock Action Row */}
+                              {msg.isLocked ? (
+                                <div className={styles.paywallUnlockBar}>
+                                  <div className={styles.coinPriceTag}>
+                                    <img src="/coin.png" alt="Coin" className={styles.coinIcon} />
+                                    <span>{msg.coinPrice} Coins</span>
+                                  </div>
+                                  <button 
+                                    className={styles.unlockBtn}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleUnlockMedia(msg.id, msg.coinPrice);
+                                    }}
+                                  >
+                                    Unlock
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className={styles.unlockedNotice}>
+                                  <Check size={14} /> Unlocked
                                 </div>
                               )}
                             </div>
+                          </div>
+                        );
+                      }
 
-                            <div className={styles.paywallContentBlock}>
-                              <h4 className={styles.paywallMediaTitle}>{msg.mediaType}</h4>
-                              <p className={styles.paywallSubtext}>{msg.textSub}</p>
+                      return (
+                        <div 
+                          key={msg.id} 
+                          id={msg.id}
+                          className={`${styles.msgRow} ${isUser ? styles.msgRowRight : styles.msgRowLeft}`}
+                          onClick={() => selectMessage(msg.id)}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <div className={styles.msgContentWrapper}>
+                            <div className={`${styles.msgBubble} ${isUser ? styles.bubbleUser : styles.bubbleCreator} ${msg.isTip ? styles.bubbleTip : ''} ${selectedMsgId === msg.id ? styles.bubbleSelected : ''}`}>
+                              {msg.text && <p className={styles.msgText}>{msg.text}</p>}
+                            </div>
+                            <div className={`${styles.msgTimestampInline} ${isUser ? styles.timestampRight : styles.timestampLeft}`}>
+                              <span className={styles.msgTimestamp}>{msg.time}</span>
                             </div>
                           </div>
-
-                          {/* Unlock Action Row */}
-                          {msg.isLocked ? (
-                            <div className={styles.paywallUnlockBar}>
-                              <div className={styles.coinPriceTag}>
-                                <img src="/coin.png" alt="Coin" className={styles.coinIcon} />
-                                <span>{msg.coinPrice} Coins</span>
-                              </div>
-                              <button 
-                                className={styles.unlockBtn}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleUnlockMedia(msg.id, msg.coinPrice);
-                                }}
-                              >
-                                Unlock
-                              </button>
-                            </div>
-                          ) : (
-                            <div className={styles.unlockedNotice}>
-                              <Check size={14} /> Unlocked
-                            </div>
-                          )}
                         </div>
-                      </div>
-                    );
-                  }
+                      );
+                    })}
 
-                  return (
-                    <div 
-                      key={msg.id} 
-                      id={msg.id}
-                      className={`${styles.msgRow} ${isUser ? styles.msgRowRight : styles.msgRowLeft}`}
-                      onClick={() => selectMessage(msg.id)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <div className={styles.msgContentWrapper}>
-                        <div className={`${styles.msgBubble} ${isUser ? styles.bubbleUser : styles.bubbleCreator} ${msg.isTip ? styles.bubbleTip : ''} ${selectedMsgId === msg.id ? styles.bubbleSelected : ''}`}>
-                          <p className={styles.msgText}>{msg.text}</p>
-                        </div>
-                        <div className={`${styles.msgTimestampInline} ${isUser ? styles.timestampRight : styles.timestampLeft}`}>
-                          <span className={styles.msgTimestamp}>{msg.time}</span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-
-                <div ref={messagesEndRef} />
+                    <div ref={messagesEndRef} />
+                  </>
+                )}
               </div>
 
               {/* Input Bar */}
@@ -1381,6 +1248,7 @@ export const MessagesPage = () => {
                 </button>
 
                 <input 
+                  ref={chatInputRef}
                   type="text"
                   placeholder="Enter your message..."
                   value={inputText}
@@ -1389,9 +1257,11 @@ export const MessagesPage = () => {
                 />
 
                 <div className={styles.inputRightIcons}>
-                  <button type="button" className={styles.inputIconButton} title="Emoji">
-                    <Smile size={19} />
-                  </button>
+                  <ChatComposerExtras
+                    dark={darkMode}
+                    anchor="right"
+                    onPickEmoji={handlePickEmoji}
+                  />
                   <button type="button" className={styles.inputIconButton} title="Attach Image">
                     <ImageIcon size={19} />
                   </button>
@@ -1401,6 +1271,8 @@ export const MessagesPage = () => {
                 </div>
               </form>
             </>
+          ) : selectedConvId && (loadingConversations || loadingMessages) ? (
+            <ChatScreenSkeleton light={!darkMode} />
           ) : (
             <div className={styles.emptyStateContainer}>
               <div className={styles.emptyStateCard}>
@@ -1453,7 +1325,9 @@ export const MessagesPage = () => {
               <div className={styles.sidebarCard}>
                 <div className={styles.cardHeaderRow}>
                   <span className={styles.cardHeaderTitle}>Subscription</span>
-                  <span className={styles.statusActiveTag}>Active</span>
+                  {selectedConv.user.hasSubscription && (
+                    <span className={styles.statusActiveTag}>Active</span>
+                  )}
                 </div>
 
                 <div className={styles.detailRow}>
@@ -1518,7 +1392,7 @@ export const MessagesPage = () => {
 
                 <button 
                   className={styles.viewProfileBtn}
-                  onClick={() => setActiveTab('All Creators')}
+                  onClick={() => navigateTo(`/listener-profile/${selectedConv.user.username}`)}
                 >
                   View Profile
                 </button>
@@ -1535,75 +1409,24 @@ export const MessagesPage = () => {
 
       </div>
 
-      {/* Send Tip Modal */}
+      {/* Send Gift Panel Modal */}
       {showTipModal && selectedConv && (
-        <div className={styles.modalOverlay} onClick={() => setShowTipModal(false)}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <button className={styles.closeModalBtn} onClick={() => setShowTipModal(false)} aria-label="Close">
-              <X size={20} />
-            </button>
-
-            <div className={styles.modalCreatorHeader}>
-              <div className={styles.modalAvatarContainer}>
-                <img src={selectedConv.user.avatarUrl} alt={selectedConv.user.displayName} className={styles.modalCreatorAvatar} />
-                <div className={styles.modalHeartBadge}>
-                  <Heart size={14} fill="#ffffff" color="#ff007f" />
-                </div>
-              </div>
-              <h3 className={styles.modalTitle}>
-                Support {selectedConv.user.displayName}
-                {selectedConv.user.isVerified && <BadgeCheck className={styles.verifiedIcon} size={16} />}
-              </h3>
-              <p className={styles.modalSubtext}>Tipping is a great way to support creators and get noticed!</p>
-            </div>
-
-            <div className={styles.balanceInfo}>
-              <span className={styles.balanceLabel}>Your Balance:</span>
-              <div className={styles.balanceValue}>
-                <img src="/coin.png" alt="Coin" className={styles.coinIconSmall} />
-                <span className={styles.balanceAmount}>{balance.toLocaleString()} Coins</span>
-              </div>
-            </div>
-
-            <div className={styles.tipPresets}>
-              {[20, 50, 100, 250].map((amt) => (
-                <button 
-                  key={amt}
-                  className={`${styles.presetBtn} ${tipAmount === amt ? styles.presetActive : ''}`}
-                  onClick={() => setTipAmount(amt)}
-                  type="button"
-                >
-                  <img src="/coin.png" alt="Coin" className={styles.coinIconSmall} />
-                  <span>{amt}</span>
-                </button>
-              ))}
-            </div>
-
-            <div className={styles.customTipRow}>
-              <span className={styles.customTipLabel}>Custom Amount:</span>
-              <div className={styles.customInputWrapper}>
-                <img src="/coin.png" alt="Coin" className={styles.customCoinIcon} />
-                <input 
-                  type="number"
-                  value={tipAmount}
-                  onChange={(e) => setTipAmount(Math.max(1, Number(e.target.value)))}
-                  min="1"
-                  className={styles.customTipInput}
-                />
-              </div>
-            </div>
-
-            <div className={styles.modalActions}>
-              <button className={styles.cancelBtn} onClick={() => setShowTipModal(false)} type="button">
-                Cancel
-              </button>
-              <button className={styles.confirmTipBtn} onClick={handleSendTip} type="button">
-                Send Tip ({tipAmount} Coins)
-              </button>
-            </div>
-          </div>
-        </div>
+        <GiftPanel
+          receiverName={selectedConv.user.displayName}
+          balance={balance}
+          onSendGift={handleSendGiftInChat}
+          onRecharge={() => {
+            setShowTipModal(false);
+            setRechargeOpen(true);
+          }}
+          onClose={() => setShowTipModal(false)}
+        />
       )}
+      {rechargeOpen && (
+        <QuickRecharge onClose={() => setRechargeOpen(false)} />
+      )}
+      {/* Chat Filters Sheet */}
+      <ChatFiltersSheet {...filterSheetProps} />
     </div>
   );
 };

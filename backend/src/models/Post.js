@@ -19,7 +19,7 @@ const postSchema = new mongoose.Schema(
         },
         type: {
           type: String,
-          enum: ['image', 'video'],
+          enum: ['image', 'video', 'audio'],
           required: true
         },
         isLocked: {
@@ -82,6 +82,12 @@ const postSchema = new mongoose.Schema(
       type: Boolean,
       default: true
     },
+    // Creator-hide toggle: hidden posts are invisible to all users (feed, media
+    // feed, profile, unlocks) but stay visible to the owner on creator pages.
+    isHidden: {
+      type: Boolean,
+      default: false
+    },
     reports: [
       {
         userId: {
@@ -91,6 +97,11 @@ const postSchema = new mongoose.Schema(
         reason: {
           type: String,
           required: true
+        },
+        description: {
+          type: String,
+          trim: true,
+          default: ''
         },
         date: {
           type: Date,

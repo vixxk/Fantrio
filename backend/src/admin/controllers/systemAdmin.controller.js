@@ -4,6 +4,9 @@ const Wallet = require('../../models/Wallet');
 const Transaction = require('../../models/Transaction');
 const Post = require('../../models/Post');
 const CallLog = require('../../models/CallLog');
+const LiveStream = require('../../models/LiveStream');
+const Subscription = require('../../models/Subscription');
+const Report = require('../../models/Report');
 const SystemSetting = require('../../models/SystemSetting');
 const catchAsync = require('../../utils/catchAsync');
 
@@ -54,13 +57,36 @@ exports.getDashboardStats = catchAsync(async (req, res, next) => {
   const reportedPostsStats = reportsStats[0] || { totalReportedPosts: 0, totalReportsCount: 0 };
   const activeCallsCount = await CallLog.countDocuments({ status: 'active' });
 
+  // ---- Extra engagement / platform metrics ----
+  const [totalPosts, activeSubscriptions, liveStreamsCount, suspendedUsers, todaysSignups, pendingReports, revenueAgg] =
+    await Promise.all([
+      Post.countDocuments(),
+      Subscription.countDocuments({
+        status: { $in: ['active', 'expiring'] },
+        expiryDate: { $gt: new Date() }
+      }),
+      LiveStream.countDocuments({ isLive: true }),
+      User.countDocuments({ isSuspended: true }),
+      User.countDocuments({ createdAt: { $gte: new Date(new Date().setHours(0, 0, 0, 0)) } }),
+      Report.countDocuments({ status: 'pending' }),
+      Transaction.aggregate([
+        { $match: { status: 'completed' } },
+        { $group: { _id: null, total: { $sum: '$amountCoins' }, count: { $sum: 1 } } }
+      ])
+    ]);
+
+  const totalRevenueCoins = revenueAgg[0] ? revenueAgg[0].total : 0;
+  const completedTransactionsCount = revenueAgg[0] ? revenueAgg[0].count : 0;
+
   res.status(200).json({
     status: 'success',
     stats: {
       users: {
         totalUsers,
         totalCreators,
-        totalAdmins
+        totalAdmins,
+        suspendedUsers,
+        todaysSignups
       },
       wallet: {
         totalCoinsCirculating
@@ -69,6 +95,18 @@ exports.getDashboardStats = catchAsync(async (req, res, next) => {
       moderation: reportedPostsStats,
       calls: {
         activeCallsCount
+      },
+      engagement: {
+        totalPosts,
+        activeSubscriptions,
+        liveStreamsCount
+      },
+      revenue: {
+        totalRevenueCoins,
+        completedTransactionsCount
+      },
+      support: {
+        pendingReports
       }
     }
   });
@@ -96,7 +134,7 @@ exports.getSystemSettings = catchAsync(async (req, res, next) => {
 
 // Update system configurations
 exports.updateSystemSettings = catchAsync(async (req, res, next) => {
-  const { commissionRate, coinPackages } = req.body;
+  const { commissionRate, coinPackages, coinOffer, promoCodes } = req.body;
 
   let settings = await SystemSetting.findOne();
   if (!settings) {
@@ -109,6 +147,14 @@ exports.updateSystemSettings = catchAsync(async (req, res, next) => {
 
   if (coinPackages !== undefined) {
     settings.coinPackages = coinPackages;
+  }
+
+  if (coinOffer !== undefined) {
+    settings.coinOffer = coinOffer;
+  }
+
+  if (promoCodes !== undefined) {
+    settings.promoCodes = promoCodes;
   }
 
   await settings.save();

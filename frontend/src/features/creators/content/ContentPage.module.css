@@ -257,6 +257,27 @@
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
+.uploadStoryBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  border: none;
+  color: #ffffff;
+  padding: 0.55rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.uploadStoryBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.35);
+}
+
 /* ================= CONTENT TABLE ================= */
 .tableCard {
   background: #121212;
@@ -273,6 +294,8 @@
 .contentTable {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
+  min-width: 760px;
 }
 
 .th {
@@ -356,6 +379,17 @@
   padding-right: 0.25rem;
 }
 
+/* Center the Views, Likes & Price columns (headers and values) so
+   the numbers line up in the middle of each column. */
+.contentTable td:nth-child(5),
+.contentTable td:nth-child(6),
+.contentTable td:nth-child(7),
+.contentTable th:nth-child(5),
+.contentTable th:nth-child(6),
+.contentTable th:nth-child(7) {
+  text-align: center;
+}
+
 .statusCell {
   display: flex;
   flex-direction: column;
@@ -424,6 +458,50 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
+.menuWrap {
+  position: relative;
+}
+
+.actionMenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 120px;
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 0.3rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  z-index: 60;
+}
+
+.actionMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.78rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.actionMenuItem:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.actionMenuDanger {
+  color: #f87171;
+}
+
+.actionMenuDanger:hover {
+  background: rgba(248, 113, 113, 0.1);
+}
+
 /* ================= PAGINATION ================= */
 .pagination {
   display: flex;
@@ -474,29 +552,6 @@
   height: 34px;
   color: rgba(255, 255, 255, 0.5);
   font-size: 1.1rem;
-}
-
-.loadMore {
-  display: flex;
-  justify-content: center;
-  margin-top: 1rem;
-}
-
-.loadMoreBtn {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  background: transparent;
-  border: none;
-  color: #e10075;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-.loadMoreBtn:hover {
-  opacity: 0.8;
 }
 
 /* ================= RIGHT SIDEBAR CARDS ================= */
@@ -596,14 +651,11 @@
 .overviewStatChange {
   font-size: 0.68rem;
   font-weight: 600;
+  color: rgba(255, 255, 255, 0.45);
 }
 
-.overviewStatChange.positive {
-  color: #10b981;
-}
-
-.overviewStatChange.negative {
-  color: #ef4444;
+.light .overviewStatChange {
+  color: rgba(26, 22, 37, 0.5);
 }
 
 /* ================= CONTENT BREAKDOWN ================= */
@@ -908,6 +960,28 @@
   color: rgba(26, 22, 37, 0.8);
 }
 
+.light .actionMenu {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.light .actionMenuItem {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .actionMenuItem:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.light .actionMenuDanger {
+  color: #dc2626;
+}
+
+.light .actionMenuDanger:hover {
+  background: rgba(220, 38, 38, 0.08);
+}
+
 .light .pageBtn {
   border-color: rgba(0, 0, 0, 0.1);
   color: rgba(26, 22, 37, 0.6);
@@ -1051,6 +1125,15 @@
 .mobileCardMeta {
   font-size: 0.72rem;
   color: rgba(255, 255, 255, 0.4);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.mobileCardMeta svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
 }
 
 .mobileCardStatsRow {
@@ -1254,13 +1337,15 @@
 
   .uploadImageBtn,
   .uploadVideoBtn,
+  .uploadStoryBtn,
   .dropdownWrapper {
     width: 100%;
     min-width: 0;
   }
 
   .uploadImageBtn,
-  .uploadVideoBtn {
+  .uploadVideoBtn,
+  .uploadStoryBtn {
     justify-content: center;
     font-size: 0.72rem !important;
     padding: 0.45rem 0.5rem !important;
@@ -1281,22 +1366,41 @@
     display: block !important;
   }
 
-  .pagination {
-    display: none !important;
-  }
-
   .overviewGrid {
     grid-template-columns: 1fr 1fr;
   }
 
-  .overviewStatLabel,
-  .overviewStatChange {
-    font-size: 0.7rem;
+  .overviewStat {
+    min-width: 0;
+  }
+
+  .overviewHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+
+  .overviewTitle {
     white-space: nowrap;
   }
 
+  .overviewStatLabel,
+  .overviewStatChange {
+    font-size: 0.62rem;
+    min-width: 0;
+  }
+
+  .overviewStatLabel {
+    white-space: nowrap;
+  }
+
+  .overviewStatChange {
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+
   .overviewStatValue {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     white-space: nowrap;
   }
 
@@ -1308,6 +1412,7 @@
 
   .overviewStatChange {
     font-size: 0.55rem;
+    display: none;
   }
 
   .breakdownBody {
@@ -1391,6 +1496,13 @@
   .mobileCardMeta {
     margin-top: 0.15rem;
   }
+
+  /* In the edit content modal, stack the lock icon above the locked-media
+     message instead of beside it so it fits narrow screens nicely. */
+  .editMediaLocked {
+    flex-direction: column;
+    gap: 0.35rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1417,7 +1529,8 @@
   }
 
   .uploadImageBtn,
-  .uploadVideoBtn {
+  .uploadVideoBtn,
+  .uploadStoryBtn {
     padding: 0.45rem 0.5rem !important;
     font-size: 0.65rem !important;
     justify-content: center;
@@ -1434,6 +1547,16 @@
 
   .overviewHeader {
     margin-bottom: 0.75rem;
+  }
+
+  /* Give the Content Overview section a smaller share of the row so its
+     content fits without spilling off the right edge on small phones. */
+  .overviewCard {
+    flex: 0 1 calc(46% - 0.375rem) !important;
+  }
+
+  .breakdownCard {
+    flex: 0 1 calc(54% - 0.375rem) !important;
   }
 
   .overviewTitle,
@@ -1456,12 +1579,21 @@
 
   .overviewStatLabel,
   .overviewStatChange {
-    font-size: 0.65rem;
+    font-size: 0.55rem;
+    min-width: 0;
+  }
+
+  .overviewStatLabel {
     white-space: nowrap;
   }
 
+  .overviewStatChange {
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+
   .overviewStatValue {
-    font-size: 1rem;
+    font-size: 0.9rem;
     white-space: nowrap;
   }
 
@@ -1569,4 +1701,514 @@
     padding: 0.25rem 0.5rem;
     font-size: 0.65rem;
   }
+}
+
+/* ================= UPLOAD MODAL ================= */
+.uploadModalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.uploadModal {
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+}
+
+.uploadModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.uploadModalHeader h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #ffffff;
+}
+
+.uploadModalClose {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 6px;
+}
+
+.uploadModalClose:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+}
+
+.uploadModalBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.uploadPickBtn {
+  background: rgba(225, 0, 117, 0.1);
+  border: 1px dashed rgba(225, 0, 117, 0.4);
+  color: #e10075;
+  padding: 1rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.uploadPickBtn:hover {
+  background: rgba(225, 0, 117, 0.18);
+}
+
+/* Read-only media preview shown when editing a post */
+.editMediaPreview {
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.editMediaPreviewImg {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(0.6) brightness(0.75);
+  user-select: none;
+}
+
+.editMediaVideoWrap {
+  position: relative;
+}
+
+.editMediaPreviewVideo {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(0.6) brightness(0.75);
+  pointer-events: none;
+}
+
+.editMediaLocked {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  background: rgba(0, 0, 0, 0.45);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.5rem;
+  text-align: center;
+  pointer-events: none;
+}
+
+.uploadField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.uploadFieldLabel {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.uploadInput {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  padding: 0.7rem 0.9rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+.uploadInput:focus {
+  outline: none;
+  border-color: rgba(225, 0, 117, 0.5);
+}
+
+.uploadPriceRow {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.uploadModalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.uploadCancelBtn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.uploadCancelBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.uploadConfirmBtn {
+  background: #e10075;
+  border: none;
+  color: #ffffff;
+  padding: 0.6rem 1.4rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: background 0.2s ease;
+}
+
+.uploadConfirmBtn:hover:not(:disabled) {
+  background: #c90069;
+}
+
+.uploadConfirmBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.uploadSpin {
+  animation: upload-spin 1s linear infinite;
+}
+
+@keyframes upload-spin {
+  to { transform: rotate(360deg); }
+}
+
+.light .uploadModal {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
+}
+
+.light .uploadModalHeader h3 {
+  color: #1a1625;
+}
+
+.light .uploadModalClose {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .uploadModalClose:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: #1a1625;
+}
+
+.light .uploadInput {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #1a1625;
+}
+
+.light .uploadFieldLabel {
+  color: rgba(26, 22, 37, 0.55);
+}
+
+.light .uploadCancelBtn {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .uploadCancelBtn:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+/* ================= LOADING SKELETONS ================= */
+.sk {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+}
+
+.sk::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.06) 40%,
+    rgba(255, 255, 255, 0.14) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: skShimmer 1.6s infinite;
+}
+
+.light .sk {
+  background: rgba(20, 22, 37, 0.07);
+}
+
+.light .sk::after {
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.7) 40%,
+    rgba(255, 255, 255, 0.95) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+@keyframes skShimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Desktop table skeleton */
+.skTable {
+  padding: 0.25rem 0;
+}
+
+.skHeadRow {
+  display: grid;
+  grid-template-columns: 4fr 0.5fr 1fr 1.2fr 0.8fr 0.8fr 0.8fr 0.9fr;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 1rem 1.25rem 0.8rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.skHead {
+  height: 10px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.light .skHead {
+  background: rgba(20, 22, 37, 0.06);
+}
+
+.skRow {
+  display: grid;
+  grid-template-columns: 4fr 0.5fr 1fr 1.2fr 0.8fr 0.8fr 0.8fr 0.9fr;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.light .skRow {
+  border-bottom-color: rgba(20, 22, 37, 0.06);
+}
+
+.skCellContent {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.skCellBars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.skThumb {
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.skBar {
+  height: 12px;
+}
+
+.skBarSm {
+  height: 9px;
+  width: 55%;
+}
+
+.skBarXs {
+  height: 8px;
+  width: 46%;
+}
+
+.skChip {
+  height: 22px;
+  border-radius: 999px;
+}
+
+.skDot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  justify-self: end;
+}
+
+/* Mobile card skeleton */
+.skMobileWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.6rem;
+}
+
+.skMobileCard {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 0.7rem;
+}
+
+.light .skMobileCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.skMobileThumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.skMobileBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+/* Sidebar skeleton */
+.skSideCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.light .skSideCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.skSideTitle {
+  width: 40%;
+  height: 14px;
+}
+
+.skStatGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.skStat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.skSideBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.skDonut {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.skLegendList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  width: 100%;
+}
+
+.skLegendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.skLegendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+  flex-shrink: 0;
+}
+
+.light .skLegendDot {
+  background: rgba(20, 22, 37, 0.12);
+}
+
+.skSideList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.skTopItem {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.skTopThumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  flex-shrink: 0;
 }

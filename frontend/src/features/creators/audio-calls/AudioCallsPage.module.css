@@ -149,6 +149,21 @@
   50% { opacity: 0.5; }
 }
 
+.offlineDot {
+  width: 8px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+}
+
+.toggleSpinner {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 .heroWaveform {
   width: 280px;
   height: 80px;
@@ -188,6 +203,24 @@
   box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
 }
 
+.goLiveBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.offlineBtn {
+  background: rgba(248, 113, 113, 0.08) !important;
+  border: 1px solid rgba(248, 113, 113, 0.25) !important;
+  color: #f87171 !important;
+}
+
+.offlineBtn:hover {
+  background: rgba(248, 113, 113, 0.16);
+  border-color: rgba(248, 113, 113, 0.4);
+  box-shadow: 0 8px 20px rgba(248, 113, 113, 0.25);
+}
+
 .editRateBtn {
   display: flex;
   align-items: center;
@@ -212,7 +245,7 @@
 /* ================= STATS GRID ================= */
 .statsGrid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.75rem;
 }
 
@@ -486,6 +519,170 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
+.menuWrap {
+  position: relative;
+}
+
+.actionMenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 140px;
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 0.3rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  z-index: 60;
+}
+
+.actionMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.78rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.actionMenuItem:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.light .actionMenu {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.light .actionMenuItem {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .actionMenuItem:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.detailsOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.detailsModal {
+  background: #1a1625;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 380px;
+  overflow: hidden;
+}
+
+.detailsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(90deg, rgba(225, 0, 117, 0.15), rgba(126, 0, 243, 0.15));
+}
+
+.detailsTitle {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #ffffff;
+}
+
+.detailsClose {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  padding: 0.2rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.detailsClose:hover {
+  color: #e10075;
+}
+
+.detailsBody {
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.detailRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.detailLabel {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.78rem;
+}
+
+.detailValue {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.82rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.detailAvatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.light .detailsModal {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.light .detailsHeader {
+  background: linear-gradient(90deg, rgba(225, 0, 117, 0.08), rgba(126, 0, 243, 0.08));
+}
+
+.light .detailsTitle {
+  color: #1a1625;
+}
+
+.light .detailsClose {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .detailsClose:hover {
+  color: #e10075;
+}
+
+.light .detailLabel {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .detailValue {
+  color: rgba(26, 22, 37, 0.9);
+}
+
 .loadMore {
   display: flex;
   justify-content: center;
@@ -587,6 +784,15 @@
 
 .earningsChange .positive {
   color: #10b981;
+  font-weight: 600;
+  font-size: 0.82rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.earningsChange .negative {
+  color: #f87171;
   font-weight: 600;
   font-size: 0.82rem;
   display: flex;
@@ -945,6 +1151,47 @@
   font-weight: 700;
 }
 
+.boostDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+.tonePositive {
+  background: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+}
+
+.toneAction {
+  background: #3b82f6;
+  box-shadow: 0 0 6px rgba(59, 130, 246, 0.5);
+}
+
+.toneWarning {
+  background: #f59e0b;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
+}
+
+.boostBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.boostTitle {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.boostDetail {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.4;
+}
+
 .viewAllTipsBtn {
   display: flex;
   align-items: center;
@@ -1109,6 +1356,14 @@
   color: rgba(26, 22, 37, 0.7);
 }
 
+.light .boostTitle {
+  color: rgba(26, 22, 37, 0.92);
+}
+
+.light .boostDetail {
+  color: rgba(26, 22, 37, 0.55);
+}
+
 .light .rateUnit {
   color: rgba(26, 22, 37, 0.5);
 }
@@ -1213,6 +1468,10 @@
 
 .light .onlineDot {
   background: #059669;
+}
+
+.light .offlineDot {
+  background: rgba(26, 22, 37, 0.25);
 }
 
 .light .goLiveBtn {
@@ -1345,8 +1604,17 @@
 }
 
 @media (max-width: 768px) {
-  .missedStatMobile {
-    display: none;
+  /* Audio Call Performance card: title on one line, dropdown below */
+  .performanceHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+
+  .performanceTitle {
+    white-space: nowrap;
+    /* Match the Live Calls Call Performance header text size */
+    font-size: 0.82rem !important;
   }
 
   .callsContainer {
@@ -1388,13 +1656,13 @@
   }
 
   .rightSidebar > .performanceCard {
-    flex: 0 1 calc(50% - 0.25rem) !important;
+    flex: 1 1 100% !important;
     min-width: 0 !important;
     order: 2;
   }
 
   .rightSidebar > .tipsCard {
-    flex: 0 1 calc(50% - 0.25rem) !important;
+    flex: 1 1 100% !important;
     min-width: 0 !important;
     order: 3;
   }
@@ -1418,34 +1686,66 @@
   .performanceBody {
     flex-direction: column !important;
     align-items: center !important;
-    gap: 0.5rem !important;
+    gap: 1.5rem !important;
+    padding: 0 0.25rem !important;
+  }
+
+  .donutContainer {
+    flex: 0 0 110px !important;
   }
 
   .donutChart {
-    width: 80px !important;
-    height: 80px !important;
+    width: 110px !important;
+    height: 110px !important;
+  }
+
+  .donutValue {
+    font-size: 18px !important;
+  }
+
+  .donutLabel {
+    font-size: 8px !important;
   }
 
   .donutLegend {
-    flex-direction: row !important;
-    align-items: center !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, auto) !important;
+    gap: 0.4rem 1.5rem !important;
     justify-content: center !important;
-    gap: 0.4rem !important;
-    flex-wrap: wrap !important;
+    width: 100% !important;
+    padding: 0 0.5rem !important;
+  }
+
+  .donutLegend > .legendItem:last-child {
+    grid-column: 1 / -1;
+    justify-self: center;
+  }
+
+  .donutLegend > .legendItem:first-child {
+    padding-left: 0.25rem;
+  }
+
+  .donutLegend > .legendItem:nth-child(2) {
+    padding-right: 0.25rem;
   }
 
   .legendItem {
-    gap: 0.2rem !important;
-    flex: 0 1 calc(50% - 0.3rem) !important;
-    min-width: 0 !important;
+    gap: 0.3rem !important;
+    white-space: nowrap !important;
+  }
+
+  .legendDot {
+    width: 7px !important;
+    height: 7px !important;
   }
 
   .legendLabel {
-    font-size: 0.55rem !important;
+    font-size: 0.6rem !important;
+    font-weight: 600 !important;
   }
 
   .legendValue {
-    font-size: 0.45rem !important;
+    font-size: 0.52rem !important;
   }
 
   .heroContent {
@@ -1623,6 +1923,10 @@
     margin-left: 0;
   }
 
+  .earningsCard > .earningsChange .negative {
+    margin-left: 0;
+  }
+
   .changeLabel {
     font-size: 0.58rem !important;
   }
@@ -1751,7 +2055,7 @@
   }
 
   .tipsTitle {
-    font-size: 0.65rem !important;
+    font-size: 0.78rem !important;
   }
 
   .tipItem {
@@ -1828,31 +2132,26 @@
     border-radius: 8px !important;
   }
 
+  .donutContainer {
+    flex: 0 0 70px;
+  }
+
   .donutChart {
     width: 70px !important;
     height: 70px !important;
   }
 
-  .donutLegend {
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 0.4rem !important;
-    flex-wrap: wrap !important;
-  }
-
-  .legendItem {
-    gap: 0.2rem !important;
-    flex: 0 1 calc(50% - 0.3rem) !important;
-    min-width: 0 !important;
+  .performanceBody {
+    gap: 0.5rem !important;
+    padding: 0 0.5rem !important;
   }
 
   .legendLabel {
-    font-size: 0.55rem !important;
+    font-size: 0.6rem !important;
   }
 
   .legendValue {
-    font-size: 0.45rem !important;
+    font-size: 0.55rem !important;
   }
 
   .heroIconWrap {
@@ -2023,7 +2322,7 @@
   }
 
   .tipsTitle {
-    font-size: 0.58rem !important;
+    font-size: 0.72rem !important;
   }
 
   .tipItem {

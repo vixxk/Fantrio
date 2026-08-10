@@ -61,7 +61,7 @@
 .logoText {
   font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
   font-size: 1.65rem; /* increased font size slightly */
-  font-weight: 600;
+  font-weight: 800;
   color: #ffffff;
   letter-spacing: -0.4px;
   line-height: 1;
@@ -375,6 +375,141 @@
 
 .logoutButton:hover .logoutIcon {
   transform: translateX(2px);
+}
+
+/* Logout Confirmation Dialog */
+.logoutConfirmOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.logoutConfirmDialog {
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.3s ease;
+}
+
+.logoutConfirmTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.5rem 0;
+}
+
+.logoutConfirmText {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+  margin: 0 0 1.5rem 0;
+}
+
+.logoutConfirmActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.logoutCancelBtn {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  background: transparent;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logoutCancelBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.logoutConfirmBtn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(225, 0, 117, 0.3);
+}
+
+.logoutConfirmBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(225, 0, 117, 0.4);
+}
+
+.logoutConfirmBtn:active {
+  transform: translateY(0);
+}
+
+/* Light Mode Styles */
+.light .logoutConfirmDialog {
+  background: #f7f6fb;
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .logoutConfirmTitle {
+  color: #1a1625;
+}
+
+.light .logoutConfirmText {
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .logoutCancelBtn {
+  border-color: rgba(0, 0, 0, 0.15);
+  color: #1a1625;
+}
+
+.light .logoutCancelBtn:hover {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.light .logoutConfirmBtn {
+  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
+  color: #ffffff;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.logoutButton .lucide-log-out {
+  margin-right: 0.5rem;
 }
 
 /* Switch Styles */

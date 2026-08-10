@@ -1,278 +1,220 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { api } from '../../../services/api';
 import { useApp } from '../../../context/AppContext';
-import { 
-  Star, 
-  Lock, 
-  MessageCircle, 
-  Trash2, 
-  MoreVertical, 
-  BadgeCheck, 
-  Crown, 
-  Camera, 
-  Phone, 
-  DollarSign, 
-  Headphones, 
+import {
+  Star,
+  MessageCircle,
+  Trash2,
+  MoreVertical,
+  BadgeCheck,
+  Camera,
+  Phone,
+  DollarSign,
+  Headphones,
   Grid,
   List,
   ChevronDown,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  X,
+  History,
+  RefreshCw
 } from 'lucide-react';
+import { ConfirmDeleteDialog } from '../../../components/ConfirmDeleteDialog/ConfirmDeleteDialog';
+import { useConfirmDelete } from '../../../hooks/useConfirmDelete';
+import { useToast } from '../../../components/Toast/Toast';
 import styles from './SubscriptionsPage.module.css';
 
-const MOCK_SUBSCRIPTIONS = [
-  // Active
-  {
-    _id: 'sub-1',
-    creatorId: 'creator-savannah',
-    status: 'active',
-    startDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
-    expiryDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
-    priceCoins: 18,
-    creator: {
-      displayName: 'Savannah Nguyen',
-      username: 'mollyjane',
-      avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
-      isVerifiedBadge: true,
-      rates: { voiceCallMinute: 18, videoCallMinute: 25 }
-    }
-  },
-  {
-    _id: 'sub-2',
-    creatorId: 'creator-leslie',
-    status: 'active',
-    startDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
-    expiryDate: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000),
-    priceCoins: 18,
-    creator: {
-      displayName: 'Savannah Nguyen',
-      username: 'mollyjane',
-      avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80',
-      isVerifiedBadge: true,
-      rates: { voiceCallMinute: 18, videoCallMinute: 25 }
-    }
-  },
-  {
-    _id: 'sub-3',
-    creatorId: 'creator-kristin',
-    status: 'active',
-    startDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-    expiryDate: new Date(Date.now() + 25 * 24 * 60 * 60 * 1000),
-    priceCoins: 18,
-    creator: {
-      displayName: 'Savannah Nguyen',
-      username: 'mollyjane',
-      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-      isVerifiedBadge: true,
-      rates: { voiceCallMinute: 18, videoCallMinute: 25 }
-    }
-  },
-  {
-    _id: 'sub-4',
-    creatorId: 'creator-jenny',
-    status: 'active',
-    startDate: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
-    expiryDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
-    priceCoins: 18,
-    creator: {
-      displayName: 'Savannah Nguyen',
-      username: 'mollyjane',
-      avatarUrl: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=400&q=80',
-      isVerifiedBadge: true,
-      rates: { voiceCallMinute: 18, videoCallMinute: 25 }
-    }
-  },
-  {
-    _id: 'sub-5',
-    creatorId: 'creator-dianne',
-    status: 'active',
-    startDate: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000),
-    expiryDate: new Date(Date.now() + 18 * 24 * 60 * 60 * 1000),
-    priceCoins: 18,
-    creator: {
-      displayName: 'Savannah Nguyen',
-      username: 'mollyjane',
-      avatarUrl: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=400&q=80',
-      isVerifiedBadge: true,
-      rates: { voiceCallMinute: 18, videoCallMinute: 25 }
-    }
-  },
-  {
-    _id: 'sub-6',
-    creatorId: 'creator-molly',
-    status: 'active',
-    startDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-    expiryDate: new Date(Date.now() + 28 * 24 * 60 * 60 * 1000),
-    priceCoins: 18,
-    creator: {
-      displayName: 'Savannah Nguyen',
-      username: 'mollyjane',
-      avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80',
-      isVerifiedBadge: true,
-      rates: { voiceCallMinute: 18, videoCallMinute: 25 }
-    }
-  },
-  // Expiring Soon
-  {
-    _id: 'sub-exp-1',
-    creatorId: 'creator-molly-exp1',
-    status: 'expiring',
-    startDate: new Date(Date.now() - 26 * 24 * 60 * 60 * 1000),
-    expiryDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days left
-    priceCoins: 29.99,
-    creator: {
-      displayName: 'Savannah Nguyen',
-      username: 'mollyjane',
-      avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80',
-      isVerifiedBadge: true,
-      rates: { voiceCallMinute: 18, videoCallMinute: 25 }
-    }
-  },
-  {
-    _id: 'sub-exp-2',
-    creatorId: 'creator-molly-exp2',
-    status: 'expiring',
-    startDate: new Date(Date.now() - 27 * 24 * 60 * 60 * 1000),
-    expiryDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days left
-    priceCoins: 29.99,
-    creator: {
-      displayName: 'Savannah Nguyen',
-      username: 'mollyjane',
-      avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80',
-      isVerifiedBadge: true,
-      rates: { voiceCallMinute: 18, videoCallMinute: 25 }
-    }
-  },
-  // Expired
-  {
-    _id: 'sub-expired-1',
-    creatorId: 'creator-molly-exp3',
-    status: 'expired',
-    startDate: new Date(Date.now() - 42 * 24 * 60 * 60 * 1000),
-    expiryDate: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000), // expired 12 days ago
-    priceCoins: 29.99,
-    creator: {
-      displayName: 'Savannah Nguyen',
-      username: 'mollyjane',
-      avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
-      isVerifiedBadge: true,
-      rates: { voiceCallMinute: 18, videoCallMinute: 25 }
-    }
-  },
-  // Cancelled (Mocked for dashboard tabs count)
-  { _id: 'sub-can-1', status: 'cancelled' },
-  { _id: 'sub-can-2', status: 'cancelled' },
-  { _id: 'sub-can-3', status: 'cancelled' },
-  { _id: 'sub-can-4', status: 'cancelled' }
-];
+const PLAN_COLORS = { Basic: '#10b981', Premium: '#3b82f6', VIP: '#f59e0b' };
+
+const formatDate = (iso, opts = { month: 'short', day: 'numeric', year: 'numeric' }) =>
+  iso ? new Date(iso).toLocaleDateString(undefined, opts) : '—';
 
 export const SubscriptionsPage = () => {
-  const { darkMode } = useApp();
+  const { darkMode, navigateTo } = useApp();
+  const { toast } = useToast();
   const [subscriptions, setSubscriptions] = useState([]);
+  const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTabFilter, setActiveTabFilter] = useState('Active'); // 'Active', 'Expiring Soon', 'Expired', 'Cancelled'
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
+  const [activeTabFilter, setActiveTabFilter] = useState('Active');
+  const [viewMode, setViewMode] = useState('grid');
   const [sortBy, setSortBy] = useState('newest');
   const [sortOpen, setSortOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [activeKebabSubId, setActiveKebabSubId] = useState(null);
+  const [spendingOpen, setSpendingOpen] = useState(false);
+  const [spending, setSpending] = useState([]);
+  const [spendingLoading, setSpendingLoading] = useState(false);
+
+  const fetchSubscriptions = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await api.get('/monetization/subscriptions');
+      const data = res.data || res;
+      setSubscriptions(data.subscriptions || []);
+      setSummary(data.summary || null);
+    } catch (err) {
+      console.error('Failed to load subscriptions:', err);
+      setSubscriptions([]);
+      setSummary(null);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const handleWindowClick = () => {
-      setActiveKebabSubId(null);
-    };
+    Promise.resolve().then(() => {
+      fetchSubscriptions();
+    });
+  }, [fetchSubscriptions]);
+
+  useEffect(() => {
+    const handleWindowClick = () => setActiveKebabSubId(null);
     window.addEventListener('click', handleWindowClick);
     return () => window.removeEventListener('click', handleWindowClick);
   }, []);
 
-  useEffect(() => {
-    const fetchSubscriptions = async () => {
-      try {
-        setLoading(true);
-        const res = await api.get('/monetization/subscriptions');
-        const dbSubs = res.data?.subscriptions || [];
-        
-        // Merge DB subscriptions with Mock subscriptions to make a fully populated premium UI
-        const merged = [...dbSubs];
-        MOCK_SUBSCRIPTIONS.forEach(mock => {
-          // Check if mock already exists to avoid duplicates
-          if (!merged.find(m => m._id === mock._id)) {
-            merged.push(mock);
-          }
-        });
-        setSubscriptions(merged);
-      } catch (err) {
-        console.error('Failed to load subscriptions:', err);
-        // Fallback to purely mock data on error or offline
-        setSubscriptions(MOCK_SUBSCRIPTIONS);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchSubscriptions();
-  }, []);
-
-  const handleUnsubscribe = async (creatorId) => {
-    if (!window.confirm('Are you sure you want to cancel this subscription?')) return;
+  const openSpendingHistory = async () => {
+    setSpendingOpen(true);
+    setSpendingLoading(true);
     try {
-      await api.post(`/monetization/unsubscribe/${creatorId}`);
-      alert('Subscription cancelled successfully!');
-      // Update state
-      setSubscriptions(prev => prev.map(sub => {
-        if (sub.creatorId === creatorId && sub.status === 'active') {
-          return { ...sub, status: 'cancelled' };
-        }
-        return sub;
-      }));
+      const res = await api.get('/monetization/subscriptions/spending');
+      const data = res.data || res;
+      setSpending(data.history || []);
     } catch (err) {
-      alert('Failed to unsubscribe: ' + (err.response?.data?.message || err.message));
+      console.error('Failed to load spending history:', err);
+      setSpending([]);
+    } finally {
+      setSpendingLoading(false);
     }
   };
 
-  // Filtered Lists
-  const activeSubs = subscriptions.filter(sub => sub.status === 'active' && sub.creator);
-  const expiringSubs = subscriptions.filter(sub => sub.status === 'expiring' && sub.creator);
-  const expiredSubs = subscriptions.filter(sub => sub.status === 'expired' && sub.creator);
-  const cancelledSubs = subscriptions.filter(sub => sub.status === 'cancelled' && sub.creator);
+  const {
+    target: renewTarget,
+    open: openRenew,
+    close: closeRenew,
+    confirm: confirmRenew,
+    deleting: renewing,
+  } = useConfirmDelete({
+    onConfirm: (sub) => api.post(`/monetization/renew/${sub.creatorId}`, { plan: sub.plan }),
+    successMessage: 'Subscription renewed successfully!',
+    errorMessage: 'Failed to renew subscription',
+    onSuccess: () => fetchSubscriptions(),
+  });
 
-  // Counts
+  const {
+    target: cancelTarget,
+    open: openCancel,
+    close: closeCancel,
+    confirm: confirmCancel,
+    deleting: cancelling,
+  } = useConfirmDelete({
+    onConfirm: (sub) => api.post(`/monetization/unsubscribe/${sub.creatorId}`),
+    successMessage: 'Subscription cancelled successfully!',
+    errorMessage: 'Failed to unsubscribe',
+    onSuccess: () => fetchSubscriptions(),
+  });
+
+  const isBusy = (sub) =>
+    (renewTarget?._id === sub._id && renewing) ||
+    (cancelTarget?._id === sub._id && cancelling);
+
+  const filteredList = subscriptions
+    .filter((sub) => sub.creator && sub.status === activeTabFilter.toLowerCase())
+    .filter(Boolean);
+
+  if (sortBy === 'newest') {
+    filteredList.sort((a, b) => new Date(b.startDate || 0) - new Date(a.startDate || 0));
+  } else if (sortBy === 'price-low') {
+    filteredList.sort((a, b) => (a.priceCoins || 0) - (b.priceCoins || 0));
+  } else if (sortBy === 'price-high') {
+    filteredList.sort((a, b) => (b.priceCoins || 0) - (a.priceCoins || 0));
+  }
+
+  const limit = 4;
+  const totalPages = Math.max(1, Math.ceil(filteredList.length / limit));
+  const paginatedList = filteredList.slice((page - 1) * limit, page * limit);
+
+  const activeSubs = subscriptions.filter((s) => s.creator && s.status === 'active');
+  const expiringSubs = subscriptions.filter((s) => s.creator && s.status === 'expiring');
+  const expiredSubs = subscriptions.filter((s) => s.creator && s.status === 'expired');
+  const cancelledSubs = subscriptions.filter((s) => s.creator && s.status === 'cancelled');
+
   const counts = {
     Active: activeSubs.length,
     'Expiring Soon': expiringSubs.length,
     Expired: expiredSubs.length,
-    Cancelled: subscriptions.filter(sub => sub.status === 'cancelled').length
+    Cancelled: cancelledSubs.length
   };
 
-  // Filtered array based on current tab select
-  let displayedList = [];
-  if (activeTabFilter === 'Active') {
-    displayedList = activeSubs;
-  } else if (activeTabFilter === 'Expiring Soon') {
-    displayedList = expiringSubs;
-  } else if (activeTabFilter === 'Expired') {
-    displayedList = expiredSubs;
-  } else if (activeTabFilter === 'Cancelled') {
-    displayedList = cancelledSubs;
-  }
-
-  // Sorting
-  if (sortBy === 'newest') {
-    displayedList.sort((a, b) => new Date(b.startDate || 0) - new Date(a.startDate || 0));
-  } else if (sortBy === 'price-low') {
-    displayedList.sort((a, b) => (a.priceCoins || 0) - (b.priceCoins || 0));
-  } else if (sortBy === 'price-high') {
-    displayedList.sort((a, b) => (b.priceCoins || 0) - (a.priceCoins || 0));
-  }
-
-  // Pagination Calculations
-  const limit = 4;
-  const totalPages = Math.ceil(displayedList.length / limit);
-  const paginatedList = displayedList.slice((page - 1) * limit, page * limit);
+  const renderKebab = (sub) => (
+    <div className={styles.kebabWrapper}>
+      <button
+        className={styles.threeDotsBtn}
+        onClick={(e) => {
+          e.stopPropagation();
+          setActiveKebabSubId(activeKebabSubId === sub._id ? null : sub._id);
+        }}
+      >
+        <MoreVertical size={16} />
+      </button>
+      {activeKebabSubId === sub._id && (
+        <div className={styles.kebabDropdown} onClick={(e) => e.stopPropagation()}>
+          <button
+            className={styles.kebabOption}
+            onClick={() => {
+              navigator.clipboard.writeText(`${window.location.origin}/creator/${sub.creator.username}`);
+              toast.success('Creator profile link copied to clipboard!');
+              setActiveKebabSubId(null);
+            }}
+          >
+            Copy creator link
+          </button>
+          <div className={styles.kebabDivider} />
+          {sub.status === 'active' && (
+            <>
+              <button
+                className={styles.kebabOption}
+                onClick={() => {
+                  openRenew(sub);
+                  setActiveKebabSubId(null);
+                }}
+              >
+                Renew Subscription
+              </button>
+              <div className={styles.kebabDivider} />
+            </>
+          )}
+          {(sub.status === 'expired' || sub.status === 'cancelled') && (
+            <>
+              <button
+                className={styles.kebabOption}
+                onClick={() => {
+                  openRenew(sub);
+                  setActiveKebabSubId(null);
+                }}
+              >
+                Resubscribe
+              </button>
+              <div className={styles.kebabDivider} />
+            </>
+          )}
+          <button
+            className={`${styles.kebabOption} ${styles.kebabDanger}`}
+            onClick={() => {
+              setActiveKebabSubId(null);
+              navigateTo('/more');
+            }}
+          >
+            Report Creator
+          </button>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className={`${styles.pageContainer} ${darkMode ? styles.dark : styles.light}`}>
-      {/* SVG Gradient Defs */}
       <svg width="0" height="0" style={{ position: 'absolute' }}>
         <defs>
           <linearGradient id="sub-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -283,26 +225,26 @@ export const SubscriptionsPage = () => {
       </svg>
 
       <div className={styles.mainFeed}>
-        
-        {/* Header Block */}
         <div className={styles.header}>
           <div className={styles.headerTitleRow}>
             <Star className={styles.headerStarIcon} size={28} fill="url(#sub-gradient)" stroke="url(#sub-gradient)" />
             <h1 className={styles.title}>My Subscriptions</h1>
           </div>
           <p className={styles.subtitle}>
-            Connect with your favourite creators through private video calls.
+            Manage your creator subscriptions, renew before they expire, and review your spending.
           </p>
         </div>
 
-        {/* Tab Selection & Sort/View Row */}
         <div className={styles.filterRow}>
           <div className={styles.tabsList}>
             {Object.keys(counts).map((tab) => (
               <button
                 key={tab}
                 className={`${styles.tabBtn} ${activeTabFilter === tab ? styles.tabActive : ''}`}
-                onClick={() => { setActiveTabFilter(tab); setPage(1); }}
+                onClick={() => {
+                  setActiveTabFilter(tab);
+                  setPage(1);
+                }}
               >
                 {tab} ({counts[tab]})
               </button>
@@ -312,7 +254,7 @@ export const SubscriptionsPage = () => {
           <div className={styles.controlsRight}>
             <div className={styles.sortWrapper}>
               <button className={styles.sortButton} onClick={() => setSortOpen(!sortOpen)}>
-                Sort By Price: {sortBy === 'newest' ? 'Newest' : sortBy === 'price-low' ? 'Low to High' : 'High to Low'}
+                Sort: {sortBy === 'newest' ? 'Newest' : sortBy === 'price-low' ? 'Price Low to High' : 'Price High to Low'}
                 <ChevronDown size={16} />
               </button>
               {sortOpen && (
@@ -325,13 +267,13 @@ export const SubscriptionsPage = () => {
             </div>
 
             <div className={styles.viewToggle}>
-              <button 
+              <button
                 className={`${styles.toggleBtn} ${viewMode === 'grid' ? styles.toggleActive : ''}`}
                 onClick={() => { setViewMode('grid'); setPage(1); }}
               >
                 <Grid size={18} />
               </button>
-              <button 
+              <button
                 className={`${styles.toggleBtn} ${viewMode === 'list' ? styles.toggleActive : ''}`}
                 onClick={() => { setViewMode('list'); setPage(1); }}
               >
@@ -341,7 +283,6 @@ export const SubscriptionsPage = () => {
           </div>
         </div>
 
-        {/* Subscriptions Display Grid/List */}
         {loading ? (
           <div className={styles.subscriptionsGrid}>
             {Array.from({ length: 4 }).map((_, idx) => (
@@ -368,56 +309,7 @@ export const SubscriptionsPage = () => {
             <div className={viewMode === 'grid' ? styles.subscriptionsGrid : styles.subscriptionsList}>
               {paginatedList.map((sub) => (
                 <div key={sub._id} className={styles.subCard}>
-                  
-                  <div className={styles.kebabWrapper}>
-                    <button 
-                      className={styles.threeDotsBtn}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveKebabSubId(activeKebabSubId === sub._id ? null : sub._id);
-                      }}
-                    >
-                      <MoreVertical size={16} />
-                    </button>
-                    {activeKebabSubId === sub._id && (
-                      <div className={styles.kebabDropdown} onClick={(e) => e.stopPropagation()}>
-                        <button 
-                          className={styles.kebabOption} 
-                          onClick={() => {
-                            navigator.clipboard.writeText(`${window.location.origin}/creator/${sub.creator.username}`);
-                            alert('Creator profile link copied to clipboard!');
-                            setActiveKebabSubId(null);
-                          }}
-                        >
-                          Copy creator link
-                        </button>
-                        <div className={styles.kebabDivider} />
-                        {sub.status === 'active' && (
-                          <>
-                            <button 
-                              className={styles.kebabOption} 
-                              onClick={() => {
-                                handleUnsubscribe(sub.creatorId);
-                                setActiveKebabSubId(null);
-                              }}
-                            >
-                              Cancel Subscription
-                            </button>
-                            <div className={styles.kebabDivider} />
-                          </>
-                        )}
-                        <button 
-                          className={`${styles.kebabOption} ${styles.kebabDanger}`} 
-                          onClick={() => {
-                            alert(`Reported creator @${sub.creator.username}`);
-                            setActiveKebabSubId(null);
-                          }}
-                        >
-                          Report Creator
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                  {renderKebab(sub)}
 
                   <div className={styles.cardImageWrapper}>
                     <img src={sub.creator.avatarUrl} alt={sub.creator.displayName} className={styles.creatorAvatar} />
@@ -434,61 +326,81 @@ export const SubscriptionsPage = () => {
 
                     <div className={styles.cardStatusRow}>
                       <span className={styles.statusDot} />
-                      {viewMode === 'grid' && <span className={styles.statusText}>Active Now</span>}
+                      {viewMode === 'grid' && (
+                        <span className={styles.statusText}>
+                          {sub.status === 'expiring'
+                            ? `Expires in ${sub.daysUntilExpiry}d`
+                            : sub.status === 'expired'
+                              ? 'Expired'
+                              : sub.status === 'cancelled'
+                                ? 'Cancelled'
+                                : 'Active'}
+                        </span>
+                      )}
                     </div>
 
                     <div className={styles.detailsBlock}>
                       <div className={styles.detailRow}>
                         <span className={styles.detailLabel}>Plan</span>
-                        <span className={styles.detailVal}>Premium</span>
+                        <span className={styles.detailVal} style={{ color: PLAN_COLORS[sub.plan] || '#7e00f3' }}>
+                          {sub.plan}
+                        </span>
                       </div>
                       <div className={styles.detailRow}>
                         <span className={styles.detailLabel}>Price</span>
                         <span className={styles.detailVal}>
                           <img src="/coin.png" alt="Coin" className={styles.coinIconSmall} />
-                          {sub.priceCoins} Coin / Min
+                          {sub.priceCoins} / Month
                         </span>
                       </div>
                       <div className={styles.detailRow}>
-                        <span className={styles.detailLabel}>Renew On</span>
-                        <span className={styles.detailVal}>
-                          {new Date(sub.expiryDate).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}
+                        <span className={styles.detailLabel}>
+                          {sub.status === 'expired' || sub.status === 'cancelled' ? 'Ended On' : 'Renew On'}
                         </span>
+                        <span className={styles.detailVal}>{formatDate(sub.expiryDate)}</span>
                       </div>
                     </div>
 
-                    <button className={styles.viewProfileBtn}>View Profile</button>
+                    <button className={styles.viewProfileBtn} onClick={() => navigateTo('/more')}>
+                      View Profile
+                    </button>
 
                     <div className={styles.cardActionsFooter}>
-                      <button className={styles.msgBtn}>
+                      <button className={styles.msgBtn} onClick={() => navigateTo('/messages')}>
                         <MessageCircle size={16} />
                         <span>Message</span>
                       </button>
-                      <button className={styles.unsubBtn} onClick={() => handleUnsubscribe(sub.creatorId)}>
-                        <Trash2 size={16} />
-                        <span>Unsubscribe</span>
-                      </button>
+                      {sub.status === 'active' ? (
+                        <button className={styles.unsubBtn} onClick={() => openCancel(sub)} disabled={isBusy(sub)}>
+                          <Trash2 size={16} />
+                          <span>{isBusy(sub) ? '...' : 'Unsubscribe'}</span>
+                        </button>
+                      ) : (
+                        <button className={styles.unsubBtn} style={{ color: '#22c55e' }} onClick={() => openRenew(sub)} disabled={isBusy(sub)}>
+                          <RefreshCw size={16} />
+                          <span>{isBusy(sub) ? '...' : 'Resubscribe'}</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Pagination */}
             {!loading && totalPages > 1 && (
               <div className={styles.paginationRow}>
-                <button 
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
                   className={styles.pageArrow}
                 >
                   <ChevronLeft size={16} />
                 </button>
-                
+
                 {Array.from({ length: totalPages }).map((_, idx) => {
                   const pageNum = idx + 1;
                   return (
-                    <button 
+                    <button
                       key={pageNum}
                       onClick={() => setPage(pageNum)}
                       className={`${styles.pageNumBtn} ${page === pageNum ? styles.activePage : ''}`}
@@ -498,8 +410,8 @@ export const SubscriptionsPage = () => {
                   );
                 })}
 
-                <button 
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
                   className={styles.pageArrow}
                 >
@@ -510,7 +422,6 @@ export const SubscriptionsPage = () => {
           </>
         )}
 
-        {/* Expiring Soon Section */}
         {expiringSubs.length > 0 && activeTabFilter === 'Active' && (
           <div className={styles.sectionBlock}>
             <h2 className={styles.sectionTitle}>Expiring Soon</h2>
@@ -530,15 +441,15 @@ export const SubscriptionsPage = () => {
 
                   <div className={styles.rowPlan}>
                     <span className={styles.rowLabel}>Plan</span>
-                    <span className={styles.rowValue}>Premium</span>
+                    <span className={styles.rowValue} style={{ color: PLAN_COLORS[sub.plan] || '#7e00f3' }}>
+                      {sub.plan}
+                    </span>
                   </div>
 
                   <div className={styles.rowRenewal}>
                     <span className={styles.rowLabel}>Renewal Date</span>
-                    <span className={styles.rowValue}>
-                      {new Date(sub.expiryDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </span>
-                    <span className={styles.daysLeft}>5 Days</span>
+                    <span className={styles.rowValue}>{formatDate(sub.expiryDate)}</span>
+                    <span className={styles.daysLeft}>{sub.daysUntilExpiry} Days</span>
                   </div>
 
                   <div className={styles.rowPrice}>
@@ -550,7 +461,9 @@ export const SubscriptionsPage = () => {
                   </div>
 
                   <div className={styles.rowActions}>
-                    <button className={styles.renewBtn}>Renew Now</button>
+                    <button className={styles.renewBtn} onClick={() => openRenew(sub)} disabled={isBusy(sub)}>
+                      {isBusy(sub) ? 'Renewing...' : 'Renew Now'}
+                    </button>
                     <button className={styles.rowThreeDots}>
                       <MoreVertical size={16} />
                     </button>
@@ -561,7 +474,6 @@ export const SubscriptionsPage = () => {
           </div>
         )}
 
-        {/* Recently Expired Section */}
         {expiredSubs.length > 0 && activeTabFilter === 'Active' && (
           <div className={styles.sectionBlock}>
             <h2 className={styles.sectionTitle}>Recently Expired</h2>
@@ -581,15 +493,15 @@ export const SubscriptionsPage = () => {
 
                   <div className={styles.rowPlan}>
                     <span className={styles.rowLabel}>Plan</span>
-                    <span className={styles.rowValue}>Premium</span>
+                    <span className={styles.rowValue} style={{ color: PLAN_COLORS[sub.plan] || '#7e00f3' }}>
+                      {sub.plan}
+                    </span>
                   </div>
 
                   <div className={styles.rowRenewal}>
                     <span className={styles.rowLabel}>Expired on</span>
-                    <span className={styles.rowValue}>
-                      {new Date(sub.expiryDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </span>
-                    <span className={styles.daysExpired}>12 Days ago</span>
+                    <span className={styles.rowValue}>{formatDate(sub.expiryDate)}</span>
+                    <span className={styles.daysExpired}>Expired</span>
                   </div>
 
                   <div className={styles.rowPrice}>
@@ -601,7 +513,9 @@ export const SubscriptionsPage = () => {
                   </div>
 
                   <div className={styles.rowActions}>
-                    <button className={styles.resubscribeBtn}>Resubscribe</button>
+                    <button className={styles.resubscribeBtn} onClick={() => openRenew(sub)} disabled={isBusy(sub)}>
+                      {isBusy(sub) ? 'Resubscribing...' : 'Resubscribe'}
+                    </button>
                     <button className={styles.rowThreeDots}>
                       <MoreVertical size={16} />
                     </button>
@@ -611,15 +525,9 @@ export const SubscriptionsPage = () => {
             </div>
           </div>
         )}
-
-
-
       </div>
 
-      {/* Right Sidebar Section */}
       <div className={styles.sidebarSection}>
-        
-        {/* Subscriptions Overview */}
         <div className={styles.sidebarCard}>
           <div className={styles.cardTitleRow}>
             <img src="/crown.png" alt="Crown" className={styles.crownIconSmall} />
@@ -628,29 +536,42 @@ export const SubscriptionsPage = () => {
           <div className={styles.overviewList}>
             <div className={styles.overviewItem}>
               <span>Active Subscriptions</span>
-              <span className={styles.overviewVal}>{counts.Active}</span>
+              <span className={styles.overviewVal}>{summary ? summary.active : counts.Active}</span>
             </div>
             <div className={styles.overviewItem}>
               <span>Expiring Soon</span>
-              <span className={styles.overviewVal}>{counts['Expiring Soon']}</span>
+              <span className={styles.overviewVal}>{summary ? summary.expiring : counts['Expiring Soon']}</span>
             </div>
             <div className={styles.overviewItem}>
               <span>Expired</span>
-              <span className={styles.overviewVal}>{counts.Expired}</span>
+              <span className={styles.overviewVal}>{summary ? summary.expired : counts.Expired}</span>
+            </div>
+            <div className={styles.overviewItem}>
+              <span>Cancelled</span>
+              <span className={styles.overviewVal}>{summary ? summary.cancelled : counts.Cancelled}</span>
             </div>
             <div className={styles.divider} />
+            <div className={styles.overviewItem}>
+              <span className={styles.boldText}>Monthly Spend</span>
+              <span className={styles.totalSpentVal}>
+                <img src="/coin.png" alt="Coin" className={styles.coinIconSmall} />
+                {summary ? summary.monthlySpendCoins : 0} / Month
+              </span>
+            </div>
             <div className={styles.overviewItem}>
               <span className={styles.boldText}>Total Spent</span>
               <span className={styles.totalSpentVal}>
                 <img src="/coin.png" alt="Coin" className={styles.coinIconSmall} />
-                135 / Month
+                {summary ? summary.totalSpentCoins : 0}
               </span>
             </div>
           </div>
-          <button className={styles.spendingHistoryBtn}>View Spending History</button>
+          <button className={styles.spendingHistoryBtn} onClick={openSpendingHistory}>
+            <History size={16} style={{ marginRight: 6, verticalAlign: 'middle' }} />
+            View Spending History
+          </button>
         </div>
 
-        {/* Subscription Perks */}
         <div className={styles.sidebarCard}>
           <h3 className={styles.cardTitle}>Subscription Perks</h3>
           <div className={styles.perksList}>
@@ -661,7 +582,7 @@ export const SubscriptionsPage = () => {
                 <p className={styles.perkDesc}>Access premium photos, videos, and PPV.</p>
               </div>
             </div>
-            
+
             <div className={styles.perkItem}>
               <Phone size={22} className={styles.perkIcon} />
               <div className={styles.perkContent}>
@@ -688,19 +609,88 @@ export const SubscriptionsPage = () => {
           </div>
         </div>
 
-
-
-        {/* Need Help? Card */}
         <div className={`${styles.sidebarCard} ${styles.safeHelpCard}`}>
           <h3 className={styles.cardTitle}>Need Help?</h3>
           <p className={styles.helpText}>We are here to help you with your subscription.</p>
-          <button className={styles.contactSupportBtn}>
+          <button className={styles.contactSupportBtn} onClick={() => navigateTo('/more')}>
             <Headphones size={16} />
             <span>Contact Support</span>
           </button>
         </div>
-
       </div>
+
+      {/* Renew Subscription Confirmation */}
+      <ConfirmDeleteDialog
+        open={!!renewTarget}
+        itemName={renewTarget ? `${renewTarget.creator.displayName} · ${renewTarget.plan}` : ''}
+        title="Renew Subscription?"
+        confirmLabel="Renew"
+        busyLabel="Renewing…"
+        icon={<RefreshCw size={22} />}
+        message={renewTarget ? <>Renew your <strong>{renewTarget.plan}</strong> subscription to <strong>{renewTarget.creator.displayName}</strong> for <strong>{renewTarget.priceCoins} coins</strong>?</> : ''}
+        deleting={renewing}
+        darkMode={darkMode}
+        onCancel={closeRenew}
+        onConfirm={confirmRenew}
+      />
+
+      {/* Cancel Subscription Confirmation */}
+      <ConfirmDeleteDialog
+        open={!!cancelTarget}
+        title="Cancel Subscription?"
+        confirmLabel="Cancel Subscription"
+        busyLabel="Cancelling…"
+        icon={<Trash2 size={22} />}
+        message="Are you sure you want to cancel this subscription?"
+        deleting={cancelling}
+        darkMode={darkMode}
+        onCancel={closeCancel}
+        onConfirm={confirmCancel}
+      />
+
+      {spendingOpen && (
+        <div className={styles.spendingModalOverlay} onClick={() => setSpendingOpen(false)}>
+          <div className={styles.spendingModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.spendingModalHeader}>
+              <div className={styles.spendingModalTitleRow}>
+                <History size={20} className={styles.spendingModalIcon} />
+                <h3 className={styles.spendingModalTitle}>Spending History</h3>
+              </div>
+              <button className={styles.spendingCloseBtn} onClick={() => setSpendingOpen(false)}>
+                <X size={18} />
+              </button>
+            </div>
+
+            {spendingLoading ? (
+              <div className={styles.spendingEmpty}>Loading spending history...</div>
+            ) : spending.length === 0 ? (
+              <div className={styles.spendingEmpty}>No subscription spending yet.</div>
+            ) : (
+              <div className={styles.spendingList}>
+                {spending.map((tx) => (
+                  <div key={tx._id} className={styles.spendingItem}>
+                    <img
+                      src={tx.creator?.avatarUrl || '/coin.png'}
+                      alt={tx.creator?.displayName || 'Creator'}
+                      className={styles.spendingAvatar}
+                    />
+                    <div className={styles.spendingInfo}>
+                      <span className={styles.spendingName}>
+                        {tx.creator?.displayName || 'Creator'} @{tx.creator?.username || 'unknown'}
+                      </span>
+                      <span className={styles.spendingDate}>{formatDate(tx.createdAt)}</span>
+                    </div>
+                    <span className={styles.spendingAmount}>
+                      <img src="/coin.png" alt="Coin" className={styles.coinIconSmall} />
+                      {tx.amountCoins}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

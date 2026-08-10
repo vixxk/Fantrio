@@ -72,6 +72,10 @@
   color: #10b981;
 }
 
+.changeNegative {
+  color: #ef4444;
+}
+
 .changeInfo {
   color: #f59e0b;
 }
@@ -440,6 +444,21 @@
   color: #10b981;
 }
 
+.statusPending {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.statusFailed {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+.statusInfo {
+  background: rgba(139, 92, 246, 0.15);
+  color: #a78bfa;
+}
+
 /* ================= PAGINATION ================= */
 .pagination {
   display: flex;
@@ -724,7 +743,7 @@
 .subscriberSpent {
   font-size: 0.78rem;
   font-weight: 600;
-  color: #10b981;
+  color: #ffffff;
 }
 
 /* ================= PAYOUT LIST ================= */
@@ -830,6 +849,10 @@
 
 .light .changePositive {
   color: #059669;
+}
+
+.light .changeNegative {
+  color: #dc2626;
 }
 
 .light .changeInfo {
@@ -954,6 +977,21 @@
   color: #dc2626;
 }
 
+.light .statusPending {
+  background: rgba(217, 119, 6, 0.12);
+  color: #d97706;
+}
+
+.light .statusFailed {
+  background: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+}
+
+.light .statusInfo {
+  background: rgba(124, 58, 237, 0.1);
+  color: #7c3aed;
+}
+
 .light .pageBtn {
   border-color: rgba(0, 0, 0, 0.1);
   color: rgba(26, 22, 37, 0.6);
@@ -1027,7 +1065,7 @@
 }
 
 .light .subscriberSpent {
-  color: #059669;
+  color: #1a1625;
 }
 
 .light .payoutItem {
@@ -1193,7 +1231,7 @@
   }
 
   .payoutInfoCard .payoutTitleInfo {
-    display: block;
+    display: inline;
   }
 
   .quickStatsCard {
@@ -1378,29 +1416,8 @@
     padding-top: 0;
   }
 
-  /* User info row */
-  .td:nth-child(1) {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .userAvatar {
-    width: 32px !important;
-    height: 32px !important;
-    border-radius: 0 !important;
-  }
-
   /* Description - left aligned */
   .td:nth-child(2) {
-    font-size: 0.68rem !important;
-    color: rgba(255, 255, 255, 0.5);
-    margin-top: 0.15rem;
-    order: 2;
-  }
-
-  /* Source badge - top right under the user name */
-  .td:nth-child(3) {
     position: absolute;
     right: 0.75rem;
     top: 2.5rem;
@@ -1412,12 +1429,12 @@
   }
 
   /* Date - hidden on mobile */
-  .td:nth-child(4) {
+  .td:nth-child(3) {
     display: none;
   }
 
   /* Amount - under name */
-  .td:nth-child(5) {
+  .td:nth-child(4) {
     font-size: 0.85rem !important;
     font-weight: 700;
     margin-top: 0.05rem;
@@ -1425,7 +1442,7 @@
   }
 
   /* Status badge - positioned top right */
-  .td:nth-child(6) {
+  .td:nth-child(5) {
     position: absolute;
     right: 0.75rem;
     top: 0.75rem;

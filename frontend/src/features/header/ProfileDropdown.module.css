@@ -5,6 +5,7 @@
   top: calc(100% + 8px);
   right: 0;
   width: var(--dropdown-width, 20vw);
+  max-width: var(--dropdown-max-width, 280px);
   background-color: #0b0813;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--dropdown-radius, 1.2vw);
@@ -255,6 +256,137 @@ input:checked + .slider:before {
   background-color: rgba(255, 26, 83, 0.05);
 }
 
+/* Logout Confirmation Dialog */
+.logoutConfirmOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2100;
+  animation: fadeIn 0.2s ease;
+}
+
+.logoutConfirmDialog {
+  background: #0b0813;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.3s ease;
+}
+
+.logoutConfirmTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+}
+
+.logoutConfirmText {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+  margin: 0 0 16px 0;
+}
+
+.logoutConfirmActions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.logoutCancelBtn {
+  padding: 8px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: transparent;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logoutCancelBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.logoutConfirmBtn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(225, 0, 117, 0.3);
+}
+
+.logoutConfirmBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(225, 0, 117, 0.4);
+}
+
+.logoutConfirmBtn:active {
+  transform: translateY(0);
+}
+
+/* Light Theme Styles */
+.lightTheme .logoutConfirmDialog {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.lightTheme .logoutConfirmTitle {
+  color: #1a1625;
+}
+
+.lightTheme .logoutConfirmText {
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.lightTheme .logoutCancelBtn {
+  border-color: rgba(0, 0, 0, 0.15);
+  color: #1a1625;
+}
+
+.lightTheme .logoutCancelBtn:hover {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.lightTheme .logoutConfirmBtn {
+  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
+  color: #ffffff;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .logoutLabel {
   color: #ff1a53;
   font-size: var(--dropdown-font-item, 0.9vw);
@@ -330,26 +462,27 @@ input:checked + .slider:before {
 :root {
   --dropdown-top: 75px;
   --dropdown-right: 2vw;
-  --dropdown-width: 20vw;
-  --dropdown-radius: 1vw;
-  --dropdown-padding-container: 1.2vw;
-  --dropdown-gap-profile: 0.8vw;
-  --dropdown-padding-profile: 0.3vw 0;
-  --dropdown-avatar-size: 3vw;
-  --dropdown-font-title: 0.9vw;
-  --dropdown-font-subtitle: 0.7vw;
-  --dropdown-font-link: 0.7vw;
-  --dropdown-margin-divider: 0.8vw 0;
-  --dropdown-gap-items: 0.3vw;
-  --dropdown-padding-item: 0.5vw 0.6vw;
-  --dropdown-item-radius: 0.5vw;
-  --dropdown-gap-icon: 0.6vw;
-  --dropdown-gap-right: 0.4vw;
-  --dropdown-font-item: 0.8vw;
-  --dropdown-switch-width: 2.2vw;
-  --dropdown-switch-height: 1.2vw;
-  --dropdown-switch-dot: 0.9vw;
-  --dropdown-switch-translate: 1vw;
+  --dropdown-width: 15vw;
+  --dropdown-max-width: 280px;
+  --dropdown-radius: 0.85vw;
+  --dropdown-padding-container: 0.9vw;
+  --dropdown-gap-profile: 0.6vw;
+  --dropdown-padding-profile: 0.2vw 0;
+  --dropdown-avatar-size: 2.4vw;
+  --dropdown-font-title: 0.72vw;
+  --dropdown-font-subtitle: 0.58vw;
+  --dropdown-font-link: 0.58vw;
+  --dropdown-margin-divider: 0.6vw 0;
+  --dropdown-gap-items: 0.2vw;
+  --dropdown-padding-item: 0.38vw 0.5vw;
+  --dropdown-item-radius: 0.4vw;
+  --dropdown-gap-icon: 0.5vw;
+  --dropdown-gap-right: 0.3vw;
+  --dropdown-font-item: 0.66vw;
+  --dropdown-switch-width: 1.7vw;
+  --dropdown-switch-height: 0.95vw;
+  --dropdown-switch-dot: 0.68vw;
+  --dropdown-switch-translate: 0.76vw;
 }
 
 /* Medium screens (tablets) */

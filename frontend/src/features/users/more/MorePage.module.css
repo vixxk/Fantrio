@@ -673,6 +673,40 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.statusBadge.in-progress {
+  background: rgba(126, 0, 243, 0.12);
+  color: #a78bfa;
+  border: 1px solid rgba(126, 0, 243, 0.25);
+}
+
+.ticketReplyBox {
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.18);
+  border-left: 3px solid #10b981;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+}
+
+.ticketReplyBox strong {
+  color: #10b981;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ticketReplyBox p {
+  margin: 0.35rem 0 0 0;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+}
+
+.inlineHint {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0;
+}
+
 .ticketMessage {
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.6);
@@ -784,6 +818,27 @@
   font-size: 0.9rem;
   padding-top: 0.75rem;
   border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.copyBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: rgba(255, 0, 127, 0.08);
+  border: 1px solid rgba(255, 0, 127, 0.25);
+  border-radius: 8px;
+  color: #ff007f;
+  padding: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.copyBtn:hover {
+  background: rgba(255, 0, 127, 0.15);
 }
 
 .claimForm {
@@ -949,6 +1004,11 @@
   color: rgba(255, 255, 255, 0.5);
 }
 
+.featureStatusBadge.under-review {
+  background: rgba(234, 179, 8, 0.1);
+  color: #eab308;
+}
+
 .featureStatusBadge.planned {
   background: rgba(126, 0, 243, 0.1);
   color: #a78bfa;
@@ -1073,6 +1133,20 @@
   color: #ff007f;
 }
 
+.typeBadge.ppv_unlock,
+.typeBadge.call_billing,
+.typeBadge.withdrawal {
+  background: rgba(234, 179, 8, 0.1);
+  color: #eab308;
+}
+
+.typeBadge.referral_bonus,
+.typeBadge.reward_bonus,
+.typeBadge.promo_bonus {
+  background: rgba(126, 0, 243, 0.12);
+  color: #a78bfa;
+}
+
 .positiveAmount {
   color: #10b981 !important;
   font-weight: 600;
@@ -1133,6 +1207,11 @@
 .announcementBadge.update {
   background: rgba(16, 185, 129, 0.1);
   color: #10b981;
+}
+
+.announcementBadge.maintenance {
+  background: rgba(234, 179, 8, 0.1);
+  color: #eab308;
 }
 
 .announcementContent {
@@ -1460,6 +1539,24 @@
 .light .ticketFooter {
   border-color: rgba(0, 0, 0, 0.04);
   color: rgba(26, 22, 37, 0.45);
+}
+
+.light .ticketReplyBox {
+  background: rgba(16, 185, 129, 0.06);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.light .ticketReplyBox p {
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .inlineHint {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .copyBtn {
+  background: rgba(255, 0, 127, 0.06);
+  border-color: rgba(255, 0, 127, 0.25);
 }
 
 .light .accordionItem {

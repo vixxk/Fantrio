@@ -10,15 +10,37 @@ const signToken = (id, role) => {
   return jwt.sign(
     { id, role },
     process.env.JWT_SECRET || '1a9c4b789d701e67e3a8r3cb721867c293c6fe10b42f6ab3ercB5a5dfb0c7931',
-    { expiresIn: process.env.JWT_EXPIRE || '30d' }
+    { expiresIn: process.env.JWT_EXPIRE || '7d' }
   );
+};
+
+const buildLoginActivity = (req) => {
+  const userAgent = (req.headers['user-agent'] || '').toLowerCase();
+  let device = 'Unknown device';
+
+  if (/mobile|android|iphone|ipad|tablet/i.test(userAgent)) {
+    device = /android/i.test(userAgent) ? 'Android Device' : 'Mobile Device';
+  } else if (/windows/i.test(userAgent)) {
+    device = 'Windows Computer';
+  } else if (/macintosh|mac os/i.test(userAgent)) {
+    device = 'Apple Computer';
+  } else if (/linux/i.test(userAgent)) {
+    device = 'Linux Computer';
+  }
+
+  return {
+    device,
+    ip: req.ip || req.socket?.remoteAddress || '',
+    location: '—',
+    loggedInAt: new Date()
+  };
 };
 
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id, user.role);
 
   const cookieOptions = {
-    expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax'
@@ -42,16 +64,55 @@ const createSendToken = (user, statusCode, res) => {
 };
 
 exports.register = catchAsync(async (req, res, next) => {
-  const { email, password, role } = req.body;
+  const { email, password, role, username, displayName } = req.body;
 
   if (!email || !password) {
     return next(new ApiError(400, 'Please provide email and password'));
+  }
+
+  if (password.length < 8) {
+    return next(new ApiError(400, 'Password must be at least 8 characters long'));
   }
 
   // Check if user already exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     return next(new ApiError(400, 'Email already in use'));
+  }
+
+  // In development, skip email verification for a frictionless signup flow.
+  // Production keeps the OTP email verification flow below.
+  if (process.env.NODE_ENV === 'development') {
+    const suffix = crypto.randomBytes(3).toString('hex');
+    const newUser = await User.create({
+      email,
+      password,
+      role: role || 'user',
+      isVerified: true,
+      username: username || `user_${suffix}`,
+      displayName: displayName || `User ${suffix.slice(0, 4)}`
+    });
+
+    // Initialize wallet
+    const Wallet = require('../models/Wallet');
+    const existingWallet = await Wallet.findOne({ userId: newUser._id });
+    if (!existingWallet) {
+      await Wallet.create({ userId: newUser._id, balanceCoins: 0 });
+    }
+
+    // If role is creator, automatically initialize CreatorProfile
+    if (newUser.role === 'creator') {
+      const existingProfile = await CreatorProfile.findOne({ userId: newUser._id });
+      if (!existingProfile) {
+        await CreatorProfile.create({
+          userId: newUser._id,
+          username: newUser.username,
+          displayName: newUser.displayName
+        });
+      }
+    }
+
+    return createSendToken(newUser, 201, res);
   }
 
   // Generate a 6-digit numeric OTP
@@ -145,20 +206,34 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new ApiError(400, 'Please provide email and password'));
   }
 
-  let user = await User.findOne({ email }).select('+password');
-  if (!user && (email === 'johnn@example.com' || process.env.NODE_ENV === 'development')) {
-    const Wallet = require('../models/Wallet');
-    user = await User.create({
-      email,
-      password,
-      role: 'user',
+  // Hardcoded admin credentials check
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (email === adminEmail && password === adminPassword) {
+    // Create a mock admin user object for token generation
+    const adminUser = {
+      _id: 'admin-hardcoded',
+      email: adminEmail,
+      role: 'admin',
       isVerified: true,
-      username: 'john_doe',
-      displayName: 'John Doe'
-    });
-    // Create wallet with 10,000 coins
-    await Wallet.create({ userId: user._id, balanceCoins: 10000 });
-  } else if (!user || !(await user.comparePassword(password, user.password))) {
+      isSuspended: false,
+      username: process.env.ADMIN_USERNAME || 'admin',
+      displayName: 'Administrator',
+      avatarUrl: '',
+      comparePassword: async () => true,
+      save: async () => {}
+    };
+
+    // Update last login (skip for hardcoded admin)
+    const activity = buildLoginActivity(req);
+    // No DB update for hardcoded admin
+
+    return createSendToken(adminUser, 200, res);
+  }
+
+  const user = await User.findOne({ email }).select('+password');
+  if (!user || !(await user.comparePassword(password, user.password))) {
     return next(new ApiError(401, 'Incorrect email or password'));
   }
 
@@ -170,18 +245,111 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new ApiError(403, 'Your account has been suspended by administration.'));
   }
 
+  // Two-factor authentication challenge: email a code before completing sign-in
+  if (user.twoFactorEnabled) {
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    user.twoFactorOtp = {
+      code,
+      expiresAt: new Date(Date.now() + 10 * 60 * 1000)
+    };
+    await user.save({ validateBeforeSave: false });
+
+    try {
+      await emailService.send2FACode(user.email, code);
+    } catch (err) {
+      console.error('Error sending 2FA email:', err);
+    }
+
+    // Short-lived token proving the password step passed; final auth happens at /verify-2fa
+    const pendingToken = jwt.sign(
+      { id: user._id, step: '2fa' },
+      process.env.JWT_SECRET || '1a9c4b789d701e67e3a8r3cb721867c293c6fe10b42f6ab3ercB5a5dfb0c7931',
+      { expiresIn: '10m' }
+    );
+
+    return res.status(200).json({
+      status: 'success',
+      requires2FA: true,
+      pendingToken,
+      message: 'Two-factor authentication code sent to your email'
+    });
+  }
+
   // Update last login
   user.lastLogin = Date.now();
   await user.save({ validateBeforeSave: false });
+
+  const activity = buildLoginActivity(req);
+  await User.updateOne(
+    { _id: user._id },
+    { $push: { loginActivity: { $each: [activity], $slice: -50 } } }
+  );
+
+  createSendToken(user, 200, res);
+});
+
+// Complete the 2FA challenge and issue the real auth token
+exports.verify2FA = catchAsync(async (req, res, next) => {
+  const { pendingToken, code } = req.body;
+
+  if (!pendingToken || !code) {
+    return next(new ApiError(400, 'Please provide the pending token and 2FA code'));
+  }
+
+  let payload;
+  try {
+    payload = jwt.verify(
+      pendingToken,
+      process.env.JWT_SECRET || '1a9c4b789d701e67e3a8r3cb721867c293c6fe10b42f6ab3ercB5a5dfb0c7931'
+    );
+  } catch (err) {
+    return next(new ApiError(401, '2FA session expired. Please sign in again.'));
+  }
+
+  if (!payload.id || payload.step !== '2fa') {
+    return next(new ApiError(401, 'Invalid 2FA session'));
+  }
+
+  const user = await User.findById(payload.id).select('+password');
+  if (!user) {
+    return next(new ApiError(404, 'No user found'));
+  }
+
+  if (!user.twoFactorEnabled || !user.twoFactorOtp || !user.twoFactorOtp.code) {
+    return next(new ApiError(400, 'Two-factor authentication is not enabled for this account'));
+  }
+
+  if (user.twoFactorOtp.code !== code) {
+    return next(new ApiError(401, 'Invalid 2FA code'));
+  }
+
+  if (new Date() > user.twoFactorOtp.expiresAt) {
+    return next(new ApiError(401, '2FA code has expired. Please sign in again.'));
+  }
+
+  // Code verified — finalize sign-in
+  user.twoFactorOtp = undefined;
+  user.lastLogin = Date.now();
+  await user.save({ validateBeforeSave: false });
+
+  const activity = buildLoginActivity(req);
+  await User.updateOne(
+    { _id: user._id },
+    { $push: { loginActivity: { $each: [activity], $slice: -50 } } }
+  );
 
   createSendToken(user, 200, res);
 });
 
 exports.logout = catchAsync(async (req, res, next) => {
-  res.cookie('token', 'loggedout', {
-    expires: new Date(Date.now() + 10 * 1000), // 10 seconds
-    httpOnly: true
-  });
+  const cookieOptions = {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax'
+  };
+
+  res.cookie('token', 'loggedout', cookieOptions);
 
   res.status(200).json({
     success: true,
@@ -263,7 +431,8 @@ exports.getMe = catchAsync(async (req, res, next) => {
       role: req.user.role,
       username: req.user.username,
       displayName: req.user.displayName,
-      avatarUrl: req.user.avatarUrl
+      avatarUrl: req.user.avatarUrl,
+      bio: req.user.bio
     }
   });
 });
@@ -277,15 +446,41 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   const allowedFields = ['username', 'displayName', 'avatarUrl', 'bio'];
   const filteredBody = {};
   Object.keys(req.body).forEach(key => {
-    if (allowedFields.includes(key)) {
+    if (allowedFields.includes(key) && req.body[key] !== undefined) {
       filteredBody[key] = req.body[key];
     }
   });
+
+  if (Object.keys(filteredBody).length === 0) {
+    return next(new ApiError(400, 'No valid profile fields provided'));
+  }
+
+  // Username uniqueness check (ignore current user)
+  if (filteredBody.username) {
+    const cleanUsername = String(filteredBody.username).trim().toLowerCase();
+    filteredBody.username = cleanUsername;
+    const existing = await User.findOne({ username: cleanUsername, _id: { $ne: req.user._id } });
+    if (existing) {
+      return next(new ApiError(400, 'That username is already taken'));
+    }
+  }
 
   const updatedUser = await User.findByIdAndUpdate(req.user._id, filteredBody, {
     new: true,
     runValidators: true
   });
+
+  // Keep the creator profile in sync for creator accounts
+  if (updatedUser.role === 'creator') {
+    const profileUpdate = {};
+    if (filteredBody.username) profileUpdate.username = filteredBody.username;
+    if (filteredBody.displayName) profileUpdate.displayName = filteredBody.displayName;
+    if (filteredBody.avatarUrl !== undefined) profileUpdate.avatarUrl = filteredBody.avatarUrl;
+    if (filteredBody.bio !== undefined) profileUpdate.bio = filteredBody.bio;
+    if (Object.keys(profileUpdate).length > 0) {
+      await CreatorProfile.findOneAndUpdate({ userId: updatedUser._id }, profileUpdate, { new: true });
+    }
+  }
 
   res.status(200).json({
     status: 'success',
@@ -295,7 +490,8 @@ exports.updateMe = catchAsync(async (req, res, next) => {
       role: updatedUser.role,
       username: updatedUser.username,
       displayName: updatedUser.displayName,
-      avatarUrl: updatedUser.avatarUrl
+      avatarUrl: updatedUser.avatarUrl,
+      bio: updatedUser.bio
     }
   });
 });
@@ -309,7 +505,7 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
   const user = await User.findById(req.user._id).select('+password');
 
-  if (!(await user.correctPassword(currentPassword, user.password))) {
+  if (!(await user.comparePassword(currentPassword, user.password))) {
     return next(new ApiError(401, 'Your current password is incorrect'));
   }
 
@@ -334,6 +530,24 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
 
   // Perform cleanups
   await CreatorProfile.findOneAndDelete({ userId });
+
+  // Remove uploaded media from S3 before deleting records (stream covers are kept)
+  const awsService = require('../services/aws.service');
+  const [userStories, userPosts, userMessages] = await Promise.all([
+    Story.find({ creatorId: userId }).select('mediaUrl'),
+    Post.find({ creatorId: userId }).select('media'),
+    Message.find({ $or: [{ senderId: userId }, { receiverId: userId }], mediaUrl: { $ne: '' } }).select('mediaUrl')
+  ]);
+  const mediaUrls = userStories.map((s) => s.mediaUrl);
+  userPosts.forEach((p) => {
+    (p.media || []).forEach((m) => {
+      mediaUrls.push(m.url);
+      if (m.thumbnailUrl) mediaUrls.push(m.thumbnailUrl);
+    });
+  });
+  userMessages.forEach((msg) => mediaUrls.push(msg.mediaUrl));
+  await awsService.deleteS3Media(mediaUrls);
+
   await Story.deleteMany({ creatorId: userId });
   await LiveStream.deleteMany({ creatorId: userId });
   await Wallet.findOneAndDelete({ userId });
@@ -358,10 +572,13 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   await User.findByIdAndDelete(userId);
 
   // Clear cookie if present
-  res.cookie('token', 'loggedout', {
+  const cookieOptions = {
     expires: new Date(Date.now() + 10 * 1000),
-    httpOnly: true
-  });
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax'
+  };
+  res.cookie('token', 'loggedout', cookieOptions);
 
   res.status(200).json({
     status: 'success',

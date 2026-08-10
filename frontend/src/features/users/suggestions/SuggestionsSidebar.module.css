@@ -320,11 +320,34 @@
   font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   background-image: linear-gradient(#121212, #121212), linear-gradient(90deg, #e10075, #7e00f3);
   background-origin: border-box;
   background-clip: padding-box, border-box;
   border: 1.5px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 76px;
+}
+
+.subscribeBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+.subscribeBtnBusy {
+  background-image: linear-gradient(rgba(225, 0, 117, 0.15), rgba(126, 0, 243, 0.15)), linear-gradient(90deg, #e10075, #7e00f3);
+}
+
+.subscribeSpinner {
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.7s linear infinite;
 }
 
 .subscribeBtnText {
@@ -332,10 +355,25 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  transition: color 0.2s, -webkit-text-fill-color 0.2s;
 }
 
 .subscribeBtn:hover {
-  background-image: linear-gradient(rgba(225, 0, 117, 0.1), rgba(126, 0, 243, 0.1)), linear-gradient(90deg, #e10075, #7e00f3);
+  background-image: linear-gradient(90deg, #e10075 0%, #7e00f3 100%), linear-gradient(90deg, #e10075 0%, #7e00f3 100%);
+  box-shadow: 0 4px 14px rgba(225, 0, 117, 0.35);
+  transform: translateY(-1px);
+}
+
+.subscribeBtn:hover .subscribeBtnText {
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  -webkit-text-fill-color: #ffffff;
+  color: #ffffff;
+}
+
+.subscribeBtn:active {
+  transform: translateY(0) scale(0.97);
 }
 
 /* Animations */
@@ -408,4 +446,46 @@
 
 .light .verifiedIcon {
   color: #f7f6fb;
+}
+
+.light .subscribeBtn {
+  background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(90deg, #e10075, #7e00f3);
+}
+
+.light .subscribeBtn:hover {
+  background-image: linear-gradient(90deg, #e10075 0%, #7e00f3 100%), linear-gradient(90deg, #e10075 0%, #7e00f3 100%);
+}
+
+.emptyList {
+  font-size: 0.85rem;
+  color: rgba(134, 142, 150, 0.8);
+  padding: 0.75rem 0;
+  margin: 0;
+}
+
+/* Skeleton loading rows */
+.skeletonList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 36px;
+}
+
+.skeletonTextCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+/* Spinner keyframes */
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

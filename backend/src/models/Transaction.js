@@ -14,7 +14,7 @@ const transactionSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ['deposit', 'withdrawal', 'subscription', 'tip', 'ppv_unlock', 'call_billing'],
+      enum: ['deposit', 'withdrawal', 'subscription', 'tip', 'gift', 'ppv_unlock', 'call_billing', 'live_entry', 'store_purchase'],
       required: true
     },
     status: {
@@ -32,7 +32,7 @@ const transactionSchema = new mongoose.Schema(
     },
     gateway: {
       type: String,
-      enum: ['segpay', 'ccbill', 'internal'],
+      enum: ['segpay', 'ccbill', 'internal', 'reward_bonus', 'referral_bonus'],
       default: 'internal'
     },
     gatewayTxId: {
@@ -42,6 +42,10 @@ const transactionSchema = new mongoose.Schema(
     referenceId: {
       type: mongoose.Schema.Types.ObjectId,
       default: null // Dynamic reference (Post, Message, CallLog)
+    },
+    metadata: {
+      type: mongoose.Schema.Types.Mixed,
+      default: {} // Package details, card last4, bonus coins, promo info
     }
   },
   {

@@ -1,11 +1,24 @@
-import React, { useState } from 'react';
-import { subscriberGrowthData } from './mockData';
+import { useState } from 'react';
 import { PeriodDropdown } from './PeriodDropdown';
 import styles from './AnalyticsPage.module.css';
 
-export const SubscriberGrowthChart = ({ isDark }) => {
-  const { labels, total, new: newSubs } = subscriberGrowthData;
-  const [activeIndex, setActiveIndex] = useState(6);
+// Nice round tick values derived from the real data max (no hardcoded axis).
+const makeTicks = (maxVal, count = 5) => {
+  const max = Math.max(Number(maxVal) || 0, 1);
+  const raw = max / count;
+  const pow = Math.pow(10, Math.floor(Math.log10(raw)));
+  const norm = raw / pow;
+  const step = (norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 2.5 ? 2.5 : norm <= 5 ? 5 : 10) * pow;
+  const ticks = [];
+  for (let v = 0; v <= max + step; v += step) {
+    ticks.push(Math.round(v * 100) / 100);
+  }
+  return ticks;
+};
+
+export const SubscriberGrowthChart = ({ isDark, data, value, onPeriodChange }) => {
+  const { labels = [], total = [], new: newSubs = [] } = data || {};
+  const [activeIndex, setActiveIndex] = useState(labels.length - 1 || 0);
 
   const width = 500;
   const height = 165;
@@ -13,10 +26,11 @@ export const SubscriberGrowthChart = ({ isDark }) => {
   const chartWidth = width - padding.left - padding.right;
   const chartHeight = height - padding.top - padding.bottom;
 
-  const maxTotal = Math.max(...total) * 1.1;
-  const maxNew = Math.max(...newSubs) * 1.2;
+  const maxTotal = Math.max(...total, 1) * 1.1;
+  const maxNew = Math.max(...newSubs, 1) * 1.2;
+  const yTicks = makeTicks(maxTotal);
 
-  const getX = (i) => padding.left + (i / (labels.length - 1)) * chartWidth;
+  const getX = (i) => padding.left + (i / Math.max(1, labels.length - 1)) * chartWidth;
   const getTotalY = (val) => padding.top + chartHeight - (val / maxTotal) * chartHeight;
   const getNewY = (val) => padding.top + chartHeight - (val / maxNew) * chartHeight;
 
@@ -33,18 +47,15 @@ export const SubscriberGrowthChart = ({ isDark }) => {
     let minDist = Infinity;
     for (let i = 0; i < labels.length; i++) {
       const dist = Math.abs(getX(i) - svgX);
-      if (dist < minDist) {
-        minDist = dist;
-        closest = i;
-      }
+      if (dist < minDist) { minDist = dist; closest = i; }
     }
     setActiveIndex(closest);
   };
 
   const activeTooltip = {
-    date: labels[activeIndex],
-    total: Number(total[activeIndex]).toLocaleString() + ' Total',
-    new: '+' + newSubs[activeIndex] + ' New',
+    date: labels[activeIndex] || '',
+    total: Number(total[activeIndex] || 0).toLocaleString() + ' Total',
+    new: '+' + (newSubs[activeIndex] || 0) + ' New'
   };
 
   const svgX = getX(activeIndex);
@@ -55,7 +66,7 @@ export const SubscriberGrowthChart = ({ isDark }) => {
     <div className={`${styles.chartCard} ${!isDark ? styles.light : ''}`}>
       <div className={styles.chartHeader}>
         <h3 className={styles.chartTitle}>Subscribers Growth</h3>
-        <PeriodDropdown variant="text" />
+        <PeriodDropdown variant="text" value={value} onChange={onPeriodChange} />
       </div>
       <div className={styles.chartLegend}>
         <div className={styles.legendItem}>
@@ -68,11 +79,8 @@ export const SubscriberGrowthChart = ({ isDark }) => {
         </div>
       </div>
       <div className={styles.chartContainer}>
-        <svg viewBox={`0 0 ${width} ${height}`} className={styles.chartSvg} onMouseMove={handleMouseMove} onMouseLeave={() => setActiveIndex(6)} style={{ cursor: 'pointer' }}>
-          {[0, 300, 600, 900, '1.2K', '1.5K'].map((label, i) => (
-            <text key={i} x={padding.left - 8} y={getTotalY(i * 300)} textAnchor="end" className={styles.axisLabel}>{label}</text>
-          ))}
-          {[0, 300, 600, 900, 1200, 1500].map((val, i) => (
+        <svg viewBox={`0 0 ${width} ${height}`} className={styles.chartSvg} onMouseMove={handleMouseMove} onMouseLeave={() => setActiveIndex(labels.length - 1 || 0)} style={{ cursor: 'pointer' }}>
+          {yTicks.map((val, i) => (
             <line key={i} x1={padding.left} y1={getTotalY(val)} x2={width - padding.right} y2={getTotalY(val)} className={styles.gridLine} />
           ))}
           {labels.map((label, i) => (

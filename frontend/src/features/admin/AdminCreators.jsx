@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '../../services/api';
-import { Check, X, ShieldCheck, Edit, Save, Search } from 'lucide-react';
+import { X, Save, Search } from 'lucide-react';
 import { useAdminUI } from './AdminUI';
+import { SkeletonTable } from './AdminSkeletons';
+import { AdminPeriodFilter } from './AdminPeriodFilter';
+import { AdminFilterButton } from './AdminFilterButton';
 import styles from './AdminPage.module.css';
 
 export const AdminCreators = () => {
@@ -9,17 +12,26 @@ export const AdminCreators = () => {
   const [creators, setCreators] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [period, setPeriod] = useState({ preset: null, from: '', to: '' });
   const [editProfile, setEditProfile] = useState(null);
-  const [editedRates, setEditedRates] = useState({ voiceCallMinute: 0, videoCallMinute: 0 });
+  // IMPORTANT: these keys MUST match the CreatorProfile schema (`rates.audioCallPerMin` /
+  // `rates.videoCallPerMin`) — the listener-facing call pages, profile and live-stream cards
+  // all read those exact fields. Legacy keys (voiceCallMinute/videoCallMinute) were written to
+  // nowhere and admin rate edits never reached listeners.
+  const [editedRates, setEditedRates] = useState({ audioCallPerMin: 0, videoCallPerMin: 0 });
 
   useEffect(() => {
     fetchCreators();
-  }, [search]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, period]);
 
-  const fetchCreators = async () => {
+  async function fetchCreators() {
     try {
       setLoading(true);
-      const res = await api.get(`/admin/creators?search=${encodeURIComponent(search)}`);
+      const params = new URLSearchParams({ search });
+      if (period.from) params.set('from', period.from);
+      if (period.to) params.set('to', period.to);
+      const res = await api.get(`/admin/creators?${params.toString()}`);
       if (res.status === 'success') {
         setCreators(res.profiles || []);
       }
@@ -28,7 +40,7 @@ export const AdminCreators = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const handleApprove = async (creatorId) => {
     try {
@@ -69,8 +81,8 @@ export const AdminCreators = () => {
   const openRatesModal = (profile) => {
     setEditProfile(profile);
     setEditedRates({
-      voiceCallMinute: profile.rates?.voiceCallMinute || 0,
-      videoCallMinute: profile.rates?.videoCallMinute || 0
+      audioCallPerMin: profile.rates?.audioCallPerMin || 0,
+      videoCallPerMin: profile.rates?.videoCallPerMin || 0
     });
   };
 
@@ -96,24 +108,30 @@ export const AdminCreators = () => {
           <h2 className={styles.pageTitle}>Creators & Verification</h2>
           <p className={styles.pageSub}>Review applications, badges, and call tariffs.</p>
         </div>
-        <div className={styles.searchBar}>
-          <Search size={18} className={styles.searchIcon} />
-          <input
-            type="text"
-            placeholder="Search creators..."
-            className={styles.searchInput}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+        <div className={styles.searchRow}>
+          <div className={styles.searchBar}>
+            <Search size={18} className={styles.searchIcon} />
+            <input
+              type="text"
+              placeholder="Search creators..."
+              className={styles.searchInput}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <AdminFilterButton
+            period={period}
+            onPeriodChange={setPeriod}
+            activeCount={(period.preset || period.from || period.to) ? 1 : 0}
           />
         </div>
       </div>
 
+      <AdminPeriodFilter value={period} onChange={setPeriod} />
+
       <div className={styles.glassPanel}>
         {loading ? (
-          <div className={styles.loadingState}>
-            <div className={styles.spinner} />
-            <span>Retrieving creator listings…</span>
-          </div>
+          <SkeletonTable columns={10} rows={5} />
         ) : (
           <>
             <div className={styles.customTableWrapper}>
@@ -123,6 +141,9 @@ export const AdminCreators = () => {
                     <th>Creator</th>
                     <th>Email</th>
                     <th>Subscribers</th>
+                    <th>Followers</th>
+                    <th>Rating</th>
+                    <th>Joined</th>
                     <th>Verification</th>
                     <th>Badge</th>
                     <th>Rates / Min</th>
@@ -132,9 +153,29 @@ export const AdminCreators = () => {
                 <tbody>
                   {creators.map((profile) => (
                     <tr key={profile._id}>
-                      <td className={styles.cellStrong}>{profile.userId?.displayName} (@{profile.userId?.username})</td>
+                      <td>
+                        <div className={styles.userCell}>
+                          <img
+                            src={profile.userId?.avatarUrl || '/profile.png'}
+                            alt={profile.userId?.displayName || 'Creator'}
+                            className={styles.userAvatar}
+                            loading="lazy"
+                          />
+                          <div className={styles.userCellText}>
+                            <span className={styles.cellStrong}>{profile.userId?.displayName || 'Unknown'}</span>
+                            {profile.userId?.username && <span className={styles.cellSub}>@{profile.userId.username}</span>}
+                          </div>
+                        </div>
+                      </td>
                       <td>{profile.userId?.email}</td>
                       <td>{profile.subscriberCount || 0}</td>
+                      <td>{profile.followerCount || 0}</td>
+                      <td>{profile.rating ? `${profile.rating} ★` : '—'}</td>
+                      <td className={styles.cellSub}>
+                        {profile.userId?.createdAt
+                          ? new Date(profile.userId.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+                          : '—'}
+                      </td>
                       <td>
                         <span className={`${styles.badge} ${
                           profile.verificationStatus === 'approved' ? styles.badgeSuccess :
@@ -149,7 +190,7 @@ export const AdminCreators = () => {
                         </span>
                       </td>
                       <td>
-                        Audio: {profile.rates?.voiceCallMinute || 0}c / Video: {profile.rates?.videoCallMinute || 0}c
+                        Audio: {profile.rates?.audioCallPerMin || 0}c / Video: {profile.rates?.videoCallPerMin || 0}c
                       </td>
                       <td>
                         <div className={styles.actionBtns}>
@@ -175,7 +216,7 @@ export const AdminCreators = () => {
                   ))}
                   {creators.length === 0 && (
                     <tr>
-                      <td colSpan="7">
+                      <td colSpan="10">
                         <div className={styles.emptyState}>No creators registered</div>
                       </td>
                     </tr>
@@ -188,18 +229,28 @@ export const AdminCreators = () => {
             <div className={styles.mobileCardList}>
               {creators.map((profile) => (
                 <div key={profile._id} className={styles.mobileCard}>
-                  <div className={styles.mobileRow}>
-                    <span className={styles.mobileCardTitle}>{profile.userId?.displayName}</span>
-                    <span className={`${styles.badge} ${
-                      profile.verificationStatus === 'approved' ? styles.badgeSuccess :
-                      profile.verificationStatus === 'pending' ? styles.badgeWarning : styles.badgeDanger
-                    }`}>
-                      {profile.verificationStatus}
-                    </span>
-                  </div>
-                  <div className={styles.mobileRow}>
-                    <span className={styles.mobileLabel}>Username:</span>
-                    <span className={styles.mobileVal}>@{profile.userId?.username}</span>
+                  <div className={styles.mobileUserHead}>
+                    <img
+                      src={profile.userId?.avatarUrl || '/profile.png'}
+                      alt={profile.userId?.displayName || 'Creator'}
+                      className={styles.mobileAvatar}
+                      loading="lazy"
+                    />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div className={styles.mobileRow}>
+                        <span className={styles.mobileCardTitle}>{profile.userId?.displayName}</span>
+                        <span className={`${styles.badge} ${
+                          profile.verificationStatus === 'approved' ? styles.badgeSuccess :
+                          profile.verificationStatus === 'pending' ? styles.badgeWarning : styles.badgeDanger
+                        }`}>
+                          {profile.verificationStatus}
+                        </span>
+                      </div>
+                      <div className={styles.mobileRow}>
+                        <span className={styles.mobileLabel}>Username:</span>
+                        <span className={styles.mobileVal}>@{profile.userId?.username}</span>
+                      </div>
+                    </div>
                   </div>
                   <div className={styles.mobileRow}>
                     <span className={styles.mobileLabel}>Email:</span>
@@ -210,6 +261,22 @@ export const AdminCreators = () => {
                     <span className={styles.mobileVal}>{profile.subscriberCount || 0}</span>
                   </div>
                   <div className={styles.mobileRow}>
+                    <span className={styles.mobileLabel}>Followers:</span>
+                    <span className={styles.mobileVal}>{profile.followerCount || 0}</span>
+                  </div>
+                  <div className={styles.mobileRow}>
+                    <span className={styles.mobileLabel}>Rating:</span>
+                    <span className={styles.mobileVal}>{profile.rating ? `${profile.rating} ★` : '—'}</span>
+                  </div>
+                  <div className={styles.mobileRow}>
+                    <span className={styles.mobileLabel}>Joined:</span>
+                    <span className={styles.mobileVal}>
+                      {profile.userId?.createdAt
+                        ? new Date(profile.userId.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+                        : '—'}
+                    </span>
+                  </div>
+                  <div className={styles.mobileRow}>
                     <span className={styles.mobileLabel}>Badge status:</span>
                     <span className={`${styles.badge} ${profile.isVerifiedBadge ? styles.badgeSuccess : styles.badgeOutline}`}>
                       {profile.isVerifiedBadge ? 'Verified' : 'Unverified'}
@@ -217,7 +284,7 @@ export const AdminCreators = () => {
                   </div>
                   <div className={styles.mobileRow}>
                     <span className={styles.mobileLabel}>Rates:</span>
-                    <span className={styles.mobileVal}>Audio: {profile.rates?.voiceCallMinute}c | Video: {profile.rates?.videoCallMinute}c</span>
+                    <span className={styles.mobileVal}>Audio: {profile.rates?.audioCallPerMin}c | Video: {profile.rates?.videoCallPerMin}c</span>
                   </div>
                   <div className={styles.actionBtns} style={{ marginTop: 4, width: '100%' }}>
                     {profile.verificationStatus === 'pending' && (
@@ -258,12 +325,12 @@ export const AdminCreators = () => {
 
             <div className={styles.formGrid}>
               <div className={styles.formControlItem}>
-                <label className={styles.inputLabel}>Voice Billing (Coins/Min)</label>
+                <label className={styles.inputLabel}>Audio Billing (Coins/Min)</label>
                 <input
                   type="number"
                   className={styles.inputField}
-                  value={editedRates.voiceCallMinute}
-                  onChange={(e) => setEditedRates({ ...editedRates, voiceCallMinute: parseInt(e.target.value) || 0 })}
+                  value={editedRates.audioCallPerMin}
+                  onChange={(e) => setEditedRates({ ...editedRates, audioCallPerMin: parseInt(e.target.value) || 0 })}
                 />
               </div>
 
@@ -272,8 +339,8 @@ export const AdminCreators = () => {
                 <input
                   type="number"
                   className={styles.inputField}
-                  value={editedRates.videoCallMinute}
-                  onChange={(e) => setEditedRates({ ...editedRates, videoCallMinute: parseInt(e.target.value) || 0 })}
+                  value={editedRates.videoCallPerMin}
+                  onChange={(e) => setEditedRates({ ...editedRates, videoCallPerMin: parseInt(e.target.value) || 0 })}
                 />
               </div>
             </div>

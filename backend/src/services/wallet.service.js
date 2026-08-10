@@ -14,7 +14,7 @@ const ApiError = require('../utils/apiError');
  * @param {number} commissionRate - Commission rate (defaults to 0.20, i.e., 20%)
  * @returns {Promise<Object>} - Created transaction log
  */
-const transferCoins = async (senderId, receiverId, amount, type, referenceId = null, commissionRate = 0.20) => {
+const transferCoins = async (senderId, receiverId, amount, type, referenceId = null, commissionRate = 0.20, metadata = {}) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -52,7 +52,7 @@ const transferCoins = async (senderId, receiverId, amount, type, referenceId = n
       }
 
       // Apply commission on direct peer transactions
-      if (['subscription', 'tip', 'ppv_unlock', 'call_billing'].includes(type)) {
+      if (['subscription', 'tip', 'gift', 'ppv_unlock', 'call_billing', 'live_entry', 'store_purchase'].includes(type)) {
         const commission = amount * activeCommissionRate;
         netAmount = amount - commission;
       }
@@ -71,7 +71,8 @@ const transferCoins = async (senderId, receiverId, amount, type, referenceId = n
           status: 'completed',
           amountCoins: amount,
           referenceId,
-          gateway: 'internal'
+          gateway: 'internal',
+          metadata
         }
       ],
       { session }

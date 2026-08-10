@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '../../services/api';
-import { DollarSign, Landmark, Check, X, Undo, Search } from 'lucide-react';
+import { DollarSign, Landmark, Undo, Search } from 'lucide-react';
 import { useAdminUI } from './AdminUI';
+import { SkeletonTable } from './AdminSkeletons';
+import { AdminPeriodFilter } from './AdminPeriodFilter';
+import { AdminFilterButton } from './AdminFilterButton';
 import styles from './AdminPage.module.css';
 
 export const AdminFinance = () => {
@@ -11,6 +14,7 @@ export const AdminFinance = () => {
   const [loading, setLoading] = useState(true);
   const [subTab, setSubTab] = useState('transactions');
   const [search, setSearch] = useState('');
+  const [period, setPeriod] = useState({ preset: null, from: '', to: '' });
 
   useEffect(() => {
     if (subTab === 'transactions') {
@@ -18,12 +22,16 @@ export const AdminFinance = () => {
     } else {
       fetchWithdrawals();
     }
-  }, [subTab, search]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subTab, search, period]);
 
-  const fetchTransactions = async () => {
+  async function fetchTransactions() {
     try {
       setLoading(true);
-      const res = await api.get(`/admin/transactions?search=${encodeURIComponent(search)}`);
+      const params = new URLSearchParams({ search });
+      if (period.from) params.set('from', period.from);
+      if (period.to) params.set('to', period.to);
+      const res = await api.get(`/admin/transactions?${params.toString()}`);
       if (res.status === 'success') {
         setTransactions(res.transactions || []);
       }
@@ -32,12 +40,15 @@ export const AdminFinance = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  const fetchWithdrawals = async () => {
+  async function fetchWithdrawals() {
     try {
       setLoading(true);
-      const res = await api.get(`/admin/withdrawals?search=${encodeURIComponent(search)}`);
+      const params = new URLSearchParams({ search });
+      if (period.from) params.set('from', period.from);
+      if (period.to) params.set('to', period.to);
+      const res = await api.get(`/admin/withdrawals?${params.toString()}`);
       if (res.status === 'success') {
         setWithdrawals(res.withdrawals || []);
       }
@@ -46,7 +57,7 @@ export const AdminFinance = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   const handleRefund = async (txId) => {
     const ok = await confirm({
@@ -105,17 +116,26 @@ export const AdminFinance = () => {
           <h2 className={styles.pageTitle}>Finance & Payouts</h2>
           <p className={styles.pageSub}>Audit transactions and process creator withdrawals.</p>
         </div>
-        <div className={styles.searchBar}>
-          <Search size={18} className={styles.searchIcon} />
-          <input
-            type="text"
-            placeholder={subTab === 'transactions' ? 'Search transactions...' : 'Search withdrawals...'}
-            className={styles.searchInput}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+        <div className={styles.searchRow}>
+          <div className={styles.searchBar}>
+            <Search size={18} className={styles.searchIcon} />
+            <input
+              type="text"
+              placeholder={subTab === 'transactions' ? 'Search transactions...' : 'Search withdrawals...'}
+              className={styles.searchInput}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <AdminFilterButton
+            period={period}
+            onPeriodChange={setPeriod}
+            activeCount={(period.preset || period.from || period.to) ? 1 : 0}
           />
         </div>
       </div>
+
+      <AdminPeriodFilter value={period} onChange={setPeriod} />
 
       <div className={styles.pillTabs}>
         <button
@@ -136,10 +156,7 @@ export const AdminFinance = () => {
 
       <div className={styles.glassPanel}>
         {loading ? (
-          <div className={styles.loadingState}>
-            <div className={styles.spinner} />
-            <span>Syncing ledger…</span>
-          </div>
+          <SkeletonTable columns={7} rows={5} />
         ) : (
           <>
             {subTab === 'transactions' ? (
@@ -148,7 +165,7 @@ export const AdminFinance = () => {
                 <table className={styles.customTable}>
                   <thead>
                     <tr>
-                      <th>TX ID</th>
+                      <th>Transaction ID</th>
                       <th>Sender</th>
                       <th>Receiver</th>
                       <th>Type</th>
@@ -167,7 +184,7 @@ export const AdminFinance = () => {
                         <span className={styles.badge} style={{ background: 'var(--bg-surface-2)', borderColor: 'var(--border)' }}>{tx.type}</span>
                       </td>
                       <td className={tx.amountCoins > 0 ? styles.posAmount : styles.negAmount}>
-                        {tx.amountCoins}c
+                        {tx.amountCoins}
                       </td>
                       <td>
                         <span className={`${styles.badge} ${
@@ -210,7 +227,7 @@ export const AdminFinance = () => {
                       </span>
                     </div>
                     <div className={styles.mobileRow}>
-                      <span className={styles.mobileLabel}>TX ID:</span>
+                      <span className={styles.mobileLabel}>Transaction ID:</span>
                       <span className={`${styles.mobileVal} ${styles.cellMono}`}>{tx._id}</span>
                     </div>
                     <div className={styles.mobileRow}>
@@ -223,7 +240,7 @@ export const AdminFinance = () => {
                     </div>
                     <div className={styles.mobileRow}>
                       <span className={styles.mobileLabel}>Amount:</span>
-                      <span className={`${styles.mobileVal} ${tx.amountCoins > 0 ? styles.posAmount : styles.negAmount}`}>{tx.amountCoins}c</span>
+                      <span className={`${styles.mobileVal} ${tx.amountCoins > 0 ? styles.posAmount : styles.negAmount}`}>{tx.amountCoins}</span>
                     </div>
                     {tx.status === 'completed' && (
                       <button className={`${styles.buttonControl} ${styles.btnBordered} ${styles.btnBlock}`} onClick={() => handleRefund(tx._id)} style={{ marginTop: 4 }}>

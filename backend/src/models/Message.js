@@ -22,7 +22,7 @@ const messageSchema = new mongoose.Schema(
     },
     mediaType: {
       type: String,
-      enum: ['none', 'image', 'video'],
+      enum: ['none', 'image', 'video', 'gif', 'media'],
       default: 'none'
     },
     isPaywall: {

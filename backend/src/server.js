@@ -12,7 +12,7 @@ process.on('uncaughtException', err => {
   process.exit(1);
 });
 
-const { initPostScheduler, initSubscriptionExpirationScheduler } = require('./utils/scheduler');
+const { initPostScheduler, initSubscriptionExpirationScheduler, initStoryExpirationScheduler, initLiveStreamScheduler } = require('./utils/scheduler');
 const seedMoreData = require('./utils/moreSeed');
 
 // Database Connection
@@ -22,6 +22,8 @@ mongoose.connect(dbUri)
     console.log('DB Connection successful! 🔌');
     initPostScheduler();
     initSubscriptionExpirationScheduler();
+    initStoryExpirationScheduler();
+    initLiveStreamScheduler();
     seedMoreData();
   })
   .catch(err => {
@@ -52,6 +54,18 @@ io.on('connection', (socket) => {
   socket.on('join_room', (userId) => {
     socket.join(userId);
     console.log(`User ${userId} joined room ${userId}`);
+  });
+
+  // Join a live stream room to receive real-time viewer count updates
+  socket.on('join_stream_room', (streamId) => {
+    if (!streamId) return;
+    socket.join(`live_stream_${streamId}`);
+  });
+
+  // Leave a live stream room (stops receiving viewer count updates)
+  socket.on('leave_stream_room', (streamId) => {
+    if (!streamId) return;
+    socket.leave(`live_stream_${streamId}`);
   });
 
   socket.on('disconnect', () => {

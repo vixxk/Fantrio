@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useState, useCallback, useRef } from 'react';
+import { createContext, useContext, useState, useCallback } from 'react';
 import { CheckCircle2, XCircle, AlertTriangle, Info, X, LogOut } from 'lucide-react';
 import styles from './AdminPage.module.css';
 
 const AdminUIContext = createContext(null);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAdminUI = () => {
   const ctx = useContext(AdminUIContext);
   if (!ctx) throw new Error('useAdminUI must be used within AdminUIProvider');
@@ -70,8 +71,11 @@ export const AdminUIProvider = ({ children }) => {
       <div className={styles.toastContainer}>
         {toasts.map((t) => (
           <div key={t.id} className={`${styles.toast} ${styles['toast' + capitalize(t.type)]}`} role="status">
-            <span className={styles.toastIcon}>{iconFor(t.type)}</span>
-            <span className={styles.toastMsg}>{t.message}</span>
+            <div className={styles.toastIcon}>{iconFor(t.type)}</div>
+            <div className={styles.toastBody}>
+              <div className={styles.toastMsg}>{t.message}</div>
+              <div className={styles.toastProgress} />
+            </div>
             <button className={styles.toastClose} onClick={() => removeToast(t.id)} aria-label="Dismiss">
               <X size={14} />
             </button>
@@ -95,11 +99,17 @@ export const AdminUIProvider = ({ children }) => {
         return (
           <div className={styles.customModalOverlay} onClick={() => closeConfirm(false)}>
             <div className={styles.confirmDialog} onClick={(e) => e.stopPropagation()} role="alertdialog" aria-modal="true">
-              <div className={`${styles.confirmBadge} ${badge}`}>
-                <Icon size={22} />
+              <div className={styles.confirmHead}>
+                <div className={`${styles.confirmBadge} ${badge}`}>
+                  <Icon size={20} />
+                </div>
+                <h3 className={styles.confirmTitle}>{confirmState.title}</h3>
               </div>
-              <h3 className={styles.confirmTitle}>{confirmState.title}</h3>
-              {confirmState.message && <p className={styles.confirmText}>{confirmState.message}</p>}
+              {confirmState.message && (
+                <div className={styles.confirmBody}>
+                  <p className={styles.confirmText}>{confirmState.message}</p>
+                </div>
+              )}
               <div className={styles.confirmActions}>
                 <button className={`${styles.buttonControl} ${styles.btnBordered}`} onClick={() => closeConfirm(false)}>
                   {confirmState.cancelText}

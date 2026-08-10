@@ -563,3 +563,1382 @@
     font-size: 0.72rem !important;
   }
 }
+
+/* ================= SUB-PAGE LAYOUT ================= */
+.subPageContainer {
+  width: 100%;
+  min-width: 0;
+}
+
+.subPageHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.backBtn {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #121212;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.backBtn:hover {
+  background: rgba(255, 0, 127, 0.1);
+  border-color: rgba(255, 0, 127, 0.35);
+}
+
+.subPageTitleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.subPageTitle {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.subPageDesc {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.subPageBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+/* --- Status alert --- */
+.statusAlert {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.statusAlert.success {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34d399;
+}
+
+.statusAlert.error {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #f87171;
+}
+
+.alertIcon {
+  flex-shrink: 0;
+}
+
+.alertCloseBtn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 1.1rem;
+  cursor: pointer;
+  opacity: 0.7;
+  line-height: 1;
+}
+
+.alertCloseBtn:hover {
+  opacity: 1;
+}
+
+/* --- Forms --- */
+.formGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  min-width: 0;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  position: relative;
+  min-width: 0;
+}
+
+.formLabel {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.formInput,
+.formSelect,
+.formTextarea {
+  width: 100%;
+  background: #181818;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-family: inherit;
+  padding: 0.75rem 1rem;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.formInput:focus,
+.formSelect:focus,
+.formTextarea:focus {
+  outline: none;
+  border-color: #e10075;
+  box-shadow: 0 0 0 3px rgba(225, 0, 117, 0.15);
+}
+
+.formInput::placeholder,
+.formTextarea::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.formSelect {
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+
+.formTextarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.formTextarea::-webkit-scrollbar {
+  width: 6px;
+}
+
+.formTextarea::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+.inputDisabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.charCount {
+  position: absolute;
+  right: 0.75rem;
+  bottom: -1.2rem;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.submitBtn {
+  align-self: flex-start;
+  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%);
+  border: none;
+  color: #ffffff;
+  padding: 0.7rem 1.6rem;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.submitBtn:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(225, 0, 117, 0.3);
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Profile preview --- */
+.profilePreview {
+  display: flex;
+  align-items: center;
+  gap: 1.15rem;
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+}
+
+.profileAvatarWrap {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(255, 0, 127, 0.4);
+}
+
+.profileAvatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profilePreviewText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.profilePreviewText h3 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+
+.profilePreviewText p {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0;
+}
+
+.emailVerifiedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* --- Security cards --- */
+.securityCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.4rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.securityCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.securityCardTitleRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+
+.securityIconBox {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(225, 0, 117, 0.1);
+  color: #e10075;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.securityCardTitle {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.25rem 0;
+}
+
+.securityCardDesc {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+  max-width: 520px;
+  line-height: 1.5;
+}
+
+.securityStatusBadge {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.securityStatusBadge.enabled {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+.twoFaForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.twoFaActions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.dangerBtn {
+  align-self: flex-start;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+  padding: 0.65rem 1.4rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.dangerBtn:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.25);
+  transform: translateY(-1px);
+}
+
+.dangerBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cancelBtn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.75);
+  padding: 0.65rem 1.4rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cancelBtn:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* --- Login activity --- */
+.activityList {
+  display: flex;
+  flex-direction: column;
+}
+
+.activityRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.activityRow:first-child {
+  border-top: none;
+}
+
+.activityIconWrap {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.activityInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.activityDevice {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.activityMeta {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.activityTime {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* --- Notifications --- */
+.notifIntro {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.notifIntro svg {
+  color: #e10075;
+  flex-shrink: 0;
+}
+
+.notifList {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.notifRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.4rem;
+}
+
+.notifRow:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.notifTextCol {
+  min-width: 0;
+}
+
+.notifTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.2rem 0;
+}
+
+.notifDesc {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.toggle {
+  flex-shrink: 0;
+  width: 46px;
+  height: 26px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.25s;
+  padding: 0;
+}
+
+.toggleOn {
+  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%);
+}
+
+.toggleThumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.toggleOn .toggleThumb {
+  transform: translateX(20px);
+}
+
+/* --- Payment methods --- */
+.payHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.payIntro {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0;
+  max-width: 560px;
+  line-height: 1.5;
+}
+
+.actionBtn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%);
+  border: none;
+  color: #ffffff;
+  padding: 0.6rem 1.25rem;
+  border-radius: 11px;
+  font-size: 0.83rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.actionBtn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.payForm {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.4rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.cardList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.cardItem {
+  position: relative;
+  background: linear-gradient(120deg, #1a1a2e 0%, #121212 55%, #2a1635 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.4rem 1.5rem;
+  overflow: hidden;
+}
+
+.brand_visa {
+  background: linear-gradient(120deg, #1b2a6b 0%, #121212 60%, #151d3d 100%);
+}
+
+.brand_mastercard {
+  background: linear-gradient(120deg, #3d2a12 0%, #121212 60%, #2a1609 100%);
+}
+
+.brand_amex {
+  background: linear-gradient(120deg, #1c4b3a 0%, #121212 60%, #123d2f 100%);
+}
+
+.brand_discover {
+  background: linear-gradient(120deg, #3a1d24 0%, #121212 60%, #2a1014 100%);
+}
+
+.cardItemTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.6rem;
+}
+
+.cardBrandRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #ffffff;
+}
+
+.cardBrand {
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.defaultBadge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(52, 211, 153, 0.18);
+  color: #34d399;
+}
+
+.cardNumber {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.cardItemBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.cardHolder {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cardExpiry {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.cardActions {
+  display: flex;
+  gap: 0.6rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cardActionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.45rem 0.95rem;
+  border-radius: 9px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cardActionBtn:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.cardDeleteBtn {
+  color: #f87171;
+}
+
+.cardDeleteBtn:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+/* --- Help centre --- */
+.helpCentreHero {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: linear-gradient(120deg, rgba(225, 0, 117, 0.12), rgba(126, 0, 243, 0.12));
+  border: 1px solid rgba(225, 0, 117, 0.2);
+  border-radius: 16px;
+  padding: 1.4rem 1.5rem;
+}
+
+.helpCentreHero svg {
+  color: #e10075;
+  flex-shrink: 0;
+}
+
+.helpCentreHero h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.2rem 0;
+}
+
+.helpCentreHero p {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0;
+}
+
+.accordionContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.accordionItem {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.accordionItem:hover {
+  border-color: rgba(255, 0, 127, 0.25);
+}
+
+.accordionTrigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 700;
+  font-family: inherit;
+  text-align: left;
+  padding: 1.05rem 1.3rem;
+  cursor: pointer;
+}
+
+.accordionChevron {
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.4);
+  transition: transform 0.25s;
+}
+
+.chevronRotated {
+  transform: rotate(90deg);
+  color: #ff007f;
+}
+
+.accordionPanel {
+  padding: 0 1.3rem 1.15rem 1.3rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 0.9rem;
+}
+
+.accordionPanel p {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.helpCta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 1.1rem 1.3rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  flex-wrap: wrap;
+}
+
+.helpCta svg {
+  color: #e10075;
+  flex-shrink: 0;
+}
+
+.helpCta .supportBtn {
+  margin-left: auto;
+}
+
+/* --- Tickets --- */
+.ticketsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.ticketCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 1.2rem 1.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.ticketHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ticketSubject {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.statusBadge {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+}
+
+.statusBadge.open,
+.statusBadge.pending {
+  background: rgba(250, 204, 21, 0.15);
+  color: #facc15;
+}
+
+.statusBadge.in-progress {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+}
+
+.statusBadge.closed,
+.statusBadge.resolved {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+.ticketMessage {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Admin reply shown on the user's ticket */
+.ticketReplyBox {
+  background: rgba(16, 185, 129, 0.07);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-left: 3px solid #10b981;
+  border-radius: 10px;
+  padding: 0.7rem 0.9rem;
+}
+
+.ticketReplyBox strong {
+  display: block;
+  color: #34d399;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 0.25rem;
+}
+
+.ticketReplyBox p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.45;
+}
+
+.ticketFooter {
+  display: flex;
+  gap: 1.25rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+  padding-top: 0.55rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* --- Contact --- */
+.contactHero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.75rem 1.5rem;
+}
+
+.contactHero .helpHeroIconWrap {
+  width: 44px;
+  height: 44px;
+}
+
+.contactHero h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+
+.contactHero p {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0;
+  max-width: 480px;
+  line-height: 1.5;
+}
+
+/* --- Guidelines --- */
+.guidelinesHero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  background: linear-gradient(120deg, rgba(225, 0, 117, 0.12), rgba(126, 0, 243, 0.12));
+  border: 1px solid rgba(225, 0, 117, 0.2);
+  border-radius: 16px;
+  padding: 1.75rem 1.5rem;
+}
+
+.guidelinesHero svg {
+  color: #e10075;
+}
+
+.guidelinesHero h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+
+.guidelinesHero p {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0;
+  max-width: 480px;
+}
+
+.guidelinesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.guidelineCard {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 1.3rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.guidelineNumber {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: #e10075;
+}
+
+.guidelineCard h4 {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+
+.guidelineCard p {
+  font-size: 0.83rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.guidelinesFooter {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 12px;
+  padding: 0.95rem 1.15rem;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+}
+
+.guidelinesFooter svg {
+  flex-shrink: 0;
+  color: #f87171;
+  margin-top: 1px;
+}
+
+/* --- Report segmented control --- */
+.segmentedControl {
+  display: flex;
+  gap: 0.5rem;
+  background: #181818;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.35rem;
+}
+
+.segmentBtn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: inherit;
+  padding: 0.55rem 1rem;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.segmentActive {
+  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%);
+  color: #ffffff;
+}
+
+/* --- Empty state --- */
+.emptyBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 2.75rem 1.5rem;
+  text-align: center;
+}
+
+.emptyBoxIcon {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.emptyBox p {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+/* ================= LIGHT THEME OVERRIDES ================= */
+.light .subPageTitle,
+.light .securityCardTitle,
+.light .profilePreviewText h3,
+.light .notifTitle,
+.light .ticketSubject,
+.light .helpCentreHero h3,
+.light .contactHero h3,
+.light .guidelinesHero h3,
+.light .guidelineCard h4 {
+  color: #1a1625;
+}
+
+.light .subPageDesc,
+.light .securityCardDesc,
+.light .profilePreviewText p,
+.light .notifDesc,
+.light .payIntro,
+.light .helpCentreHero p,
+.light .contactHero p,
+.light .guidelinesHero p,
+.light .guidelineCard p,
+.light .notifIntro,
+.light .helpCta,
+.light .ticketMessage,
+.light .ticketFooter,
+.light .formLabel,
+.light .activityMeta,
+.light .activityTime {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .backBtn {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #1a1625;
+}
+
+.light .backBtn:hover {
+  background: rgba(225, 0, 117, 0.06);
+}
+
+.light .profilePreview,
+.light .securityCard,
+.light .notifList,
+.light .notifIntro,
+.light .payForm,
+.light .accordionItem,
+.light .ticketCard,
+.light .contactHero,
+.light .guidelineCard,
+.light .emptyBox,
+.light .helpCta {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.light .securityIconBox {
+  background: rgba(225, 0, 117, 0.08);
+}
+
+.light .formInput,
+.light .formSelect,
+.light .formTextarea {
+  background: #f7f7f9;
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #1a1625;
+}
+
+.light .formInput::placeholder,
+.light .formTextarea::placeholder {
+  color: rgba(26, 22, 37, 0.3);
+}
+
+.light .formSelect {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231a1625' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+.light .statusAlert.success {
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.light .statusAlert.error {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.light .notifRow:not(:last-child) {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .activityRow {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .activityIconWrap {
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .activityDevice {
+  color: #1a1625;
+}
+
+.light .toggle {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.light .segmentedControl {
+  background: #f2f2f5;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .segmentBtn {
+  color: rgba(26, 22, 37, 0.55);
+}
+
+.light .accordionTrigger {
+  color: #1a1625;
+}
+
+.light .accordionPanel {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .accordionPanel p {
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .ticketFooter,
+.light .cardActions {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .ticketReplyBox {
+  background: rgba(16, 185, 129, 0.06);
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+.light .ticketReplyBox p {
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .emptyBoxIcon {
+  color: rgba(26, 22, 37, 0.25);
+}
+
+.light .emptyBox p {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .charCount {
+  color: rgba(26, 22, 37, 0.35);
+}
+
+.light .cardItem {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.light .cardActionBtn {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .cardActionBtn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.light .cardDeleteBtn {
+  color: #dc2626;
+}
+
+.light .cardDeleteBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.light .cardHolder,
+.light .cardNumber,
+.light .cardBrand {
+  color: #ffffff;
+}
+
+.light .guidelinesFooter {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+/* ================= RESPONSIVE SUB-PAGES ================= */
+@media (max-width: 768px) {
+  .subPageHeader {
+    margin-bottom: 1.25rem;
+  }
+
+  .subPageTitle {
+    font-size: 1.05rem !important;
+  }
+
+  .subPageDesc {
+    font-size: 0.72rem !important;
+  }
+
+  .backBtn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+
+  .profilePreview {
+    padding: 1rem;
+  }
+
+  .profileAvatarWrap {
+    width: 52px;
+    height: 52px;
+  }
+
+  .securityCard,
+  .payForm {
+    padding: 1.1rem;
+  }
+
+  .securityCardHeader {
+    flex-direction: column;
+  }
+
+  .notifRow {
+    padding: 0.9rem 1rem;
+  }
+
+  .notifIntro {
+    padding: 0.85rem 1rem;
+    align-items: flex-start;
+  }
+
+  .payHeaderRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .guidelinesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .helpCta .supportBtn {
+    margin-left: 0;
+  }
+
+  .cardItem {
+    padding: 1.1rem 1.15rem;
+  }
+
+  .cardItemTop,
+  .cardItemBottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .twoFaActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .twoFaActions .submitBtn,
+  .twoFaActions .cancelBtn {
+    align-self: stretch;
+    text-align: center;
+    justify-content: center;
+  }
+}
+

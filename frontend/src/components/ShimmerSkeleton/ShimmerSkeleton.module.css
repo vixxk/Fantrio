@@ -1,0 +1,47 @@
+.shimmerBlock {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--shimmer-bg, rgba(255, 255, 255, 0.07));
+  border-radius: inherit;
+}
+
+.shimmerBlock::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    var(--shimmer-highlight, rgba(255, 255, 255, 0.06)) 40%,
+    rgba(255, 255, 255, 0.12) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer 2s infinite;
+  content: '';
+}
+
+.shimmerBlock.light {
+  background-color: var(--shimmer-bg, #e6e6ec);
+}
+
+.shimmerBlock.light::after {
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.8) 40%,
+    rgba(255, 255, 255, 1) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}

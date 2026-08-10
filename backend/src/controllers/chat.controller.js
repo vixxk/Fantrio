@@ -1,6 +1,7 @@
 const Message = require('../models/Message');
 const Subscription = require('../models/Subscription');
 const User = require('../models/User');
+const CreatorProfile = require('../models/CreatorProfile');
 const walletService = require('../services/wallet.service');
 const awsService = require('../services/aws.service');
 const ApiError = require('../utils/apiError');
@@ -49,6 +50,8 @@ const formatMessageForUser = async (user, msg) => {
 };
 
 // Retrieve chat threads
+// Each conversation carries the peer user, their creator profile (rates/status),
+// the last message, and an unread count so the UI can render the sidebar directly.
 exports.getConversations = catchAsync(async (req, res, next) => {
   const conversations = await Message.aggregate([
     {
@@ -77,6 +80,49 @@ exports.getConversations = catchAsync(async (req, res, next) => {
     path: '_id',
     select: 'username displayName avatarUrl role',
     model: 'User'
+  });
+
+  // Unread message counts per peer (messages sent TO the current user, not opened yet)
+  const unread = await Message.aggregate([
+    { $match: { receiverId: req.user._id, isOpened: false } },
+    { $group: { _id: '$senderId', count: { $sum: 1 } } }
+  ]);
+  const unreadMap = {};
+  unread.forEach((u) => { unreadMap[String(u._id)] = u.count; });
+
+  // Creator profiles for peers (rates, verification badge, online status, location)
+  const peerIds = populated
+    .map((c) => (c._id && c._id._id ? c._id._id : c._id))
+    .filter(Boolean);
+  const profiles = await CreatorProfile.find({ userId: { $in: peerIds } }).lean();
+  const profileMap = {};
+  profiles.forEach((p) => { profileMap[String(p.userId)] = p; });
+
+  // The viewer's active subscription with each peer (so the UI can show the
+  // real plan + renewal date instead of placeholder data).
+  const activeSubs = await Subscription.find({
+    userId: req.user._id,
+    creatorId: { $in: peerIds },
+    // 'active' and 'expiring' both count as a live subscription the viewer
+    // still benefits from.
+    status: { $in: ['active', 'expiring'] },
+    expiryDate: { $gt: new Date() }
+  }).lean();
+  const subMap = {};
+  activeSubs.forEach((s) => { subMap[String(s.creatorId)] = s; });
+
+  populated.forEach((c) => {
+    const peerId = String(c._id && c._id._id ? c._id._id : c._id);
+    c.unreadCount = unreadMap[peerId] || 0;
+    const profile = profileMap[peerId] || null;
+    // Respect the creator's "Show Online Status" preference for presence dots
+    if (profile) {
+      profile.isOnline = profile.showOnlineStatus !== false && !!profile.isOnline;
+    }
+    c.profile = profile;
+    c.subscription = subMap[peerId]
+      ? { status: 'active', plan: subMap[peerId].plan || 'Premium', renewalDate: subMap[peerId].expiryDate || null }
+      : null;
   });
 
   res.status(200).json({

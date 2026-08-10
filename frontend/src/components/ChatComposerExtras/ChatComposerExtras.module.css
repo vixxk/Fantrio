@@ -1,0 +1,202 @@
+/* ==========================================================================
+   Chat Composer Extras — emoji picker popover
+   Dark theme by default, light via `.dark` inverse handled by parent pages.
+   ========================================================================== */
+
+.wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1rem;
+}
+
+.iconBtn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.iconBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.iconBtnActive {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+/* ============================== popover ============================== */
+.popover {
+  position: fixed;
+  z-index: 6000;
+  background: #16121f;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: min(400px, 55vh);
+  animation: popIn 0.18s ease;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.popoverHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.closeBtn {
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+/* =============================== body =============================== */
+.popoverBody {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.popoverBody::-webkit-scrollbar {
+  width: 6px;
+}
+
+.popoverBody::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 99px;
+}
+
+/* =============================== emoji ============================== */
+.emojiBody {
+  padding: 0.5rem 0.75rem 0.75rem;
+}
+
+.emojiGroup {
+  margin-bottom: 0.6rem;
+}
+
+.groupLabel {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 0.35rem;
+}
+
+.emojiGrid {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 2px;
+}
+
+.emojiCell {
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  padding: 0.28rem 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  line-height: 1;
+}
+
+.emojiCell:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.15);
+}
+
+/* ========================== light theme ========================== */
+.wrap.light .iconBtn {
+  color: rgba(26, 22, 37, 0.45);
+}
+
+.wrap.light .iconBtn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #1a1625;
+}
+
+.wrap.light .iconBtnActive {
+  background: rgba(0, 0, 0, 0.06);
+  color: #1a1625;
+}
+
+.popover.light {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 60px rgba(30, 10, 60, 0.18);
+}
+
+.popover.light .popoverHeader {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+.popover.light .title {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.popover.light .closeBtn {
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.popover.light .closeBtn:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: #1a1625;
+}
+
+.popover.light .popoverBody::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.popover.light .groupLabel {
+  color: rgba(26, 22, 37, 0.45);
+}
+
+.popover.light .emojiCell:hover {
+  background: rgba(0, 0, 0, 0.07);
+}

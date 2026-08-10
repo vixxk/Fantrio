@@ -1,48 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '../../../services/api';
 import { useApp } from '../../../context/AppContext';
 import { 
   LayoutGrid, ChevronRight, ArrowLeft, Ticket, Headphones, 
-  HelpCircle, UserPlus, Gift, Shield, ShieldAlert, Megaphone, 
-  Lightbulb, Info, CreditCard, FileText, Lock, Plus, ThumbsUp, Check, AlertTriangle, Send,
-  User, Wallet, Scale, Trophy
+  HelpCircle, Gift, Shield, ShieldAlert, Megaphone, 
+  Lightbulb, Info, CreditCard, FileText, Lock, Plus, ThumbsUp, Check, AlertTriangle,
+  User, Wallet, Scale, Trophy, Copy, UserPlus
 } from 'lucide-react';
 import styles from './MorePage.module.css';
 
-// FAQ data matching premium collapsible accordion
-const FAQ_DATA = [
-  {
-    q: "How do I buy Fantrio Coins?",
-    a: "You can purchase coins by clicking 'Buy Coins' in the sidebar or 'Add Coins' in your balance card. We support multiple packages with secure payments."
-  },
-  {
-    q: "How do I subscribe to a creator?",
-    a: "Visit any creator's profile page and click the 'Subscribe' button. Subscriptions are billed monthly using your Fantrio Coins."
-  },
-  {
-    q: "How do 1:1 calls work?",
-    a: "If a creator is online and has call availability enabled, you can request an audio or video call directly. Coins are deducted per minute based on the creator's set rate."
-  },
-  {
-    q: "Are my chat messages and calls private?",
-    a: "Yes, all messages and calls on Fantrio are encrypted and completely secure to protect your privacy."
-  },
-  {
-    q: "What is the coin conversion rate?",
-    a: "100 Fantrio Coins are equivalent to $1.00 USD. All prices on the platform are transparently displayed in coins and USD."
-  }
-];
-
 export const MorePage = () => {
-  const { darkMode, balance, addCoins, setActiveTab } = useApp();
+  const { darkMode, setActiveTab } = useApp();
   const [subView, setSubView] = useState(null); // 'tickets', 'contact', 'faq', 'referral', 'rewards', 'announcements', 'features', 'about', 'report-creator', 'report-content', 'transactions', 'terms', 'privacy'
 
   // Sub-view specific states
   const [tickets, setTickets] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
   const [features, setFeatures] = useState([]);
+  const [faqs, setFaqs] = useState([]);
+  const [rewards, setRewards] = useState([]);
   const [creators, setCreators] = useState([]);
-  const [transactions, setTransactions] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
 
   // Forms states
@@ -64,7 +42,8 @@ export const MorePage = () => {
   // Load data depending on active sub-view
   useEffect(() => {
     if (!subView) return;
-    clearStatus();
+    Promise.resolve().then(() => {
+      clearStatus();
 
     const fetchData = async () => {
       setLoading(true);
@@ -78,12 +57,18 @@ export const MorePage = () => {
         } else if (subView === 'features') {
           const res = await api.get('/more/features');
           if (res.status === 'success') setFeatures(res.features);
+        } else if (subView === 'faq') {
+          const res = await api.get('/settings/faqs');
+          if (res.status === 'success') setFaqs(res.faqs || []);
+        } else if (subView === 'rewards') {
+          const res = await api.get('/more/rewards');
+          if (res.status === 'success') setRewards(res.rewards || []);
         } else if (subView === 'report-creator') {
-          const res = await api.get('/creators');
+          const res = await api.get('/more/creators');
           if (res.status === 'success') setCreators(res.creators || []);
-        } else if (subView === 'transactions') {
-          const res = await api.get('/wallet/transactions');
-          if (res.status === 'success') setTransactions(res.transactions);
+        } else if (subView === 'report-content') {
+          const res = await api.get('/posts?limit=100');
+          if (res.status === 'success') setPosts(res.posts || []);
         } else if (subView === 'referral') {
           const res = await api.get('/more/referrals/stats');
           if (res.status === 'success') setReferralStats(res);
@@ -96,7 +81,8 @@ export const MorePage = () => {
       }
     };
 
-    fetchData();
+      fetchData();
+    });
   }, [subView]);
 
   // Form Submissions
@@ -186,20 +172,9 @@ export const MorePage = () => {
     try {
       const res = await api.post(`/more/features/${id}/vote`);
       if (res.status === 'success') {
-        // Optimistically update list
-        setFeatures(prev => prev.map(f => {
-          if (f._id === id) {
-            const hasVotedBefore = f.votes.includes(res.userId || ''); // approximate check or reload
-            const newVotes = res.hasVoted 
-              ? [...f.votes, 'temp-user-id'] 
-              : f.votes.filter(v => v !== 'temp-user-id' && v !== 'userId'); // actually reloading is safer
-            return { ...f, votesCount: res.votesCount };
-          }
-          return f;
-        }));
-        // Reload list to be 100% accurate
-        const fresh = await api.get('/more/features');
-        if (fresh.status === 'success') setFeatures(fresh.features);
+        setFeatures(prev => prev.map(f => (
+          f._id === id ? { ...f, votesCount: res.votesCount, hasVoted: res.hasVoted } : f
+        )));
       }
     } catch (err) {
       console.error('Error voting:', err);
@@ -223,6 +198,19 @@ export const MorePage = () => {
       setStatusMsg({ type: 'error', text: err.message || 'Failed to claim referral.' });
     } finally {
       setLoading(false);
+    }
+  };
+
+
+
+  const handleCopyReferral = async () => {
+    if (!referralStats.referralCode) return;
+    try {
+      await navigator.clipboard.writeText(referralStats.referralCode);
+      setStatusMsg({ type: 'success', text: 'Referral code copied to clipboard!' });
+    } catch (err) {
+      console.error('Failed to copy referral code:', err);
+      setStatusMsg({ type: 'error', text: 'Failed to copy referral code.' });
     }
   };
 
@@ -268,9 +256,15 @@ export const MorePage = () => {
                   <div key={t._id} className={styles.ticketCard}>
                     <div className={styles.ticketHeader}>
                       <span className={styles.ticketSubject}>{t.subject}</span>
-                      <span className={`${styles.statusBadge} ${styles[t.status]}`}>{t.status}</span>
+                      <span className={`${styles.statusBadge} ${styles[t.status] || styles.open}`}>{t.status}</span>
                     </div>
                     <p className={styles.ticketMessage}>{t.message}</p>
+                    {t.reply ? (
+                      <div className={styles.ticketReplyBox}>
+                        <strong>Support Response:</strong>
+                        <p>{t.reply}</p>
+                      </div>
+                    ) : null}
                     <div className={styles.ticketFooter}>
                       <span>Category: {t.category}</span>
                       <span>Created: {new Date(t.createdAt).toLocaleDateString()}</span>
@@ -333,27 +327,34 @@ export const MorePage = () => {
         return (
           <div className={styles.subPageContainer}>
             <h2 className={styles.subPageTitle}>FAQ / Help Center</h2>
-            <div className={styles.accordionContainer}>
-              {FAQ_DATA.map((faq, idx) => (
-                <div key={idx} className={styles.accordionItem}>
-                  <button 
-                    className={styles.accordionTrigger}
-                    onClick={() => setExpandedFaq(expandedFaq === idx ? null : idx)}
-                  >
-                    <span>{faq.q}</span>
-                    <ChevronRight 
-                      size={18} 
-                      className={`${styles.accordionChevron} ${expandedFaq === idx ? styles.chevronRotated : ''}`} 
-                    />
-                  </button>
-                  {expandedFaq === idx && (
-                    <div className={styles.accordionPanel}>
-                      <p>{faq.a}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+            {faqs.length === 0 ? (
+              <div className={styles.emptyBox}>
+                <HelpCircle size={48} className={styles.emptyBoxIcon} />
+                <p>No help articles published yet.</p>
+              </div>
+            ) : (
+              <div className={styles.accordionContainer}>
+                {faqs.map((faq, idx) => (
+                  <div key={faq._id || idx} className={styles.accordionItem}>
+                    <button 
+                      className={styles.accordionTrigger}
+                      onClick={() => setExpandedFaq(expandedFaq === idx ? null : idx)}
+                    >
+                      <span>{faq.question}</span>
+                      <ChevronRight 
+                        size={18} 
+                        className={`${styles.accordionChevron} ${expandedFaq === idx ? styles.chevronRotated : ''}`} 
+                      />
+                    </button>
+                    {expandedFaq === idx && (
+                      <div className={styles.accordionPanel}>
+                        <p>{faq.answer}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         );
 
@@ -365,6 +366,9 @@ export const MorePage = () => {
               <div className={styles.referralPromoCard}>
                 <h3>Your Referral Code</h3>
                 <div className={styles.referralCodeBox}>{referralStats.referralCode || 'LOAD...'}</div>
+                <button type="button" className={styles.copyBtn} onClick={handleCopyReferral}>
+                  <Copy size={16} /> Copy Code
+                </button>
                 <p>Share this code with your friends! They get 50 bonus coins on sign up, and you get 100 bonus coins.</p>
                 <div className={styles.referralStatCount}>
                   <span>Friends Referred:</span> <strong>{referralStats.referredCount}</strong>
@@ -403,59 +407,40 @@ export const MorePage = () => {
           <div className={styles.subPageContainer}>
             <h2 className={styles.subPageTitle}>Rewards Program & Milestones</h2>
             <p className={styles.sectionSubtitle}>Unlock rewards by interacting with creators and completing tasks.</p>
-            <div className={styles.rewardsList}>
-              <div className={styles.rewardItem}>
-                <div className={styles.rewardIconCol}>
-                  <div className={styles.rewardIconBox}>
-                    <CreditCard size={20} className={styles.rewardIcon} />
-                  </div>
-                </div>
-                <div className={styles.rewardInfoCol}>
-                  <h4>First Wallet Recharge</h4>
-                  <p>Add mock coins to your wallet balance.</p>
-                  <div className={styles.rewardStatusRow}>
-                    <span className={`${styles.rewardStatusBadge} ${balance > 0 ? styles.claimed : styles.unclaimed}`}>
-                      {balance > 0 ? 'Completed' : 'Pending'}
-                    </span>
-                    <span className={styles.rewardRewardAmount}>+20 Coins</span>
-                  </div>
-                </div>
+            {rewards.length === 0 ? (
+              <div className={styles.emptyBox}>
+                <Gift size={48} className={styles.emptyBoxIcon} />
+                <p>No rewards available right now.</p>
               </div>
-
-              <div className={styles.rewardItem}>
-                <div className={styles.rewardIconCol}>
-                  <div className={styles.rewardIconBox}>
-                    <UserPlus size={20} className={styles.rewardIcon} />
+            ) : (
+              <div className={styles.rewardsList}>
+                {rewards.map(r => (
+                  <div key={r.type} className={styles.rewardItem}>
+                    <div className={styles.rewardIconCol}>
+                      <div className={styles.rewardIconBox}>
+                        {r.icon === 'user' ? (
+                          <UserPlus size={20} className={styles.rewardIcon} />
+                        ) : r.icon === 'call' ? (
+                          <Headphones size={20} className={styles.rewardIcon} />
+                        ) : (
+                          <CreditCard size={20} className={styles.rewardIcon} />
+                        )}
+                      </div>
+                    </div>
+                    <div className={styles.rewardInfoCol}>
+                      <h4>{r.title}</h4>
+                      <p>{r.description}</p>
+                      <div className={styles.rewardStatusRow}>
+                        <span className={`${styles.rewardStatusBadge} ${r.completed ? styles.claimed : styles.unclaimed}`}>
+                          {r.completed ? 'Completed' : 'Pending'}
+                        </span>
+                        <span className={styles.rewardRewardAmount}>+{r.coins} Coins</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className={styles.rewardInfoCol}>
-                  <h4>Enter Friend's Referral Code</h4>
-                  <p>Support your friend and claim startup bonus.</p>
-                  <div className={styles.rewardStatusRow}>
-                    <span className={`${styles.rewardStatusBadge} ${referralStats.claimed ? styles.claimed : styles.unclaimed}`}>
-                      {referralStats.claimed ? 'Completed' : 'Pending'}
-                    </span>
-                    <span className={styles.rewardRewardAmount}>+50 Coins</span>
-                  </div>
-                </div>
+                ))}
               </div>
-
-              <div className={styles.rewardItem}>
-                <div className={styles.rewardIconCol}>
-                  <div className={styles.rewardIconBox}>
-                    <Headphones size={20} className={styles.rewardIcon} />
-                  </div>
-                </div>
-                <div className={styles.rewardInfoCol}>
-                  <h4>Make 1:1 Audio Call</h4>
-                  <p>Initiate a call with any online creator.</p>
-                  <div className={styles.rewardStatusRow}>
-                    <span className={`${styles.rewardStatusBadge} ${styles.unclaimed}`}>Pending</span>
-                    <span className={styles.rewardRewardAmount}>+30 Coins</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         );
 
@@ -526,7 +511,7 @@ export const MorePage = () => {
             ) : (
               <div className={styles.featuresList}>
                 {features.map(f => {
-                  const hasVoted = f.votes && f.votes.includes(api.userId || 'current-user-placeholder');
+                  const hasVoted = !!f.hasVoted;
                   return (
                     <div key={f._id} className={styles.featureCard}>
                       <div className={styles.featureVoteCol}>
@@ -535,7 +520,7 @@ export const MorePage = () => {
                           onClick={() => handleVoteFeature(f._id)}
                         >
                           <ThumbsUp size={16} />
-                          <span>{f.votesCount || (f.votes ? f.votes.length : 0)}</span>
+                          <span>{f.votesCount}</span>
                         </button>
                       </div>
                       <div className={styles.featureInfoCol}>
@@ -603,7 +588,7 @@ export const MorePage = () => {
                 >
                   <option value="">-- Choose Creator --</option>
                   {creators.map(c => (
-                    <option key={c._id} value={c.userId?._id || c._id}>
+                    <option key={c.userId} value={c.userId}>
                       {c.displayName} (@{c.username})
                     </option>
                   ))}
@@ -646,15 +631,26 @@ export const MorePage = () => {
             <h2 className={styles.subPageTitle}>Report Inappropriate Content</h2>
             <form onSubmit={handleCreateReportContent} className={styles.formGrid}>
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Post ID / URL Reference</label>
-                <input 
-                  type="text" 
-                  className={styles.formInput} 
-                  placeholder="Enter the post ID or describe the location of content"
-                  required
-                  value={reportContentForm.postId}
-                  onChange={e => setReportContentForm({ ...reportContentForm, postId: e.target.value })}
-                />
+                <label className={styles.formLabel}>Select Post</label>
+                {posts.length === 0 ? (
+                  <p className={styles.inlineHint}>No posts available to report right now.</p>
+                ) : (
+                  <select 
+                    className={styles.formSelect} 
+                    required
+                    value={reportContentForm.postId}
+                    onChange={e => setReportContentForm({ ...reportContentForm, postId: e.target.value })}
+                  >
+                    <option value="">-- Choose Post --</option>
+                    {posts.map(p => (
+                      <option key={p._id} value={p._id}>
+                        {String(p.content || 'Untitled post').slice(0, 80)}
+                        {p.content && p.content.length > 80 ? '…' : ''}
+                        {p.creatorId?.displayName ? ` — ${p.creatorId.displayName}` : ''}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>Violation Reason</label>
@@ -684,46 +680,6 @@ export const MorePage = () => {
                 Submit Content Report
               </button>
             </form>
-          </div>
-        );
-
-      case 'transactions':
-        return (
-          <div className={styles.subPageContainer}>
-            <h2 className={styles.subPageTitle}>Transaction History</h2>
-            {transactions.length === 0 ? (
-              <div className={styles.emptyBox}>
-                <CreditCard size={48} className={styles.emptyBoxIcon} />
-                <p>No coin transactions logged on your wallet yet.</p>
-              </div>
-            ) : (
-              <div className={styles.tableWrapper}>
-                <table className={styles.transactionTable}>
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>Type</th>
-                      <th>Method/Gateway</th>
-                      <th>Amount</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {transactions.map(t => (
-                      <tr key={t._id}>
-                        <td>{new Date(t.createdAt).toLocaleDateString()}</td>
-                        <td><span className={`${styles.typeBadge} ${styles[t.type]}`}>{t.type}</span></td>
-                        <td>{t.gateway}</td>
-                        <td className={t.type === 'deposit' ? styles.positiveAmount : styles.negativeAmount}>
-                          {t.type === 'deposit' ? '+' : '-'}{t.amountCoins} Coins
-                        </td>
-                        <td><span className={styles.statusCompleted}>{t.status}</span></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
           </div>
         );
 
@@ -966,7 +922,7 @@ export const MorePage = () => {
                     <h3>Billing & Transactions</h3>
                   </div>
                   <div className={styles.sectionCards}>
-                    <button className={styles.menuCard} onClick={() => setSubView('transactions')}>
+                    <button className={styles.menuCard} onClick={() => setActiveTab('Transaction History')}>
                       <CreditCard size={20} className={styles.cardIcon} />
                       <div className={styles.cardText}>
                         <span className={styles.cardTitle}>Transaction History</span>

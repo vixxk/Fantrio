@@ -33,6 +33,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: ''
     },
+    bio: {
+      type: String,
+      default: '',
+      maxlength: [500, 'Bio cannot exceed 500 characters']
+    },
     role: {
       type: String,
       enum: ['user', 'creator', 'admin'],
@@ -53,9 +58,51 @@ const userSchema = new mongoose.Schema(
     lastLogin: {
       type: Date
     },
+    twoFactorEnabled: {
+      type: Boolean,
+      default: false
+    },
+    twoFactorOtp: {
+      code: { type: String },
+      expiresAt: { type: Date }
+    },
+    notificationPreferences: {
+      type: {
+        newMessages: { type: Boolean, default: true },
+        newSubscribers: { type: Boolean, default: true },
+        tipsAndPayments: { type: Boolean, default: true },
+        liveStreamReminders: { type: Boolean, default: true },
+        productPurchases: { type: Boolean, default: true },
+        announcements: { type: Boolean, default: true }
+      },
+      default: () => ({
+        newMessages: true,
+        newSubscribers: true,
+        tipsAndPayments: true,
+        liveStreamReminders: true,
+        productPurchases: true,
+        announcements: true
+      })
+    },
+    loginActivity: {
+      type: [
+        {
+          device: { type: String, default: '' },
+          ip: { type: String, default: '' },
+          location: { type: String, default: '' },
+          loggedInAt: { type: Date, default: Date.now }
+        }
+      ],
+      default: []
+    },
     passwordResetToken: { type: String },
     passwordResetExpires: { type: Date },
     following: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: 'User',
+      default: []
+    },
+    blockedUsers: {
       type: [mongoose.Schema.Types.ObjectId],
       ref: 'User',
       default: []

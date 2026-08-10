@@ -1,6 +1,4 @@
-import React from 'react';
 import { Phone, Video } from 'lucide-react';
-import { callRates } from './mockData';
 import styles from './ProfilePage.module.css';
 
 const rateIcons = {
@@ -8,16 +6,17 @@ const rateIcons = {
   'Video Call': Video,
 };
 
-export const CallRates = ({ isDark }) => {
+export const CallRates = ({ isDark, callRates }) => {
+  const rates = callRates || { title: 'Call Rates', subtitle: '', rates: [] };
   return (
     <div className={`${styles.callRatesCard} ${!isDark ? styles.light : ''}`}>
       <div className={styles.callRatesHeader}>
-        <h3 className={styles.sectionTitle}>{callRates.title}</h3>
-        <p className={styles.sectionSubtitle}>{callRates.subtitle}</p>
+        <h3 className={styles.sectionTitle}>{rates.title}</h3>
+        <p className={styles.sectionSubtitle}>{rates.subtitle}</p>
       </div>
       <div className={styles.callRatesGrid}>
-        {callRates.rates.map((rate, index) => {
-          const Icon = rateIcons[rate.type];
+        {rates.rates.map((rate, index) => {
+          const Icon = rateIcons[rate.type] || Phone;
           return (
             <div key={index} className={styles.callRateCard}>
               <div className={styles.callRateIcon} style={{ background: `${rate.color}15` }}>

@@ -1,62 +1,113 @@
 import { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../../context/AppContext';
-import { ChevronLeft, MoreVertical, Send, Smile, Image as ImageIcon, Star, DollarSign, Gift, Ban, Lock, Check } from 'lucide-react';
+import { api } from '../../../services/api';
+import { getSocket, joinSocketRoom } from '../../../services/socket';
+import ShimmerSkeleton from '../../../components/ShimmerSkeleton/ShimmerSkeleton';
+import { ChevronLeft, MoreVertical, Send, Image as ImageIcon, Star, DollarSign, Gift, Ban, Lock, Check, Trash2 } from 'lucide-react';
 import styles from './CreatorMobileChatPage.module.css';
+import { ChatComposerExtras } from '../../../components/ChatComposerExtras/ChatComposerExtras';
+import { insertEmojiAtCaret } from '../../../components/ChatComposerExtras/chatComposerUtils';
+import { ConfirmDeleteDialog } from '../../../components/ConfirmDeleteDialog/ConfirmDeleteDialog';
+import { useConfirmDelete } from '../../../hooks/useConfirmDelete';
+import { useToast } from '../../../components/Toast/Toast';
+import { useAppDialog } from '../../../components/AppDialog/AppDialog';
 
-const FANS = {
-  fan1: {
-    displayName: 'Michael Chen',
-    username: 'mikechen',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
-    isVerified: false,
-    isOnline: true,
-    isTopFan: true,
-  },
-  fan2: {
-    displayName: 'Sarah Williams',
-    username: 'sarahw',
-    avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80',
-    isVerified: false,
-    isOnline: false,
-    isTopFan: false,
-  },
-  fan3: {
-    displayName: 'Alex Thompson',
-    username: 'alext',
-    avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80',
-    isVerified: false,
-    isOnline: true,
-    isTopFan: true,
-  },
+const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80';
+
+const formatTime = (iso) => {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const diff = Date.now() - d.getTime();
+  if (diff < 60000) return 'Just now';
+  if (diff < 3600000) return `${Math.floor(diff / 60000)}m`;
+  if (diff < 86400000) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  if (diff < 172800000) return 'Yesterday';
+  return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
 };
 
-const MESSAGES = [
-  { id: 'm1', sender: 'fan', text: 'Hey! Love your content 🔥', time: '10:15 AM' },
-  { id: 'm2', sender: 'creator', text: 'Thank you so much! 🥰', time: '10:16 AM' },
-  { id: 'm3', sender: 'fan', text: 'When is your next live stream?', time: '10:17 AM' },
-  { id: 'm4', sender: 'creator', text: 'Planning one for this weekend!', time: '10:18 AM' },
-  { id: 'm5', sender: 'creator', isPaywall: true, isLocked: true, coinPrice: 50, title: 'You sent an exclusive photo', mediaType: 'Exclusive Photo', textSub: 'Locked — fan needs to pay', previewUrl: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=400&q=80', time: '10:19 AM' },
-  { id: 'm6', sender: 'fan', text: 'Can\'t wait! I\'ll be there', time: '10:20 AM' },
-  { id: 'm7', sender: 'creator', text: 'Amazing, I\'ll send you a reminder', time: '10:21 AM' },
-  { id: 'm8', sender: 'creator', isPaywall: true, isLocked: false, coinPrice: 30, title: 'You sent a premium video', mediaType: 'Premium Video', textSub: 'Fan has unlocked this', previewUrl: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=400&q=80', time: '10:22 AM' },
-  { id: 'm9', sender: 'fan', text: 'Also, I sent a tip your way 💰', time: '10:23 AM' },
-  { id: 'm10', sender: 'creator', text: 'You\'re the best! 🙏💕', time: '10:24 AM' },
-  { id: 'm11', sender: 'fan', text: 'Keep doing what you do! ✨', time: '10:25 AM' },
-];
+const mapMessage = (m, currentUserId) => {
+  const isCreator = String(m.senderId) === String(currentUserId);
+  const mediaType = m.mediaType || 'media';
+  return {
+    id: String(m._id),
+    sender: isCreator ? 'creator' : 'fan',
+    text: m.content || '',
+    time: formatTime(m.createdAt),
+    isPaywall: !!m.isPaywall,
+    isLocked: !!m.isLocked,
+    coinPrice: m.coinPrice || 0,
+    mediaType,
+    title: mediaType === 'image' ? 'Exclusive Photo' : mediaType === 'video' ? 'Premium Video' : 'Exclusive Media',
+    textSub: m.isPaywall ? (isCreator ? 'Locked — fan needs to pay' : 'Locked — pay to view') : '',
+    previewUrl: m.mediaUrl || '',
+    createdAt: m.createdAt
+  };
+};
 
 export const CreatorMobileChatPage = () => {
-  const { darkMode, currentPath, navigateTo } = useApp();
+  const { darkMode, currentPath, navigateTo, user } = useApp();
+  const { toast } = useToast();
+  const { prompt } = useAppDialog();
   const [inputText, setInputText] = useState('');
   const [showMenu, setShowMenu] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [fan, setFan] = useState(null);
+  const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null);
   const menuRef = useRef(null);
+  const inputRef = useRef(null);
+  const mediaInputRef = useRef(null);
 
   const fanId = currentPath.split('/').filter(Boolean).pop();
-  const fan = FANS[fanId] || FANS.fan1;
+  const currentUserId = user?.id || null;
+
+  // Favorite fans (persisted locally, same store as the messages list page)
+  const [favoriteIds, setFavoriteIds] = useState(() => {
+    try {
+      return new Set(JSON.parse(localStorage.getItem('favoriteFans') || '[]'));
+    } catch {
+      return new Set();
+    }
+  });
+  const isFavorite = fanId ? favoriteIds.has(fanId) : false;
+
+  const toggleFavorite = () => {
+    if (!fanId) return;
+    setFavoriteIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(fanId)) next.delete(fanId);
+      else next.add(fanId);
+      try {
+        localStorage.setItem('favoriteFans', JSON.stringify([...next]));
+      } catch (err) {
+        console.error('Failed to persist favorites:', err);
+      }
+      return next;
+    });
+  };
+
+  // Delete conversation — shared confirm dialog state machine
+  const {
+    target: deleteChatTarget,
+    open: openDeleteChat,
+    close: closeDeleteChat,
+    confirm: confirmDeleteChat,
+    deleting: deletingChat,
+  } = useConfirmDelete({
+    onConfirm: () => api.delete(`/chat/conversation/${fanId}`),
+    successMessage: 'Conversation deleted',
+    errorMessage: 'Failed to delete conversation. Please try again.',
+    onSuccess: () => navigateTo('/creators/messages'),
+  });
+
+  const requestDeleteChat = () => {
+    setShowMenu(false);
+    openDeleteChat({ fanId });
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
-  }, []);
+  }, [messages]);
 
   useEffect(() => {
     if (!showMenu) return;
@@ -69,14 +120,200 @@ export const CreatorMobileChatPage = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showMenu]);
 
-  const handleSend = (e) => {
+  // Load fan info + messages from the real chat API
+  useEffect(() => {
+    if (!fanId) return;
+    let cancelled = false;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const [convRes, msgRes] = await Promise.all([
+          api.get('/chat/conversations'),
+          api.get(`/chat/messages/${fanId}`)
+        ]);
+        if (cancelled) return;
+        const conv = (convRes.conversations || []).find(
+          (c) => String(c._id && c._id._id ? c._id._id : c._id) === fanId
+        );
+        if (conv) {
+          const profile = conv.profile || {};
+          setFan({
+            displayName: conv._id.displayName || conv._id.username || 'Fan',
+            username: conv._id.username || '',
+            avatarUrl: conv._id.avatarUrl || DEFAULT_AVATAR,
+            isVerified: !!profile.isVerifiedBadge,
+            isOnline: !!profile.isOnline,
+            isTopFan: false
+          });
+        }
+        setMessages((msgRes.messages || []).map((m) => mapMessage(m, currentUserId)));
+      } catch (err) {
+        console.error('Failed to load chat:', err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    load();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fanId]);
+
+  // Real-time delivery via Socket.io
+  useEffect(() => {
+    if (!currentUserId || !fanId) return;
+    let socket = null;
+    try {
+      socket = getSocket();
+      joinSocketRoom(currentUserId);
+      const onNewMessage = (msg) => {
+        const otherId = String(msg.senderId) === String(currentUserId)
+          ? String(msg.receiverId)
+          : String(msg.senderId);
+        if (otherId === fanId) {
+          setMessages((prev) => [...prev, mapMessage(msg, currentUserId)]);
+        }
+      };
+      socket.on('new_message', onNewMessage);
+      return () => { socket.off('new_message', onNewMessage); };
+    } catch (err) {
+      console.error('Socket init failed:', err);
+    }
+  }, [fanId, currentUserId]);
+
+  const handleSend = async (e) => {
     e.preventDefault();
-    if (!inputText.trim()) return;
-    setInputText('');
+    if (!inputText.trim() || !fanId) return;
+    const content = inputText.trim();
+    try {
+      const res = await api.post('/chat/message', { receiverId: fanId, content });
+      if (res.status === 'success' && res.message) {
+        setMessages((prev) => [...prev, mapMessage(res.message, currentUserId)]);
+      }
+      setInputText('');
+    } catch (err) {
+      console.error('Failed to send message:', err);
+      toast.error('Failed to send message. Please try again.');
+    }
   };
 
   const handleBack = () => {
     navigateTo('/creators/messages');
+  };
+
+  // Upload a picked image to S3 (via presigned URL) and send it as a media message
+  const handleSendImage = async (file) => {
+    if (!file || !fanId) return;
+    const fileType = file.type || 'image/jpeg';
+    const mediaType = fileType.startsWith('video/') ? 'video' : 'image';
+    try {
+      const res = await api.post('/posts/upload-url', {
+        fileName: (file.name || `chat-image-${Date.now()}.jpg`).replace(/[^a-zA-Z0-9._-]/g, '_'),
+        fileType
+      });
+      if (res.status !== 'success') {
+        toast.error('Failed to get upload URL.');
+        return;
+      }
+      const putRes = await fetch(res.uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': fileType },
+        body: file
+      });
+      if (!putRes.ok) {
+        toast.error('Upload to storage failed.');
+        return;
+      }
+      const msgRes = await api.post('/chat/message', {
+        receiverId: fanId,
+        content: '',
+        mediaUrl: res.fileUrl,
+        mediaType
+      });
+      if (msgRes.status === 'success' && msgRes.message) {
+        setMessages((prev) => [...prev, mapMessage(msgRes.message, currentUserId)]);
+      }
+    } catch (err) {
+      console.error('Failed to send image:', err);
+      toast.error('Failed to send image. Please try again.');
+    }
+  };
+
+  // Insert a picked emoji at the caret position of the chat input
+  const handlePickEmoji = (emoji) => {
+    setInputText((prev) => insertEmojiAtCaret(prev, emoji, inputRef.current));
+  };
+
+  const handleViewProfile = () => {
+    setShowMenu(false);
+    navigateTo('/creators/subscribers');
+  };
+
+  const handleSendTip = async () => {
+    setShowMenu(false);
+    const amount = await prompt({
+      title: 'Send a Tip',
+      message: `Send a coin tip to ${fan?.displayName || 'this fan'}.`,
+      placeholder: 'Tip amount (coins)',
+      initialValue: '10',
+      confirmLabel: 'Send Tip'
+    });
+    const parsed = Math.floor(Number(amount));
+    if (!amount || Number.isNaN(parsed) || parsed <= 0) return;
+    try {
+      await api.post(`/monetization/tip/${fanId}`, { coins: parsed });
+      const text = `Sent ${parsed} coin${parsed === 1 ? '' : 's'} tip to ${fan?.displayName || 'fan'}`;
+      setMessages((prev) => [...prev, mapMessage({ _id: `tip-${Date.now()}`, content: `💸 ${text}`, senderId: currentUserId, receiverId: fanId, createdAt: new Date().toISOString() }, currentUserId)]);
+    } catch (err) {
+      console.error('Failed to send tip:', err);
+      toast.error('Failed to send tip. Please try again.');
+    }
+  };
+
+  const handleSendPpv = async () => {
+    setShowMenu(false);
+    const price = await prompt({
+      title: 'PPV Offer',
+      message: 'Set the price fans must pay to unlock this media.',
+      placeholder: 'Price (coins)',
+      initialValue: '10',
+      confirmLabel: 'Send Offer'
+    });
+    const parsed = Math.floor(Number(price));
+    if (!price || Number.isNaN(parsed) || parsed <= 0) return;
+    try {
+      const res = await api.post('/chat/message', {
+        receiverId: fanId,
+        content: 'PPV offer — pay to unlock',
+        isPaywall: true,
+        coinPrice: parsed,
+        mediaType: 'media'
+      });
+      if (res.status === 'success' && res.message) {
+        setMessages((prev) => [...prev, mapMessage(res.message, currentUserId)]);
+      }
+    } catch (err) {
+      console.error('Failed to send PPV offer:', err);
+      toast.error('Failed to send PPV offer. Please try again.');
+    }
+  };
+
+  // Block fan — shared confirm dialog state machine
+  const {
+    target: blockTarget,
+    open: openBlock,
+    close: closeBlock,
+    confirm: confirmBlockUser,
+    deleting: blocking,
+  } = useConfirmDelete({
+    onConfirm: () => api.post(`/block/${fanId}`),
+    successMessage: () => `${fan?.displayName || 'User'} blocked`,
+    errorMessage: 'Failed to block user. Please try again.',
+    onSuccess: () => navigateTo('/creators/messages'),
+  });
+
+  const handleBlockUser = () => {
+    setShowMenu(false);
+    openBlock({ fanId });
   };
 
   return (
@@ -88,35 +325,47 @@ export const CreatorMobileChatPage = () => {
 
         <div className={styles.userBlock}>
           <div className={styles.avatarWrap}>
-            <img src={fan.avatarUrl} alt={fan.displayName} className={styles.avatar} />
-            {fan.isOnline && <span className={styles.onlineDot} />}
+            <img src={fan?.avatarUrl || DEFAULT_AVATAR} alt={fan?.displayName || 'Fan'} className={styles.avatar} />
+            {fan?.isOnline && <span className={styles.onlineDot} />}
           </div>
           <div className={styles.nameBlock}>
             <div className={styles.displayName}>
-              {fan.displayName}
-              {fan.isTopFan && <Star size={12} fill="#eab308" color="#eab308" />}
+              {fan?.displayName || 'Fan'}
+              {fan?.isTopFan && <Star size={12} fill="#eab308" color="#eab308" />}
             </div>
-            <span className={styles.status}>{fan.isOnline ? 'Online' : 'Offline'}</span>
+            <span className={styles.status}>{fan?.isOnline ? 'Online' : 'Offline'}</span>
           </div>
         </div>
 
         <div className={styles.actions}>
+          <button
+            className={`${styles.actionBtn} ${isFavorite ? styles.actionActive : ''}`}
+            onClick={toggleFavorite}
+            type="button"
+            title={isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+            aria-label="Toggle favorite"
+          >
+            <Star size={20} fill={isFavorite ? 'currentColor' : 'none'} />
+          </button>
+          <button className={styles.actionBtn} onClick={requestDeleteChat} type="button" title="Delete Conversation" aria-label="Delete conversation">
+            <Trash2 size={20} />
+          </button>
           <div className={styles.menuWrap} ref={menuRef}>
             <button className={styles.actionBtn} onClick={() => setShowMenu(!showMenu)} type="button">
               <MoreVertical size={20} />
             </button>
             {showMenu && (
               <div className={styles.dropdown}>
-                <button className={styles.dropdownItem} type="button">
+                <button className={styles.dropdownItem} type="button" onClick={handleViewProfile}>
                   <Star size={14} /> View Profile
                 </button>
-                <button className={styles.dropdownItem} type="button">
+                <button className={styles.dropdownItem} type="button" onClick={handleSendTip}>
                   <DollarSign size={14} /> Send Tip
                 </button>
-                <button className={styles.dropdownItem} type="button">
+                <button className={styles.dropdownItem} type="button" onClick={handleSendPpv}>
                   <Gift size={14} /> PPV Offer
                 </button>
-                <button className={`${styles.dropdownItem} ${styles.dangerItem}`} type="button">
+                <button className={`${styles.dropdownItem} ${styles.dangerItem}`} type="button" onClick={handleBlockUser}>
                   <Ban size={14} /> Block
                 </button>
               </div>
@@ -130,69 +379,153 @@ export const CreatorMobileChatPage = () => {
           <span>Today</span>
         </div>
 
-        {MESSAGES.map((msg) => {
-          const isCreator = msg.sender === 'creator';
-          return (
-            <div key={msg.id} className={`${styles.msgRow} ${isCreator ? styles.msgRight : styles.msgLeft}`}>
-              {!isCreator && (
-                <img src={fan.avatarUrl} alt="" className={styles.msgAvatar} />
-              )}
-              <div className={styles.msgContent}>
-                {msg.isPaywall ? (
-                  <div className={styles.paywall}>
-                    <div className={styles.paywallPreview}>
-                      <img src={msg.previewUrl} alt="" className={styles.paywallImg} />
-                      {msg.isLocked && (
-                        <div className={styles.lockOverlay}>
-                          <Lock size={16} />
+        {loading && messages.length === 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1rem 0' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
+              <ShimmerSkeleton variant="avatar" width="36px" height="36px" />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginTop: '0.25rem' }}>
+                <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '12px', borderBottomLeftRadius: '4px', padding: '0.6rem 0.9rem' }}>
+                  <ShimmerSkeleton variant="text" width="70%" height="11px" />
+                  <ShimmerSkeleton variant="text" width="45%" height="11px" marginTop="0.35rem" />
+                </div>
+                <ShimmerSkeleton variant="text" width="25%" height="8px" marginLeft="0.5rem" />
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start', justifyContent: 'flex-end' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'flex-end', marginTop: '0.25rem' }}>
+                <div style={{ background: 'linear-gradient(135deg, rgba(225,0,117,0.35), rgba(155,81,224,0.35))', borderRadius: '12px', borderBottomRightRadius: '4px', padding: '0.6rem 0.9rem' }}>
+                  <ShimmerSkeleton variant="text" width="60%" height="11px" />
+                  <ShimmerSkeleton variant="text" width="35%" height="11px" marginTop="0.35rem" />
+                </div>
+                <ShimmerSkeleton variant="text" width="20%" height="8px" marginRight="0.5rem" />
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
+              <ShimmerSkeleton variant="avatar" width="36px" height="36px" />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginTop: '0.25rem' }}>
+                <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '12px', borderBottomLeftRadius: '4px', padding: '0.6rem 0.9rem' }}>
+                  <ShimmerSkeleton variant="text" width="55%" height="11px" />
+                </div>
+                <ShimmerSkeleton variant="text" width="20%" height="8px" marginLeft="0.5rem" />
+              </div>
+            </div>
+          </div>
+        ) : (
+          messages.map((msg) => {
+            const isCreator = msg.sender === 'creator';
+            return (
+              <div key={msg.id} className={`${styles.msgRow} ${isCreator ? styles.msgRight : styles.msgLeft}`}>
+                {!isCreator && (
+                  <img src={fan?.avatarUrl || DEFAULT_AVATAR} alt="" className={styles.msgAvatar} />
+                )}
+                <div className={styles.msgContent}>
+                  {msg.isPaywall ? (
+                    <div className={styles.paywall}>
+                      <div className={styles.paywallPreview}>
+                        {msg.previewUrl ? <img src={msg.previewUrl} alt="" className={styles.paywallImg} /> : <div className={styles.paywallImg} style={{ background: 'linear-gradient(135deg, #1a1a2e, #e10075)' }} />}
+                        {msg.isLocked && (
+                          <div className={styles.lockOverlay}>
+                            <Lock size={16} />
+                          </div>
+                        )}
+                      </div>
+                      <div className={styles.paywallInfo}>
+                        <span className={styles.paywallLabel}>{msg.mediaType}</span>
+                        <span className={styles.paywallDesc}>{msg.textSub}</span>
+                      </div>
+                      {msg.isLocked ? (
+                        <div className={styles.paywallAction}>
+                          <span className={styles.coinTag}>
+                            <img src="/coin.png" alt="" className={styles.coinIcon} />
+                            {msg.coinPrice} Coins
+                          </span>
+                          <button className={styles.unlockBtn} type="button">Unlock</button>
+                        </div>
+                      ) : (
+                        <div className={styles.unlocked}>
+                          <Check size={14} /> Unlocked
                         </div>
                       )}
                     </div>
-                    <div className={styles.paywallInfo}>
-                      <span className={styles.paywallLabel}>{msg.mediaType}</span>
-                      <span className={styles.paywallDesc}>{msg.textSub}</span>
+                  ) : (
+                    <div className={`${styles.bubble} ${isCreator ? styles.bubbleCreator : styles.bubbleFan}`}>
+                      {msg.previewUrl && msg.mediaType === 'video' ? (
+                        <video src={msg.previewUrl} controls className={styles.msgMedia} />
+                      ) : msg.previewUrl ? (
+                        <img src={msg.previewUrl} alt="Media" className={styles.msgMedia} />
+                      ) : null}
+                      {msg.text && <p className={styles.bubbleText}>{msg.text}</p>}
                     </div>
-                    {msg.isLocked ? (
-                      <div className={styles.paywallAction}>
-                        <span className={styles.coinTag}>
-                          <img src="/coin.png" alt="" className={styles.coinIcon} />
-                          {msg.coinPrice} Coins
-                        </span>
-                        <button className={styles.unlockBtn} type="button">Unlock</button>
-                      </div>
-                    ) : (
-                      <div className={styles.unlocked}>
-                        <Check size={14} /> Unlocked
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className={`${styles.bubble} ${isCreator ? styles.bubbleCreator : styles.bubbleFan}`}>
-                    <p className={styles.bubbleText}>{msg.text}</p>
-                  </div>
-                )}
-                <span className={`${styles.time} ${isCreator ? styles.timeRight : styles.timeLeft}`}>{msg.time}</span>
+                  )}
+                  <span className={`${styles.time} ${isCreator ? styles.timeRight : styles.timeLeft}`}>{msg.time}</span>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
         <div ref={messagesEndRef} />
       </div>
 
       <form className={styles.inputBar} onSubmit={handleSend}>
-        <button type="button" className={styles.inputIcon}><ImageIcon size={20} /></button>
         <input
+          ref={mediaInputRef}
+          type="file"
+          accept="image/*,video/*"
+          style={{ display: 'none' }}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleSendImage(file);
+            e.target.value = '';
+          }}
+        />
+        <button type="button" className={styles.inputIcon} title="Attach Image" aria-label="Attach image" onClick={() => mediaInputRef.current?.click()}>
+          <ImageIcon size={20} />
+        </button>
+        <input
+          ref={inputRef}
           type="text"
           placeholder="Reply..."
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           className={styles.input}
         />
-        <button type="button" className={styles.inputIcon}><Smile size={20} /></button>
+        <ChatComposerExtras
+          dark={darkMode}
+          anchor="right"
+          onPickEmoji={handlePickEmoji}
+        />
         <button type="submit" className={styles.sendBtn}>
           <Send size={18} />
         </button>
       </form>
+
+      {/* Delete Chat Confirmation Popup */}
+      <ConfirmDeleteDialog
+        open={!!deleteChatTarget}
+        itemName={fan?.displayName || 'this fan'}
+        title="Delete Conversation?"
+        confirmLabel="Delete Chat"
+        message={<>Are you sure you want to delete the conversation with <strong>{fan?.displayName || 'this fan'}</strong>?</>}
+        deleting={deletingChat}
+        darkMode={darkMode}
+        onCancel={closeDeleteChat}
+        onConfirm={confirmDeleteChat}
+      />
+
+      {/* Block Fan Confirmation Popup */}
+      <ConfirmDeleteDialog
+        open={!!blockTarget}
+        itemName={fan?.displayName || 'this fan'}
+        title="Block User?"
+        confirmLabel="Block"
+        busyLabel="Blocking…"
+        icon={<Ban size={22} />}
+        message={<>Are you sure you want to block <strong>{fan?.displayName || 'this fan'}</strong>? They won't be able to message you anymore.</>}
+        deleting={blocking}
+        darkMode={darkMode}
+        onCancel={closeBlock}
+        onConfirm={confirmBlockUser}
+      />
     </div>
   );
 };

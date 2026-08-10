@@ -1,32 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { api } from '../../../services/api';
 import { useApp } from '../../../context/AppContext';
-import { 
-  Eye, 
-  BadgeCheck, 
-  ChevronDown, 
-  Check, 
-  Mic, 
-  Music, 
-  Activity, 
-  Volume2, 
-  Gamepad2, 
-  LayoutGrid,
+import { useLiveStreamSocket } from '../../../hooks/useLiveStreamSocket';
+import { useLiveStreamViewer } from '../../../hooks/useLiveStreamViewer';
+import { useStreamChat } from '../../../hooks/useStreamChat';
+import {
+  Eye,
+  BadgeCheck,
+  ChevronDown,
+  Check,
   ChevronRight,
   ChevronLeft,
-  TrendingUp,
-  Star,
-  Clock
+  X,
+  Loader2,
+  Gift,
+  Coins,
+  Send,
+  MessageSquare
 } from 'lucide-react';
+import { useGiftEvents } from '../../../hooks/useGiftEvents';
+import { GiftOverlay } from '../../gifts/GiftOverlay';
+import { GiftPanel } from '../../gifts/GiftPanel';
+import { GiftLeaderboard } from '../../gifts/GiftLeaderboard';
+import { QuickRecharge } from '../../gifts/QuickRecharge';
+import { useToast } from '../../../components/Toast/Toast';
 import styles from './LiveStreamsPage.module.css';
 
 export const LiveStreamsPage = () => {
-  const { darkMode } = useApp();
+  const { darkMode, user, balance } = useApp();
+  const { toast } = useToast();
   
   // States
   const [allStreams, setAllStreams] = useState([]);
-  const [streams, setStreams] = useState([]);
-  const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('all'); // all, trending, liveNow, topRated, new
   const [sortBy, setSortBy] = useState('Viewers High To Low');
@@ -34,7 +39,104 @@ export const LiveStreamsPage = () => {
   const [category, setCategory] = useState('All Categories');
   const [language, setLanguage] = useState('All Languages');
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [error, setError] = useState(false);
+  const [categoryCounts, setCategoryCounts] = useState({});
+
+  // Join modal state
+  const [joinStream, setJoinStream] = useState(null);
+  const [joinResult, setJoinResult] = useState(null);
+  const [joinLoading, setJoinLoading] = useState(false);
+  const [viewerError, setViewerError] = useState('');
+
+  // Passive Agora subscriber used to actually watch the stream inside the modal
+  const viewer = useLiveStreamViewer();
+
+  // Live gifts + recharge while watching a stream. Animations are broadcast to
+  // the whole `live_stream_{id}` room so the host and every viewer see them.
+  const { events: giftEvents, sendGift, leaderboard: giftLeaderboard } = useGiftEvents({
+    streamId: joinStream?._id || null,
+    enabled: !!joinResult && joinResult.status === 'success',
+    receiverId: joinStream?.creatorId || null
+  });
+  const [giftOpen, setGiftOpen] = useState(false);
+  const [rechargeOpen, setRechargeOpen] = useState(false);
+
+  // Live chat while watching — messages append in arrival order, one after
+  // another, for every viewer and the host.
+  const { messages: chatMessages, sendMessage: sendChatMessage, sending: chatSending } = useStreamChat({
+    streamId: joinStream?._id || null,
+    enabled: !!joinResult && joinResult.status === 'success'
+  });
+  const [chatDraft, setChatDraft] = useState('');
+  const chatListRef = useRef(null);
+
+  // Keep the chat pinned to the newest message.
+  useEffect(() => {
+    if (chatListRef.current) {
+      chatListRef.current.scrollTop = chatListRef.current.scrollHeight;
+    }
+  }, [chatMessages]);
+
+  const handleChatSend = async (e) => {
+    e.preventDefault();
+    if (!chatDraft.trim()) return;
+    const sent = await sendChatMessage(chatDraft);
+    if (sent) setChatDraft('');
+  };
+
+  const openJoinModal = (stream) => {
+    setJoinResult(null);
+    setViewerError('');
+    setJoinStream(stream);
+  };
+
+  const handleLeaveStream = async () => {
+    // Leave the Agora channel first so the viewer count drops client-side too
+    try { viewer.leave(); } catch (e) { console.error('Failed to leave live channel', e); }
+    const streamId = joinStream?._id;
+    setJoinStream(null);
+    setJoinResult(null);
+    if (streamId) {
+      try { await api.post(`/creators/live/${streamId}/leave`); } catch { /* noop */ }
+    }
+  };
+
+  const handleJoin = async () => {
+    if (!joinStream) return;
+    setJoinLoading(true);
+    setViewerError('');
+    try {
+      const res = await api.post(`/creators/live/${joinStream._id}/join`);
+      if (res.status === 'success') {
+        setJoinResult(res);
+        setAllStreams((prev) => prev.map((s) =>
+          s._id === joinStream._id ? { ...s, viewerCount: res.viewerCount } : s
+        ));
+
+        // Join the Agora channel as a passive subscriber and play the creator's
+        // video. A failure here is non-fatal — the backend join (entry payment
+        // + viewer tracking) already succeeded.
+        try {
+          await viewer.join({
+            channel: res.roomId,
+            token: res.agoraToken,
+            uid: user?.id,
+            onStreamEnded: () => {
+              handleLeaveStream();
+              toast.info('The live stream has ended.');
+            }
+          });
+        } catch (joinErr) {
+          console.error('Failed to join live stream channel', joinErr);
+          setViewerError('Live playback could not be started. Please try again.');
+        }
+      }
+    } catch (err) {
+      setJoinResult({ status: 'error', message: err.message || 'Failed to join stream' });
+    } finally {
+      setJoinLoading(false);
+    }
+  };
 
   // UI Open Dropdowns
   const [sortOpen, setSortOpen] = useState(false);
@@ -55,15 +157,18 @@ export const LiveStreamsPage = () => {
   const languagesList = ['All Languages', 'English', 'Spanish', 'French', 'German', 'Japanese'];
   const sortOptions = ['Viewers High To Low', 'Viewers Low To High'];
 
-  // Categories metadata for bottom row
+  // Categories metadata for bottom row (live counts come from the backend)
   const categoryMetadata = [
-    { name: 'Just Chatting', imageSrc: '/mic.png', liveCount: '12 Live' },
-    { name: 'Music', imageSrc: '/music.png', liveCount: '7 Live' },
-    { name: 'Dance', imageSrc: '/dance.png', liveCount: '7 Live' },
-    { name: 'ASMR', imageSrc: '/asmr.png', liveCount: '12 Live' },
-    { name: 'Gaming', imageSrc: '/gaming.png', liveCount: '12 Live' },
-    { name: 'Others', imageSrc: '/others.png', liveCount: '12 Live' },
-  ];
+    { name: 'Just Chatting', imageSrc: '/mic.png' },
+    { name: 'Music', imageSrc: '/music.png' },
+    { name: 'Dance', imageSrc: '/dance.png' },
+    { name: 'ASMR', imageSrc: '/asmr.png' },
+    { name: 'Gaming', imageSrc: '/gaming.png' },
+    { name: 'Others', imageSrc: '/others.png' },
+  ].map((c) => ({
+    ...c,
+    liveCount: `${categoryCounts[c.name] || 0} Live`
+  }));
 
   // Fetch streams
   // Fetch streams
@@ -80,103 +185,55 @@ export const LiveStreamsPage = () => {
       const res = await api.get(`/creators/live?${queryParams.toString()}`);
       if (res.status === 'success') {
         setAllStreams(res.liveStreams || []);
-        const mappedLeaderboard = (res.leaderboard || []).slice(0, 5).map((c, idx) => ({
-          rank: idx + 1,
-          name: c.displayName || c.name || 'User',
-          avatarUrl: c.avatarUrl,
-          spentCoins: c.coinsEarned || c.spentCoins || '1,000'
-        }));
-        setLeaderboard(mappedLeaderboard);
+        const counts = {};
+        (res.categories || []).forEach((c) => { counts[c.name] = c.liveCount; });
+        setCategoryCounts(counts);
       }
     } catch (err) {
       console.error('Failed to load live streams:', err);
-      // Local fallback in case of connection failure
-      const fallbackCovers = [
-        '/Girl.png',
-        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1542206395-9feb3edaa68d?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80'
-      ];
-      const fallbackNames = ['Savannah', 'Leslie', 'Jenny', 'Kristin', 'Molly Jane', 'Aria', 'Chloe', 'Emma', 'Sophia', 'Olivia', 'Isabella', 'Ava'];
-      const fallbackUsernames = ['savannah', 'leslie', 'jenny', 'kristin', 'mollyjane', 'aria_live', 'chloe_stream', 'emma_xo', 'sophia_chat', 'olivia_star', 'isabella_d', 'ava_game'];
-      const fallbackCategories = ['Just Chatting', 'Music', 'Dance', 'ASMR', 'Gaming', 'Others'];
-
-      let localList = Array.from({ length: 12 }).map((_, idx) => ({
-        _id: `fallback-id-${idx}`,
-        username: fallbackUsernames[idx],
-        displayName: fallbackNames[idx],
-        isVerified: true,
-        viewerCount: 432 - idx * 25,
-        streamTitle: "Let's talk...",
-        coverUrl: fallbackCovers[idx],
-        category: fallbackCategories[idx % fallbackCategories.length],
-        rate: 18,
-        language: idx % 3 === 0 ? 'Spanish' : 'English',
-        isLive: idx % 10 !== 9,
-        isUpcoming: idx % 10 === 9,
-        rating: 4.9
-      }));
-
-      // Apply local filters for rich preview
-      if (category !== 'All Categories') {
-        localList = localList.filter(s => s.category.toLowerCase() === category.toLowerCase());
-      }
-      if (language !== 'All Languages') {
-        localList = localList.filter(s => s.language.toLowerCase() === language.toLowerCase());
-      }
-      if (availability === 'live') {
-        localList = localList.filter(s => s.isLive);
-      } else if (availability === 'upcoming') {
-        localList = localList.filter(s => s.isUpcoming);
-      }
-      if (tab === 'trending') {
-        localList.sort((a, b) => b.viewerCount - a.viewerCount);
-      } else if (tab === 'liveNow') {
-        localList = localList.filter(s => s.isLive);
-      } else if (tab === 'topRated') {
-        localList.sort((a, b) => b.rating - a.rating);
-      }
-      if (sortBy === 'Viewers High To Low') {
-        localList.sort((a, b) => b.viewerCount - a.viewerCount);
-      } else if (sortBy === 'Viewers Low To High') {
-        localList.sort((a, b) => a.viewerCount - b.viewerCount);
-      }
-
-      setAllStreams(localList);
-      setLeaderboard([
-        { rank: 1, name: 'Alex King', avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80', spentCoins: '132.67' },
-        { rank: 2, name: 'Jane Cooper', avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80', spentCoins: '132.67' },
-        { rank: 3, name: 'Robert Fox', avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80', spentCoins: '132.67' },
-        { rank: 4, name: 'Jacob Jones', avatarUrl: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=100&q=80', spentCoins: '132.67' },
-        { rank: 5, name: 'Emily Smith', avatarUrl: 'https://images.unsplash.com/photo-1554151228-14d9def656e4?auto=format&fit=crop&w=100&q=80', spentCoins: '132.67' }
-      ]);
+      setError(true);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    loadStreams();
-  }, [tab, category, language, sortBy, availability]);
-
   const STREAMS_PER_PAGE = 8;
-  useEffect(() => {
-    setTotalPages(Math.ceil(allStreams.length / STREAMS_PER_PAGE) || 1);
-    const startIndex = (page - 1) * STREAMS_PER_PAGE;
-    setStreams(allStreams.slice(startIndex, startIndex + STREAMS_PER_PAGE));
-  }, [page, allStreams]);
+  const totalPages = Math.max(1, Math.ceil(allStreams.length / STREAMS_PER_PAGE));
+  const startIndex = (page - 1) * STREAMS_PER_PAGE;
+  const visibleStreams = allStreams.slice(startIndex, startIndex + STREAMS_PER_PAGE);
+  const liveCount = allStreams.filter((s) => s.isLive).length;
+
+  // Real-time viewer count updates + live list refreshes via Socket.io
+  useLiveStreamSocket({
+    streamIds: visibleStreams.map((s) => s._id),
+    onViewerUpdate: (payload) => {
+      if (!payload || !payload.streamId) return;
+      setAllStreams((prev) => prev.map((s) =>
+        s._id === payload.streamId ? { ...s, viewerCount: payload.viewerCount, isLive: payload.isLive } : s
+      ));
+      // Keep the open Join modal's viewer count in sync too
+      setJoinStream((prev) => (prev && prev._id === payload.streamId ? { ...prev, viewerCount: payload.viewerCount } : prev));
+    },
+    onStreamEvent: () => {
+      // A stream went live or ended elsewhere — refresh so cards appear/disappear
+      loadStreams();
+    }
+  });
 
   useEffect(() => {
-    setPage(1);
+    Promise.resolve().then(() => {
+      loadStreams();
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab, category, language, sortBy, availability]);
+
+  // Reset to first page when filters change — adjusted during render
+  const filtersKey = `${tab}|${category}|${language}|${sortBy}|${availability}`;
+  const [prevFilters, setPrevFilters] = useState(filtersKey);
+  if (filtersKey !== prevFilters) {
+    setPrevFilters(filtersKey);
+    setPage(1);
+  }
 
   const handleResetFilters = () => {
     setAvailability('all');
@@ -258,7 +315,7 @@ export const LiveStreamsPage = () => {
               className={`${styles.pill} ${tab === 'liveNow' ? styles.activePill : ''}`}
               onClick={() => setTab('liveNow')}
             >
-              <span role="img" aria-label="green dot">🟢</span> Live Now (242)
+              <span role="img" aria-label="green dot">🟢</span> Live Now ({liveCount})
             </button>
             <button 
               className={`${styles.pill} ${tab === 'topRated' ? styles.activePill : ''} ${styles.desktopOnlyPill}`}
@@ -283,14 +340,21 @@ export const LiveStreamsPage = () => {
                 </div>
               ))}
             </div>
-          ) : streams.length === 0 ? (
+          ) : visibleStreams.length === 0 ? (
             <div className={styles.emptyContainer}>
-              <p>No live streams found matching your filters.</p>
+              <p>
+                {error
+                  ? 'Could not load live streams. Please check your connection and try again.'
+                  : 'No live streams found matching your filters.'}
+              </p>
+              {error && (
+                <button className={styles.retryBtn} onClick={loadStreams}>Try Again</button>
+              )}
             </div>
           ) : (
             <>
               <div className={styles.streamsGrid}>
-                {streams.map((stream) => (
+                {visibleStreams.map((stream) => (
                   <div key={stream._id} className={styles.streamCard}>
                     <div 
                       className={styles.cardBackground} 
@@ -325,11 +389,17 @@ export const LiveStreamsPage = () => {
                           <div className={styles.rateContainer}>
                             <img src="/coin.png" alt="Coin" className={styles.rateCoin} />
                             <div className={styles.rateTextWrapper}>
-                              <span className={styles.rateValue}>{stream.rate} Coin</span>
-                              <span className={styles.rateLabel}>/ Min</span>
+                              <span className={styles.rateValue}>{stream.entryPriceCoins > 0 ? stream.entryPriceCoins : 'Free'}</span>
+                              <span className={styles.rateLabel}>{stream.entryPriceCoins > 0 ? ' Coin Entry' : ''}</span>
                             </div>
                           </div>
-                          <button className={styles.joinBtn}>Join Stream</button>
+                          <button
+                            className={styles.joinBtn}
+                            onClick={() => openJoinModal(stream)}
+                            disabled={!stream.isLive}
+                          >
+                            {stream.isLive ? 'Join Stream' : 'Scheduled'}
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -673,6 +743,178 @@ export const LiveStreamsPage = () => {
           </div>
         </div>
       )}
+
+      {/* Join Stream Modal */}
+      {joinStream && (
+        <div className={styles.joinModalBackdrop} onClick={handleLeaveStream}>
+          <div className={styles.joinModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.joinModalHeader}>
+              <h3 className={styles.joinModalTitle}>{joinResult?.status === 'success' ? 'Watching Live' : 'Join Stream'}</h3>
+              <button className={styles.joinModalClose} onClick={handleLeaveStream}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className={styles.joinModalBody}>
+              {!joinResult ? (
+                <>
+                  <div className={styles.joinStreamPreview}>
+                    <div className={styles.joinStreamCover} style={{ backgroundImage: `url(${joinStream.coverUrl})` }} />
+                    <div className={styles.joinStreamInfo}>
+                      <span className={styles.joinStreamName}>{joinStream.displayName}</span>
+                      <span className={styles.joinStreamTitle}>{joinStream.streamTitle}</span>
+                      <span className={styles.joinStreamMeta}>
+                        {joinStream.category} · {joinStream.viewerCount} watching
+                      </span>
+                    </div>
+                  </div>
+                  {joinStream.entryPriceCoins > 0 ? (
+                    <p className={styles.joinPriceNote}>
+                      {joinStream.freeForSubscribers
+                        ? `This stream costs ${joinStream.entryPriceCoins} coins to enter — free for active subscribers.`
+                        : `Joining this stream will charge ${joinStream.entryPriceCoins} coins from your wallet.`}
+                    </p>
+                  ) : (
+                    <p className={styles.joinPriceNote}>This stream is free to join.</p>
+                  )}
+                </>
+              ) : joinResult.status === 'error' ? (
+                <div className={styles.joinErrorBox}>
+                  <p className={styles.joinErrorText}>{joinResult.message}</p>
+                </div>
+              ) : (
+                <div className={styles.joinSuccessBox}>
+                  <div className={styles.liveViewerArea}>
+                    <video
+                      ref={(el) => el && viewer.attachVideo(el)}
+                      className={styles.liveViewerVideo}
+                      playsInline
+                      autoPlay
+                    />
+                    {!viewer.isPlaying && (
+                      <div className={styles.liveWaitingOverlay}>
+                        {viewerError ? (
+                          <span className={styles.liveWaitingText}>{viewerError}</span>
+                        ) : (
+                          <>
+                            <Loader2 size={22} className={styles.joinSpin} />
+                            <span className={styles.liveWaitingText}>Waiting for the stream…</span>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  {joinResult.entryPaid && (
+                    <span className={styles.joinSuccessMeta}>
+                      {joinResult.chargeAmount > 0
+                        ? `${joinResult.chargeAmount} coins charged for entry.`
+                        : 'Entry already paid.'}
+                    </span>
+                  )}
+                  <div className={styles.joinStreamLiveInfo}>
+                    <span className={styles.joinSuccessTitle}>
+                      {joinResult.creatorName ? `${joinResult.creatorName}'s Live Stream` : 'Live Stream'}
+                    </span>
+                    <span className={styles.joinSuccessMeta}>
+                      {joinResult.streamTitle} · {joinResult.viewerCount} watching
+                    </span>
+                  </div>
+                  <div className={styles.streamGiftBar}>
+                    <span className={styles.streamBalanceChip}>
+                      <img src="/coin.png" alt="Coin" className={styles.streamCoinImg} />
+                      {balance.toLocaleString()}
+                      <button
+                        className={styles.streamRechargeBtn}
+                        onClick={() => setRechargeOpen(true)}
+                        title="Recharge coins"
+                      >
+                        <Coins size={11} /> Recharge
+                      </button>
+                    </span>
+                    <button className={styles.streamGiftBtn} onClick={() => setGiftOpen(true)}>
+                      <Gift size={16} /> Send Gift
+                    </button>
+                  </div>
+                  <div className={styles.streamChatBox}>
+                    <div className={styles.streamChatHeader}>
+                      <MessageSquare size={13} />
+                      <span>Live Chat</span>
+                      <span className={styles.streamChatCount}>{chatMessages.length}</span>
+                    </div>
+                    {/* Pinned top-gifters — always visible above the messages */}
+                    <GiftLeaderboard leaderboard={giftLeaderboard} />
+                    <div ref={chatListRef} className={styles.streamChatList}>
+                      {chatMessages.length === 0 ? (
+                        <span className={styles.streamChatEmpty}>No messages yet — say hi!</span>
+                      ) : (
+                        chatMessages.map((m) => (
+                          <div key={m._id} className={styles.streamChatMsg}>
+                            <span className={styles.streamChatName}>{m.displayName}</span>
+                            <span className={styles.streamChatText}>{m.text}</span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                    <form className={styles.streamChatComposer} onSubmit={handleChatSend}>
+                      <input
+                        type="text"
+                        className={styles.streamChatInput}
+                        placeholder="Send a message…"
+                        maxLength={500}
+                        value={chatDraft}
+                        onChange={(e) => setChatDraft(e.target.value)}
+                      />
+                      <button
+                        type="submit"
+                        className={styles.streamChatSend}
+                        disabled={!chatDraft.trim() || chatSending}
+                        aria-label="Send message"
+                      >
+                        <Send size={14} />
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className={styles.joinModalFooter}>
+              {!joinResult ? (
+                <button
+                  className={styles.joinConfirmBtn}
+                  onClick={handleJoin}
+                  disabled={joinLoading}
+                >
+                  {joinLoading ? (
+                    <span className={styles.joinLoading}><Loader2 size={16} className={styles.joinSpin} /> Joining…</span>
+                  ) : joinStream.entryPriceCoins > 0 ? (
+                    `Join for ${joinStream.entryPriceCoins} coins`
+                  ) : (
+                    'Join Stream'
+                  )}
+                </button>
+              ) : joinResult.status === 'error' ? (
+                <button className={styles.joinConfirmBtn} onClick={handleLeaveStream}>Close</button>
+              ) : (
+                <button className={styles.joinConfirmBtn} onClick={handleLeaveStream}>Leave Stream</button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Gift animation layer + gift picker + recharge (watching live only) */}
+      {joinResult && joinResult.status === 'success' && <GiftOverlay events={giftEvents} />}
+      {giftOpen && (
+        <GiftPanel
+          receiverName={joinStream?.displayName || 'this creator'}
+          balance={balance}
+          onSendGift={(gift) => sendGift(gift)}
+          onRecharge={() => { setGiftOpen(false); setRechargeOpen(true); }}
+          onClose={() => setGiftOpen(false)}
+        />
+      )}
+      {rechargeOpen && <QuickRecharge onClose={() => setRechargeOpen(false)} />}
     </div>
   );
 };

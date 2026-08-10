@@ -1,8 +1,10 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useApp } from '../../../context/AppContext';
+import { api } from '../../../services/api';
+import { getSocket, joinSocketRoom } from '../../../services/socket';
 import {
   Search, MoreVertical, SlidersHorizontal,
-  Smile, Image as ImageIcon, Send, Star,
+  Image as ImageIcon, Send, Star,
   MessageSquare, User, ChevronLeft, Trash2, Ban,
   Eye, DollarSign, Gift
 } from 'lucide-react';
@@ -10,6 +12,19 @@ import {
 // Diamond Badge (kept for future use)
 // const DiamondBadge = ({ size = 12 }) => ( ... )
 import styles from './CreatorMessagesPage.module.css';
+import { ChatFiltersSheet } from '../../../components/ChatFiltersSheet/ChatFiltersSheet';
+import {
+  DEFAULT_CHAT_FILTERS,
+  matchesChatFilters,
+  sortConversationsByFilter,
+  countActiveChatFilters
+} from '../../../components/ChatFiltersSheet/chatFilters';
+import { ChatThreadSkeleton, ChatScreenSkeleton } from '../../../components/ChatThreadSkeleton/ChatThreadSkeleton';
+import { ChatComposerExtras } from '../../../components/ChatComposerExtras/ChatComposerExtras';
+import { insertEmojiAtCaret } from '../../../components/ChatComposerExtras/chatComposerUtils';
+import { ConfirmDeleteDialog } from '../../../components/ConfirmDeleteDialog/ConfirmDeleteDialog';
+import { useConfirmDelete } from '../../../hooks/useConfirmDelete';
+import { useToast } from '../../../components/Toast/Toast';
 
 // Custom Gradient Verification Badge
 const GradientBadgeCheck = ({ size = 15 }) => (
@@ -35,264 +50,69 @@ const TopFanBadge = ({ size = 12 }) => (
   </svg>
 );
 
-// Diamond Badge
-const DiamondBadge = ({ size = 12 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
-    <path d="M6 3H18L22 9L12 22L2 9L6 3Z" fill="#3b82f6" stroke="#3b82f6" strokeWidth="1" />
-  </svg>
-);
+const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80';
 
-const FAN_CONVERSATIONS = [
-  {
-    id: 'fan1',
-    user: {
-      id: 'usr1',
-      displayName: 'Alex Turner',
-      username: 'alext_23',
-      avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
-      isVerified: true,
-      isOnline: true,
-      isTopFan: true,
-      isHighSpender: true,
-      fanSince: 'Feb 14, 2024',
-      totalSpent: 1245.80,
-      totalTips: 320.00,
-      messages: 156,
-      subscription: { tier: 'VIP Fan', status: 'ACTIVE', since: 'Mar 10, 2024', renewsOn: 'Jun 10, 2024' },
-      labels: ['Top Fan', 'High Spender']
-    },
-    lastMessage: "Can't wait for your next stream!",
-    time: '2m',
-    unreadCount: 2,
-    isNew: false
-  },
-  {
-    id: 'fan2',
-    user: {
-      id: 'usr2',
-      displayName: 'Jason Miller',
-      username: 'jason_m',
-      avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80',
-      isVerified: false,
-      isOnline: true,
-      isTopFan: false,
-      isHighSpender: false,
-      fanSince: 'Jan 5, 2024',
-      totalSpent: 450.00,
-      totalTips: 120.00,
-      messages: 45,
-      subscription: { tier: 'Monthly', status: 'ACTIVE', since: 'Apr 1, 2024', renewsOn: 'May 1, 2024' },
-      labels: []
-    },
-    lastMessage: 'You looked amazing today 🔥',
-    time: '15m',
-    unreadCount: 1,
-    isNew: false
-  },
-  {
-    id: 'fan3',
-    user: {
-      id: 'usr3',
-      displayName: 'Chris Evans',
-      username: 'chris_e',
-      avatarUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=300&q=80',
-      isVerified: false,
-      isOnline: false,
-      isTopFan: false,
-      isHighSpender: false,
-      fanSince: 'Mar 20, 2024',
-      totalSpent: 85.00,
-      totalTips: 25.00,
-      messages: 12,
-      subscription: { tier: 'Free', status: 'INACTIVE', since: '-', renewsOn: '-' },
-      labels: []
-    },
-    lastMessage: 'Thanks for the reply! That made...',
-    time: '1h',
-    unreadCount: 0,
-    isNew: false
-  },
-  {
-    id: 'fan4',
-    user: {
-      id: 'usr4',
-      displayName: 'Mike Anderson',
-      username: 'mike_a',
-      avatarUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=300&q=80',
-      isVerified: false,
-      isOnline: false,
-      isTopFan: false,
-      isHighSpender: false,
-      fanSince: 'Feb 1, 2024',
-      totalSpent: 210.00,
-      totalTips: 50.00,
-      messages: 28,
-      subscription: { tier: 'Monthly', status: 'ACTIVE', since: 'Mar 1, 2024', renewsOn: 'Apr 1, 2024' },
-      labels: []
-    },
-    lastMessage: "When's the next Q&A?",
-    time: '2h',
-    unreadCount: 0,
-    isNew: false
-  },
-  {
-    id: 'fan5',
-    user: {
-      id: 'usr5',
-      displayName: 'Daniel Roberts',
-      username: 'dan_r',
-      avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=300&q=80',
-      isVerified: false,
-      isOnline: true,
-      isTopFan: true,
-      isHighSpender: false,
-      fanSince: 'Dec 15, 2023',
-      totalSpent: 890.00,
-      totalTips: 200.00,
-      messages: 98,
-      subscription: { tier: 'Yearly', status: 'ACTIVE', since: 'Dec 15, 2023', renewsOn: 'Dec 15, 2024' },
-      labels: ['Top Fan']
-    },
-    lastMessage: "Just sent a tip! You're the best ❤️",
-    time: '3h',
-    unreadCount: 1,
-    isNew: false
-  },
-  {
-    id: 'fan6',
-    user: {
-      id: 'usr6',
-      displayName: 'Ryan Cooper',
-      username: 'ryan_c',
-      avatarUrl: 'https://images.unsplash.com/photo-1463453091185-61582044d556?auto=format&fit=crop&w=300&q=80',
-      isVerified: false,
-      isOnline: false,
-      isTopFan: false,
-      isHighSpender: false,
-      fanSince: 'Apr 2, 2024',
-      totalSpent: 120.00,
-      totalTips: 30.00,
-      messages: 15,
-      subscription: { tier: 'Monthly', status: 'ACTIVE', since: 'Apr 2, 2024', renewsOn: 'May 2, 2024' },
-      labels: []
-    },
-    lastMessage: 'Love your content so much!',
-    time: '5h',
-    unreadCount: 0,
-    isNew: false
-  },
-  {
-    id: 'fan7',
-    user: {
-      id: 'usr7',
-      displayName: 'Tyler Brooks',
-      username: 'tyler_b',
-      avatarUrl: 'https://images.unsplash.com/photo-1504257432389-52343af06ae3?auto=format&fit=crop&w=300&q=80',
-      isVerified: false,
-      isOnline: false,
-      isTopFan: false,
-      isHighSpender: false,
-      fanSince: 'Mar 10, 2024',
-      totalSpent: 340.00,
-      totalTips: 80.00,
-      messages: 32,
-      subscription: { tier: 'Monthly', status: 'ACTIVE', since: 'Mar 10, 2024', renewsOn: 'Apr 10, 2024' },
-      labels: []
-    },
-    lastMessage: 'That workout was intense! 💪',
-    time: '8h',
-    unreadCount: 1,
-    isNew: false
-  },
-  {
-    id: 'fan8',
-    user: {
-      id: 'usr8',
-      displayName: 'Brandon Lee',
-      username: 'brandon_l',
-      avatarUrl: 'https://images.unsplash.com/photo-1507591064344-4c6ce005b128?auto=format&fit=crop&w=300&q=80',
-      isVerified: false,
-      isOnline: false,
-      isTopFan: false,
-      isHighSpender: false,
-      fanSince: 'Jan 20, 2024',
-      totalSpent: 175.00,
-      totalTips: 45.00,
-      messages: 20,
-      subscription: { tier: 'Monthly', status: 'ACTIVE', since: 'Jan 20, 2024', renewsOn: 'Feb 20, 2024' },
-      labels: []
-    },
-    lastMessage: 'See you on the stream tonight',
-    time: '1d',
-    unreadCount: 0,
-    isNew: false
-  },
-  {
-    id: 'fan9',
-    user: {
-      id: 'usr9',
-      displayName: 'Matt Wilson',
-      username: 'matt_w',
-      avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=300&q=80',
-      isVerified: false,
-      isOnline: false,
-      isTopFan: true,
-      isHighSpender: true,
-      fanSince: 'Oct 5, 2023',
-      totalSpent: 2150.00,
-      totalTips: 550.00,
-      messages: 210,
-      subscription: { tier: 'VIP', status: 'ACTIVE', since: 'Oct 5, 2023', renewsOn: 'Oct 5, 2024' },
-      labels: ['Top Fan', 'High Spender', 'VIP']
-    },
-    lastMessage: 'Keep up the fantastic work!',
-    time: '1d',
-    unreadCount: 0,
-    isNew: false
-  }
-];
+const formatTime = (iso) => {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const diff = Date.now() - d.getTime();
+  if (diff < 60000) return 'Just now';
+  if (diff < 3600000) return `${Math.floor(diff / 60000)}m`;
+  if (diff < 86400000) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  if (diff < 172800000) return 'Yesterday';
+  return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+};
 
-const INITIAL_MESSAGES = {
-  fan1: [
-    { id: 'm1', sender: 'fan', text: 'Hey Bella! Hope you\'re having an amazing day 💜', time: '10:24 AM' },
-    { id: 'm2', sender: 'creator', text: 'Hey Alex! You just made my day 🥰', time: '10:25 AM', read: true },
-    { id: 'm3', sender: 'fan', text: 'Your last stream was 🔥🔥🔥\nCan\'t wait for your next one!', time: '10:26 AM' },
-    { id: 'm4', sender: 'creator', text: 'Thank you so much! The support means everything to me 🩷', time: '10:27 AM', read: true },
-    { id: 'm5', sender: 'fan', text: 'Is there anything special planned for the next stream?', time: '10:28 AM' },
-    { id: 'm6', sender: 'creator', text: 'Yes! We\'re doing a Q&A and some fun games with exclusive rewards 🎉', time: '10:30 AM', read: true },
-    { id: 'm7', sender: 'fan', text: 'Awesome! I\'ll be there for sure 🙌', time: '10:31 AM' },
-  ],
-  fan2: [
-    { id: 'm8', sender: 'fan', text: 'You looked amazing today 🔥', time: '9:45 AM' },
-    { id: 'm9', sender: 'creator', text: 'Thank you so much! 💕', time: '9:50 AM', read: true },
-  ],
-  fan3: [
-    { id: 'm10', sender: 'fan', text: 'Thanks for the reply!', time: '8:30 AM' },
-    { id: 'm11', sender: 'creator', text: 'Anytime! ❤️', time: '8:35 AM', read: true },
-  ],
-  fan4: [
-    { id: 'm12', sender: 'fan', text: 'When\'s the next Q&A?', time: '7:00 AM' },
-    { id: 'm13', sender: 'creator', text: 'Stay tuned, will announce soon!', time: '7:15 AM', read: true },
-  ],
-  fan5: [
-    { id: 'm14', sender: 'fan', text: 'Just sent a tip! You\'re the best ❤️', time: '6:30 AM' },
-  ],
-  fan6: [
-    { id: 'm15', sender: 'fan', text: 'Love your content so much!', time: '5:00 AM' },
-  ],
-  fan7: [
-    { id: 'm16', sender: 'fan', text: 'That workout was intense! 💪', time: '2:00 AM' },
-  ],
-  fan8: [
-    { id: 'm17', sender: 'fan', text: 'See you on the stream tonight', time: 'Yesterday' },
-  ],
-  fan9: [
-    { id: 'm18', sender: 'fan', text: 'Keep up the fantastic work!', time: 'Yesterday' },
-  ]
+const mapConversation = (conv) => {
+  const peer = conv._id || {};
+  const profile = conv.profile || {};
+  const lastMsg = conv.lastMessage || {};
+  return {
+    id: String(peer._id || conv._id),
+    user: {
+      id: String(peer._id || conv._id),
+      displayName: peer.displayName || peer.username || 'Fan',
+      username: peer.username || '',
+      avatarUrl: peer.avatarUrl || DEFAULT_AVATAR,
+      isVerified: !!profile.isVerifiedBadge,
+      isOnline: !!profile.isOnline,
+      isTopFan: false,
+      isHighSpender: false,
+      fanSince: '—',
+      totalSpent: 0,
+      totalTips: 0,
+      messages: 0,
+      subscription: { tier: 'Free', status: 'INACTIVE', since: '—', renewsOn: '—' },
+      labels: []
+    },
+    lastMessage: lastMsg.content || (lastMsg.isPaywall ? '🔒 ' + (lastMsg.mediaType || 'Media') : '📎 Media'),
+    time: formatTime(lastMsg.createdAt),
+    lastMessageAt: lastMsg.createdAt ? new Date(lastMsg.createdAt).getTime() : 0,
+    unreadCount: conv.unreadCount || 0,
+    isNew: false
+  };
+};
+
+const mapCreatorMessage = (m, currentUserId) => {
+  const isCreator = String(m.senderId) === String(currentUserId);
+  return {
+    id: String(m._id),
+    sender: isCreator ? 'creator' : 'fan',
+    text: m.content || '',
+    time: formatTime(m.createdAt),
+    isPaywall: !!m.isPaywall,
+    isLocked: !!m.isLocked,
+    coinPrice: m.coinPrice || 0,
+    mediaType: m.mediaType || 'media',
+    mediaUrl: m.mediaUrl || '',
+    read: !!m.isOpened,
+    createdAt: m.createdAt
+  };
 };
 
 export const CreatorMessagesPage = () => {
-  const { darkMode, navigateTo, currentPath } = useApp();
+  const { darkMode, navigateTo, currentPath, user } = useApp();
+  const { toast } = useToast();
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [mobileView, setMobileView] = useState(() => {
     const parts = window.location.pathname.split('/').filter(Boolean);
@@ -300,12 +120,44 @@ export const CreatorMessagesPage = () => {
     return convId ? 'chat' : 'list';
   });
   const [filter, setFilter] = useState('all');
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
+  const [chatFilters, setChatFilters] = useState(DEFAULT_CHAT_FILTERS);
+  const activeFilterCount = countActiveChatFilters(chatFilters);
   const [searchQuery, setSearchQuery] = useState('');
   const [inputText, setInputText] = useState('');
-  const [messagesMap, setMessagesMap] = useState(INITIAL_MESSAGES);
+  const chatInputRef = useRef(null);
+  const chatMediaInputRef = useRef(null);
+  const [messagesMap, setMessagesMap] = useState({});
+  const [conversations, setConversations] = useState([]);
+  const [loadingConversations, setLoadingConversations] = useState(true);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const currentUserId = user?.id || null;
+  const convIdsRef = useRef(new Set());
   const [showMenu, setShowMenu] = useState(false);
   const messagesEndRef = useRef(null);
-  const menuRef = useRef(null);
+
+  // Favorite fans (persisted locally)
+  const [favoriteIds, setFavoriteIds] = useState(() => {
+    try {
+      return new Set(JSON.parse(localStorage.getItem('favoriteFans') || '[]'));
+    } catch {
+      return new Set();
+    }
+  });
+
+  const toggleFavorite = (convId) => {
+    setFavoriteIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(convId)) next.delete(convId);
+      else next.add(convId);
+      try {
+        localStorage.setItem('favoriteFans', JSON.stringify([...next]));
+      } catch (err) {
+        console.error('Failed to persist favorites:', err);
+      }
+      return next;
+    });
+  };
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -319,18 +171,130 @@ export const CreatorMessagesPage = () => {
     return parts[2] || null;
   })();
 
-  const selectedConv = FAN_CONVERSATIONS.find(c => c.id === selectedConvId) || null;
+  const selectedConv = conversations.find(c => c.id === selectedConvId) || null;
   const currentMessages = useMemo(() => selectedConvId ? (messagesMap[selectedConvId] || []) : [], [selectedConvId, messagesMap]);
+  const unreadConversationCount = conversations.filter(c => c.unreadCount > 0).length;
+
+  // ---- Real data loading (chat API) ----
+  const loadConversations = useCallback(async () => {
+    try {
+      const res = await api.get('/chat/conversations');
+      if (res.conversations) {
+        setConversations(res.conversations.map(mapConversation));
+      }
+    } catch (err) {
+      console.error('Failed to load conversations:', err);
+    } finally {
+      setLoadingConversations(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    Promise.resolve().then(() => {
+      loadConversations();
+    });
+  }, [loadConversations]);
+
+  useEffect(() => {
+    convIdsRef.current = new Set(conversations.map(c => c.id));
+  }, [conversations]);
+
+  useEffect(() => {
+    if (!selectedConvId) return;
+    let cancelled = false;
+    Promise.resolve().then(() => setLoadingMessages(true));
+    const loadMessages = async () => {
+      try {
+        const res = await api.get(`/chat/messages/${selectedConvId}`);
+        if (!cancelled && res.messages) {
+          setMessagesMap(prev => ({
+            ...prev,
+            [selectedConvId]: res.messages.map(m => mapCreatorMessage(m, currentUserId))
+          }));
+          setConversations(prev => prev.map(c => (c.id === selectedConvId ? { ...c, unreadCount: 0 } : c)));
+        }
+      } catch (err) {
+        console.error('Failed to load messages:', err);
+      } finally {
+        if (!cancelled) setLoadingMessages(false);
+      }
+    };
+    loadMessages();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedConvId]);
+
+  // Real-time delivery via Socket.io
+  useEffect(() => {
+    if (!currentUserId) return;
+    let socket = null;
+    try {
+      socket = getSocket();
+      joinSocketRoom(currentUserId);
+      const onNewMessage = (msg) => {
+        const otherId = String(msg.senderId) === String(currentUserId)
+          ? String(msg.receiverId)
+          : String(msg.senderId);
+        const uiMsg = mapCreatorMessage(msg, currentUserId);
+        if (selectedConvId && otherId === selectedConvId) {
+          setMessagesMap(prev => ({
+            ...prev,
+            [selectedConvId]: [...(prev[selectedConvId] || []), uiMsg]
+          }));
+        }
+        if (!convIdsRef.current.has(otherId)) {
+          loadConversations();
+        }
+        setConversations(prev => {
+          const idx = prev.findIndex(c => c.id === otherId);
+          if (idx === -1) return prev;
+          const next = [...prev];
+          next[idx] = { ...next[idx], lastMessage: msg.content || '📎 Media', time: 'Just now', lastMessageAt: Date.now() };
+          return next;
+        });
+      };
+      socket.on('new_message', onNewMessage);
+      return () => { socket.off('new_message', onNewMessage); };
+    } catch (err) {
+      console.error('Socket init failed:', err);
+    }
+  }, [selectedConvId, currentUserId, loadConversations]);
 
   // Filter conversations
-  const filteredConversations = FAN_CONVERSATIONS.filter(c => {
-    const matchesSearch = c.user.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          c.lastMessage.toLowerCase().includes(searchQuery.toLowerCase());
-    if (!matchesSearch) return false;
-    if (filter === 'unread') return c.unreadCount > 0;
-    if (filter === 'favorites') return c.user.isTopFan;
-    return true;
-  });
+  const sortedConversations = useMemo(() => {
+    return [...conversations].sort((a, b) => (b.lastMessageAt || 0) - (a.lastMessageAt || 0));
+  }, [conversations]);
+
+  const filteredConversations = useMemo(() => {
+    const base = sortedConversations.filter((c) => {
+      const matchesSearch = c.user.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            c.lastMessage.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesSearch && matchesChatFilters(c, chatFilters, { favoriteIds });
+    });
+    return sortConversationsByFilter(base, chatFilters);
+  }, [sortedConversations, searchQuery, chatFilters, favoriteIds]);
+
+  const setTypeFilter = (type) => {
+    setFilter(type);
+    setChatFilters((prev) => ({ ...prev, type }));
+  };
+
+  const handleApplyFilters = (f) => {
+    setChatFilters(f);
+    setFilter(f.type === 'unread' || f.type === 'favorites' ? f.type : 'all');
+  };
+
+  const filterSheetProps = {
+    open: filterSheetOpen,
+    onClose: () => setFilterSheetOpen(false),
+    onApply: handleApplyFilters,
+    initialFilters: chatFilters,
+    variant: 'creator',
+    conversations: sortedConversations,
+    favoriteIds,
+    dark: darkMode,
+    desktop: !isMobile
+  };
 
   // Handle conversation selection with mobile view switching
   const handleSelectConversation = (convId) => {
@@ -354,6 +318,50 @@ export const CreatorMessagesPage = () => {
     setMobileView('chat');
   };
 
+  // Block the fan in the active conversation — shared confirm dialog state machine
+  const {
+    target: blockTarget,
+    open: openBlock,
+    close: closeBlock,
+    confirm: confirmBlockUser,
+    deleting: blocking,
+  } = useConfirmDelete({
+    onConfirm: (conv) => api.post(`/block/${conv.user.id}`),
+    successMessage: (conv) => `${conv.user.displayName || 'User'} blocked`,
+    errorMessage: 'Failed to block user. Please try again.',
+    onSuccess: () => loadConversations(),
+  });
+
+  const handleBlockUser = () => {
+    const userId = selectedConv?.user?.id;
+    if (!userId) return;
+    setShowMenu(false);
+    openBlock(selectedConv);
+  };
+
+  // Delete the active conversation — shared confirm dialog state machine
+  const {
+    target: deleteChatTarget,
+    open: openDeleteChat,
+    close: closeDeleteChat,
+    confirm: confirmDeleteChat,
+    deleting: deletingChat,
+  } = useConfirmDelete({
+    onConfirm: (conv) => api.delete(`/chat/conversation/${conv.id}`),
+    successMessage: 'Conversation deleted',
+    errorMessage: 'Failed to delete conversation. Please try again.',
+    onSuccess: (conv) => {
+      setMessagesMap((prev) => { const next = { ...prev }; delete next[conv.id]; return next; });
+      setConversations((prev) => prev.filter((c) => c.id !== conv.id));
+      navigateTo('/creators/messages');
+    },
+  });
+
+  const requestDeleteChat = () => {
+    setShowMenu(false);
+    openDeleteChat(selectedConv);
+  };
+
   useEffect(() => {
     if (selectedConvId && mobileView === 'chat') {
       const timer = setTimeout(() => {
@@ -365,7 +373,7 @@ export const CreatorMessagesPage = () => {
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
+      if (!e.target.closest('[data-kebab-menu]')) {
         setShowMenu(false);
       }
     };
@@ -373,38 +381,90 @@ export const CreatorMessagesPage = () => {
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, []);
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e?.preventDefault();
     if (!inputText.trim() || !selectedConvId) return;
 
-    const newMsg = {
-      id: `msg_${Date.now()}`,
-      sender: 'creator',
-      text: inputText.trim(),
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      read: false
-    };
-
-    setMessagesMap(prev => ({
-      ...prev,
-      [selectedConvId]: [...(prev[selectedConvId] || []), newMsg]
-    }));
-    setInputText('');
+    const content = inputText.trim();
+    try {
+      const res = await api.post('/chat/message', { receiverId: selectedConvId, content });
+      if (res.status === 'success' && res.message) {
+        const uiMsg = mapCreatorMessage(res.message, currentUserId);
+        setMessagesMap(prev => ({
+          ...prev,
+          [selectedConvId]: [...(prev[selectedConvId] || []), uiMsg]
+        }));
+        setConversations(prev => prev.map(c => (c.id === selectedConvId
+          ? { ...c, lastMessage: content, time: 'Just now', lastMessageAt: Date.now() }
+          : c)));
+      }
+      setInputText('');
+    } catch (err) {
+      console.error('Failed to send message:', err);
+      toast.error('Failed to send message. Please try again.');
+    }
   };
 
-  // Auto-sync mobileView with URL
-  useEffect(() => {
-    if (selectedConvId) {
-      if (mobileView === 'list') {
-        setMobileView('chat');
+  // Insert a picked emoji at the caret position of the chat input
+  const handlePickEmoji = (emoji) => {
+    setInputText((prev) => insertEmojiAtCaret(prev, emoji, chatInputRef.current));
+  };
+
+  // Upload a picked image to S3 (via presigned URL) and send it as a media message
+  const handleSendImage = async (file) => {
+    if (!file || !selectedConvId) return;
+    const fileType = file.type || 'image/jpeg';
+    const mediaType = fileType.startsWith('video/') ? 'video' : 'image';
+    try {
+      const res = await api.post('/posts/upload-url', {
+        fileName: (file.name || `chat-image-${Date.now()}.jpg`).replace(/[^a-zA-Z0-9._-]/g, '_'),
+        fileType
+      });
+      if (res.status !== 'success') {
+        toast.error('Failed to get upload URL.');
+        return;
       }
-    } else {
-      setMobileView('list');
+      const putRes = await fetch(res.uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': fileType },
+        body: file
+      });
+      if (!putRes.ok) {
+        toast.error('Upload to storage failed.');
+        return;
+      }
+      const msgRes = await api.post('/chat/message', {
+        receiverId: selectedConvId,
+        content: '',
+        mediaUrl: res.fileUrl,
+        mediaType
+      });
+      if (msgRes.status === 'success' && msgRes.message) {
+        const uiMsg = mapCreatorMessage(msgRes.message, currentUserId);
+        setMessagesMap(prev => ({
+          ...prev,
+          [selectedConvId]: [...(prev[selectedConvId] || []), uiMsg]
+        }));
+        setConversations(prev => prev.map(c => (c.id === selectedConvId
+          ? { ...c, lastMessage: '📎 Media', time: 'Just now', lastMessageAt: Date.now() }
+          : c)));
+      }
+    } catch (err) {
+      console.error('Failed to send image:', err);
+      toast.error('Failed to send image. Please try again.');
     }
-  }, [selectedConvId]);
+  };
+
+  // Auto-sync mobileView with URL — adjusted during render
+  const [prevConvId, setPrevConvId] = useState(selectedConvId);
+  if (selectedConvId !== prevConvId) {
+    setPrevConvId(selectedConvId);
+    setMobileView(selectedConvId ? 'chat' : 'list');
+  }
 
   if (isMobile) {
     return (
+      <>
       <div className={`${styles.mobileContainer} ${!darkMode ? styles.lightMobile : ''}`}>
 
         {/* ================= VIEW 1: FANS LIST ================= */}
@@ -430,34 +490,50 @@ export const CreatorMessagesPage = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={styles.mobileSearchInput}
               />
-              <button className={styles.mobileFilterBtn}>
+              <button
+                className={`${styles.mobileFilterBtn} ${activeFilterCount > 0 ? styles.mobileFilterBtnActive : ''}`}
+                onClick={() => setFilterSheetOpen(true)}
+                aria-label="Open filters"
+              >
                 <SlidersHorizontal size={15} />
+                {activeFilterCount > 0 && <span className={styles.filterBadge} />}
               </button>
             </div>
 
             <div className={styles.mobileFilterPills}>
               <button
                 className={`${styles.mobileFilterPill} ${filter === 'all' ? styles.mobileFilterActive : ''}`}
-                onClick={() => setFilter('all')}
+                onClick={() => setTypeFilter('all')}
               >
                 All
               </button>
               <button
                 className={`${styles.mobileFilterPill} ${filter === 'unread' ? styles.mobileFilterActive : ''}`}
-                onClick={() => setFilter('unread')}
+                onClick={() => setTypeFilter('unread')}
               >
                 Unread
               </button>
               <button
                 className={`${styles.mobileFilterPill} ${filter === 'favorites' ? styles.mobileFilterActive : ''}`}
-                onClick={() => setFilter('favorites')}
+                onClick={() => setTypeFilter('favorites')}
               >
                 Favorites
               </button>
             </div>
 
             <div className={styles.mobileConvList}>
-              {filteredConversations.map((conv) => {
+              {loadingConversations ? (
+                Array.from({ length: 6 }).map((_, idx) => (
+                  <div key={idx} className={`${styles.convSkeleton} ${styles.mobileConvSkeleton}`}>
+                    <span className={`${styles.convSkeletonAvatar} ${styles.sk}`} />
+                    <div className={styles.convSkeletonLines}>
+                      <span className={`${styles.convSkeletonName} ${styles.sk}`} />
+                      <span className={`${styles.convSkeletonPreview} ${styles.sk}`} />
+                    </div>
+                  </div>
+                ))
+              ) : (
+              filteredConversations.map((conv) => {
                 const isSelected = conv.id === selectedConvId;
                 return (
                   <div
@@ -485,7 +561,16 @@ export const CreatorMessagesPage = () => {
                     </div>
                   </div>
                 );
-              })}
+              })
+              )}
+              {filteredConversations.length === 0 && !loadingConversations && (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', padding: '2.5rem 1rem', textAlign: 'center' }}>
+                  <MessageSquare size={36} className={styles.emptyIcon} />
+                  <p style={{ margin: 0, fontSize: '0.85rem', opacity: 0.55 }}>
+                    No conversations yet
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -518,7 +603,15 @@ export const CreatorMessagesPage = () => {
                 </div>
               </div>
 
-              <div className={styles.mobileChatActions}>
+              <div className={styles.mobileChatActions} data-kebab-menu>
+                <button
+                  className={`${styles.mobileMoreBtn} ${favoriteIds.has(selectedConvId) ? styles.mobileFavActive : ''}`}
+                  onClick={() => { setShowMenu(false); toggleFavorite(selectedConvId); }}
+                  type="button"
+                  title={favoriteIds.has(selectedConvId) ? 'Remove from Favorites' : 'Add to Favorites'}
+                >
+                  <Star size={18} fill={favoriteIds.has(selectedConvId) ? 'currentColor' : 'none'} />
+                </button>
                 <button
                   className={styles.mobileMoreBtn}
                   onClick={() => setShowMenu(!showMenu)}
@@ -532,11 +625,11 @@ export const CreatorMessagesPage = () => {
                       <Eye size={16} />
                       <span>View Profile</span>
                     </button>
-                    <button className={styles.dropdownItem} type="button">
+                    <button className={styles.dropdownItem} onClick={handleBlockUser} type="button">
                       <Ban size={16} />
                       <span>Block User</span>
                     </button>
-                    <button className={styles.dropdownItem} type="button">
+                    <button className={styles.dropdownItem} onClick={requestDeleteChat} type="button">
                       <Trash2 size={16} />
                       <span>Delete Chat</span>
                     </button>
@@ -546,45 +639,70 @@ export const CreatorMessagesPage = () => {
             </div>
 
             <div className={styles.mobileChatBody}>
-              <div className={styles.dateSeparator}>
-                <span>Today</span>
-              </div>
-
-              {currentMessages.map((msg) => {
-                const isCreator = msg.sender === 'creator';
-                return (
-                  <div
-                    key={msg.id}
-                    className={`${styles.msgRow} ${isCreator ? styles.msgRowRight : styles.msgRowLeft}`}
-                    style={isCreator ? { maxWidth: '85%' } : undefined}
-                  >
-                    {!isCreator && (
-                      <img src={selectedConv.user.avatarUrl} alt="" className={styles.msgAvatar} />
-                    )}
-                    <div className={styles.msgContentWrapper}>
-                      <div className={`${styles.msgBubble} ${isCreator ? styles.bubbleCreator : styles.bubbleFan}`}>
-                        <p className={styles.msgText}>{msg.text}</p>
-                      </div>
-                      <div className={`${styles.msgTimestampInline} ${isCreator ? styles.timestampRight : styles.timestampLeft}`}>
-                        <span className={styles.msgTimestamp}>{msg.time}</span>
-                      </div>
-                    </div>
+              {loadingMessages && currentMessages.length === 0 ? (
+                <ChatThreadSkeleton light={!darkMode} />
+              ) : (
+                <>
+                  <div className={styles.dateSeparator}>
+                    <span>Today</span>
                   </div>
-                );
-              })}
-              <div ref={messagesEndRef} />
+
+                  {currentMessages.map((msg) => {
+                    const isCreator = msg.sender === 'creator';
+                    return (
+                      <div
+                        key={msg.id}
+                        className={`${styles.msgRow} ${isCreator ? styles.msgRowRight : styles.msgRowLeft}`}
+                        style={isCreator ? { maxWidth: '85%' } : undefined}
+                      >
+                        {!isCreator && (
+                          <img src={selectedConv.user.avatarUrl} alt="" className={styles.msgAvatar} />
+                        )}
+                        <div className={styles.msgContentWrapper}>
+                          <div className={`${styles.msgBubble} ${isCreator ? styles.bubbleCreator : styles.bubbleFan}`}>
+                            {msg.mediaUrl && msg.mediaType === 'video' ? (
+                              <video src={msg.mediaUrl} controls className={styles.msgMedia} />
+                            ) : msg.mediaUrl ? (
+                              <img src={msg.mediaUrl} alt="Media" className={styles.msgMedia} />
+                            ) : null}
+                            {msg.text && <p className={styles.msgText}>{msg.text}</p>}
+                          </div>
+                          <div className={`${styles.msgTimestampInline} ${isCreator ? styles.timestampRight : styles.timestampLeft}`}>
+                            <span className={styles.msgTimestamp}>{msg.time}</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div ref={messagesEndRef} />
+                </>
+              )}
             </div>
 
             <form className={styles.mobileChatInputBar} onSubmit={handleSendMessage}>
               <div className={styles.inputLeftIcons}>
-                <button type="button" className={styles.inputIconButton} title="Attach Image">
+                <input
+                  ref={chatMediaInputRef}
+                  type="file"
+                  accept="image/*,video/*"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleSendImage(file);
+                    e.target.value = '';
+                  }}
+                />
+                <button type="button" className={styles.inputIconButton} title="Attach Image" onClick={() => chatMediaInputRef.current?.click()}>
                   <ImageIcon size={19} />
                 </button>
-                <button type="button" className={styles.inputIconButton} title="Emoji">
-                  <Smile size={19} />
-                </button>
+                <ChatComposerExtras
+                  dark={darkMode}
+                  anchor="left"
+                  onPickEmoji={handlePickEmoji}
+                />
               </div>
               <input
+                ref={chatInputRef}
                 type="text"
                 placeholder="Type a message..."
                 value={inputText}
@@ -674,19 +792,19 @@ export const CreatorMessagesPage = () => {
               <div className={styles.actionsCard}>
                 <h4 className={styles.actionsTitle}>Quick Actions</h4>
                 <button className={`${styles.actionBtn} ${styles.actionViewProfile}`}>
-                  <div className={`${styles.actionIcon} ${styles.iconPink}`}><User size={16} /></div>
+                  <div className={`${styles.actionIcon} ${styles.iconPink}`}><User size={22} /></div>
                   <span>View Profile</span>
                 </button>
                 <button className={`${styles.actionBtn} ${styles.actionSendTip}`}>
-                  <div className={`${styles.actionIcon} ${styles.iconWhite}`}><DollarSign size={16} /></div>
+                  <div className={`${styles.actionIcon} ${styles.iconWhite}`}><DollarSign size={22} /></div>
                   <span>Send Tip</span>
                 </button>
                 <button className={`${styles.actionBtn} ${styles.actionCreatePPV}`}>
-                  <div className={`${styles.actionIcon} ${styles.iconPurple}`}><Gift size={16} /></div>
+                  <div className={`${styles.actionIcon} ${styles.iconPurple}`}><Gift size={22} /></div>
                   <span>Create PPV Offer</span>
                 </button>
                 <button className={`${styles.actionBtn} ${styles.actionBlockUser}`}>
-                  <div className={`${styles.actionIcon} ${styles.iconRed}`}><Ban size={16} /></div>
+                  <div className={`${styles.actionIcon} ${styles.iconRed}`}><Ban size={22} /></div>
                   <span>Block User</span>
                 </button>
               </div>
@@ -695,15 +813,53 @@ export const CreatorMessagesPage = () => {
         )}
 
         {!selectedConv && mobileView === 'chat' && (
-          <div className={styles.emptyStateContainer}>
-            <div className={styles.emptyStateCard}>
-              <MessageSquare size={48} className={styles.emptyIcon} />
-              <h3 className={styles.emptyTitle}>Your Messages</h3>
-              <p className={styles.emptyText}>Select a conversation to start chatting</p>
+          loadingConversations || loadingMessages ? (
+            <div className={styles.mobileChatScreen}>
+              <ChatScreenSkeleton light={!darkMode} />
             </div>
-          </div>
+          ) : (
+            <div className={styles.emptyStateContainer}>
+              <div className={styles.emptyStateCard}>
+                <MessageSquare size={48} className={styles.emptyIcon} />
+                <h3 className={styles.emptyTitle}>Your Messages</h3>
+                <p className={styles.emptyText}>Select a conversation to start chatting</p>
+              </div>
+            </div>
+          )
         )}
+
+        {/* Delete Chat Confirmation Popup */}
+        <ConfirmDeleteDialog
+          open={!!deleteChatTarget}
+          itemName={selectedConv?.user?.displayName || 'this fan'}
+          title="Delete Conversation?"
+          confirmLabel="Delete Chat"
+          message={<>Are you sure you want to delete the conversation with <strong>{selectedConv?.user?.displayName || 'this fan'}</strong>?</>}
+          deleting={deletingChat}
+          darkMode={darkMode}
+          onCancel={closeDeleteChat}
+          onConfirm={confirmDeleteChat}
+        />
+
+        {/* Block Fan Confirmation Popup */}
+        <ConfirmDeleteDialog
+          open={!!blockTarget}
+          itemName={selectedConv?.user?.displayName || 'this fan'}
+          title="Block User?"
+          confirmLabel="Block"
+          busyLabel="Blocking…"
+          icon={<Ban size={22} />}
+          message={<>Are you sure you want to block <strong>{selectedConv?.user?.displayName || 'this fan'}</strong>? They won't be able to message you anymore.</>}
+          deleting={blocking}
+          darkMode={darkMode}
+          onCancel={closeBlock}
+          onConfirm={confirmBlockUser}
+        />
       </div>
+
+      {/* Chat Filters Sheet */}
+      <ChatFiltersSheet {...filterSheetProps} />
+      </>
     );
   }
 
@@ -713,12 +869,6 @@ export const CreatorMessagesPage = () => {
 
         {/* ================= COLUMN 1: FANS LIST ================= */}
         <div className={`${styles.chatsSidebar} ${mobileView !== 'list' ? styles.hideOnMobile : ''}`}>
-          <div className={styles.chatsHeader}>
-            <div>
-              <h2 className={styles.chatsTitle}>Messages</h2>
-            </div>
-          </div>
-
           <div className={styles.searchWrapper}>
             <Search size={16} className={styles.searchIcon} />
             <input
@@ -728,34 +878,50 @@ export const CreatorMessagesPage = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               className={styles.searchInput}
             />
-            <button className={styles.filterBtn}>
+            <button
+              className={`${styles.filterBtn} ${activeFilterCount > 0 ? styles.filterBtnActive : ''}`}
+              onClick={() => setFilterSheetOpen(true)}
+              aria-label="Open filters"
+            >
               <SlidersHorizontal size={16} />
+              {activeFilterCount > 0 && <span className={styles.filterBadge} />}
             </button>
           </div>
 
           <div className={styles.filterPills}>
             <button
               className={`${styles.filterPill} ${filter === 'all' ? styles.filterActive : ''}`}
-              onClick={() => setFilter('all')}
+              onClick={() => setTypeFilter('all')}
             >
               All
             </button>
             <button
               className={`${styles.filterPill} ${filter === 'unread' ? styles.filterActive : ''}`}
-              onClick={() => setFilter('unread')}
+              onClick={() => setTypeFilter('unread')}
             >
-              Unread (8)
+              Unread ({unreadConversationCount})
             </button>
             <button
               className={`${styles.filterPill} ${filter === 'favorites' ? styles.filterActive : ''}`}
-              onClick={() => setFilter('favorites')}
+              onClick={() => setTypeFilter('favorites')}
             >
               Favorites
             </button>
           </div>
 
           <div className={styles.conversationsList}>
-            {filteredConversations.map((conv) => {
+            {loadingConversations ? (
+              Array.from({ length: 6 }).map((_, idx) => (
+                <div key={idx} className={styles.convSkeleton}>
+                  <span className={`${styles.convSkeletonAvatar} ${styles.sk}`} />
+                  <div className={styles.convSkeletonLines}>
+                    <span className={`${styles.convSkeletonName} ${styles.sk}`} />
+                    <span className={`${styles.convSkeletonPreview} ${styles.sk}`} />
+                  </div>
+                </div>
+              ))
+            ) : (
+            filteredConversations.map((conv) => {
               const isSelected = conv.id === selectedConvId;
               return (
                 <div
@@ -785,7 +951,16 @@ export const CreatorMessagesPage = () => {
                   </div>
                 </div>
               );
-            })}
+            })
+            )}
+            {filteredConversations.length === 0 && !loadingConversations && (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', padding: '2.5rem 1rem', textAlign: 'center' }}>
+                <MessageSquare size={36} className={styles.emptyIcon} />
+                <p style={{ margin: 0, fontSize: '0.85rem', opacity: 0.55 }}>
+                  {'No conversations yet'}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -821,13 +996,17 @@ export const CreatorMessagesPage = () => {
                 </div>
 
                 <div className={styles.roomActions}>
-                  <button className={styles.roomActionBtn} title="Favorite">
-                    <Star size={18} />
+                  <button
+                    className={`${styles.roomActionBtn} ${favoriteIds.has(selectedConvId) ? styles.roomActionActive : ''}`}
+                    title={favoriteIds.has(selectedConvId) ? 'Remove from Favorites' : 'Add to Favorites'}
+                    onClick={() => toggleFavorite(selectedConvId)}
+                  >
+                    <Star size={18} fill={favoriteIds.has(selectedConvId) ? 'currentColor' : 'none'} />
                   </button>
-                  <button className={styles.roomActionBtn} title="Delete">
+                  <button className={styles.roomActionBtn} title="Delete" onClick={requestDeleteChat}>
                     <Trash2 size={18} />
                   </button>
-                  <div className={styles.menuWrapper} ref={menuRef}>
+                  <div className={styles.menuWrapper} data-kebab-menu>
                     <button
                       className={styles.roomActionBtn}
                       onClick={() => setShowMenu(!showMenu)}
@@ -840,11 +1019,11 @@ export const CreatorMessagesPage = () => {
                           <Eye size={16} />
                           <span>View Profile</span>
                         </button>
-                        <button className={styles.dropdownItem}>
+                        <button className={styles.dropdownItem} onClick={handleBlockUser}>
                           <Ban size={16} />
                           <span>Block User</span>
                         </button>
-                        <button className={styles.dropdownItem}>
+                        <button className={styles.dropdownItem} onClick={requestDeleteChat}>
                           <Trash2 size={16} />
                           <span>Delete Chat</span>
                         </button>
@@ -855,49 +1034,76 @@ export const CreatorMessagesPage = () => {
               </div>
 
               <div className={styles.messagesBody}>
-                <div className={styles.dateSeparator}>
-                  <span>Today</span>
-                </div>
-
-                {currentMessages.map((msg) => {
-                  const isCreator = msg.sender === 'creator';
-                  return (
-                    <div
-                      key={msg.id}
-                      className={`${styles.msgRow} ${isCreator ? styles.msgRowRight : styles.msgRowLeft}`}
-                    >
-                      {!isCreator && (
-                        <img src={selectedConv.user.avatarUrl} alt="" className={styles.msgAvatar} />
-                      )}
-                      <div className={styles.msgContentWrapper}>
-                        <div className={`${styles.msgBubble} ${isCreator ? styles.bubbleCreator : styles.bubbleFan}`}>
-                          <p className={styles.msgText}>{msg.text}</p>
-                        </div>
-                        <div className={`${styles.msgTimestampInline} ${isCreator ? styles.timestampRight : styles.timestampLeft}`}>
-                          <span className={styles.msgTimestamp}>{msg.time}</span>
-                        </div>
-                      </div>
+                {loadingMessages && currentMessages.length === 0 ? (
+                  <ChatThreadSkeleton light={!darkMode} />
+                ) : (
+                  <>
+                    <div className={styles.dateSeparator}>
+                      <span>Today</span>
                     </div>
-                  );
-                })}
 
-                <div ref={messagesEndRef} />
+                    {currentMessages.map((msg) => {
+                      const isCreator = msg.sender === 'creator';
+                      return (
+                        <div
+                          key={msg.id}
+                          className={`${styles.msgRow} ${isCreator ? styles.msgRowRight : styles.msgRowLeft}`}
+                        >
+                          {!isCreator && (
+                            <img src={selectedConv.user.avatarUrl} alt="" className={styles.msgAvatar} />
+                          )}
+                          <div className={styles.msgContentWrapper}>
+                            <div className={`${styles.msgBubble} ${isCreator ? styles.bubbleCreator : styles.bubbleFan}`}>
+                              {msg.mediaUrl && msg.mediaType === 'video' ? (
+                                <video src={msg.mediaUrl} controls className={styles.msgMedia} />
+                              ) : msg.mediaUrl ? (
+                                <img src={msg.mediaUrl} alt="Media" className={styles.msgMedia} />
+                              ) : null}
+                              {msg.text && <p className={styles.msgText}>{msg.text}</p>}
+                            </div>
+                            <div className={`${styles.msgTimestampInline} ${isCreator ? styles.timestampRight : styles.timestampLeft}`}>
+                              <span className={styles.msgTimestamp}>{msg.time}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    <div ref={messagesEndRef} />
+                  </>
+                )}
               </div>
 
               <form className={styles.chatInputBar} onSubmit={handleSendMessage}>
                 <div className={styles.inputLeftIcons}>
-                  <button type="button" className={styles.inputIconButton} title="Attach Image">
+                  <input
+                    ref={chatMediaInputRef}
+                    type="file"
+                    accept="image/*,video/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleSendImage(file);
+                      e.target.value = '';
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className={styles.inputIconButton}
+                    title="Attach Image"
+                    onClick={() => chatMediaInputRef.current?.click()}
+                  >
                     <ImageIcon size={19} />
                   </button>
-                  <button type="button" className={styles.inputIconButton} title="GIF">
-                    <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>GIF</span>
-                  </button>
-                  <button type="button" className={styles.inputIconButton} title="Emoji">
-                    <Smile size={19} />
-                  </button>
+                  <ChatComposerExtras
+                    dark={darkMode}
+                    anchor="left"
+                    onPickEmoji={handlePickEmoji}
+                  />
                 </div>
 
                 <input
+                  ref={chatInputRef}
                   type="text"
                   placeholder="Type a message..."
                   value={inputText}
@@ -910,6 +1116,8 @@ export const CreatorMessagesPage = () => {
                 </button>
               </form>
             </>
+          ) : selectedConvId && (loadingConversations || loadingMessages) ? (
+            <ChatScreenSkeleton light={!darkMode} />
           ) : (
             <div className={styles.emptyStateContainer}>
               <div className={styles.emptyStateCard}>
@@ -1006,25 +1214,25 @@ export const CreatorMessagesPage = () => {
                 <h4 className={styles.actionsTitle}>Quick Actions</h4>
                 <button className={`${styles.actionBtn} ${styles.actionViewProfile}`}>
                   <div className={`${styles.actionIcon} ${styles.iconPink}`}>
-                    <User size={16} />
+                    <User size={22} />
                   </div>
                   <span>View Profile</span>
                 </button>
                 <button className={`${styles.actionBtn} ${styles.actionSendTip}`}>
                   <div className={`${styles.actionIcon} ${styles.iconWhite}`}>  
-                    <DollarSign size={16} />
+                    <DollarSign size={22} />
                   </div>
                   <span>Send Tip</span>
                 </button>
                 <button className={`${styles.actionBtn} ${styles.actionCreatePPV}`}>
                   <div className={`${styles.actionIcon} ${styles.iconPurple}`}>
-                    <Gift size={16} />
+                    <Gift size={22} />
                   </div>
                   <span>Create PPV Offer</span>
                 </button>
                 <button className={`${styles.actionBtn} ${styles.actionBlockUser}`}>
                   <div className={`${styles.actionIcon} ${styles.iconRed}`}>
-                    <Ban size={16} />
+                    <Ban size={22} />
                   </div>
                   <span>Block User</span>
                 </button>
@@ -1040,6 +1248,37 @@ export const CreatorMessagesPage = () => {
           )}
         </div>
       </div>
+
+      {/* Chat Filters Sheet */}
+      <ChatFiltersSheet {...filterSheetProps} />
+
+      {/* Delete Chat Confirmation Popup */}
+      <ConfirmDeleteDialog
+        open={!!deleteChatTarget}
+        itemName={selectedConv?.user?.displayName || 'this fan'}
+        title="Delete Conversation?"
+        confirmLabel="Delete Chat"
+        message={<>Are you sure you want to delete the conversation with <strong>{selectedConv?.user?.displayName || 'this fan'}</strong>?</>}
+        deleting={deletingChat}
+        darkMode={darkMode}
+        onCancel={closeDeleteChat}
+        onConfirm={confirmDeleteChat}
+      />
+
+      {/* Block Fan Confirmation Popup */}
+      <ConfirmDeleteDialog
+        open={!!blockTarget}
+        itemName={selectedConv?.user?.displayName || 'this fan'}
+        title="Block User?"
+        confirmLabel="Block"
+        busyLabel="Blocking…"
+        icon={<Ban size={22} />}
+        message={<>Are you sure you want to block <strong>{selectedConv?.user?.displayName || 'this fan'}</strong>? They won't be able to message you anymore.</>}
+        deleting={blocking}
+        darkMode={darkMode}
+        onCancel={closeBlock}
+        onConfirm={confirmBlockUser}
+      />
     </div>
   );
 };

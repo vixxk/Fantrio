@@ -13,6 +13,17 @@ const walletSchema = new mongoose.Schema(
       required: true,
       default: 0,
       min: [0, 'Wallet balance cannot be negative']
+    },
+    // Creator payout details (masked before sending to the client)
+    payoutMethod: {
+      accountHolder: { type: String, default: '' },
+      bankName: { type: String, default: '' },
+      routingNumber: { type: String, default: '' },
+      accountNumber: { type: String, default: '' },
+      verified: { type: Boolean, default: false },
+      payoutSchedule: { type: String, default: 'weekly' },
+      currency: { type: String, default: 'usd' },
+      minimumPayout: { type: Number, default: 100 }
     }
   },
   {

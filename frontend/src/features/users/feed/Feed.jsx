@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { api } from '../../../services/api';
 import { useApp } from '../../../context/AppContext';
 import { 
@@ -11,316 +11,100 @@ import {
   BadgeCheck, 
   Send,
   Play,
-  Video
+  Video,
+  Inbox,
+  Ban,
+  X,
+  Check,
+  Zap,
+  Link2,
+  MessageSquare
 } from 'lucide-react';
+import { ConfirmDeleteDialog } from '../../../components/ConfirmDeleteDialog/ConfirmDeleteDialog';
+import { useToast } from '../../../components/Toast/Toast';
+import { useAppDialog } from '../../../components/AppDialog/AppDialog';
+import { useConfirmDelete } from '../../../hooks/useConfirmDelete';
 import styles from './Feed.module.css';
+import { GiftPanel } from '../../../features/gifts/GiftPanel';
+import { QuickRecharge } from '../../../features/gifts/QuickRecharge';
 
-const MOCK_POSTS = [
+const formatTimeAgo = (dateString) => {
+  if (!dateString) return 'just now';
+  const seconds = Math.floor((new Date() - new Date(dateString)) / 1000);
+  if (seconds < 60) return `${seconds}s ago`;
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+};
+
+const SEEN_KEY = 'fantrio_seen_posts';
+
+const loadSeenIds = () => {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(SEEN_KEY) || '[]'));
+  } catch {
+    return new Set();
+  }
+};
+
+const persistSeenIds = (ids) => {
+  try {
+    localStorage.setItem(SEEN_KEY, JSON.stringify(Array.from(ids)));
+  } catch (err) {
+    console.error('Failed to persist seen posts:', err);
+  }
+};
+
+const buildShareTargets = (url) => [
   {
-    _id: 'mock-post-1',
-    creatorId: {
-      _id: 'creator-savannah',
-      avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80',
-      displayName: 'Savannah Nguyen',
-      isVerifiedBadge: true,
-      username: 'savannah_n'
-    },
-    postType: 'free',
-    hasAccess: true,
-    content: 'Had an amazing weekend photoshoot! 📸 Can\'t wait to share more with you guys. Which one is your favorite?',
-    media: [
-      {
-        _id: 'media-1',
-        type: 'image',
-        url: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80'
-      }
-    ],
-    likesCount: 142,
-    isLiked: false,
-    commentsCount: 2,
-    comments: [
-      {
-        _id: 'comment-1-1',
-        text: 'You look absolutely stunning! 😍',
-        userId: { displayName: 'Alex King', avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80' }
-      },
-      {
-        _id: 'comment-1-2',
-        text: 'Where was this taken?',
-        userId: { displayName: 'Jane Cooper', avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80' }
-      }
-    ],
-    sharesCount: 12
+    id: 'whatsapp',
+    label: 'WhatsApp',
+    color: '#25D366',
+    url: `https://wa.me/?text=${encodeURIComponent(url)}`
   },
   {
-    _id: 'mock-post-2',
-    creatorId: {
-      _id: 'creator-leslie',
-      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
-      displayName: 'Leslie Alexander',
-      isVerifiedBadge: true,
-      username: 'leslie_alex'
-    },
-    postType: 'ppv',
-    hasAccess: false,
-    coinPrice: 50,
-    content: 'Behind the scenes video from my latest dance rehearsals! 💃 Unlock to see the full routine.',
-    media: [
-      {
-        _id: 'media-2',
-        type: 'video',
-        url: 'https://assets.mixkit.co/videos/preview/mixkit-woman-dancing-in-front-of-a-pink-neon-light-41865-large.mp4',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=800&q=80'
-      }
-    ],
-    likesCount: 89,
-    isLiked: false,
-    commentsCount: 1,
-    comments: [
-      {
-        _id: 'comment-2-1',
-        text: 'So excited to see this!',
-        userId: { displayName: 'Robert Fox', avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80' }
-      }
-    ],
-    sharesCount: 5
+    id: 'x',
+    label: 'X / Twitter',
+    color: '#000000',
+    url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`
   },
   {
-    _id: 'mock-post-3',
-    creatorId: {
-      _id: 'creator-kristin',
-      avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80',
-      displayName: 'Kristin Watson',
-      isVerifiedBadge: true,
-      username: 'kristin_w'
-    },
-    postType: 'free',
-    hasAccess: true,
-    content: 'Just recorded a new acoustic vocal cover! 🎙️ Grab your headphones and let me know what you think.',
-    media: [
-      {
-        _id: 'media-3',
-        type: 'audio',
-        url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=300&q=80'
-      }
-    ],
-    likesCount: 204,
-    isLiked: false,
-    commentsCount: 0,
-    comments: [],
-    sharesCount: 24
+    id: 'telegram',
+    label: 'Telegram',
+    color: '#229ED9',
+    url: `https://t.me/share/url?url=${encodeURIComponent(url)}`
   },
   {
-    _id: 'mock-post-4',
-    creatorId: {
-      _id: 'creator-jenny',
-      avatarUrl: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=150&q=80',
-      displayName: 'Jenny Wilson',
-      isVerifiedBadge: false,
-      username: 'jenny_wil_mock'
-    },
-    postType: 'ppv',
-    hasAccess: false,
-    coinPrice: 35,
-    content: 'Exclusive high-resolution portrait from my latest studio set. ✨ Unlock to see the full unblurred image.',
-    media: [
-      {
-        _id: 'media-4',
-        type: 'image',
-        url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=800&q=80',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=800&q=80'
-      }
-    ],
-    likesCount: 56,
-    isLiked: false,
-    commentsCount: 0,
-    comments: [],
-    sharesCount: 2
-  },
-  {
-    _id: 'mock-post-5',
-    creatorId: {
-      _id: 'creator-dianne',
-      avatarUrl: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=150&q=80',
-      displayName: 'Dianne Russell',
-      isVerifiedBadge: true,
-      username: 'dianne_r'
-    },
-    postType: 'free',
-    hasAccess: true,
-    content: 'Good morning everyone! Sending you all positive vibes for a productive and wonderful week ahead. Remember to stay hydrated and take small breaks! ☀️🌸',
-    media: [],
-    likesCount: 310,
-    isLiked: false,
-    commentsCount: 1,
-    comments: [
-      {
-        _id: 'comment-5-1',
-        text: 'Morning Dianne! Thanks for the positive energy!',
-        userId: { displayName: 'Jacob Jones', avatarUrl: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=100&q=80' }
-      }
-    ],
-    sharesCount: 45
-  },
-  {
-    _id: 'mock-post-6',
-    creatorId: {
-      _id: 'creator-savannah',
-      avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80',
-      displayName: 'Savannah Nguyen',
-      isVerifiedBadge: true,
-      username: 'savannah_n'
-    },
-    postType: 'free',
-    hasAccess: true,
-    content: 'Just dropped a brand new vlog behind-the-scenes of the summer collection shoot! Check it out below! 🌴✨',
-    media: [
-      {
-        _id: 'media-6',
-        type: 'video',
-        url: 'https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-sign-smiling-and-dancing-34360-large.mp4',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=800&q=80'
-      }
-    ],
-    likesCount: 512,
-    isLiked: false,
-    commentsCount: 3,
-    comments: [
-      {
-        _id: 'comment-6-1',
-        text: 'Love the aesthetic of this! 💖',
-        userId: { displayName: 'Emily Watson', avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=100&q=80' }
-      }
-    ],
-    sharesCount: 89
-  },
-  {
-    _id: 'mock-post-7',
-    creatorId: {
-      _id: 'creator-leslie',
-      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
-      displayName: 'Leslie Alexander',
-      isVerifiedBadge: true,
-      username: 'leslie_alex'
-    },
-    postType: 'ppv',
-    hasAccess: false,
-    coinPrice: 40,
-    content: 'My favorite photo from the sunset rooftop shoot yesterday. Unlock to see the full high-res unblurred image! 🌅🍷',
-    media: [
-      {
-        _id: 'media-7',
-        type: 'image',
-        url: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80'
-      }
-    ],
-    likesCount: 198,
-    isLiked: false,
-    commentsCount: 2,
-    comments: [],
-    sharesCount: 15
-  },
-  {
-    _id: 'mock-post-8',
-    creatorId: {
-      _id: 'creator-kristin',
-      avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80',
-      displayName: 'Kristin Watson',
-      isVerifiedBadge: true,
-      username: 'kristin_w'
-    },
-    postType: 'free',
-    hasAccess: true,
-    content: 'Writing some acoustic melodies today. Here is a sneak peek at the new song lyrics: "Under the starlight, we found our way back home..." 💫🎵 Let me know what you think!',
-    media: [],
-    likesCount: 88,
-    isLiked: false,
-    commentsCount: 1,
-    comments: [
-      {
-        _id: 'comment-8-1',
-        text: 'Can\'t wait for the album release! 😭',
-        userId: { displayName: 'Cody Fisher', avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80' }
-      }
-    ],
-    sharesCount: 8
-  },
-  {
-    _id: 'mock-post-9',
-    creatorId: {
-      _id: 'creator-jenny',
-      avatarUrl: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=150&q=80',
-      displayName: 'Jenny Wilson',
-      isVerifiedBadge: false,
-      username: 'jenny_wilson'
-    },
-    postType: 'ppv',
-    hasAccess: false,
-    coinPrice: 20,
-    content: 'Unlock to hear my exclusive voice note check-in where I answer questions from my VIP subscribers! 🎙️💬',
-    media: [
-      {
-        _id: 'media-9',
-        type: 'audio',
-        url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=300&q=80'
-      }
-    ],
-    likesCount: 125,
-    isLiked: false,
-    commentsCount: 0,
-    comments: [],
-    sharesCount: 11
-  },
-  {
-    _id: 'mock-post-10',
-    creatorId: {
-      _id: 'creator-dianne',
-      avatarUrl: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=150&q=80',
-      displayName: 'Dianne Russell',
-      isVerifiedBadge: true,
-      username: 'dianne_r'
-    },
-    postType: 'free',
-    hasAccess: true,
-    content: 'Taking a quick coffee break between photoshoot sets! ☕✨ What are you all up to today?',
-    media: [
-      {
-        _id: 'media-10',
-        type: 'image',
-        url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80'
-      }
-    ],
-    likesCount: 242,
-    isLiked: false,
-    commentsCount: 4,
-    comments: [
-      {
-        _id: 'comment-10-1',
-        text: 'So beautiful, wish I was there!',
-        userId: { displayName: 'Guy Hawkins', avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80' }
-      }
-    ],
-    sharesCount: 30
+    id: 'facebook',
+    label: 'Facebook',
+    color: '#1877F2',
+    url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`
   }
 ];
 
 export const Feed = () => {
-  const { darkMode, refreshBalance, balance } = useApp();
+  const { darkMode, refreshBalance, balance, user } = useApp();
+  const { toast } = useToast();
+  const { prompt } = useAppDialog();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  // States for comments and tipping modals
+  const [nextCursor, setNextCursor] = useState(null);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [seenIds, setSeenIds] = useState(loadSeenIds);
+  const [sharePostId, setSharePostId] = useState(null);
+  const sentinelRef = useRef(null);
+  const seenObserverRef = useRef(null);
+
+  // States for comments and gifting modals
   const [activeCommentPost, setActiveCommentPost] = useState(null);
   const [newComment, setNewComment] = useState('');
-  
+
   const [activeTipCreator, setActiveTipCreator] = useState(null);
-  const [tipAmount, setTipAmount] = useState('10');
-  const [copiedPostId, setCopiedPostId] = useState(null);
+  const [giftOpen, setGiftOpen] = useState(false);
+  const [rechargeOpen, setRechargeOpen] = useState(false);
   const [activeKebabPostId, setActiveKebabPostId] = useState(null);
 
   useEffect(() => {
@@ -331,168 +115,292 @@ export const Feed = () => {
     return () => window.removeEventListener('click', handleWindowClick);
   }, []);
 
-  const fetchPosts = () => {
-    setLoading(true);
-    const stored = localStorage.getItem('fantrio_mock_posts');
-    let loadedPosts = MOCK_POSTS;
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      const merged = [...parsed];
-      MOCK_POSTS.forEach(mp => {
-        if (!merged.find(p => p._id === mp._id)) {
-          merged.push(mp);
-        }
-      });
-      loadedPosts = merged;
-      localStorage.setItem('fantrio_mock_posts', JSON.stringify(merged));
-    } else {
-      localStorage.setItem('fantrio_mock_posts', JSON.stringify(MOCK_POSTS));
+  const fetchPosts = useCallback(async (cursor) => {
+    const params = cursor ? `?limit=30&cursor=${cursor}` : '?limit=30';
+    try {
+      const res = await api.get(`/posts${params}`);
+      if (res.status === 'success') {
+        const incoming = res.posts || [];
+        setPosts((prev) => cursor ? [...prev, ...incoming] : incoming);
+        setNextCursor(res.nextCursor || null);
+      } else {
+        setPosts((prev) => cursor ? prev : []);
+        setNextCursor(null);
+      }
+    } catch (err) {
+      console.error('Failed to fetch posts:', err);
+      if (!cursor) setPosts([]);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
     }
-    setPosts(loadedPosts);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchPosts();
   }, []);
 
-  const savePosts = (newPosts) => {
-    setPosts(newPosts);
-    localStorage.setItem('fantrio_mock_posts', JSON.stringify(newPosts));
-  };
-
-  const handleLike = (postId) => {
-    const updated = posts.map(p => {
-      if (p._id === postId) {
-        return {
-          ...p,
-          isLiked: !p.isLiked,
-          likesCount: p.isLiked ? p.likesCount - 1 : p.likesCount + 1
-        };
-      }
-      return p;
+  useEffect(() => {
+    Promise.resolve().then(() => {
+      fetchPosts();
     });
-    savePosts(updated);
-  };
+  }, [fetchPosts]);
 
-  const handleUnlock = async (postId, coinPrice) => {
-    if (balance < coinPrice) {
-      alert(`Insufficient coins! You need ${coinPrice} coins but have ${balance}. Add coins in the sidebar first!`);
-      return;
+  // Mark a post as seen locally + persist + fire server notification
+  const markPostAsSeen = useCallback(async (postId) => {
+    setSeenIds((prev) => {
+      if (prev.has(postId)) return prev;
+      const next = new Set(prev);
+      next.add(postId);
+      persistSeenIds(next);
+      return next;
+    });
+    api.post(`/posts/${postId}/seen`).catch(() => {});
+  }, []);
+
+  // IntersectionObserver for seen-tracking — observe post cards entering viewport
+  useEffect(() => {
+    if (!seenObserverRef.current) {
+      seenObserverRef.current = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const postId = entry.target.getAttribute('data-post-id');
+              if (postId) markPostAsSeen(postId);
+            }
+          });
+        },
+        { threshold: 0.3 }
+      );
     }
-
-    if (!window.confirm(`Unlock this premium content for ${coinPrice} Coins?`)) {
-      return;
-    }
-
-    const postObj = posts.find(p => p._id === postId);
-    const creatorId = postObj?.creatorId?._id || '64b1f3c30a84e24cf8f83001';
-
-    try {
-      // Deduct coins using the backend tip route for matching wallet ledger
-      await api.post(`/monetization/tip/${creatorId}`, { coins: coinPrice });
-      
-      const updated = posts.map(p => {
-        if (p._id === postId) {
-          return {
-            ...p,
-            hasAccess: true,
-            media: p.media.map(m => ({
-              ...m,
-              isLocked: false
-            }))
-          };
-        }
-        return p;
-      });
-      savePosts(updated);
-      await refreshBalance();
-      alert('Content unlocked successfully!');
-    } catch (err) {
-      alert('Failed to unlock content: ' + err.message);
-    }
-  };
-
-  const handleCommentSubmit = (postId) => {
-    if (!newComment.trim()) return;
-
-    const newCommentObj = {
-      _id: `comment-${Date.now()}`,
-      text: newComment,
-      userId: {
-        displayName: 'Johnn',
-        avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80'
-      },
-      createdAt: new Date().toISOString()
+    const observer = seenObserverRef.current;
+    const cards = document.querySelectorAll('[data-post-id]');
+    cards.forEach((el) => observer.observe(el));
+    return () => {
+      cards.forEach((el) => observer.unobserve(el));
     };
+  }, [posts, markPostAsSeen]);
 
-    const updated = posts.map(p => {
-      if (p._id === postId) {
-        return {
-          ...p,
-          commentsCount: p.commentsCount + 1,
-          comments: [...(p.comments || []), newCommentObj]
-        };
-      }
-      return p;
-    });
-    
-    savePosts(updated);
-    setNewComment('');
-  };
+  // IntersectionObserver for infinite scroll — fire fetch when sentinel enters viewport
+  useEffect(() => {
+    if (!nextCursor || !sentinelRef.current) return;
+    const sentinel = sentinelRef.current;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && nextCursor && !loadingMore) {
+          setLoadingMore(true);
+          fetchPosts(nextCursor);
+        }
+      },
+      { rootMargin: '300px' }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [nextCursor, loadingMore, fetchPosts]);
 
-  const handleTipSubmit = async () => {
-    const coinsVal = parseFloat(tipAmount);
-    if (isNaN(coinsVal) || coinsVal <= 0) {
-      alert('Please enter a valid positive number of coins.');
-      return;
-    }
+  const handleLike = async (postId) => {
+    const prev = posts.find((p) => p._id === postId);
+    if (!prev) return;
 
-    if (balance < coinsVal) {
-      alert('Insufficient coins for this tip.');
-      return;
-    }
+    setPosts((current) => current.map((p) =>
+      p._id === postId
+        ? { ...p, isLiked: !p.isLiked, likesCount: p.isLiked ? p.likesCount - 1 : p.likesCount + 1 }
+        : p
+    ));
 
     try {
-      await api.post(`/monetization/tip/${activeTipCreator}`, { coins: coinsVal });
-      alert(`Successfully sent a ${coinsVal} coins tip!`);
+      const res = await api.post(`/posts/${postId}/like`);
+      if (res && typeof res.likesCount === 'number') {
+        setPosts((current) => current.map((p) =>
+          p._id === postId ? { ...p, likesCount: res.likesCount, isLiked: res.isLiked } : p
+        ));
+      }
+    } catch (err) {
+      setPosts((current) => current.map((p) =>
+        p._id === postId ? { ...p, isLiked: prev.isLiked, likesCount: prev.likesCount } : p
+      ));
+      console.error('Failed to like post:', err);
+    }
+  };
+
+  // Unlock premium content — shared confirm dialog state machine
+  const {
+    target: unlockTarget,
+    open: openUnlock,
+    close: closeUnlock,
+    confirm: confirmUnlock,
+    deleting: unlocking,
+  } = useConfirmDelete({
+    onConfirm: ({ postId }) => api.post(`/posts/${postId}/unlock`),
+    successMessage: 'Content unlocked successfully!',
+    errorMessage: 'Failed to unlock content',
+    onSuccess: ({ postId }, res) => {
+      const mediaUrlMap = {};
+      (res.mediaUrls || []).forEach((m) => { mediaUrlMap[m._id] = m.url; });
+
+      setPosts((current) => current.map((p) =>
+        p._id === postId
+          ? {
+              ...p,
+              hasAccess: true,
+              media: p.media.map((m) => ({
+                ...m,
+                isLocked: false,
+                url: mediaUrlMap[m._id] || m.url
+              }))
+            }
+          : p
+      ));
+      refreshBalance();
+    },
+  });
+
+  const handleUnlock = (postId, coinPrice) => {
+    if (balance < coinPrice) {
+      toast.error(`Insufficient coins! You need ${coinPrice} coins but have ${balance}. Add coins first!`);
+      return;
+    }
+    openUnlock({ postId, coinPrice });
+  };
+
+  const handleCommentSubmit = async (postId) => {
+    const text = newComment.trim();
+    if (!text) return;
+
+    try {
+      const res = await api.post(`/posts/${postId}/comment`, { text });
+      const comments = res.comments || [];
+      setPosts((current) => current.map((p) =>
+        p._id === postId ? { ...p, comments, commentsCount: comments.length } : p
+      ));
+      setNewComment('');
+    } catch (err) {
+      toast.error('Failed to post comment: ' + err.message);
+    }
+  };
+
+  const handleSendGift = async (gift) => {
+    if (balance < gift.coins) {
+      setGiftOpen(false);
+      setRechargeOpen(true);
+      return;
+    }
+    try {
+      await api.post(`/monetization/gift/${activeTipCreator}`, { giftId: gift.id });
+      toast.success(`${gift.name} sent!`);
+      setGiftOpen(false);
       setActiveTipCreator(null);
       await refreshBalance();
     } catch (err) {
-      alert('Failed to send tip: ' + err.message);
+      toast.error('Failed to send gift: ' + (err.message || 'Please try again'));
+      throw err;
     }
   };
 
-  const handleShare = async (postId) => {
+  const handleShare = (postId) => {
+    setSharePostId(postId);
+    // Increment share count on the server (fire-and-forget)
+    api.post(`/posts/${postId}/share`).then(() => {
+      setPosts((current) => current.map((p) =>
+        p._id === postId ? { ...p, sharesCount: (p.sharesCount || 0) + 1 } : p
+      ));
+    }).catch(() => {});
+  };
+
+  const handleSharePlatform = (targetUrl) => {
+    window.open(targetUrl, '_blank', 'noopener,noreferrer');
+    setSharePostId(null);
+  };
+
+  const handleCopyShareLink = async (postId) => {
     try {
-      const shareUrl = `${window.location.origin}/post/${postId}`;
-      await navigator.clipboard.writeText(shareUrl);
-      
-      const updated = posts.map(p => {
-        if (p._id === postId) {
-          return {
-            ...p,
-            sharesCount: p.sharesCount + 1
-          };
-        }
-        return p;
-      });
-      savePosts(updated);
+      await navigator.clipboard.writeText(`${window.location.origin}/post/${postId}`);
+      toast.success('Post link copied to clipboard!');
+    } catch {
+      toast.error('Failed to copy link');
+    }
+    setSharePostId(null);
+  };
 
-      setCopiedPostId(postId);
-      setTimeout(() => {
-        setCopiedPostId(null);
-      }, 2000);
+  const handleCopyLink = (postId) => {
+    navigator.clipboard.writeText(`${window.location.origin}/post/${postId}`);
+    toast.success('Post link copied to clipboard!');
+    setActiveKebabPostId(null);
+  };
+
+  const handleToggleFollow = async (creatorId, isFollowing) => {
+    // Optimistic update
+    setPosts((current) => current.map((p) => {
+      const pid = p.creatorId?._id || p.creatorId;
+      return pid === creatorId ? { ...p, isFollowing: !isFollowing } : p;
+    }));
+    try {
+      await api.post(`/creators/follow/${creatorId}`);
+      toast.success(isFollowing ? 'Unfollowed creator.' : 'Following creator!');
+      setActiveKebabPostId(null);
     } catch (err) {
-      console.error('Failed to share post:', err);
+      // Revert on error
+      setPosts((current) => current.map((p) => {
+        const pid = p.creatorId?._id || p.creatorId;
+        return pid === creatorId ? { ...p, isFollowing: isFollowing } : p;
+      }));
+      toast.error('Failed to update follow status: ' + err.message);
     }
   };
+
+  // Block creator — shared confirm dialog state machine
+  const {
+    target: blockTarget,
+    open: openBlock,
+    close: closeBlock,
+    confirm: confirmBlock,
+    deleting: blocking,
+  } = useConfirmDelete({
+    onConfirm: (creatorId) => api.post(`/block/${creatorId}`),
+    successMessage: 'Creator blocked successfully.',
+    errorMessage: 'Failed to block creator',
+    onSuccess: (creatorId) => {
+      setPosts((current) => current.filter((p) => (p.creatorId?._id || p.creatorId) !== creatorId));
+    },
+  });
+
+  const handleBlock = (creatorId) => {
+    setActiveKebabPostId(null);
+    openBlock(creatorId);
+  };
+
+  const handleReport = async (post) => {
+    const reason = await prompt({
+      title: 'Report Post',
+      message: 'Please describe why you are reporting this post.',
+      placeholder: 'Reason for reporting...',
+      confirmLabel: 'Submit Report'
+    });
+    if (!reason || !reason.trim()) {
+      setActiveKebabPostId(null);
+      return;
+    }
+    try {
+      await api.post(`/posts/${post._id}/report`, { reason: reason.trim() });
+      toast.success('Post reported. Our team will review it shortly.');
+    } catch (err) {
+      toast.error('Failed to report post: ' + err.message);
+    }
+    setActiveKebabPostId(null);
+  };
+
+  // Discovery sort: fresh (unseen, un-interacted) posts first, already-seen/interacted last
+  const sortedPosts = useMemo(() => {
+    const fresh = [];
+    const stale = [];
+    posts.forEach((p) => {
+      const hasInteracted = seenIds.has(p._id) || p.isSeen || p.isLiked || p.hasCommented;
+      (hasInteracted ? stale : fresh).push(p);
+    });
+    return [...fresh, ...stale];
+  }, [posts, seenIds]);
 
   if (loading) {
     return (
       <div className={`${styles.feedContainer} ${darkMode ? styles.dark : styles.light}`} style={{ padding: '2rem 0' }}>
         <div className={styles.postsList}>
-          {Array.from({ length: 3 }).map((_, idx) => (
+          {Array.from({ length: 4 }).map((_, idx) => (
             <div key={idx} className="skeleton-card">
               <div className="skeleton-header">
                 <div className="skeleton-box skeleton-avatar" />
@@ -511,18 +419,46 @@ export const Feed = () => {
     );
   }
 
+  if (!loading && sortedPosts.length === 0) {
+    return (
+      <div className={`${styles.feedContainer} ${darkMode ? styles.dark : styles.light}`}>
+        <div className={styles.postsList}>
+          <div className={styles.emptyState}>
+            <Inbox size={40} />
+            <p>No posts to show right now.</p>
+            <span>Follow more creators to fill your feed.</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const TIER_STYLES = {
+    1: styles.tierBadge1,
+    2: styles.tierBadge2,
+    3: styles.tierBadge3,
+    4: styles.tierBadge4
+  };
+
+  const giftCreator = posts.find((p) => {
+    const pid = p.creatorId?._id || p.creatorId;
+    return pid === activeTipCreator;
+  });
+  const receiverName = giftCreator?.creatorId?.displayName || 'this creator';
+
   return (
     <div className={`${styles.feedContainer} ${darkMode ? styles.dark : styles.light}`}>
       
       {/* Posts List */}
       <div className={styles.postsList}>
-        {posts.map((post) => {
+        {sortedPosts.map((post) => {
           const creator = post.creatorId || {};
+          const creatorId = creator._id || post.creatorId;
           const isPPV = post.postType === 'ppv';
           const isLocked = isPPV && !post.hasAccess;
 
           return (
-            <article key={post._id} className={styles.postCard}>
+            <article key={post._id} className={styles.postCard} data-post-id={post._id}>
               {/* Post Header */}
               <div className={styles.postHeader}>
                 <div className={styles.creatorProfile}>
@@ -533,15 +469,26 @@ export const Feed = () => {
                   />
                   <div className={styles.creatorInfo}>
                     <div className={styles.nameBlock}>
-                      <span className={styles.displayName}>{creator.displayName || 'Molly Jane'}</span>
-                      {creator.isVerifiedBadge !== false && <BadgeCheck size={14} className={styles.verifiedIcon} />}
+                      <span className={styles.displayName}>{creator.displayName || 'Creator'}</span>
+                      {creator.isVerifiedBadge && <BadgeCheck size={14} className={styles.verifiedIcon} />}
                     </div>
-                    <span className={styles.username}>@{creator.username || 'mollyjane'}</span>
+                    <div className={styles.nameRow}>
+                      <span className={styles.username}>@{creator.username || 'creator'}</span>
+                      <button
+                        className={`${styles.followBadge} ${post.isFollowing ? styles.followingBadge : ''}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleFollow(creatorId, Boolean(post.isFollowing));
+                        }}
+                      >
+                        {post.isFollowing ? 'Following' : 'Follow'}
+                      </button>
+                    </div>
                   </div>
                 </div>
 
                 <div className={styles.headerRight}>
-                  <span className={styles.timestamp}>2h ago</span>
+                  <span className={styles.timestamp}>{formatTimeAgo(post.createdAt)}</span>
                   <div className={styles.kebabWrapper}>
                     <button 
                       className={styles.moreBtn}
@@ -556,41 +503,21 @@ export const Feed = () => {
                       <div className={styles.kebabDropdown} onClick={(e) => e.stopPropagation()}>
                         <button 
                           className={styles.kebabOption} 
-                          onClick={() => {
-                            navigator.clipboard.writeText(`${window.location.origin}/post/${post._id}`);
-                            alert('Post link copied to clipboard!');
-                            setActiveKebabPostId(null);
-                          }}
+                          onClick={() => handleCopyLink(post._id)}
                         >
                           Copy post link
                         </button>
                         <div className={styles.kebabDivider} />
                         <button 
                           className={styles.kebabOption} 
-                          onClick={() => {
-                            alert(`Unfollowed creator @${creator.username}`);
-                            setActiveKebabPostId(null);
-                          }}
-                        >
-                          Unfollow
-                        </button>
-                        <div className={styles.kebabDivider} />
-                        <button 
-                          className={styles.kebabOption} 
-                          onClick={() => {
-                            alert(`Blocked creator @${creator.username}`);
-                            setActiveKebabPostId(null);
-                          }}
+                          onClick={() => handleBlock(creatorId)}
                         >
                           Block
                         </button>
                         <div className={styles.kebabDivider} />
                         <button 
                           className={`${styles.kebabOption} ${styles.kebabDanger}`} 
-                          onClick={() => {
-                            alert(`Reported post: ${post.content.slice(0, 20)}...`);
-                            setActiveKebabPostId(null);
-                          }}
+                          onClick={() => handleReport(post)}
                         >
                           Report
                         </button>
@@ -610,9 +537,8 @@ export const Feed = () => {
                 {post.media && post.media.map((mediaItem) => (
                   <div key={mediaItem._id} className={styles.mediaItemWrapper}>
                     {isLocked ? (
-                      /* LOCKED STATE OVERLAY */
                       <div className={styles.lockedOverlay}>
-                        <div className={styles.blurBg} style={{ backgroundImage: `url(${mediaItem.thumbnailUrl || mediaItem.url || 'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=40&q=10'})` }} />
+                        <div className={styles.blurBg} style={{ backgroundImage: `url(${mediaItem.thumbnailUrl || 'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=40&q=10'})` }} />
                         {mediaItem.type === 'video' && (
                           <>
                             <span className={styles.videoLengthBadge}>
@@ -639,14 +565,13 @@ export const Feed = () => {
                         </div>
                       </div>
                     ) : (
-                      /* UNLOCKED STATE */
                       mediaItem.type === 'video' ? (
                         <div className={styles.videoPlayerWrapper}>
                           <video 
                             src={mediaItem.url} 
                             controls 
                             className={styles.postVideo} 
-                            poster="https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=800&q=80"
+                            poster={mediaItem.thumbnailUrl}
                           />
                           <div className={styles.videoLengthBadge}>
                             <Play size={10} fill="#ffffff" />
@@ -707,20 +632,20 @@ export const Feed = () => {
 
                   <button 
                     className={`${styles.footerActionBtn} ${styles.giftBtn}`}
-                    onClick={() => setActiveTipCreator(creator._id)}
+                    onClick={() => { setActiveTipCreator(creatorId); setGiftOpen(true); }}
                   >
                     <Gift size={20} />
-                    <span>{post.giftCount || 48}</span>
+                    <span>{post.giftCount || 0}</span>
                   </button>
                 </div>
 
                 <button 
-                  className={`${styles.shareActionBtn} ${copiedPostId === post._id ? styles.copied : ''}`} 
+                  className={styles.shareActionBtn}
                   onClick={() => handleShare(post._id)}
-                  title="Copy share link"
+                  title="Share this post"
                 >
-                  <Share2 size={20} className={copiedPostId === post._id ? styles.copiedIcon : ''} />
-                  <span>{copiedPostId === post._id ? 'Copied!' : 'Share'}</span>
+                  <Share2 size={20} />
+                  <span>Share</span>
                 </button>
               </div>
 
@@ -728,6 +653,11 @@ export const Feed = () => {
               {activeCommentPost === post._id && (
                 <div className={styles.commentsSection}>
                   <div className={styles.commentInputRow}>
+                    <img
+                      src={user?.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=50&q=80'}
+                      alt="Your avatar"
+                      className={styles.commentInputAvatar}
+                    />
                     <input 
                       type="text" 
                       placeholder="Write a comment..." 
@@ -739,80 +669,143 @@ export const Feed = () => {
                     <button 
                       className={styles.sendCommentBtn}
                       onClick={() => handleCommentSubmit(post._id)}
+                      disabled={!newComment.trim()}
+                      aria-label="Post comment"
                     >
                       <Send size={16} />
                     </button>
                   </div>
 
                   <div className={styles.commentsList}>
-                    {post.comments && post.comments.slice(-5).reverse().map((c, i) => (
-                      <div key={i} className={styles.commentItem}>
-                        <img 
-                          src={c.userId?.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=50&q=80'} 
-                          alt="Commenter avatar" 
-                          className={styles.commentAvatar} 
-                        />
-                        <div className={styles.commentBubble}>
-                          <span className={styles.commenterName}>{c.userId?.displayName || 'User'}</span>
-                          <p className={styles.commentText}>{c.text}</p>
+                    {post.comments && post.comments.length > 0 ? (
+                      post.comments.slice(-5).reverse().map((c, i) => (
+                        <div key={c._id || i} className={styles.commentItem}>
+                          <img 
+                            src={c.userId?.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=50&q=80'} 
+                            alt={`${c.userId?.displayName || 'User'}'s avatar`} 
+                            className={styles.commentAvatar} 
+                          />
+                          <div className={styles.commentBubble}>
+                            <div className={styles.commentMeta}>
+                              <span className={styles.commenterName}>{c.userId?.displayName || 'User'}</span>
+                              {c.userId?.isVerifiedBadge && <BadgeCheck size={12} className={styles.commentVerifiedIcon} />}
+                              <span className={styles.commentTime}>{formatTimeAgo(c.createdAt)}</span>
+                            </div>
+                            <p className={styles.commentText}>{c.text}</p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))
+                    ) : (
+                      <p className={styles.commentsEmpty}>No comments yet — be the first to join the conversation.</p>
+                    )}
                   </div>
                 </div>
               )}
             </article>
           );
         })}
+
+        {/* Infinite scroll sentinel */}
+        <div ref={sentinelRef} className={styles.sentinel}>
+          {loadingMore && (
+            <div className={styles.loadingDots}>
+              <span className={styles.dot} /><span className={styles.dot} /><span className={styles.dot} />
+            </div>
+          )}
+          {!nextCursor && !loadingMore && (
+            <div className={styles.caughtUp}>
+              <span className={styles.caughtUpIcon}><Inbox size={28} /></span>
+              <p className={styles.caughtUpText}>You are all caught up!</p>
+              <span className={styles.caughtUpSub}>Explore other features too.</span>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Tip Creator Modal */}
-      {activeTipCreator && (
-        <div className={styles.modalBackdrop}>
-          <div className={styles.tipModal}>
-            <h3 className={styles.modalTitle}>Send a Tip</h3>
-            <p className={styles.modalDesc}>Support this creator by sending some coins.</p>
-            
-            <div className={styles.tipOptions}>
-              {['10', '20', '50', '100'].map((amt) => (
-                <button 
-                  key={amt}
-                  className={`${styles.tipOptBtn} ${tipAmount === amt ? styles.selectedTip : ''}`}
-                  onClick={() => setTipAmount(amt)}
+      {/* Share Sheet */}
+      {sharePostId && (
+        <div className={styles.shareBackdrop} onClick={() => setSharePostId(null)}>
+          <div className={styles.shareSheet} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.shareHandle} />
+            <h3 className={styles.shareTitle}>Share this post</h3>
+            <div className={styles.sharePlatforms}>
+              <button
+                className={styles.sharePlatform}
+                onClick={() => handleCopyShareLink(sharePostId)}
+              >
+                <div className={`${styles.shareIconWrap} ${styles.shareIconCopy}`}>
+                  <Link2 size={22} />
+                </div>
+                <span className={styles.shareLabel}>Copy Link</span>
+              </button>
+              {buildShareTargets(`${window.location.origin}/post/${sharePostId}`).map((target) => (
+                <button
+                  key={target.id}
+                  className={styles.sharePlatform}
+                  onClick={() => handleSharePlatform(target.url)}
                 >
-                  {amt} Coins
+                  <div className={styles.shareIconWrap} style={{ backgroundColor: target.color }}>
+                    <MessageSquare size={22} />
+                  </div>
+                  <span className={styles.shareLabel}>{target.label}</span>
                 </button>
               ))}
             </div>
-
-            <div className={styles.customTipRow}>
-              <span className={styles.customLabel}>Custom Amount:</span>
-              <input 
-                type="number" 
-                value={tipAmount}
-                onChange={(e) => setTipAmount(e.target.value)}
-                className={styles.customTipInput}
-                min="1"
-              />
-            </div>
-
-            <div className={styles.modalActions}>
-              <button 
-                className={styles.cancelBtn}
-                onClick={() => setActiveTipCreator(null)}
-              >
-                Cancel
-              </button>
-              <button 
-                className={styles.confirmBtn}
-                onClick={handleTipSubmit}
-              >
-                Send Tip
-              </button>
-            </div>
+            <button className={styles.shareCancel} onClick={() => setSharePostId(null)}>
+              Cancel
+            </button>
           </div>
         </div>
       )}
+
+      {/* Gift Panel */}
+      {giftOpen && activeTipCreator && (
+        <GiftPanel
+          receiverName={receiverName}
+          balance={balance}
+          onSendGift={handleSendGift}
+          onRecharge={() => {
+            setGiftOpen(false);
+            setRechargeOpen(true);
+          }}
+          onClose={() => {
+            setGiftOpen(false);
+            setActiveTipCreator(null);
+          }}
+        />
+      )}
+      {rechargeOpen && (
+        <QuickRecharge onClose={() => setRechargeOpen(false)} />
+      )}
+
+      {/* Unlock Premium Content Confirmation */}
+      <ConfirmDeleteDialog
+        open={!!unlockTarget}
+        itemName={unlockTarget ? `${unlockTarget.coinPrice} coins` : ''}
+        title="Unlock Premium Content?"
+        confirmLabel="Unlock"
+        busyLabel="Unlocking…"
+        icon={<Lock size={22} />}
+        message={unlockTarget ? <>Unlock this premium content for <strong>{unlockTarget.coinPrice} Coins</strong>?</> : ''}
+        deleting={unlocking}
+        darkMode={darkMode}
+        onCancel={closeUnlock}
+        onConfirm={confirmUnlock}
+      />
+
+      {/* Block Creator Confirmation */}
+      <ConfirmDeleteDialog
+        open={!!blockTarget}
+        title="Block Creator?"
+        confirmLabel="Block"
+        busyLabel="Blocking…"
+        icon={<Ban size={22} />}
+        message="Block this creator? You will no longer see their posts and they will not be notified."
+        deleting={blocking}
+        darkMode={darkMode}
+        onCancel={closeBlock}
+        onConfirm={confirmBlock}
+      />
     </div>
   );
 };

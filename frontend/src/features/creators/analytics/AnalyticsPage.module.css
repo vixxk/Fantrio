@@ -163,111 +163,71 @@
 
 .statCard {
   background: #121212;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  justify-content: center;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.statCard:hover {
-  border-color: rgba(225, 0, 117, 0.3);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-}
-
-.statValueRow {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 1rem;
   display: flex;
   align-items: center;
   gap: 0.85rem;
-  margin-bottom: 0.25rem;
+  transition: all 0.2s ease;
+  min-height: 80px;
+  overflow: hidden;
 }
 
-.statValueCol {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}
-
-.statChangeInline {
-  margin-left: auto;
-  font-size: 1rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.statChangeInline.positive {
-  color: #10b981;
-}
-
-.statChangeInline.negative {
-  color: #ef4444;
-}
-
-.statLabelRow {
-  margin-bottom: 0.25rem;
+.statCard:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .statIconWrap {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
   background: rgba(225, 0, 117, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1.5px solid rgba(255, 255, 255, 0.1);
   flex-shrink: 0;
 }
 
-.statIcon {
-  color: #e10075;
+.statContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
 }
 
 .statLabel {
-  font-size: 0.82rem;
+  font-size: 0.72rem;
   color: rgba(255, 255, 255, 0.5);
   font-weight: 500;
-  display: block;
 }
 
 .statValue {
-  font-size: 2rem;
-  font-weight: 800;
+  font-size: 1.35rem;
+  font-weight: 700;
   color: #ffffff;
-  line-height: 1;
-  letter-spacing: -0.02em;
-}
-
-.statFooter {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  flex-wrap: wrap;
+  line-height: 1.2;
 }
 
 .statChange {
-  font-size: 0.82rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 0.15rem;
+  font-size: 0.68rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.statChange.positive {
+.changePositive {
   color: #10b981;
 }
 
-.statChange.negative {
+.changeNegative {
   color: #ef4444;
 }
 
-.statPeriod {
-  font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.4);
+.changeInfo {
+  color: #f59e0b;
 }
 
 /* ================= MAIN GRID ================= */
@@ -690,6 +650,18 @@
   gap: 0.2rem;
 }
 
+.contentBadges {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+/* Type badge shown inside the card details on mobile only (desktop keeps its column) */
+.typeBadgeMobile {
+  display: none;
+}
+
 .contentTitleRow {
   display: flex;
   align-items: center;
@@ -777,9 +749,46 @@
   display: inline-flex;
 }
 
+/* Kebab dropdown menu */
+.actionMenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 150px;
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 0.3rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.actionMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.78rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.actionMenuItem:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
 .mobileDetailPopup,
 .mobileDetailBackdrop {
-  display: none;
+  display: block;
 }
 
 .mobileDetailPopup {
@@ -1026,12 +1035,20 @@
 }
 
 .light .statLabel,
-.light .statPeriod {
+.light .statChange {
   color: rgba(26, 22, 37, 0.5);
 }
 
-.light .statIconWrap {
-  border-color: rgba(0, 0, 0, 0.1);
+.light .changePositive {
+  color: #059669;
+}
+
+.light .changeNegative {
+  color: #dc2626;
+}
+
+.light .changeInfo {
+  color: #d97706;
 }
 
 .light .statValue {
@@ -1139,6 +1156,20 @@
   color: rgba(26, 22, 37, 0.8);
 }
 
+.light .actionMenu {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.light .actionMenuItem {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .actionMenuItem:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
 .light .mobileDetailPopup {
   background: #ffffff;
   border-color: rgba(0, 0, 0, 0.1);
@@ -1239,34 +1270,46 @@
 
   .statsGrid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 0.75rem !important;
+    gap: 0.5rem !important;
+    margin-bottom: 1rem;
   }
 
   .statCard {
-    padding: 1rem !important;
-    border-radius: 12px !important;
+    padding: 0.75rem !important;
+    border-radius: 10px !important;
+    gap: 0.6rem !important;
+    min-height: 0;
   }
 
   .statIconWrap {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 8px !important;
+  }
+
+  .statContent {
+    overflow: hidden;
   }
 
   .statLabel {
-    font-size: 0.72rem !important;
+    font-size: 0.62rem !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .statValue {
-    font-size: 1.4rem !important;
+    font-size: 1.05rem !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .statChange {
-    font-size: 0.72rem !important;
-  }
-
-  .statPeriod {
-    font-size: 0.65rem !important;
+    font-size: 0.58rem !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .mainGrid {
@@ -1320,45 +1363,197 @@
   }
 
   .contentInfo {
-    gap: 0.65rem !important;
+    gap: 0.65rem;
+    align-items: flex-start;
+    height: 100%;
+  }
+
+  /* Content performance table becomes PPV-style cards on mobile */
+  .tableContainer {
+    overflow: visible;
+  }
+
+  .contentTable,
+  .contentTable thead,
+  .contentTable tbody,
+  .contentTable tr,
+  .contentTable th,
+  .contentTable td {
+    display: block;
+  }
+
+  .contentTable thead {
+    display: none;
+  }
+
+  .contentTable tr {
+    display: grid;
+    /* minmax(0,1fr) lets the content column shrink; max-content sizes the stats
+       column to its widest natural label+value so nothing wraps or clips */
+    grid-template-columns: minmax(0, 1fr) max-content;
+    gap: 0.22rem 0.65rem;
+    background: #121212;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 0.7rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .contentTable td {
+    padding: 0;
+    border: none;
+    vertical-align: middle;
+  }
+
+  .contentTable td:empty {
+    display: none;
   }
 
   .contentThumb {
-    width: 40px !important;
-    height: 40px !important;
+    width: 56px !important;
+    height: 56px !important;
+    border-radius: 8px !important;
+    flex-shrink: 0;
+  }
+
+  .contentDetails {
+    min-width: 0;
+    overflow: hidden;
+    flex: 1;
+    gap: 0.15rem;
+    height: 100%;
+  }
+
+  .contentBadges {
+    gap: 0.3rem;
+  }
+
+  .typeBadgeMobile {
+    display: inline-block;
   }
 
   .contentName {
-    font-size: 0.82rem !important;
+    font-size: 0.85rem !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .contentDate {
-    font-size: 0.68rem !important;
+    font-size: 0.7rem !important;
   }
 
   .statusOpen,
   .statusLocked {
-    font-size: 0.6rem !important;
-    padding: 0.15rem 0.4rem !important;
+    font-size: 0.55rem !important;
+    padding: 0.1rem 0.35rem !important;
   }
 
   .typeBadge {
-    font-size: 0.68rem !important;
-    padding: 0.25rem 0.6rem !important;
+    font-size: 0.6rem !important;
+    padding: 0.2rem 0.5rem !important;
   }
 
-  .tableHeader,
-  .tableCell {
-    padding: 0.75rem 0.5rem 0.75rem 0 !important;
-    font-size: 0.78rem !important;
-  }
-
-  /* Hide less important columns on mobile */
-  .tableHeader:nth-child(6),
-  .tableCell:nth-child(6),
-  .tableHeader:nth-child(7),
-  .tableCell:nth-child(7) {
+  /* Hide only the Type column on mobile (badge moves into the card details) */
+  .tableHeader:nth-child(2),
+  .tableCell:nth-child(2) {
     display: none;
+  }
+
+  /* No kebab menu on mobile — the action cell is removed entirely */
+  .contentTable td:nth-child(7) {
+    display: none;
+  }
+
+  /* Content cell spans the full height of the left column */
+  .contentTable td:nth-child(1) {
+    grid-column: 1;
+    grid-row: 1 / 5;
+    align-self: stretch;
+  }
+
+  /* Views / Likes / Comments / Revenue / Conversion stacked on the right */
+  .contentTable td:nth-child(3) {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    align-self: start;
+    white-space: nowrap;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .contentTable td:nth-child(3)::before {
+    content: 'Views: ';
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 400;
+    margin-right: 0.2rem;
+  }
+
+  .contentTable td:nth-child(4) {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: end;
+    white-space: nowrap;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .contentTable td:nth-child(4)::before {
+    content: 'Likes: ';
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 400;
+    margin-right: 0.2rem;
+  }
+
+  .contentTable td:nth-child(5) {
+    grid-column: 2;
+    grid-row: 3;
+    justify-self: end;
+    white-space: nowrap;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+
+  .contentTable td:nth-child(5)::before {
+    content: 'Comments: ';
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 400;
+    margin-right: 0.2rem;
+  }
+
+  .contentTable td:nth-child(6) {
+    grid-column: 2;
+    grid-row: 4;
+    justify-self: end;
+    white-space: nowrap;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #10b981;
+  }
+
+  .contentTable td:nth-child(6)::before {
+    content: 'Revenue: ';
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 400;
+    margin-right: 0.2rem;
+  }
+
+  /* Light theme for the mobile content cards */
+  .light .contentTable tr {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.08);
+  }
+
+  .light .contentTable td:nth-child(3)::before,
+  .light .contentTable td:nth-child(4)::before,
+  .light .contentTable td:nth-child(5)::before,
+  .light .contentTable td:nth-child(6)::before {
+    color: rgba(26, 22, 37, 0.4);
+  }
+
+  .light .contentTable td:nth-child(6) {
+    color: #059669;
   }
 
   .insightItem {
@@ -1409,10 +1604,6 @@
     height: 10px;
   }
 
-  .statChangeInline {
-    font-size: 0.85rem !important;
-  }
-
   .periodTextBtn {
     font-size: 0.72rem !important;
   }
@@ -1420,11 +1611,6 @@
   .periodOption {
     font-size: 0.75rem;
     padding: 0.4rem 0.65rem;
-  }
-
-  .mobileDetailPopup,
-  .mobileDetailBackdrop {
-    display: block;
   }
 }
 
@@ -1439,33 +1625,23 @@
 
   .statsGrid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 0.5rem !important;
+    gap: 0.4rem !important;
   }
 
   .statCard {
-    padding: 0.85rem !important;
+    padding: 0.6rem !important;
+    border-radius: 8px !important;
+    gap: 0.5rem !important;
   }
 
   .statIconWrap {
-    width: 36px !important;
-    height: 36px !important;
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 8px !important;
   }
 
   .statValue {
-    font-size: 1.25rem !important;
-  }
-
-  .statLabel {
-    font-size: 0.68rem !important;
-  }
-
-  .statPeriod {
-    font-size: 0.5rem !important;
-    white-space: nowrap;
-  }
-
-  .statChangeInline {
-    font-size: 0.78rem !important;
+    font-size: 0.95rem !important;
   }
 
   .chartCard,
@@ -1523,17 +1699,16 @@
     font-size: 0.62rem !important;
   }
 
-  .tableHeader,
-  .tableCell {
-    padding: 0.5rem 0.35rem 0.5rem 0 !important;
-    font-size: 0.7rem !important;
+  .contentTable tr {
+    padding: 0.6rem;
+    border-radius: 10px;
   }
 
-  .tableHeader:nth-child(4),
-  .tableCell:nth-child(4),
-  .tableHeader:nth-child(5),
-  .tableCell:nth-child(5) {
-    display: none;
+  .contentTable td:nth-child(3),
+  .contentTable td:nth-child(4),
+  .contentTable td:nth-child(5),
+  .contentTable td:nth-child(6) {
+    font-size: 0.78rem !important;
   }
 
   .statusOpen,

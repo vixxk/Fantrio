@@ -1,22 +1,20 @@
-import React from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useApp } from '../../context/AppContext';
-import { 
-  Home, 
-  Users, 
-  Radio, 
-  Phone, 
-  Video, 
-  Star, 
-  MessageCircle, 
-  Landmark, 
-  Settings, 
-  LayoutGrid, 
-  LogOut, 
-  Moon, 
-  Sun,
+import { api } from '../../services/api';
+import {
+  Home,
+  Users,
+  Radio,
+  Phone,
+  Video,
+  Star,
+  MessageCircle,
+  Landmark,
+  History,
+  Settings,
+  LayoutGrid,
   Menu,
-  LayoutDashboard,
-  Briefcase
+  LayoutDashboard
 } from 'lucide-react';
 import styles from './Sidebar.module.css';
 
@@ -29,8 +27,26 @@ export const Sidebar = ({ onClose }) => {
     darkMode, 
     setDarkMode, 
     logout,
-    addCoins
+    navigateTo
   } = useApp();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Fetch total unread message count from the chat API
+  const loadUnreadCount = useCallback(async () => {
+    try {
+      const res = await api.get('/chat/conversations');
+      const conversations = res.conversations || [];
+      const total = conversations.filter(c => (c.unreadCount || 0) > 0).length;
+      setUnreadCount(total);
+    } catch (err) {
+      console.error('Failed to load unread count:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadUnreadCount();
+  }, [loadUnreadCount, activeTab]);
 
   const menuItems = [
     { name: 'Discover Feed', icon: Home, badge: null },
@@ -39,24 +55,19 @@ export const Sidebar = ({ onClose }) => {
     { name: '1:1 Audio Calls', icon: Phone, badge: null },
     { name: '1:1 Video Calls', icon: Video, badge: null },
     { name: 'My Subscription', icon: Star, badge: null },
-    { name: 'Messages', icon: MessageCircle, badge: 12 },
+    { name: 'Messages', icon: MessageCircle, badge: unreadCount },
     { name: 'Buy Coins', icon: Landmark, badge: null },
+    { name: 'Transaction History', icon: History, badge: null },
     { name: 'Settings', icon: Settings, badge: null },
-    { name: 'More', icon: LayoutGrid, badge: null },
-    { name: 'Creator', icon: Briefcase, badge: 'New', href: '/creators/dashboard' }
+    { name: 'More', icon: LayoutGrid, badge: null }
   ];
 
   if (user && user.role === 'admin') {
     menuItems.push({ name: 'Admin Panel', icon: LayoutDashboard, badge: 'Admin' });
   }
 
-  const handleAddCoins = async () => {
-    try {
-      await addCoins(100);
-      alert('100 mock coins successfully added!');
-    } catch (e) {
-      alert('Failed to add coins: ' + e.message);
-    }
+  const handleLogout = () => {
+    setShowLogoutConfirm(true);
   };
 
   const formattedBalance = balance.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
@@ -153,7 +164,7 @@ export const Sidebar = ({ onClose }) => {
             alt="Gift and Coins promo" 
             className={styles.promoImage} 
           />
-          <button className={styles.promoButton} onClick={handleAddCoins}>
+          <button className={styles.promoButton} onClick={() => setActiveTab('Buy Coins')}>
             Buy Coins Now
           </button>
         </div>
@@ -168,7 +179,7 @@ export const Sidebar = ({ onClose }) => {
               <span className={styles.balanceUsd}>(${usdValue} USD)</span>
             </div>
           </div>
-          <button className={styles.addCoinsButton} onClick={handleAddCoins}>
+          <button className={styles.addCoinsButton} onClick={() => setActiveTab('Buy Coins')}>
             Add Coins
           </button>
         </div>
@@ -187,10 +198,37 @@ export const Sidebar = ({ onClose }) => {
           </label>
         </div>
 
-        <button className={styles.logoutButton} onClick={logout}>
+        <button className={styles.logoutButton} onClick={handleLogout}>
           <span>Logout</span>
           <img src="/arrow.png" alt="Logout" className={styles.logoutIcon} />
         </button>
+
+      {showLogoutConfirm && (
+        <div className={styles.logoutConfirmOverlay} onClick={() => setShowLogoutConfirm(false)}>
+          <div className={styles.logoutConfirmDialog} onClick={e => e.stopPropagation()}>
+            <h3 className={styles.logoutConfirmTitle}>Confirm Logout</h3>
+            <p className={styles.logoutConfirmText}>Are you sure you want to logout from Fantrio?</p>
+            <div className={styles.logoutConfirmActions}>
+              <button 
+                className={styles.logoutCancelBtn} 
+                onClick={() => setShowLogoutConfirm(false)}
+              >
+                Cancel
+              </button>
+               <button 
+                 className={styles.logoutConfirmBtn} 
+                 onClick={() => {
+                   setShowLogoutConfirm(false);
+                   logout();
+                   navigateTo('/login');
+                 }}
+               >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       </div>
     </aside>
   );

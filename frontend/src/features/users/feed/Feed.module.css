@@ -489,9 +489,38 @@
 .commentsSection {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.9rem;
   padding-top: 0.85rem;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
+  animation: commentsIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes commentsIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.commentsHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.commentsTitle {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.01em;
+}
+
+.commentsCount {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #7e00f3;
+  background: rgba(126, 0, 243, 0.12);
+  border-radius: 99px;
+  padding: 0.15rem 0.55rem;
+  line-height: 1.4;
 }
 
 .commentInputRow {
@@ -500,46 +529,68 @@
   gap: 0.6rem;
 }
 
+.commentInputAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+}
+
 .commentInput {
   flex: 1;
   background-color: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 0.6rem 1rem;
+  border-radius: 99px;
+  padding: 0.6rem 1.1rem;
   font-family: inherit;
   font-size: 0.85rem;
   color: #ffffff;
+  transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+
+.commentInput::placeholder {
+  color: rgba(255, 255, 255, 0.35);
 }
 
 .commentInput:focus {
   outline: none;
-  border-color: #ff007f;
+  border-color: rgba(225, 0, 117, 0.6);
   background-color: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 3px rgba(225, 0, 117, 0.12);
 }
 
 .sendCommentBtn {
   background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
   color: #ffffff;
   border: none;
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform 0.2s;
+  flex-shrink: 0;
+  transition: transform 0.2s, opacity 0.2s, box-shadow 0.2s;
 }
 
-.sendCommentBtn:hover {
-  transform: scale(1.04);
+.sendCommentBtn:hover:not(:disabled) {
+  transform: scale(1.06);
+  box-shadow: 0 4px 14px rgba(225, 0, 117, 0.35);
+}
+
+.sendCommentBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .commentsList {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  max-height: 220px;
+  gap: 0.7rem;
+  max-height: 240px;
   overflow-y: auto;
   padding-right: 0.25rem;
 }
@@ -555,38 +606,81 @@
 
 .commentItem {
   display: flex;
-  gap: 0.6rem;
+  gap: 0.65rem;
   align-items: flex-start;
+  animation: commentItemIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes commentItemIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .commentAvatar {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.06);
 }
 
 .commentBubble {
   background-color: rgba(255, 255, 255, 0.03);
-  border-radius: 12px;
-  padding: 0.5rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 4px 14px 14px 14px;
+  padding: 0.5rem 0.85rem;
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.2rem;
   flex: 1;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.commentItem:hover .commentBubble {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.commentMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .commenterName {
-  font-size: 0.75rem;
+  font-size: 0.76rem;
   font-weight: 700;
   color: #ffffff;
 }
 
+.commentVerifiedIcon {
+  color: #7e00f3;
+  fill: #ffffff;
+  flex-shrink: 0;
+}
+
+.commentTime {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
 .commentText {
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.88);
   margin: 0;
-  line-height: 1.35;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.commentsEmpty {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.35);
+  text-align: center;
+  padding: 0.75rem 0;
+  margin: 0;
 }
 
 /* Modal Styling */
@@ -851,10 +945,32 @@
 
 .light .commentBubble {
   background-color: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.05);
+}
+
+.light .commentItem:hover .commentBubble {
+  background-color: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
 }
 
 .light .commentText {
   color: rgba(26, 22, 37, 0.85);
+}
+
+.light .commentsTitle {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .commentTime {
+  color: rgba(26, 22, 37, 0.35);
+}
+
+.light .commentsEmpty {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .commentInputAvatar {
+  border-color: rgba(0, 0, 0, 0.08);
 }
 
 .light .tipModal {
@@ -923,6 +1039,72 @@
 
 .light .audioArtist {
   color: rgba(26, 22, 37, 0.55);
+}
+
+/* Light mode overrides for new feed elements */
+.light .followBadge {
+  border-color: rgba(0, 0, 0, 0.25);
+  color: #1a1625;
+}
+
+.light .followBadge:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.4);
+}
+
+.light .followingBadge {
+  color: rgba(26, 22, 37, 0.4);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+.light .followingBadge:hover {
+  color: #ff4a5a;
+  border-color: #ff4a5a;
+}
+
+.light .dot {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.light .caughtUpText {
+  color: rgba(26, 22, 37, 0.65);
+}
+
+.light .caughtUpSub {
+  color: rgba(26, 22, 37, 0.35);
+}
+
+.light .shareSheet {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .shareHandle {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.light .shareTitle {
+  color: #1a1625;
+}
+
+.light .shareLabel {
+  color: rgba(26, 22, 37, 0.55);
+}
+
+.light .shareIconCopy {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.light .shareCancel {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .shareCancel:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: #1a1625;
 }
 
 @media (max-width: 768px) {
@@ -1011,12 +1193,21 @@
   }
   
   .commentAvatar {
-    width: 24px !important;
-    height: 24px !important;
+    width: 26px !important;
+    height: 26px !important;
+  }
+
+  .commentInputAvatar {
+    width: 28px !important;
+    height: 28px !important;
   }
   
   .commentBubble {
     padding: 0.4rem 0.65rem !important;
+  }
+
+  .commentTime {
+    font-size: 0.62rem !important;
   }
   
   .commenterName {
@@ -1047,12 +1238,13 @@
   position: absolute;
   top: 100%;
   right: 0;
-  background-color: #1e1b29;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  /* Match the discover page background (#000000) */
+  background-color: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 12px;
   padding: 0.5rem 0;
   width: 170px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
   z-index: 2000;
   margin-top: 4px;
 }
@@ -1093,7 +1285,7 @@
 
 /* Light mode overrides */
 .light .kebabDropdown {
-  background-color: #ffffff;
+  background-color: #f7f6fb;
   border-color: rgba(0, 0, 0, 0.08);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
@@ -1111,3 +1303,261 @@
   background-color: rgba(0, 0, 0, 0.06);
 }
 
+
+/* Empty state */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 4rem 1.5rem;
+  text-align: center;
+  color: var(--muted-text, rgba(134, 142, 150, 0.8));
+  border: 1px dashed rgba(134, 142, 150, 0.3);
+  border-radius: 16px;
+  background: transparent;
+}
+
+.emptyState p {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.emptyState span {
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+/* Name row — username + follow badge */
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Follow badge inline in post header */
+.followBadge {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.1rem 0.55rem;
+  border-radius: 99px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.followBadge:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #ffffff;
+}
+
+.followingBadge {
+  color: rgba(255, 255, 255, 0.45);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.followingBadge:hover {
+  color: #ff4a5a;
+  border-color: #ff4a5a;
+  background: rgba(255, 74, 90, 0.06);
+}
+
+/* Infinite scroll sentinel */
+.sentinel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  padding: 1.5rem 0;
+}
+
+.loadingDots {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.25);
+  animation: dotBounce 1.2s infinite;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dotBounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.3; }
+  40% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* "All caught up" message */
+.caughtUp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.caughtUpIcon {
+  opacity: 0.25;
+  margin-bottom: 0.25rem;
+}
+
+.caughtUpText {
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+.caughtUpSub {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* Share Sheet */
+.shareBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 2500;
+  animation: shareFadeIn 0.2s ease;
+}
+
+.shareSheet {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px 20px 0 0;
+  padding: 1.5rem 1.5rem 2rem;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+  animation: shareSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.shareHandle {
+  width: 36px;
+  height: 4px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 0 auto 1.25rem;
+}
+
+.shareTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 1.25rem;
+  text-align: center;
+}
+
+.sharePlatforms {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.sharePlatform {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  transition: transform 0.2s ease;
+}
+
+.sharePlatform:hover {
+  transform: translateY(-3px);
+}
+
+.sharePlatform:active {
+  transform: scale(0.95);
+}
+
+.shareIconWrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  transition: box-shadow 0.2s;
+}
+
+.sharePlatform:hover .shareIconWrap {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.shareIconCopy {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.shareLabel {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.shareCancel {
+  display: block;
+  width: 100%;
+  margin-top: 1.25rem;
+  padding: 0.65rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.shareCancel:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+@keyframes shareFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes shareSlideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}

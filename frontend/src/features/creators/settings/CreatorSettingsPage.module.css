@@ -78,6 +78,30 @@
   border-color: #e10075;
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.headerActions .saveBtn {
+  padding: 0.5rem 1rem;
+  font-size: 0.78rem;
+  border-radius: 8px;
+}
+
+/* Keep the payout section save button compact (no flex-grow stretching) */
+.payoutSaveBtn {
+  flex: none;
+}
+
+.headerActions .saveMsg {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #10b981;
+}
+
 /* ================= PROFILE SECTION ================= */
 .profileContent {
   display: flex;
@@ -396,28 +420,6 @@
   gap: 1rem;
 }
 
-.payoutNote {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: rgba(139, 92, 246, 0.1);
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  border-radius: 8px;
-  padding: 0.75rem;
-}
-
-.noteIcon {
-  font-size: 0.85rem;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-.noteText {
-  font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.6);
-  line-height: 1.4;
-}
-
 /* ================= BOTTOM GRID ================= */
 .bottomGrid {
   display: grid;
@@ -581,7 +583,7 @@
 
 .saveBtn {
   flex: 2;
-  background: linear-gradient(135deg, #e10075 0%, #ff6b9d 100%);
+  background: #e10075;
   border: none;
   color: #ffffff;
   padding: 0.85rem;
@@ -593,6 +595,7 @@
 }
 
 .saveBtn:hover {
+  background: #c5006a;
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(225, 0, 117, 0.35);
 }
@@ -1163,17 +1166,18 @@
     border-radius: 12px !important;
   }
 
-  /* Section header - row layout */
+  /* Section header - single compact line so there's no gap under the title */
   .sectionHeader {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
     gap: 0.5rem;
-    margin-bottom: 0.875rem;
+    margin-bottom: 0.625rem;
   }
 
   .sectionTitleRow {
     flex: 1;
+    min-width: 0;
   }
 
   .sectionTitle {
@@ -1189,6 +1193,28 @@
     padding: 0.25rem 0.5rem !important;
     font-size: 0.65rem !important;
     white-space: nowrap;
+  }
+
+  .headerActions {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.375rem;
+    flex-shrink: 0;
+  }
+
+  .headerActions .changePasswordBtn {
+    order: 2;
+  }
+
+  .headerActions .saveBtn {
+    order: 1;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.65rem !important;
+    border-radius: 6px !important;
+  }
+
+  .headerActions .saveMsg {
+    display: none;
   }
 
   /* Profile section - improved mobile layout */
@@ -1302,6 +1328,15 @@
   .payoutContent {
     grid-template-columns: 1fr;
     gap: 0.75rem;
+  }
+
+  /* On mobile, show the payout form fields above the bank transfer card */
+  .payoutLeft {
+    order: 2;
+  }
+
+  .payoutRight {
+    order: 1;
   }
 
   .connectedAccount {
@@ -1737,5 +1772,622 @@
 
   .scoreItemValue {
     font-size: 0.5625rem !important;
+  }
+}
+
+/* ================= SAVE BAR ================= */
+.saveBar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  position: sticky;
+  bottom: 1rem;
+  z-index: 5;
+  backdrop-filter: blur(8px);
+}
+
+.saveMsg {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #10b981;
+}
+
+.saveBtn {
+  background: #e10075;
+  border: none;
+  color: #ffffff;
+  padding: 0.75rem 1.75rem;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.saveBtn:hover {
+  background: #c5006a;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(225, 0, 117, 0.3);
+}
+
+.light .saveBar {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+@media (max-width: 768px) {
+  .saveBar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .saveBtn {
+    width: 100%;
+  }
+}
+
+/* ================= SETTINGS MODALS ================= */
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.modalCard {
+  background: #17171a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 1.25rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.modalTitleWrap {
+  min-width: 0;
+}
+
+.modalTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.modalSubtitle {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0.15rem 0 0 0;
+}
+
+.modalClose {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.modalClose:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.modalStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.modalStatusSuccess {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+}
+
+.modalStatusError {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+}
+
+.modalSection {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+.modalSection:first-of-type {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.modalSectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+}
+
+.modalSectionIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: rgba(225, 0, 117, 0.12);
+  color: #e10075;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.modalSectionTitleWrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.modalSectionTitle {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.modalSectionDesc {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0.1rem 0 0 0;
+}
+
+.modalBadge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.modalBadgeActive {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.modalBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  font-family: inherit;
+}
+
+.modalBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.modalBtnPrimary {
+  background: #e10075;
+  color: #ffffff;
+}
+
+.modalBtnPrimary:hover:not(:disabled) {
+  background: #c5006a;
+}
+
+.modalBtnDanger {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #f87171;
+}
+
+.modalBtnDanger:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.modalBtnGhost {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.modalBtnGhost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+}
+
+.modalBtnSmall {
+  padding: 0.35rem 0.7rem;
+  font-size: 0.72rem;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.modalBtnRow {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.payoutModalCurrent {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.modalEmpty {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.45);
+  text-align: center;
+  padding: 1.5rem 0;
+  margin: 0;
+}
+
+.modalList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.modalListItem {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.55rem 0.65rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+}
+
+.modalAvatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.modalListInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.modalListName {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.modalListMeta {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.avatarModalPreview {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.avatarModalImg {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(225, 0, 117, 0.35);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.modalAccordion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.modalAccordionItem {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.modalAccordionTrigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: none;
+  color: rgba(255, 255, 255, 0.85);
+  padding: 0.75rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: background 0.2s ease;
+}
+
+.modalAccordionTrigger:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.modalAccordionChevron {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.modalAccordionOpen {
+  transform: rotate(90deg);
+}
+
+.modalAccordionPanel {
+  padding: 0 0.9rem 0.85rem;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
+}
+
+.modalAccordionPanel p {
+  margin: 0;
+}
+
+.modalSegment {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.modalSegmentBtn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.55rem 0.5rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.modalSegmentActive {
+  background: rgba(225, 0, 117, 0.12);
+  border-color: rgba(225, 0, 117, 0.4);
+  color: #e10075;
+}
+
+/* Light theme modals */
+.lightModalBackdrop {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.light .modalCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+}
+
+.light .modalTitle {
+  color: #1a1625;
+}
+
+.light .modalSubtitle {
+  color: rgba(26, 22, 37, 0.45);
+}
+
+.light .modalClose {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .modalClose:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: #1a1625;
+}
+
+.light .modalSection {
+  border-top-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .modalSectionTitle {
+  color: #1a1625;
+}
+
+.light .modalSectionDesc {
+  color: rgba(26, 22, 37, 0.45);
+}
+
+.light .modalBadge {
+  background: rgba(0, 0, 0, 0.06);
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .modalBadgeActive {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+
+.light .modalBtnGhost {
+  border-color: rgba(0, 0, 0, 0.15);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .modalBtnGhost:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.04);
+  color: #1a1625;
+}
+
+.light .modalStatusSuccess {
+  background: rgba(5, 150, 105, 0.1);
+  color: #059669;
+}
+
+.light .modalStatusError {
+  background: rgba(220, 38, 38, 0.08);
+  color: #dc2626;
+}
+
+.light .payoutModalCurrent {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .modalEmpty {
+  color: rgba(26, 22, 37, 0.45);
+}
+
+.light .modalListItem {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .modalListName {
+  color: #1a1625;
+}
+
+.light .modalListMeta {
+  color: rgba(26, 22, 37, 0.45);
+}
+
+.light .modalAvatar {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.light .modalAccordionItem {
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .modalAccordionTrigger {
+  background: rgba(0, 0, 0, 0.02);
+  color: rgba(26, 22, 37, 0.85);
+}
+
+.light .modalAccordionTrigger:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.light .modalAccordionChevron {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .modalAccordionPanel {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .modalSegmentBtn {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .modalSegmentActive {
+  background: rgba(225, 0, 117, 0.08);
+  border-color: rgba(225, 0, 117, 0.35);
+  color: #e10075;
+}
+
+/* Responsive modals */
+@media (max-width: 480px) {
+  .modalCard {
+    padding: 1rem;
+    border-radius: 14px;
+  }
+
+  .modalSectionHeader {
+    align-items: flex-start;
+  }
+
+  .modalBadge {
+    margin-left: auto;
+  }
+
+  .modalBtn {
+    padding: 0.5rem 0.85rem;
+    font-size: 0.75rem;
+    border-radius: 6px;
+  }
+
+  .modalBtnSmall {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.68rem;
+    border-radius: 5px;
+  }
+
+  .modalBtnRow {
+    gap: 0.4rem;
   }
 }

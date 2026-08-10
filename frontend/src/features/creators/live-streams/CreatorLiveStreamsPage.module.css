@@ -62,37 +62,10 @@
   overflow: hidden;
 }
 
-.streamTabsRow {
-  display: flex;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.streamTab {
-  flex: 1;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: rgba(255, 255, 255, 0.5);
-  padding: 1rem;
-  font-size: 0.88rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: center;
-}
-
-.streamTab:hover {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.streamTabActive {
-  color: #e10075 !important;
-  border-bottom-color: #e10075 !important;
-}
-
 .streamBody {
   display: grid;
-  grid-template-columns: 200px 1fr auto;
+  grid-template-columns: 1fr 220px;
+  grid-template-rows: auto auto;
   gap: 1.5rem;
   padding: 1.5rem;
 }
@@ -100,11 +73,14 @@
 /* ================= STREAM PREVIEW ================= */
 .streamPreview {
   position: relative;
+  grid-column: 2;
+  grid-row: 1;
+  align-self: start;
 }
 
 .streamPreviewInner {
-  width: 100%;
-  height: 160px;
+  width: 200px;
+  height: 112px;
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
   border-radius: 12px;
   display: flex;
@@ -170,6 +146,8 @@
 
 /* ================= STREAM FORM ================= */
 .streamForm {
+  grid-column: 1;
+  grid-row: 1 / span 2;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -209,46 +187,14 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
-.priceInputGroup {
-  display: flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.pricePrefix {
-  padding: 0.7rem 0.75rem;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.88rem;
-  font-weight: 600;
-}
-
-.priceInput {
-  flex: 1;
-  padding: 0.7rem 0;
-  background: transparent;
-  border: none;
-  color: #ffffff;
-  font-size: 0.88rem;
-  outline: none;
-  min-width: 0;
-}
-
-.currencyLabel {
-  padding: 0.7rem 1rem;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.78rem;
-  font-weight: 500;
-  background: rgba(255, 255, 255, 0.03);
-  border-left: 1px solid rgba(255, 255, 255, 0.06);
-}
-
 .formHint {
   font-size: 0.72rem;
   color: rgba(255, 255, 255, 0.35);
   margin: 0;
+}
+
+.toggleLanguageRow {
+  display: contents;
 }
 
 .toggleRow {
@@ -256,6 +202,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  /* Desktop: keep the toggle after the price field (the wrapper holds language + toggle, so order:1 restores the original field order) */
+  order: 1;
 }
 
 .toggleInfo {
@@ -320,6 +268,9 @@
 
 /* ================= START OPTIONS ================= */
 .startOptionsSection {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: start;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -411,6 +362,547 @@
 .startNowBtn:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(225, 0, 117, 0.3);
+}
+
+/* ================= SCHEDULE POPUP ================= */
+.popupOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.popupOverlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.popupContainer {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1rem;
+  width: 90%;
+  max-width: 500px;
+  max-height: 85vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  transform: scale(0.9) translateY(20px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.popupContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%);
+}
+
+.popupOverlay.active .popupContainer {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+.popupHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.popupTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.popupTitle::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
+  box-shadow: 0 0 10px rgba(225, 0, 117, 0.6);
+}
+
+.popupClose {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.popupClose:hover {
+  color: #e10075;
+}
+
+.popupContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.popupScheduleDetails {
+  margin-top: 0.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.popupScheduleDetails p {
+  margin: 0.35rem 0;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.popupScheduleDetails strong {
+  color: #ffffff;
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.infoDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
+  flex-shrink: 0;
+}
+
+.popupError {
+  margin: 0.25rem 0 0;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #f87171;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.popupFooter {
+  display: flex;
+  gap: 0.85rem;
+  margin-top: 0.75rem;
+}
+
+.popupSaveBtn {
+  flex: 1;
+  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
+  border: none;
+  color: #ffffff;
+  padding: 0.8rem 1.5rem;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(225, 0, 117, 0.3);
+}
+
+.popupSaveBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(225, 0, 117, 0.4);
+}
+
+.popupSaveBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.popupCancelBtn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.8rem 1.5rem;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.popupCancelBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* ================= STREAM CALENDAR POPUP ================= */
+.calendarPopup {
+  max-width: 560px;
+}
+
+.calendarWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.calendarNav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.calNavBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.calNavBtn:hover {
+  border-color: rgba(225, 0, 117, 0.5);
+  color: #e10075;
+  background: rgba(225, 0, 117, 0.08);
+}
+
+.calMonthLabel {
+  flex: 1;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.calTodayBtn {
+  background: rgba(225, 0, 117, 0.1);
+  border: 1px solid rgba(225, 0, 117, 0.3);
+  color: #e10075;
+  padding: 0.35rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.calTodayBtn:hover {
+  background: rgba(225, 0, 117, 0.2);
+  border-color: #e10075;
+}
+
+.calWeekRow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.35rem;
+}
+
+.calWeekDay {
+  text-align: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.35);
+  padding: 0.2rem 0;
+}
+
+.calGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.35rem;
+}
+
+.calEmpty {
+  aspect-ratio: 1;
+}
+
+.calDay {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+  font-family: inherit;
+}
+
+.calDay:hover {
+  border-color: rgba(225, 0, 117, 0.5);
+}
+
+.calDayToday {
+  border-color: rgba(225, 0, 117, 0.6);
+}
+
+.calDaySelected {
+  border-color: #e10075;
+  box-shadow: 0 0 0 2px rgba(225, 0, 117, 0.35);
+}
+
+.calDayHasStreams {
+  background: rgba(225, 0, 117, 0.06);
+}
+
+.calDayThumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.calDayHasStreams .calDayNum {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 5px;
+  padding: 0.1rem 0.3rem;
+  line-height: 1.2;
+  display: inline-block;
+}
+
+.calDayDots {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  display: flex;
+  gap: 3px;
+}
+
+.calDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.calDotLive {
+  background: #ef4444;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.8);
+}
+
+.calDotUpcoming {
+  background: #f59e0b;
+}
+
+.calDotRecent {
+  background: #10b981;
+}
+
+.calLegend {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 0.25rem;
+}
+
+.calLegend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Selected day details */
+.calDetails {
+  margin-top: 1rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.calDetailsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+
+.calDetailsTitle {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.calDetailsCount {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.calDetailsEmpty {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.35);
+  text-align: center;
+  padding: 1.2rem 0;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  margin: 0;
+}
+
+.calDetailsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.calDetailItem {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.55rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.calDetailItem:hover {
+  border-color: rgba(225, 0, 117, 0.35);
+  background: rgba(225, 0, 117, 0.04);
+}
+
+.calDetailThumb {
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #1a1a2e;
+}
+
+.calDetailInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.calDetailTop {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.calDetailTitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.calDetailBadge {
+  flex-shrink: 0;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.45rem;
+  border-radius: 5px;
+  text-transform: uppercase;
+}
+
+.calBadgeLive {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+}
+
+.calBadgeUpcoming {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.calBadgeRecent {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.calDetailMeta {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.calDetailStats {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.calDetailAction {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(225, 0, 117, 0.1);
+  border: 1px solid rgba(225, 0, 117, 0.3);
+  color: #e10075;
+  padding: 0.35rem 0.7rem;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.calDetailAction:hover {
+  background: rgba(225, 0, 117, 0.2);
+  border-color: #e10075;
 }
 
 /* ================= SECTION ================= */
@@ -612,23 +1104,56 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
-.viewAllLink {
-  display: block;
-  text-align: center;
-  background: transparent;
-  border: none;
+/* ================= PAGINATION ================= */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
-  color: #e10075;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 1rem 0.85rem 1.25rem;
-  width: 100%;
-  transition: opacity 0.2s ease;
 }
 
-.viewAllLink:hover {
-  opacity: 0.8;
+.pageBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pageBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+}
+
+.pageBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.pageBtnActive {
+  background: #e10075 !important;
+  border-color: #e10075 !important;
+  color: #ffffff !important;
+}
+
+.pageDots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.1rem;
 }
 
 /* ================= RECENT STREAMS TABLE ================= */
@@ -1083,7 +1608,7 @@
   font-size: 0.88rem;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.8);
-  margin: 0;
+  margin: 0 0 0.75rem 0;
 }
 
 .manageLink {
@@ -1330,6 +1855,211 @@
   font-weight: 600;
 }
 
+/* ================= NEW: FORM CONTROLS ================= */
+.formSelect {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a0a0a0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+  padding-right: 2.2rem !important;
+  cursor: pointer;
+}
+
+.formSelect option {
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
+.dateInput {
+  color-scheme: dark;
+}
+
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ================= NEW: STATUS MESSAGE ================= */
+.statusMessage {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid;
+  animation: statusIn 0.25s ease;
+}
+
+@keyframes statusIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.statusSuccess {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #10b981;
+}
+
+.statusError {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+.statusClose {
+  background: transparent;
+  border: none;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+  padding: 0.2rem;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.2s ease;
+}
+
+.statusClose:hover {
+  opacity: 1;
+}
+
+/* ================= NEW: LIVE NOW BANNER ================= */
+.liveBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1.25rem;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(225, 0, 117, 0.15), rgba(126, 0, 243, 0.12));
+  border: 1px solid rgba(225, 0, 117, 0.35);
+}
+
+.liveBannerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.liveBannerBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.22rem 0.55rem;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.liveBannerTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.liveBannerMeta {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.55);
+  font-family: monospace;
+}
+
+.endStreamBtn {
+  flex-shrink: 0;
+  background: #ef4444;
+  border: none;
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.6rem 1.1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.endStreamBtn:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
+}
+
+/* ================= NEW: EDIT / SUBMIT CONTROLS ================= */
+.cancelEditBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.7rem 1rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelEditBtn:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.startNowBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.submitLoading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* ================= NEW: STATES ================= */
+.sectionLoading {
+  padding: 0.5rem;
+}
+
+.emptyState {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.85rem;
+}
+
+.emptyStateSmall {
+  padding: 0.75rem 0;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.78rem;
+}
+
 /* ================= LIGHT THEME OVERRIDES ================= */
 .light {
   color: #1a1625;
@@ -1366,26 +2096,14 @@
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
 }
 
-.light .streamTab {
-  color: rgba(26, 22, 37, 0.5);
-}
-
-.light .streamTab:hover {
-  color: rgba(26, 22, 37, 0.8);
-}
-
-.light .streamTabActive {
-  color: #e10075 !important;
-  border-bottom-color: #e10075 !important;
-}
-
 .light .streamPreviewInner {
   background: linear-gradient(135deg, #e8eaf0 0%, #d5d8e4 50%, #c4c8d8 100%);
 }
 
-.light .formInput,
-.light .priceInputGroup {
-  background: rgba(0, 0, 0, 0.04);
+/* NOTE: use background-color (not the background shorthand) here so the
+   .formSelect chevron's background-image/position is not reset on selects */
+.light .formInput {
+  background-color: rgba(0, 0, 0, 0.04);
   border-color: rgba(0, 0, 0, 0.1);
   color: #1a1625;
 }
@@ -1396,21 +2114,7 @@
 
 .light .formInput:focus {
   border-color: rgba(225, 0, 117, 0.5);
-  background: rgba(0, 0, 0, 0.06);
-}
-
-.light .pricePrefix,
-.light .currencyLabel {
-  color: rgba(26, 22, 37, 0.5);
-}
-
-.light .priceInput {
-  color: #1a1625;
-}
-
-.light .currencyLabel {
-  background: rgba(0, 0, 0, 0.03);
-  border-left-color: rgba(0, 0, 0, 0.06);
+  background-color: rgba(0, 0, 0, 0.06);
 }
 
 .light .formLabel {
@@ -1493,6 +2197,24 @@
 .light .moreBtn:hover {
   background: rgba(0, 0, 0, 0.04);
   color: rgba(26, 22, 37, 0.7);
+}
+
+.light .pageBtn {
+  border-color: rgba(0, 0, 0, 0.1);
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .pageBtn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.04);
+  color: #1a1625;
+}
+
+.light .pageDots {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .pagination {
+  border-top-color: rgba(0, 0, 0, 0.06);
 }
 
 .light .th {
@@ -1649,6 +2371,212 @@
   border-bottom-color: rgba(0, 0, 0, 0.06);
 }
 
+.light .formSelect {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+.light .formSelect option {
+  background: #ffffff;
+  color: #1a1625;
+}
+
+.light .dateInput {
+  color-scheme: light;
+}
+
+.light .statusSuccess {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.25);
+  color: #059669;
+}
+
+.light .statusError {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: #dc2626;
+}
+
+.light .liveBanner {
+  background: linear-gradient(135deg, rgba(225, 0, 117, 0.08), rgba(126, 0, 243, 0.06));
+  border-color: rgba(225, 0, 117, 0.3);
+}
+
+.light .liveBannerTitle {
+  color: #1a1625;
+}
+
+.light .liveBannerMeta {
+  color: rgba(26, 22, 37, 0.55);
+}
+
+.light .cancelEditBtn {
+  border-color: rgba(0, 0, 0, 0.12);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .cancelEditBtn:hover {
+  border-color: rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.light .emptyState {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .emptyStateSmall {
+  color: rgba(26, 22, 37, 0.35);
+}
+
+.light .popupContainer {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+}
+
+.light .popupHeader {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .popupTitle {
+  color: #1a1625;
+}
+
+.light .popupClose {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .popupClose:hover {
+  color: #e10075;
+}
+
+.light .popupScheduleDetails {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .popupScheduleDetails p {
+  color: rgba(26, 22, 37, 0.55);
+}
+
+.light .popupScheduleDetails strong {
+  color: #1a1625;
+}
+
+.light .popupCancelBtn {
+  border-color: rgba(0, 0, 0, 0.15);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .popupCancelBtn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.25);
+}
+
+.light .calMonthLabel {
+  color: #1a1625;
+}
+
+.light .calNavBtn {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .calNavBtn:hover {
+  border-color: rgba(225, 0, 117, 0.5);
+  color: #e10075;
+  background: rgba(225, 0, 117, 0.06);
+}
+
+.light .calTodayBtn {
+  background: rgba(225, 0, 117, 0.08);
+  border-color: rgba(225, 0, 117, 0.3);
+  color: #e10075;
+}
+
+.light .calTodayBtn:hover {
+  background: rgba(225, 0, 117, 0.15);
+}
+
+.light .calWeekDay {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .calDay {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .calDay:hover {
+  border-color: rgba(225, 0, 117, 0.5);
+}
+
+.light .calDayHasStreams {
+  background: rgba(225, 0, 117, 0.05);
+}
+
+.light .calLegend {
+  border-top-color: rgba(0, 0, 0, 0.07);
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .calDetails {
+  border-top-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .calDetailsTitle {
+  color: #1a1625;
+}
+
+.light .calDetailsCount {
+  color: rgba(26, 22, 37, 0.45);
+}
+
+.light .calDetailsEmpty {
+  color: rgba(26, 22, 37, 0.4);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+.light .calDetailItem {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.07);
+}
+
+.light .calDetailItem:hover {
+  border-color: rgba(225, 0, 117, 0.4);
+  background: rgba(225, 0, 117, 0.04);
+}
+
+.light .calDetailTitle {
+  color: rgba(26, 22, 37, 0.9);
+}
+
+.light .calDetailMeta,
+.light .calDetailStats {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .calDetailAction {
+  background: rgba(225, 0, 117, 0.08);
+  border-color: rgba(225, 0, 117, 0.3);
+  color: #e10075;
+}
+
+.light .calDetailAction:hover {
+  background: rgba(225, 0, 117, 0.15);
+}
+
+.light .popupSaveBtn {
+  box-shadow: 0 4px 12px rgba(225, 0, 117, 0.2);
+}
+
+.light .popupError {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #dc2626;
+}
+
 /* ================= RESPONSIVE DESIGN ================= */
 @media (max-width: 1200px) {
   .mainGrid {
@@ -1697,15 +2625,6 @@
     overflow: hidden !important;
   }
 
-  .streamTabsRow {
-    display: none !important;
-  }
-
-  .streamTab {
-    padding: 0.6rem 0.5rem !important;
-    font-size: 0.72rem !important;
-  }
-
   .streamBody {
     grid-template-columns: 96px minmax(0, 1fr) !important;
     padding: 0.75rem !important;
@@ -1717,6 +2636,7 @@
     grid-column: 1;
     grid-row: 1 / span 2;
     align-self: center;
+    justify-self: stretch;
   }
 
   .streamPreviewInner {
@@ -1759,19 +2679,38 @@
     grid-row: 1;
   }
 
-  .priceField {
+  .categoryField {
     grid-column: 2;
     grid-row: 2;
   }
 
-  .streamBody .toggleRow {
-    grid-column: 1 / span 2;
+  .priceField {
+    grid-column: 2;
     grid-row: 3;
+  }
+
+  .toggleLanguageRow {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    grid-column: 1 / span 2;
+    grid-row: 4;
+  }
+
+  .toggleLanguageRow .toggleRow {
+    order: 0;
+    flex-shrink: 0;
+  }
+
+  .toggleLanguageRow .languageField {
+    order: 1;
+    flex: 1;
+    min-width: 0;
   }
 
   .streamBody .startOptionsSection {
     grid-column: 1 / span 2;
-    grid-row: 4;
+    grid-row: 5;
   }
 
   .formGroup {
@@ -1779,39 +2718,21 @@
   }
 
   .formLabel {
-    font-size: 0.6rem !important;
+    font-size: 0.55rem !important;
   }
 
   .formInput {
-    padding: 0.5rem 0.6rem !important;
-    font-size: 0.68rem !important;
-    border-radius: 8px !important;
-  }
-
-  .priceInputGroup {
-    border-radius: 8px !important;
-  }
-
-  .pricePrefix {
-    padding: 0.5rem 0.5rem !important;
-    font-size: 0.68rem !important;
-  }
-
-  .priceInput {
-    font-size: 0.68rem !important;
-  }
-
-  .currencyLabel {
-    padding: 0.5rem 0.6rem !important;
-    font-size: 0.58rem !important;
+    font-size: 0.62rem !important;
+    padding: 0.4rem 0.5rem !important;
+    min-width: 0 !important;
   }
 
   .formHint {
-    font-size: 0.52rem !important;
+    font-size: 0.5rem !important;
   }
 
   .toggleLabel {
-    font-size: 0.6rem !important;
+    font-size: 0.55rem !important;
   }
 
   .toggleDesc {
@@ -1819,25 +2740,25 @@
   }
 
   .switch {
-    width: 36px !important;
-    height: 20px !important;
+    width: 32px !important;
+    height: 18px !important;
   }
 
   .slider::before {
-    width: 16px !important;
-    height: 16px !important;
+    width: 14px !important;
+    height: 14px !important;
   }
 
   .switch input:checked + .slider::before {
-    transform: translateX(16px) !important;
+    transform: translateX(14px) !important;
   }
 
   .startOptionsSection {
-    order: 3;
     gap: 0.35rem !important;
   }
 
   .startOptions {
+    min-width: auto !important;
     gap: 0.4rem !important;
     flex-direction: row !important;
   }
@@ -1876,8 +2797,15 @@
     padding: 0.45rem 0.75rem !important;
     font-size: 0.62rem !important;
     border-radius: 8px !important;
-    margin-top: 0.25rem !important;
+    margin-top: 0.5rem !important;
     grid-column: 1 / -1;
+  }
+
+  /* Match Cancel Edit to the Save Changes button size (minus the 1px border) */
+  .cancelEditBtn {
+    padding: calc(0.45rem - 1px) 0.75rem !important;
+    font-size: 0.62rem !important;
+    border-radius: 8px !important;
   }
 
   /* Section Headers */
@@ -1968,9 +2896,15 @@
     padding: 0.25rem !important;
   }
 
-  .viewAllLink {
-    padding: 0.7rem 0.6rem 0.9rem !important;
-    font-size: 0.68rem !important;
+  .pagination {
+    padding: 0.75rem;
+    gap: 0.25rem;
+  }
+
+  .pageBtn {
+    width: 30px;
+    height: 30px;
+    font-size: 0.75rem;
   }
 
   /* Recent Streams Table */
@@ -2050,117 +2984,106 @@
     border-radius: 10px !important;
   }
 
-  /* Mobile grid: overview + stats side-by-side on row 1, categories on row 2, top on row 3 */
+  /* Mobile grid: overview full-width on row 1, stats full-width row 2,
+     categories row 3, top row 4 */
   .overviewCard {
-    grid-column: 1 !important;
+    grid-column: 1 / -1 !important;
     grid-row: 1 !important;
   }
 
   .statsCard {
-    grid-column: 2 !important;
-    grid-row: 1 !important;
-  }
-
-  .categoriesCard {
     grid-column: 1 / -1 !important;
     grid-row: 2 !important;
   }
 
-  .topCard {
+  .categoriesCard {
     grid-column: 1 / -1 !important;
     grid-row: 3 !important;
   }
 
-  /* Compact Overview for mobile */
+  .topCard {
+    grid-column: 1 / -1 !important;
+    grid-row: 4 !important;
+  }
+
+  /* Overview for mobile - full width, larger elements */
   .overviewCard {
-    padding: 0.5rem !important;
+    padding: 0.85rem !important;
   }
 
   .overviewCard .overviewHeader {
-    margin-bottom: 0.3rem !important;
+    margin-bottom: 0.6rem !important;
   }
 
   .overviewCard .overviewTitle {
-    font-size: 0.58rem !important;
+    font-size: 0.85rem !important;
   }
 
   .overviewCard .overviewStat {
-    padding: 0.2rem 0 !important;
+    padding: 0.55rem 0 !important;
   }
 
   .overviewCard .overviewStat:nth-child(odd) {
-    padding-right: 0.4rem !important;
+    padding-right: 0.75rem !important;
   }
 
   .overviewCard .overviewStat:nth-child(even) {
-    padding-left: 0.4rem !important;
+    padding-left: 0.75rem !important;
   }
 
   .overviewCard .overviewStatLabel {
-    font-size: 0.38rem !important;
-    margin-bottom: 0.05rem !important;
+    font-size: 0.6rem !important;
+    margin-bottom: 0.2rem !important;
   }
 
   .overviewCard .overviewStatValue {
-    font-size: 0.65rem !important;
+    font-size: 1.15rem !important;
   }
 
   .overviewCard .overviewStatChange {
-    font-size: 0.35rem !important;
+    font-size: 0.6rem !important;
   }
 
   .overviewCard .viewAnalyticsBtn {
-    padding: 0.3rem !important;
-    font-size: 0.48rem !important;
-    margin-top: 0.3rem !important;
-    border-radius: 5px !important;
+    padding: 0.6rem !important;
+    font-size: 0.75rem !important;
+    margin-top: 0.6rem !important;
+    border-radius: 8px !important;
   }
 
-  /* Quick Stats for mobile */
+  /* Quick Stats for mobile - full width, larger elements */
   .statsCard {
-    padding: 0.6rem !important;
+    padding: 0.85rem !important;
   }
 
   .statsCard .statsHeader {
-    margin-bottom: 0.5rem !important;
+    margin-bottom: 0.6rem !important;
   }
 
   .statsCard .statsTitle {
-    font-size: 0.65rem !important;
+    font-size: 0.85rem !important;
   }
 
   .statsCard .statsGrid {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 0.6rem 0.3rem !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.75rem 0.4rem !important;
   }
 
   .statsCard .statItem {
-    padding: 0.4rem 0 !important;
-    gap: 0.25rem !important;
+    padding: 0.55rem 0 !important;
+    gap: 0.3rem !important;
   }
 
   .statsCard .statLabel {
-    font-size: 0.5rem !important;
+    font-size: 0.6rem !important;
   }
 
   .statsCard .statValue {
-    font-size: 0.82rem !important;
+    font-size: 1.1rem !important;
   }
 
   .statsCard .statChange {
-    font-size: 0.45rem !important;
-  }
-
-  /* Quick Stats - 2 per row, 3rd centered */
-  .statsGrid {
-    grid-template-columns: 1fr 1fr;
-    gap: 0.6rem 0.3rem;
-  }
-
-  .statItem:nth-child(3) {
-    grid-column: 1 / -1;
-    justify-self: center;
-    width: 50%;
+    font-size: 0.6rem !important;
   }
 
   .overviewHeader,
@@ -2174,20 +3097,21 @@
   .categoriesTitle,
   .topTitle,
   .statsTitle {
-    font-size: 0.68rem !important;
+    font-size: 0.85rem !important;
+    margin-bottom: 0.5rem !important;
   }
 
   .periodDropdown {
-    font-size: 0.55rem !important;
+    font-size: 0.62rem !important;
   }
 
-  /* Overview Stats - compact */
+  /* Overview Stats - full width, larger elements */
   .overviewHeader {
-    margin-bottom: 0.4rem !important;
+    margin-bottom: 0.6rem !important;
   }
 
   .overviewTitle {
-    font-size: 0.62rem !important;
+    font-size: 0.85rem !important;
   }
 
   .overviewGrid {
@@ -2195,12 +3119,12 @@
   }
 
   .overviewStat {
-    padding: 0.3rem 0 !important;
+    padding: 0.55rem 0 !important;
   }
 
   .overviewStatLabel {
-    font-size: 0.42rem !important;
-    margin-bottom: 0.1rem !important;
+    font-size: 0.6rem !important;
+    margin-bottom: 0.2rem !important;
   }
 
   .overviewStatRow {
@@ -2210,18 +3134,18 @@
   }
 
   .overviewStatValue {
-    font-size: 0.72rem !important;
+    font-size: 1.15rem !important;
   }
 
   .overviewStatChange {
-    font-size: 0.4rem !important;
+    font-size: 0.6rem !important;
   }
 
   .viewAnalyticsBtn {
-    padding: 0.4rem !important;
-    font-size: 0.55rem !important;
-    border-radius: 6px !important;
-    margin-top: 0.4rem !important;
+    padding: 0.6rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 8px !important;
+    margin-top: 0.6rem !important;
   }
 
   /* Categories */
@@ -2341,22 +3265,6 @@
   }
 
   /* Stream Card */
-  .streamTabsRow {
-    flex-direction: column;
-  }
-
-  .streamTab {
-    border-bottom: none !important;
-    border-left: 2px solid transparent;
-    padding: 0.55rem 0.5rem !important;
-    font-size: 0.68rem !important;
-  }
-
-  .streamTabActive {
-    border-left-color: #e10075 !important;
-    border-bottom-color: transparent !important;
-  }
-
   .streamBody {
     padding: 0.6rem !important;
     gap: 0.5rem !important;
@@ -2395,22 +3303,13 @@
     font-size: 0.62rem !important;
   }
 
-  .pricePrefix {
-    padding: 0.45rem 0.4rem !important;
-    font-size: 0.62rem !important;
-  }
-
-  .priceInput {
-    font-size: 0.62rem !important;
-  }
-
-  .currencyLabel {
-    padding: 0.45rem 0.5rem !important;
-    font-size: 0.52rem !important;
-  }
-
   .startNowBtn {
     padding: 0.5rem !important;
+    font-size: 0.65rem !important;
+  }
+
+  .cancelEditBtn {
+    padding: calc(0.5rem - 1px) !important;
     font-size: 0.65rem !important;
   }
 
@@ -2460,9 +3359,15 @@
     font-size: 0.55rem !important;
   }
 
-  .viewAllLink {
-    padding: 0.6rem 0.5rem 0.75rem !important;
-    font-size: 0.62rem !important;
+  .pagination {
+    padding: 0.6rem;
+    gap: 0.2rem;
+  }
+
+  .pageBtn {
+    width: 28px;
+    height: 28px;
+    font-size: 0.68rem;
   }
 
   /* Recent Streams Table */
@@ -2541,32 +3446,32 @@
   .categoriesCard,
   .topCard,
   .statsCard {
-    padding: 0.5rem !important;
-    border-radius: 8px !important;
+    padding: 0.75rem !important;
+    border-radius: 10px !important;
   }
 
   .overviewTitle,
   .categoriesTitle,
   .topTitle,
   .statsTitle {
-    font-size: 0.62rem !important;
+    font-size: 0.85rem !important;
   }
 
   .overviewStatLabel {
-    font-size: 0.45rem !important;
+    font-size: 0.6rem !important;
   }
 
   .overviewStatValue {
-    font-size: 0.72rem !important;
+    font-size: 1.15rem !important;
   }
 
   .overviewStatChange {
-    font-size: 0.42rem !important;
+    font-size: 0.6rem !important;
   }
 
   .viewAnalyticsBtn {
-    padding: 0.4rem !important;
-    font-size: 0.55rem !important;
+    padding: 0.6rem !important;
+    font-size: 0.75rem !important;
   }
 
   .categoryIconWrap {
@@ -2624,4 +3529,296 @@
   .statChange {
     font-size: 0.4rem !important;
   }
+}
+
+/* ================= SCHEDULE POPUP (MOBILE) ================= */
+@media (max-width: 768px) {
+  .popupOverlay {
+    padding: 1rem;
+  }
+
+  .popupContainer {
+    width: 100%;
+    max-width: none;
+  }
+
+  .popupScheduleDetails {
+    padding: 0.75rem;
+  }
+
+  .popupFooter {
+    flex-direction: column;
+  }
+
+  .popupSaveBtn,
+  .popupCancelBtn {
+    width: 100%;
+  }
+
+  /* Calendar popup */
+  .calendarPopup {
+    max-width: none;
+  }
+
+  .calGrid {
+    gap: 0.25rem;
+  }
+
+  .calDay {
+    border-radius: 8px;
+  }
+
+  .calDayHasStreams .calDayNum {
+    font-size: 0.55rem;
+    padding: 0.05rem 0.22rem;
+    top: 2px;
+    left: 2px;
+  }
+
+  .calDayDots {
+    bottom: 3px;
+    left: 3px;
+    gap: 2px;
+  }
+
+  .calDot {
+    width: 5px;
+    height: 5px;
+  }
+
+  .calLegend {
+    gap: 0.75rem;
+    font-size: 0.62rem;
+  }
+
+  .calDetailItem {
+    gap: 0.55rem;
+    padding: 0.45rem;
+  }
+
+  .calDetailThumb {
+    width: 40px;
+    height: 40px;
+  }
+
+  .calDetailTitle {
+    font-size: 0.78rem;
+  }
+
+  .calDetailBadge {
+    font-size: 0.52rem;
+    padding: 0.1rem 0.35rem;
+  }
+}
+
+/* Host live chat card (visible while streaming) */
+.hostChatCard {
+  background: #18141f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+.hostChatHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 14px;
+  background: linear-gradient(90deg, rgba(225, 0, 117, 0.14), rgba(126, 0, 243, 0.1));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hostChatHeaderTitle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.hostChatHeaderTitle svg {
+  color: #e10075;
+  flex-shrink: 0;
+}
+
+.hostChatCount {
+  font-size: 0.66rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+.hostChatToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.hostChatToggle:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.hostChatToggleClosed {
+  transform: rotate(180deg);
+}
+
+.hostChatList {
+  height: 190px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  text-align: left;
+}
+
+.hostChatList::-webkit-scrollbar { width: 5px; }
+.hostChatList::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.18); border-radius: 99px; }
+
+.hostChatEmpty {
+  margin: auto;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.hostChatMsg {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  font-size: 0.82rem;
+  line-height: 1.35;
+  word-break: break-word;
+  animation: hostChatMsgIn 0.22s ease-out both;
+}
+
+@keyframes hostChatMsgIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hostChatName {
+  font-weight: 800;
+  color: #ff7ab8;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.hostChatText {
+  color: rgba(255, 255, 255, 0.88);
+  min-width: 0;
+}
+
+.hostChatComposer {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hostChatInput {
+  flex: 1;
+  min-width: 0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 9px 12px;
+  color: #fff;
+  font-size: 0.82rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.hostChatInput:focus {
+  border-color: #e10075;
+  box-shadow: 0 0 0 3px rgba(225, 0, 117, 0.22);
+}
+
+.hostChatInput::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.hostChatSend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #e10075, #7e00f3);
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.hostChatSend:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: scale(1.04);
+}
+
+.hostChatSend:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.light .hostChatCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .hostChatHeader {
+  background: rgba(225, 0, 117, 0.06);
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .hostChatHeaderTitle {
+  color: #1a1625;
+}
+
+.light .hostChatCount {
+  color: rgba(26, 22, 37, 0.6);
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.light .hostChatToggle {
+  border-color: rgba(0, 0, 0, 0.12);
+  background: rgba(0, 0, 0, 0.04);
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .hostChatToggle:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: #1a1625;
+}
+
+.light .hostChatText {
+  color: rgba(26, 22, 37, 0.85);
+}
+
+.light .hostChatEmpty {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .hostChatInput {
+  background: rgba(26, 22, 37, 0.04);
+  border-color: rgba(26, 22, 37, 0.12);
+  color: #1a1625;
+}
+
+.light .hostChatInput::placeholder {
+  color: rgba(26, 22, 37, 0.35);
 }

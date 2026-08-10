@@ -1,0 +1,401 @@
+/* ================= SUBSCRIBER FILTER SHEET ================= */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 200;
+  animation: fadeIn 0.18s ease;
+}
+
+.backdropDark {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: translate(-50%, -48%) scale(0.96); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 201;
+  background: #ffffff;
+  color: #1a1625;
+  border-radius: 22px 22px 0 0;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  max-height: 88vh;
+  animation: slideUp 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.sheet.dark {
+  background: #141414;
+  color: #ffffff;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.55);
+}
+
+/* Desktop: centered dialog */
+.sheet.dialog {
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  top: 50%;
+  width: min(440px, calc(100vw - 2rem));
+  max-height: min(84vh, 640px);
+  border-radius: 20px;
+  transform: translate(-50%, -50%);
+  animation: popIn 0.22s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.dragHandle {
+  width: 44px;
+  height: 4px;
+  border-radius: 99px;
+  background: rgba(128, 128, 128, 0.35);
+  margin: 0.6rem auto 0;
+  flex-shrink: 0;
+}
+
+.dialog .dragHandle {
+  display: none;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem 0.75rem;
+  flex-shrink: 0;
+}
+
+.headerTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.titleIcon {
+  color: #e10075;
+}
+
+.headerCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 99px;
+  background: #e10075;
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.resetBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: transparent;
+  border: 1px solid rgba(128, 128, 128, 0.3);
+  border-radius: 8px;
+  color: inherit;
+  opacity: 0.7;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.resetBtn:hover {
+  opacity: 1;
+}
+
+.closeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  background: rgba(128, 128, 128, 0.12);
+  border: none;
+  border-radius: 8px;
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.closeBtn:hover {
+  background: rgba(225, 0, 117, 0.15);
+  color: #e10075;
+}
+
+.body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.25rem 1.25rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.sectionLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.5;
+}
+
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(128, 128, 128, 0.1);
+  border: 1px solid transparent;
+  border-radius: 99px;
+  color: inherit;
+  opacity: 0.8;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.42rem 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.chip:hover {
+  opacity: 1;
+  background: rgba(128, 128, 128, 0.16);
+}
+
+.chipActive {
+  background: rgba(225, 0, 117, 0.12);
+  border-color: rgba(225, 0, 117, 0.45);
+  color: #e10075;
+  opacity: 1;
+}
+
+.chipDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.chipCount {
+  font-size: 0.66rem;
+  font-weight: 700;
+  background: rgba(128, 128, 128, 0.18);
+  border-radius: 99px;
+  padding: 0.05rem 0.4rem;
+}
+
+.chipActive .chipCount {
+  background: rgba(225, 0, 117, 0.18);
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0;
+}
+
+.toggleLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.toggleHint {
+  font-size: 0.7rem;
+  opacity: 0.5;
+  margin-top: 0.1rem;
+}
+
+.toggle {
+  position: relative;
+  width: 44px;
+  height: 26px;
+  border-radius: 99px;
+  background: rgba(128, 128, 128, 0.25);
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.toggleOn {
+  background: #e10075;
+}
+
+.knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.knobOn {
+  transform: translateX(18px);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1.25rem 1rem;
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  flex-shrink: 0;
+  border-top: 1px solid rgba(128, 128, 128, 0.12);
+}
+
+.resetAllBtn {
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid rgba(128, 128, 128, 0.3);
+  border-radius: 10px;
+  color: inherit;
+  opacity: 0.7;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.7rem 0.9rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.resetAllBtn:hover {
+  opacity: 1;
+  border-color: rgba(239, 68, 68, 0.5);
+  color: #ef4444;
+}
+
+.applyBtn {
+  flex: 1;
+  background: #e10075;
+  border: none;
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.applyBtn:hover {
+  background: #c9006a;
+}
+
+.applyBtn:active {
+  transform: scale(0.98);
+}
+
+/* ================= DARK VARIANT ================= */
+.sheet.dark .chip {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.sheet.dark .chip:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.sheet.dark .chipActive {
+  background: rgba(225, 0, 117, 0.15);
+  border-color: rgba(225, 0, 117, 0.5);
+  color: #ff5fa2;
+}
+
+.sheet.dark .chipCount {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sheet.dark .chipActive .chipCount {
+  background: rgba(225, 0, 117, 0.25);
+}
+
+.sheet.dark .resetBtn {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.sheet.dark .closeBtn {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.sheet.dark .toggle {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.sheet.dark .toggleOn {
+  background: #e10075;
+}
+
+.sheet.dark .footer {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+.sheet.dark .resetAllBtn {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ================= RESPONSIVE ================= */
+@media (min-width: 769px) {
+  .sheet:not(.dialog) {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .sheet.dialog {
+    width: 100%;
+    max-height: 92vh;
+  }
+}

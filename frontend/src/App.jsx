@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Sidebar } from './features/sidebar/Sidebar';
 import { CreatorSidebar } from './features/sidebar/CreatorSidebar';
@@ -29,18 +29,26 @@ import { AudioCallsPage } from './features/users/audio/AudioCallsPage';
 import { VideoCallsPage } from './features/users/video/VideoCallsPage';
 import { SubscriptionsPage } from './features/users/subscriptions/SubscriptionsPage';
 import { MessagesPage } from './features/users/messages/MessagesPage';
+import { ListenerProfilePage } from './features/users/profile/ListenerProfilePage';
 import { MobileChatPage } from './features/users/messages/MobileChatPage';
 import { BuyCoinsPage } from './features/users/coins/BuyCoinsPage';
+import { TransactionHistoryPage } from './features/users/transactions/TransactionHistoryPage';
 import { SettingsPage } from './features/users/settings/SettingsPage';
 import { MorePage } from './features/users/more/MorePage';
 import { AdminPage } from './features/admin/AdminPage';
 import { AdminLogin } from './features/admin/AdminLogin';
-import { Menu, X, Compass, Radio, Phone, MessageSquare, User, LayoutDashboard, PenSquare } from 'lucide-react';
+import { LoginPage } from './features/auth/LoginPage';
+import { SignupPage } from './features/auth/SignupPage';
+import { IncomingCallProvider } from './features/calls/IncomingCallProvider';
+import { ToastProvider } from './components/Toast/Toast';
+import { AppDialogProvider } from './components/AppDialog/AppDialog';
+import { Compass, Radio, Phone, MessageSquare, LayoutDashboard, PenSquare } from 'lucide-react';
 import './App.css';
 
 const AppContent = () => {
-  const { darkMode, activeTab, setActiveTab, currentPath, user } = useApp();
+  const { darkMode, activeTab, setActiveTab, currentPath, user, loading, navigateTo, replacePath } = useApp();
   const isCreatorPage = activeTab.startsWith('Creator');
+  const isFullScreenPage = activeTab === 'Listener Profile';
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showBottomNav, setShowBottomNav] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -77,8 +85,10 @@ const AppContent = () => {
   }, []);
 
   useEffect(() => {
-    lastScrollY.current = 0;
-    setShowBottomNav(true);
+    Promise.resolve().then(() => {
+      lastScrollY.current = 0;
+      setShowBottomNav(true);
+    });
   }, [activeTab, currentPath]);
 
   useEffect(() => {
@@ -102,6 +112,35 @@ const AppContent = () => {
   }, []);
 
   const isChatOpen = (activeTab === 'Messages' || activeTab === 'Creator Messages') && currentPath && currentPath.split('/').filter(Boolean).length > 2;
+
+  // Auth page routes: canonical (/login, /signup) + aliases (/auth/login, /auth/signup)
+  const isAuthPath = (path) =>
+    ['/login', '/signup', '/auth/login', '/auth/signup'].some(
+      (p) => path === p || path.startsWith(p + '/')
+    );
+
+  // If a logged-in user visits an auth page URL, send them to the app home
+  useEffect(() => {
+    if (user && isAuthPath(currentPath)) {
+      navigateTo(
+        user.role === 'admin'
+          ? '/admin'
+          : user.role === 'creator'
+          ? '/creators/dashboard'
+          : '/discover'
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, currentPath]);
+
+  // Guest on a non-auth route: the login/signup page is rendered below, so make
+  // the address bar match what's on screen (e.g. /discover -> /login).
+  useEffect(() => {
+    if (!loading && !user && !isAuthPath(currentPath)) {
+      replacePath('/login');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, user, currentPath]);
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -245,10 +284,22 @@ const AppContent = () => {
             <MessagesPage />
           </div>
         );
+      case 'Listener Profile':
+        return (
+          <div className="tabMessages">
+            <ListenerProfilePage key={currentPath} />
+          </div>
+        );
       case 'Buy Coins':
         return (
           <div className="tabBuyCoins">
             <BuyCoinsPage />
+          </div>
+        );
+      case 'Transaction History':
+        return (
+          <div className="tabTransactions">
+            <TransactionHistoryPage />
           </div>
         );
       case 'Settings':
@@ -281,15 +332,46 @@ const AppContent = () => {
     }
   };
 
+  // Boot splash while the session is being restored from storage
+  if (loading) {
+    return (
+      <div className={`authBootScreen ${darkMode ? 'darkTheme' : 'lightTheme'}`}>
+        <img src="/Fantrio Logo.png" alt="Fantrio" className="authBootLogo" />
+        <span className="authBootSpinner" />
+      </div>
+    );
+  }
+
+  // Logged-in user on an auth page: keep the splash up until the redirect lands
+  if (user && isAuthPath(currentPath)) {
+    return (
+      <div className={`authBootScreen ${darkMode ? 'darkTheme' : 'lightTheme'}`}>
+        <img src="/Fantrio Logo.png" alt="Fantrio" className="authBootLogo" />
+        <span className="authBootSpinner" />
+      </div>
+    );
+  }
+
+  // Authentication gate — visitors must log in (or sign up) first
+  if (!user) {
+    const isSignup =
+      currentPath.startsWith('/signup') || currentPath.startsWith('/auth/signup');
+    return (
+      <div className={`authPageRoot ${darkMode ? 'darkTheme' : 'lightTheme'}`}>
+        {isSignup ? <SignupPage /> : <LoginPage />}
+      </div>
+    );
+  }
+
   if (activeTab === 'Admin Panel') {
-    if (!user || user.role !== 'admin') {
+    if (user.role !== 'admin') {
       return <AdminLogin />;
     }
     return <AdminPage />;
   }
 
   return (
-    <div className={`appShell ${darkMode ? 'darkTheme' : 'lightTheme'} ${isCreatorPage ? 'creatorMode' : ''}`}>
+    <div className={`appShell ${darkMode ? 'darkTheme' : 'lightTheme'} ${isCreatorPage ? 'creatorMode' : ''} ${isFullScreenPage ? 'fullScreenMode' : ''}`}>
       <svg width="0" height="0" style={{ position: 'absolute', pointerEvents: 'none' }}>
         <defs>
           <linearGradient id="activeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -299,13 +381,15 @@ const AppContent = () => {
         </defs>
       </svg>
 
-      {/* Desktop Left Sidebar */}
-      <div className="desktopSidebar">
-        {isCreatorPage ? <CreatorSidebar /> : <Sidebar />}
-      </div>
+      {/* Desktop Left Sidebar — hidden on full-screen pages like Listener Profile */}
+      {!isFullScreenPage && (
+        <div className="desktopSidebar">
+          {isCreatorPage ? <CreatorSidebar /> : <Sidebar />}
+        </div>
+      )}
 
       {/* Mobile Drawer Sidebar */}
-      {mobileMenuOpen && (
+      {!isFullScreenPage && mobileMenuOpen && (
         <div className="mobileSidebarOverlay" onClick={() => setMobileMenuOpen(false)}>
           <div className="mobileSidebarDrawer" onClick={(e) => e.stopPropagation()}>
             {isCreatorPage ? (
@@ -319,17 +403,20 @@ const AppContent = () => {
 
       {/* Main Content Area */}
       <div className="mainArea">
-        <div className="headerWrapper">
-          <Header onMenuToggle={() => setMobileMenuOpen(true)} />
-        </div>
+        {!isFullScreenPage && (
+          <div className="headerWrapper">
+            <Header onMenuToggle={() => setMobileMenuOpen(true)} />
+          </div>
+        )}
 
         <main className={`scrollableContent ${activeTab === 'Messages' || activeTab === 'Creator Messages' ? 'noScroll' : ''}`}>
           {renderTabContent()}
         </main>
       </div>
 
-      {/* Mobile Bottom Navigation Bar */}
-      <nav className={`mobileBottomNav ${(!showBottomNav || isChatOpen || mobileMenuOpen) ? 'bottomNavHidden' : ''}`}>
+      {/* Mobile Bottom Navigation Bar — hidden on full-screen pages */}
+      {!isFullScreenPage && (
+        <nav className={`mobileBottomNav ${(!showBottomNav || isChatOpen || mobileMenuOpen) ? 'bottomNavHidden' : ''}`}>
         {isCreatorPage ? (
           <>
             <button 
@@ -394,6 +481,7 @@ const AppContent = () => {
           </>
         )}
       </nav>
+      )}
     </div>
   );
 };
@@ -401,7 +489,13 @@ const AppContent = () => {
 function App() {
   return (
     <AppProvider>
-      <AppContent />
+      <ToastProvider>
+        <AppDialogProvider>
+          <IncomingCallProvider>
+            <AppContent />
+          </IncomingCallProvider>
+        </AppDialogProvider>
+      </ToastProvider>
     </AppProvider>
   );
 }

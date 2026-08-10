@@ -1,124 +1,129 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '../../../services/api';
 import { useApp } from '../../../context/AppContext';
-import { 
-  Phone, 
-  Video, 
-  MessageSquare, 
-  Radio, 
-  BadgeCheck, 
-  Sparkles 
-} from 'lucide-react';
+import { useToast } from '../../../components/Toast/Toast';
+import ShimmerSkeleton from '../../../components/ShimmerSkeleton/ShimmerSkeleton';
+import { BadgeCheck } from 'lucide-react';
 import styles from './SuggestionsSidebar.module.css';
+
+const formatFollowers = (n) => {
+  if (!n && n !== 0) return '0';
+  if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+  return String(n);
+};
 
 export const SuggestionsSidebar = () => {
   const { darkMode, setActiveTab, refreshBalance } = useApp();
+  const { toast } = useToast();
   const [topCreators, setTopCreators] = useState([]);
   const [suggestedCreators, setSuggestedCreators] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [subscribingId, setSubscribingId] = useState(null);
 
-  // Countdown timer state
+  // Countdown timer state (computed, never hardcoded)
   const [timeLeft, setTimeLeft] = useState({
-    days: '02',
-    hours: '14',
-    minutes: '35',
-    seconds: '52'
+    days: '00',
+    hours: '00',
+    minutes: '00',
+    seconds: '00'
   });
 
-  // Calculate countdown
+  // Calculate countdown from a fixed target 2 days ahead
   useEffect(() => {
     const targetDate = new Date();
     targetDate.setDate(targetDate.getDate() + 2); // 2 days from now
 
-    const timer = setInterval(() => {
-      const difference = targetDate.getTime() - new Date().getTime();
-      
+    let timer = null;
+    const tick = () => {
+      const difference = targetDate.getTime() - Date.now();
+
       if (difference <= 0) {
-        clearInterval(timer);
+        if (timer) clearInterval(timer);
         return;
       }
 
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((difference / 1000 / 60) % 60);
-      const seconds = Math.floor((difference / 1000) % 60);
-
       setTimeLeft({
-        days: String(days).padStart(2, '0'),
-        hours: String(hours).padStart(2, '0'),
-        minutes: String(minutes).padStart(2, '0'),
-        seconds: String(seconds).padStart(2, '0')
+        days: String(Math.floor(difference / (1000 * 60 * 60 * 24))).padStart(2, '0'),
+        hours: String(Math.floor((difference / (1000 * 60 * 60)) % 24)).padStart(2, '0'),
+        minutes: String(Math.floor((difference / (1000 * 60)) % 60)).padStart(2, '0'),
+        seconds: String(Math.floor((difference / 1000) % 60)).padStart(2, '0')
       });
-    }, 1000);
+    };
+
+    tick(); // render the real countdown immediately (no hardcoded placeholder)
+    timer = setInterval(tick, 1000);
 
     return () => clearInterval(timer);
   }, []);
 
-  // Fetch Sidebar Data
+  // Fetch Sidebar Data (both sections load in parallel)
   useEffect(() => {
     const fetchData = async () => {
-      // 1. Fetch Top Creators
-      try {
-        const res = await api.get('/creators/trending');
-        if (res.status === 'success') {
-          // Format
-          const formatted = res.creators.map((c) => ({
-            _id: c.userId?._id || c._id,
-            displayName: c.displayName,
-            username: `@${c.username}`,
-            avatarUrl: c.avatarUrl,
-            isVerified: c.isVerifiedBadge,
-            stat: '12.5K'
-          }));
-          setTopCreators(formatted.slice(0, 6));
-        }
-      } catch (err) {
-        console.error('Failed to fetch trending creators:', err);
-        setTopCreators([
-          { _id: '1', displayName: 'Leslie Alexander', username: '@lesliejane', avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80', isVerified: true, stat: '12.5K' },
-          { _id: '2', displayName: 'Jenny Wilson', username: '@jennywilson', avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80', isVerified: true, stat: '12.5K' },
-          { _id: '3', displayName: 'Kristin Watson', username: '@kristinwatson', avatarUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80', isVerified: true, stat: '12.5K' },
-          { _id: '4', displayName: 'Savannah Nguyen', username: '@savannah', avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80', isVerified: true, stat: '12.5K' },
-          { _id: '5', displayName: 'Leslie Alexander', username: '@lesliejane', avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80', isVerified: true, stat: '12.5K' },
-          { _id: '6', displayName: 'Dianne Russell', username: '@diannerussell', avatarUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=150&q=80', isVerified: true, stat: '12.5K' }
-        ]);
-      }
-
-      // 2. Fetch Suggested Creators
-      try {
-        const res = await api.get('/creators/suggested');
-        if (res.status === 'success') {
-          const formatted = res.creators.map((c) => ({
-            _id: c.userId?._id || c._id,
-            displayName: c.displayName,
-            username: `@${c.username}`,
-            avatarUrl: c.avatarUrl,
-            isVerified: c.isVerifiedBadge
-          }));
-          setSuggestedCreators(formatted.slice(0, 4));
-        }
-      } catch (err) {
-        console.error('Failed to fetch suggested creators:', err);
-        setSuggestedCreators([
-          { _id: 's1', displayName: 'Savannah', username: '@savannah', avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80', isVerified: true },
-          { _id: 's2', displayName: 'Savannah', username: '@savannah', avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80', isVerified: true },
-          { _id: 's3', displayName: 'Savannah', username: '@savannah', avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80', isVerified: true },
-          { _id: 's4', displayName: 'Savannah', username: '@savannah', avatarUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80', isVerified: true }
-        ]);
-      }
+      await Promise.all([
+        // 1. Fetch Top Creators
+        (async () => {
+          try {
+            const res = await api.get('/creators/trending?limit=6');
+            if (res.status === 'success') {
+              const formatted = (res.creators || []).map((c) => ({
+                _id: c.userId?._id || c._id,
+                displayName: c.displayName,
+                username: `@${c.username}`,
+                avatarUrl: c.avatarUrl,
+                isVerified: c.isVerifiedBadge,
+                stat: formatFollowers(c.followerCount)
+              }));
+              setTopCreators(formatted.slice(0, 6));
+            }
+          } catch (err) {
+            console.error('Failed to fetch trending creators:', err);
+            setTopCreators([]);
+          }
+        })(),
+        // 2. Fetch Suggested Creators
+        (async () => {
+          try {
+            const res = await api.get('/creators/suggested');
+            if (res.status === 'success') {
+              const formatted = (res.creators || []).map((c) => ({
+                _id: c.userId?._id || c._id,
+                displayName: c.displayName,
+                username: `@${c.username}`,
+                avatarUrl: c.avatarUrl,
+                isVerified: c.isVerifiedBadge
+              }));
+              setSuggestedCreators(formatted.slice(0, 4));
+            }
+          } catch (err) {
+            console.error('Failed to fetch suggested creators:', err);
+            setSuggestedCreators([]);
+          }
+        })()
+      ]);
     };
 
-    fetchData();
+    fetchData().finally(() => setLoading(false));
   }, []);
 
   const handleSubscribe = async (creatorId) => {
+    if (subscribingId) return;
+    setSubscribingId(creatorId);
     try {
       const res = await api.post(`/monetization/subscribe/${creatorId}`);
       if (res.status === 'success') {
-        alert('Subscribed successfully!');
+        if (res.alreadySubscribed) {
+          toast.info(res.message || 'You are already subscribed to this creator.');
+        } else {
+          toast.success(res.message || 'Subscribed successfully!');
+        }
         refreshBalance();
+        // The creator is now subscribed — drop them from the suggestions
+        setSuggestedCreators((prev) => prev.filter((c) => c._id !== creatorId));
       }
     } catch (err) {
-      alert('Subscription failed: ' + err.message);
+      toast.error(err.message || 'Subscription failed.');
+    } finally {
+      setSubscribingId(null);
     }
   };
 
@@ -202,7 +207,20 @@ export const SuggestionsSidebar = () => {
           <button className={styles.linkButton} onClick={() => setActiveTab('All Creators')}>View All</button>
         </div>
         <div className={styles.creatorList}>
-          {topCreators.map((creator, i) => (
+          {loading ? (
+            <div className={styles.skeletonList}>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className={styles.skeletonRow}>
+                  <ShimmerSkeleton variant="text" width="14px" height="12px" light={!darkMode} />
+                  <ShimmerSkeleton variant="avatar" width="36px" height="36px" light={!darkMode} />
+                  <div className={styles.skeletonTextCol}>
+                    <ShimmerSkeleton variant="text" width="90px" height="12px" light={!darkMode} />
+                    <ShimmerSkeleton variant="text" width="60px" height="10px" light={!darkMode} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : topCreators.length > 0 ? topCreators.map((creator, i) => (
             <div key={creator._id} className={styles.creatorRow}>
               <div className={styles.creatorDetails}>
                 <span className={styles.rankNum}>{i + 1}</span>
@@ -217,37 +235,59 @@ export const SuggestionsSidebar = () => {
               </div>
               <span className={styles.statVal}>{creator.stat}</span>
             </div>
-          ))}
+          )) : (
+            <p className={styles.emptyList}>No creators to show yet.</p>
+          )}
         </div>
       </div>
 
       {/* 4. Suggested For You */}
       <div className={styles.sectionContainer}>
-        <div className={styles.sectionHeader}>
-          <h4 className={styles.sectionHeading}>Suggested For You</h4>
-          <button className={styles.linkButton} onClick={() => setActiveTab('All Creators')}>View All</button>
-        </div>
+        <h4 className={styles.sectionHeading}>Suggested For You</h4>
         <div className={styles.suggestedList}>
-          {suggestedCreators.map((c) => (
-            <div key={c._id} className={styles.suggestedRow}>
-              <div className={styles.suggestedCreator}>
-                <img src={c.avatarUrl} alt={c.displayName} className={styles.avatar} />
-                <div className={styles.nameBlock}>
-                  <div className={styles.nameLock}>
-                    <span className={styles.displayName}>{c.displayName}</span>
-                    {c.isVerified && <BadgeCheck size={14} className={styles.verifiedIcon} />}
+          {loading ? (
+            <div className={styles.skeletonList}>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className={styles.skeletonRow}>
+                  <ShimmerSkeleton variant="avatar" width="36px" height="36px" light={!darkMode} />
+                  <div className={styles.skeletonTextCol}>
+                    <ShimmerSkeleton variant="text" width="90px" height="12px" light={!darkMode} />
+                    <ShimmerSkeleton variant="text" width="60px" height="10px" light={!darkMode} />
                   </div>
-                  <span className={styles.username}>{c.username}</span>
+                  <ShimmerSkeleton variant="chip" width="76px" height="28px" light={!darkMode} />
                 </div>
-              </div>
-              <button 
-                className={styles.subscribeBtn}
-                onClick={() => handleSubscribe(c._id)}
-              >
-                <span className={styles.subscribeBtnText}>Subscribe</span>
-              </button>
+              ))}
             </div>
-          ))}
+          ) : suggestedCreators.length > 0 ? suggestedCreators.map((c) => {
+            const isSubscribing = subscribingId === c._id;
+            return (
+              <div key={c._id} className={styles.suggestedRow}>
+                <div className={styles.suggestedCreator}>
+                  <img src={c.avatarUrl} alt={c.displayName} className={styles.avatar} />
+                  <div className={styles.nameBlock}>
+                    <div className={styles.nameLock}>
+                      <span className={styles.displayName}>{c.displayName}</span>
+                      {c.isVerified && <BadgeCheck size={14} className={styles.verifiedIcon} />}
+                    </div>
+                    <span className={styles.username}>{c.username}</span>
+                  </div>
+                </div>
+                <button
+                  className={`${styles.subscribeBtn} ${isSubscribing ? styles.subscribeBtnBusy : ''}`}
+                  onClick={() => handleSubscribe(c._id)}
+                  disabled={isSubscribing}
+                >
+                  {isSubscribing ? (
+                    <span className={styles.subscribeSpinner} />
+                  ) : (
+                    <span className={styles.subscribeBtnText}>Subscribe</span>
+                  )}
+                </button>
+              </div>
+            );
+          }) : (
+            <p className={styles.emptyList}>No suggestions right now.</p>
+          )}
         </div>
       </div>
 

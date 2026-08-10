@@ -1,30 +1,20 @@
+const mongoose = require('mongoose');
 const Post = require('../models/Post');
 const Subscription = require('../models/Subscription');
 const Transaction = require('../models/Transaction');
+const CreatorProfile = require('../models/CreatorProfile');
 const awsService = require('../services/aws.service');
 const ApiError = require('../utils/apiError');
 const catchAsync = require('../utils/catchAsync');
+const { getHiddenUserIds } = require('../utils/blockFilter');
 
 /**
  * Check if user has access to view full media of the post
  */
 const checkMediaAccess = async (user, post) => {
-  // Admins always have access
-  if (user.role === 'admin') {
-    return true;
-  }
-
-  // Creators always have access to their own posts
-  if (post.creatorId.toString() === user._id.toString()) {
-    return true;
-  }
-
-  // Free posts are accessible to everyone
-  if (post.postType === 'free') {
-    return true;
-  }
-
-  // Subscription posts require active subscription to the creator
+  if (user.role === 'admin') return true;
+  if (post.creatorId.toString() === user._id.toString()) return true;
+  if (post.postType === 'free') return true;
   if (post.postType === 'subscription') {
     const activeSub = await Subscription.findOne({
       userId: user._id,
@@ -34,8 +24,6 @@ const checkMediaAccess = async (user, post) => {
     });
     return !!activeSub;
   }
-
-  // PPV posts require a successful purchase transaction
   if (post.postType === 'ppv') {
     const purchased = await Transaction.findOne({
       senderId: user._id,
@@ -45,21 +33,32 @@ const checkMediaAccess = async (user, post) => {
     });
     return !!purchased;
   }
-
   return false;
 };
 
-/**
- * Format post media URLs by replacing private S3 URLs with presigned ones, 
- * or masking them if user has no access.
- */
-const formatPostForUser = async (user, post) => {
+const getCreatorDisplayMap = async (creatorIds) => {
+  const uniqueIds = [...new Set(creatorIds.map((id) => id.toString()))];
+  const profiles = await CreatorProfile.find({
+    userId: { $in: uniqueIds }
+  }).select('userId username displayName avatarUrl isVerifiedBadge');
+  const map = {};
+  profiles.forEach((p) => {
+    map[p.userId.toString()] = {
+      username: p.username,
+      displayName: p.displayName || p.username,
+      avatarUrl: p.avatarUrl || '',
+      isVerifiedBadge: p.isVerifiedBadge || false
+    };
+  });
+  return map;
+};
+
+const formatPostForUser = async (user, post, creatorDisplayMap, giftCounts) => {
   const hasAccess = await checkMediaAccess(user, post);
 
   const formattedMedia = await Promise.all(
     post.media.map(async (item) => {
       let signedUrl = item.url;
-      
       if (hasAccess) {
         if (item.url && item.url.includes('.amazonaws.com/')) {
           const key = item.url.split('.amazonaws.com/')[1];
@@ -69,51 +68,142 @@ const formatPostForUser = async (user, post) => {
             console.error(`[AWS S3] Error generating download URL for key ${key}:`, err);
           }
         }
-
-        return {
-          _id: item._id,
-          url: signedUrl,
-          thumbnailUrl: item.thumbnailUrl || item.url,
-          type: item.type,
-          isLocked: false
-        };
-      } else {
-        // Return masked media with thumbnail preview URL
-        return {
-          _id: item._id,
-          url: null,
-          thumbnailUrl: item.thumbnailUrl || item.url,
-          type: item.type,
-          isLocked: true
-        };
+        return { _id: item._id, url: signedUrl, thumbnailUrl: item.thumbnailUrl || item.url, type: item.type, isLocked: false };
       }
+      return { _id: item._id, url: null, thumbnailUrl: item.thumbnailUrl || item.url, type: item.type, isLocked: true };
     })
   );
 
+  const profile = creatorDisplayMap[post.creatorId.toString()] || {};
+
+  const comments = post.comments.map((c) => ({
+    _id: c._id,
+    text: c.text,
+    createdAt: c.createdAt,
+    userId: c.userId
+      ? { _id: c.userId._id, username: c.userId.username, displayName: c.userId.displayName || c.userId.username, avatarUrl: c.userId.avatarUrl || '' }
+      : null
+  }));
+
+  const seenByArr = Array.isArray(post.seenBy) ? post.seenBy : [];
+  const userIdStr = String(user._id);
+
   return {
     _id: post._id,
-    creatorId: post.creatorId,
+    creatorId: {
+      _id: post.creatorId._id || post.creatorId,
+      username: post.creatorId.username || profile.username,
+      displayName: post.creatorId.displayName || profile.displayName || 'Creator',
+      avatarUrl: post.creatorId.avatarUrl || profile.avatarUrl || '',
+      isVerifiedBadge: profile.isVerifiedBadge
+    },
     content: post.content,
     postType: post.postType,
     coinPrice: post.coinPrice,
     likesCount: post.likes.length,
     isLiked: post.likes.includes(user._id),
-    commentsCount: post.commentCount,
-    comments: post.comments,
+    commentsCount: post.commentCount || post.comments.length,
+    comments,
+    sharesCount: post.sharesCount || 0,
+    giftCount: giftCounts[post.creatorId.toString()] || 0,
+    isFollowing: user.following.includes(post.creatorId._id || post.creatorId),
+    isSeen: seenByArr.some((id) => String(id) === userIdStr),
+    hasCommented: comments.some((c) => c.userId && String(c.userId._id) === userIdStr),
     media: formattedMedia,
     createdAt: post.createdAt,
     hasAccess
   };
 };
 
-// Create a new post
+const getGiftCounts = async (creatorIds) => {
+  const uniqueIds = [...new Set(creatorIds.map((id) => id.toString()))];
+  const aggregation = await Transaction.aggregate([
+    { $match: { type: 'tip', status: 'completed', receiverId: { $in: uniqueIds.map((id) => mongoose.Types.ObjectId.createFromHexString(id)) } } },
+    { $group: { _id: '$receiverId', count: { $sum: 1 } } }
+  ]);
+  const map = {};
+  aggregation.forEach((item) => { map[item._id.toString()] = item.count; });
+  return map;
+};
+
+const getHiddenByVisibility = async (user) => {
+  if (user && user.role === 'admin') return [];
+  const restricted = await CreatorProfile.find({
+    profileVisibility: { $in: ['Private', 'Subscribers Only'] }
+  }).select('userId profileVisibility').lean();
+  if (restricted.length === 0) return [];
+  const privateIds = [];
+  const subOnlyIds = [];
+  restricted.forEach((p) => {
+    const id = String(p.userId);
+    if (user && id === String(user._id)) return;
+    if (p.profileVisibility === 'Private') privateIds.push(id);
+    else subOnlyIds.push(id);
+  });
+  if (!user) return [...privateIds, ...subOnlyIds];
+  if (subOnlyIds.length > 0) {
+    const activeSubs = await Subscription.find({
+      userId: user._id,
+      creatorId: { $in: subOnlyIds },
+      status: 'active',
+      expiryDate: { $gt: new Date() }
+    }).select('creatorId').lean();
+    const subscribed = new Set(activeSubs.map((s) => String(s.creatorId)));
+    return [...privateIds, ...subOnlyIds.filter((id) => !subscribed.has(id))];
+  }
+  return privateIds;
+};
+
+const canInteractWithCreator = async (user, creatorId) => {
+  if (user.role === 'admin') return true;
+  if (String(user._id) === String(creatorId)) return true;
+  const profile = await CreatorProfile.findOne({ userId: creatorId }).select('profileVisibility').lean();
+  if (!profile || !profile.profileVisibility || profile.profileVisibility === 'Public') return true;
+  if (profile.profileVisibility === 'Private') return false;
+  const activeSub = await Subscription.findOne({ userId: user._id, creatorId, status: 'active', expiryDate: { $gt: new Date() } });
+  return !!activeSub;
+};
+
+exports.getHiddenByVisibility = getHiddenByVisibility;
+
+const buildFeedQuery = async (user) => {
+  const hiddenIds = await getHiddenUserIds(user._id);
+  const visibilityHidden = await getHiddenByVisibility(user);
+  const allHidden = [...new Set([...hiddenIds, ...visibilityHidden])];
+  const query = { isPublished: true, isHidden: { $ne: true } };
+  // Discovery feed: show all global content except subscription-only posts
+  query.postType = { $ne: 'subscription' };
+  if (allHidden.length > 0) {
+    query.creatorId = { $nin: allHidden };
+  }
+  return query;
+};
+
+// Fisher-Yates shuffle
+const shuffle = (arr) => {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+};
+
+// Discovery feed order: fresh (unseen/un-interacted) first, then seen/interacted
+const orderForDiscovery = (posts) => {
+  const fresh = [];
+  const stale = [];
+  posts.forEach((p) => {
+    const interacted = p.isSeen || p.isLiked || p.hasCommented || p.isFollowing;
+    (interacted ? stale : fresh).push(p);
+  });
+  return [...shuffle(fresh), ...shuffle(stale)];
+};
+
 exports.createPost = catchAsync(async (req, res, next) => {
   const { content, media, postType, coinPrice, scheduledFor } = req.body;
-
   if (postType === 'ppv' && (!coinPrice || coinPrice <= 0)) {
     return next(new ApiError(400, 'PPV posts must have a coin price greater than 0'));
   }
-
   const post = await Post.create({
     creatorId: req.user._id,
     content,
@@ -122,210 +212,72 @@ exports.createPost = catchAsync(async (req, res, next) => {
     coinPrice: postType === 'ppv' ? coinPrice : 0,
     scheduledFor: scheduledFor ? new Date(scheduledFor) : null
   });
-
-  res.status(201).json({
-    status: 'success',
-    post
-  });
+  res.status(201).json({ status: 'success', post });
 });
 
-// Retrieve custom feed (subscribed creators + public posts)
+// Mark a post as seen by the current user (feed algorithm bookkeeping)
+exports.markSeen = catchAsync(async (req, res, next) => {
+  const { postId } = req.params;
+  const post = await Post.findById(postId);
+  if (!post) return next(new ApiError(404, 'Post not found'));
+  const userId = req.user._id;
+  const seenByArr = Array.isArray(post.seenBy) ? post.seenBy : [];
+  if (!seenByArr.some((id) => id.toString() === userId.toString())) {
+    seenByArr.push(userId);
+    post.seenBy = seenByArr;
+    await post.save({ validateBeforeSave: false });
+  }
+  res.status(200).json({ status: 'success', isSeen: true });
+});
+
+// Discovery feed: fresh content first (randomized), seen/interacted last
 exports.getFeed = catchAsync(async (req, res, next) => {
   const limit = parseInt(req.query.limit || '10', 10);
   const nextCursor = req.query.nextCursor;
 
-  const query = { isPublished: true };
+  const query = await buildFeedQuery(req.user);
+  if (nextCursor) query._id = { $lt: nextCursor };
 
-  // Cursor pagination filter
-  if (nextCursor) {
-    query._id = { $lt: nextCursor };
-  }
-
-  // Retrieve posts
+  const poolSize = limit * 3;
   const dbPosts = await Post.find(query)
     .populate('creatorId', 'username displayName avatarUrl')
     .sort({ _id: -1 })
-    .limit(limit + 1);
+    .limit(poolSize);
 
-  const hasMore = dbPosts.length > limit;
-  if (hasMore) {
-    dbPosts.pop();
-  }
+  const creatorIds = dbPosts.map((p) => p.creatorId._id.toString());
+  const [creatorDisplayMap, giftCounts] = await Promise.all([
+    getCreatorDisplayMap(creatorIds),
+    getGiftCounts(creatorIds)
+  ]);
 
   const formattedPosts = await Promise.all(
-    dbPosts.map(async (post) => await formatPostForUser(req.user, post))
+    dbPosts.map(async (post) => await formatPostForUser(req.user, post, creatorDisplayMap, giftCounts))
   );
 
-  const mockPosts = [
-    {
-      _id: 'mock-post-1',
-      creatorId: {
-        _id: 'mock-creator-1',
-        displayName: 'Molly Jane',
-        username: 'mollyjane',
-        avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80',
-        isVerifiedBadge: true
-      },
-      content: 'Had an amazing workout session today! 💪 Keeping up the grind! What are you guys up to today?',
-      postType: 'free',
-      coinPrice: 0,
-      likesCount: 124,
-      isLiked: false,
-      commentsCount: 12,
-      giftCount: 8,
-      media: [{
-        _id: 'mock-media-1',
-        type: 'image',
-        url: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=100&q=80',
-        isLocked: false
-      }],
-      createdAt: new Date(Date.now() - 3600000),
-      hasAccess: true,
-      comments: [
-        { userId: { displayName: 'John Doe', avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=50&q=80' }, text: 'Incredible dedication!' }
-      ]
-    },
-    {
-      _id: 'mock-post-2',
-      creatorId: {
-        _id: 'mock-creator-2',
-        displayName: 'Leslie Alexander',
-        username: 'lesliealexander',
-        avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
-        isVerifiedBadge: true
-      },
-      content: 'Check out my new choreography! 💃 Let me know what you think in the comments!',
-      postType: 'free',
-      coinPrice: 0,
-      likesCount: 382,
-      isLiked: true,
-      commentsCount: 45,
-      giftCount: 14,
-      media: [{
-        _id: 'mock-media-2',
-        type: 'video',
-        url: 'https://assets.mixkit.co/videos/preview/mixkit-girl-in-neon-light-dancing-40030-large.mp4',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
-        isLocked: false
-      }],
-      createdAt: new Date(Date.now() - 7200000),
-      hasAccess: true,
-      comments: []
-    },
-    {
-      _id: 'mock-post-3',
-      creatorId: {
-        _id: 'mock-creator-3',
-        displayName: 'Savannah',
-        username: 'savannah',
-        avatarUrl: '/Girl.png',
-        isVerifiedBadge: true
-      },
-      content: "Unlock my exclusive behind-the-scenes video from the last photo shoot! 📸 You don't want to miss this! 🔥",
-      postType: 'ppv',
-      coinPrice: 50,
-      likesCount: 750,
-      isLiked: false,
-      commentsCount: 89,
-      giftCount: 32,
-      media: [{
-        _id: 'mock-media-3',
-        type: 'video',
-        url: null,
-        thumbnailUrl: '/Girl.png',
-        isLocked: true
-      }],
-      createdAt: new Date(Date.now() - 10800000),
-      hasAccess: false,
-      comments: []
-    },
-    {
-      _id: 'mock-post-4',
-      creatorId: {
-        _id: 'mock-creator-4',
-        displayName: 'Jenny Wilson',
-        username: 'jennywilson',
-        avatarUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=150&q=80',
-        isVerifiedBadge: true
-      },
-      content: 'Premium sneak peek from my upcoming summer collection! ☀️ Unlock to see the full set!',
-      postType: 'ppv',
-      coinPrice: 20,
-      likesCount: 230,
-      isLiked: false,
-      commentsCount: 18,
-      giftCount: 5,
-      media: [{
-        _id: 'mock-media-4',
-        type: 'image',
-        url: null,
-        thumbnailUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80',
-        isLocked: true
-      }],
-      createdAt: new Date(Date.now() - 14400000),
-      hasAccess: false,
-      comments: []
-    },
-    {
-      _id: 'mock-post-5',
-      creatorId: {
-        _id: 'mock-creator-5',
-        displayName: 'Kristin Watson',
-        username: 'kristinwatson',
-        avatarUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80',
-        isVerifiedBadge: true
-      },
-      content: 'Listen to my voice note update! Sending you good vibes for the day! 🎙️❤️',
-      postType: 'free',
-      coinPrice: 0,
-      likesCount: 98,
-      isLiked: false,
-      commentsCount: 7,
-      giftCount: 3,
-      media: [{
-        _id: 'mock-media-5',
-        type: 'audio',
-        url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1484755560693-a4074577af3a?auto=format&fit=crop&w=400&q=80',
-        isLocked: false
-      }],
-      createdAt: new Date(Date.now() - 18000000),
-      hasAccess: true,
-      comments: []
-    }
-  ];
+  // Apply discovery ordering, then take exactly `limit` posts
+  const ordered = orderForDiscovery(formattedPosts).slice(0, limit);
 
-  const allPosts = [...formattedPosts, ...mockPosts];
+  // Build a cursor from the oldest post in the pool that wasn't served
+  const servedIds = new Set(ordered.map((p) => String(p._id)));
+  const remaining = formattedPosts.filter((p) => !servedIds.has(String(p._id)));
+  const lastPost = remaining[remaining.length - 1];
+  const nextCursorVal = remaining.length > 0 && lastPost ? lastPost._id : null;
 
-  const lastPost = dbPosts[dbPosts.length - 1];
-  const nextCursorVal = hasMore && lastPost ? lastPost._id : null;
-
-  res.status(200).json({
-    status: 'success',
-    posts: allPosts,
-    nextCursor: nextCursorVal
-  });
+  res.status(200).json({ status: 'success', posts: ordered, nextCursor: nextCursorVal });
 });
 
-// Retrieve media feed filtered by images or videos
 exports.getMediaFeed = catchAsync(async (req, res, next) => {
-  const { mediaType } = req.params; // 'video' or 'image'
+  const { mediaType } = req.params;
   const limit = parseInt(req.query.limit || '10', 10);
   const nextCursor = req.query.nextCursor;
 
-  if (!['video', 'image'].includes(mediaType)) {
-    return next(new ApiError(400, 'Invalid media type filter. Must be video or image.'));
+  if (!['video', 'image', 'audio'].includes(mediaType)) {
+    return next(new ApiError(400, 'Invalid media type filter. Must be video, image or audio.'));
   }
 
-  const query = {
-    isPublished: true,
-    'media.type': mediaType
-  };
-
-  if (nextCursor) {
-    query._id = { $lt: nextCursor };
-  }
+  const query = await buildFeedQuery(req.user);
+  query['media.type'] = mediaType;
+  if (nextCursor) query._id = { $lt: nextCursor };
 
   const posts = await Post.find(query)
     .populate('creatorId', 'username displayName avatarUrl')
@@ -333,279 +285,184 @@ exports.getMediaFeed = catchAsync(async (req, res, next) => {
     .limit(limit + 1);
 
   const hasMore = posts.length > limit;
-  if (hasMore) {
-    posts.pop();
-  }
+  if (hasMore) posts.pop();
+
+  const creatorIds = posts.map((p) => p.creatorId._id.toString());
+  const [creatorDisplayMap, giftCounts] = await Promise.all([
+    getCreatorDisplayMap(creatorIds),
+    getGiftCounts(creatorIds)
+  ]);
 
   const formattedPosts = await Promise.all(
-    posts.map(async (post) => await formatPostForUser(req.user, post))
+    posts.map(async (post) => await formatPostForUser(req.user, post, creatorDisplayMap, giftCounts))
   );
 
   const lastPost = posts[posts.length - 1];
   const nextCursorVal = hasMore && lastPost ? lastPost._id : null;
 
-  res.status(200).json({
-    status: 'success',
-    posts: formattedPosts,
-    nextCursor: nextCursorVal
-  });
+  res.status(200).json({ status: 'success', posts: formattedPosts, nextCursor: nextCursorVal });
 });
 
-// Access-control media server redirection endpoint
 exports.getPostMedia = catchAsync(async (req, res, next) => {
   const { postId, mediaId } = req.params;
-
   const post = await Post.findById(postId);
-  if (!post) {
+  if (!post) return next(new ApiError(404, 'Post not found'));
+  if (post.isHidden && post.creatorId.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
     return next(new ApiError(404, 'Post not found'));
   }
-
   const mediaItem = post.media.id(mediaId);
-  if (!mediaItem) {
-    return next(new ApiError(404, 'Media item not found'));
+  if (!mediaItem) return next(new ApiError(404, 'Media item not found'));
+  if (!(await canInteractWithCreator(req.user, post.creatorId))) {
+    return next(new ApiError(403, 'This content is only available to subscribers.'));
   }
-
-  // Run access control checks
   const hasAccess = await checkMediaAccess(req.user, post);
-  if (!hasAccess) {
-    return next(new ApiError(403, 'Access denied. Purchase or subscription required.'));
-  }
-
-  // Generate 1-hour presigned S3 download URL
+  if (!hasAccess) return next(new ApiError(403, 'Access denied. Purchase or subscription required.'));
   let key = mediaItem.url;
-  if (mediaItem.url.includes('.amazonaws.com/')) {
-    key = mediaItem.url.split('.amazonaws.com/')[1];
-  }
-
+  if (mediaItem.url.includes('.amazonaws.com/')) key = mediaItem.url.split('.amazonaws.com/')[1];
   const presignedUrl = await awsService.getPresignedDownloadUrl(key);
-
-  // Redirect to actual secure S3 path
   res.redirect(302, presignedUrl);
 });
 
-// Like or Unlike a post
+const rejectIfHidden = (req, post) => {
+  if (post.isHidden && post.creatorId.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+    return new ApiError(404, 'Post not found');
+  }
+  return null;
+};
+
 exports.likePost = catchAsync(async (req, res, next) => {
   const { postId } = req.params;
-
   const post = await Post.findById(postId);
-  if (!post) {
-    return next(new ApiError(404, 'Post not found'));
+  if (!post) return next(new ApiError(404, 'Post not found'));
+  const hiddenError = rejectIfHidden(req, post);
+  if (hiddenError) return next(hiddenError);
+  if (!(await canInteractWithCreator(req.user, post.creatorId))) {
+    return next(new ApiError(403, 'This content is only available to subscribers.'));
   }
-
   const index = post.likes.indexOf(req.user._id);
-  if (index === -1) {
-    post.likes.push(req.user._id);
-  } else {
-    post.likes.splice(index, 1);
-  }
-
+  if (index === -1) post.likes.push(req.user._id);
+  else post.likes.splice(index, 1);
   await post.save({ validateBeforeSave: false });
-
-  res.status(200).json({
-    status: 'success',
-    likesCount: post.likes.length,
-    isLiked: index === -1
-  });
+  res.status(200).json({ status: 'success', likesCount: post.likes.length, isLiked: index === -1 });
 });
 
-// Add a comment to a post
 exports.commentPost = catchAsync(async (req, res, next) => {
   const { postId } = req.params;
   const { text } = req.body;
-
-  if (!text) {
-    return next(new ApiError(400, 'Comment text is required'));
-  }
-
+  if (!text || !text.trim()) return next(new ApiError(400, 'Comment text is required'));
   const post = await Post.findById(postId);
-  if (!post) {
-    return next(new ApiError(404, 'Post not found'));
+  if (!post) return next(new ApiError(404, 'Post not found'));
+  const hiddenError = rejectIfHidden(req, post);
+  if (hiddenError) return next(hiddenError);
+  if (!(await canInteractWithCreator(req.user, post.creatorId))) {
+    return next(new ApiError(403, 'This content is only available to subscribers.'));
   }
-
-  post.comments.push({
-    userId: req.user._id,
-    text
-  });
-
+  post.comments.push({ userId: req.user._id, text: text.trim() });
   await post.save({ validateBeforeSave: false });
-
-  const updatedPost = await Post.findById(postId)
-    .populate('comments.userId', 'username displayName avatarUrl');
-
-  res.status(201).json({
-    status: 'success',
-    comments: updatedPost.comments
-  });
+  const updatedPost = await Post.findById(postId).populate('comments.userId', 'username displayName avatarUrl');
+  res.status(201).json({ status: 'success', comments: updatedPost.comments });
 });
 
-// Report a post
 exports.reportPost = catchAsync(async (req, res, next) => {
   const { postId } = req.params;
   const { reason } = req.body;
-
-  if (!reason) {
-    return next(new ApiError(400, 'Reason for report is required'));
-  }
-
+  if (!reason || !reason.trim()) return next(new ApiError(400, 'Reason for report is required'));
   const post = await Post.findById(postId);
-  if (!post) {
-    return next(new ApiError(404, 'Post not found'));
-  }
-
-  post.reports.push({
-    userId: req.user._id,
-    reason
-  });
-
+  if (!post) return next(new ApiError(404, 'Post not found'));
+  const hiddenError = rejectIfHidden(req, post);
+  if (hiddenError) return next(hiddenError);
+  if (post.creatorId.toString() === req.user._id.toString()) return next(new ApiError(400, 'You cannot report your own post'));
+  const alreadyReported = post.reports.some((r) => r.userId.toString() === req.user._id.toString());
+  if (alreadyReported) return next(new ApiError(400, 'You have already reported this post'));
+  post.reports.push({ userId: req.user._id, reason: reason.trim() });
   await post.save({ validateBeforeSave: false });
-
-  res.status(200).json({
-    status: 'success',
-    message: 'Post successfully reported'
-  });
+  res.status(200).json({ status: 'success', message: 'Post successfully reported' });
 });
 
-// Generate presigned upload URL for creators
 exports.getPresignedUpload = catchAsync(async (req, res, next) => {
   const { fileName, fileType } = req.body;
-
-  if (!fileName || !fileType) {
-    return next(new ApiError(400, 'Please provide fileName and fileType'));
-  }
-
+  if (!fileName || !fileType) return next(new ApiError(400, 'Please provide fileName and fileType'));
   const fileKey = `creators/${req.user._id}/${Date.now()}_${fileName}`;
   const uploadUrl = await awsService.getPresignedUploadUrl(fileKey, fileType);
   const bucketName = process.env.AWS_S3_BUCKET_NAME || 'fantrio';
   const region = process.env.AWS_REGION || 'us-east-1';
   const fileUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${fileKey}`;
-
-  res.status(200).json({
-    status: 'success',
-    uploadUrl,
-    key: fileKey,
-    fileUrl
-  });
+  res.status(200).json({ status: 'success', uploadUrl, key: fileKey, fileUrl });
 });
 
-// Share a post
 exports.sharePost = catchAsync(async (req, res, next) => {
   const { postId } = req.params;
-
   const post = await Post.findById(postId);
-  if (!post) {
-    return next(new ApiError(404, 'Post not found'));
+  if (!post) return next(new ApiError(404, 'Post not found'));
+  const hiddenError = rejectIfHidden(req, post);
+  if (hiddenError) return next(hiddenError);
+  if (!(await canInteractWithCreator(req.user, post.creatorId))) {
+    return next(new ApiError(403, 'This content is only available to subscribers.'));
   }
-
-  post.sharesCount += 1;
+  post.sharesCount = (post.sharesCount || 0) + 1;
   await post.save({ validateBeforeSave: false });
-
-  res.status(200).json({
-    status: 'success',
-    sharesCount: post.sharesCount
-  });
+  res.status(200).json({ status: 'success', sharesCount: post.sharesCount });
 });
 
-// Get trending hashtags
 exports.getTrendingHashtags = catchAsync(async (req, res, next) => {
-  const hashtags = [
-    { tag: 'hot', postCount: '12.5K' },
-    { tag: 'bikini', postCount: '12.5K' },
-    { tag: 'fitness', postCount: '12.5K' },
-    { tag: 'booty', postCount: '12.5K' }
-  ];
-
-  res.status(200).json({
-    status: 'success',
-    hashtags
-  });
+  const posts = await Post.find({ isPublished: true, isHidden: { $ne: true } }).select('content');
+  const tagCounts = {};
+  for (const post of posts) {
+    const tags = (post.content || '').match(/#[\w]+/g) || [];
+    for (const tag of tags) {
+      const key = tag.slice(1).toLowerCase();
+      if (key) tagCounts[key] = (tagCounts[key] || 0) + 1;
+    }
+  }
+  const hashtags = Object.entries(tagCounts).map(([tag, postCount]) => ({ tag, postCount })).sort((a, b) => b.postCount - a.postCount).slice(0, 8);
+  res.status(200).json({ status: 'success', hashtags });
 });
 
-// Update an existing post
 exports.updatePost = catchAsync(async (req, res, next) => {
   const { postId } = req.params;
-  const { content, media, postType, coinPrice, scheduledFor } = req.body;
-
+  const { content, media, postType, coinPrice, scheduledFor, isHidden } = req.body;
   const post = await Post.findById(postId);
-  if (!post) {
-    return next(new ApiError(404, 'Post not found'));
-  }
-
-  // Check ownership
+  if (!post) return next(new ApiError(404, 'Post not found'));
   if (post.creatorId.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
     return next(new ApiError(403, 'You do not have permission to update this post'));
   }
-
-  if (postType === 'ppv' && (!coinPrice || coinPrice <= 0)) {
-    return next(new ApiError(400, 'PPV posts must have a coin price greater than 0'));
-  }
-
+  if (postType === 'ppv' && (!coinPrice || coinPrice <= 0)) return next(new ApiError(400, 'PPV posts must have a coin price greater than 0'));
   if (content !== undefined) post.content = content;
   if (media !== undefined) post.media = media;
   if (postType !== undefined) post.postType = postType;
   if (coinPrice !== undefined) post.coinPrice = postType === 'ppv' ? coinPrice : 0;
   if (scheduledFor !== undefined) post.scheduledFor = scheduledFor ? new Date(scheduledFor) : null;
-
+  if (isHidden !== undefined) post.isHidden = !!isHidden;
   await post.save();
-
-  res.status(200).json({
-    status: 'success',
-    post
-  });
+  res.status(200).json({ status: 'success', post });
 });
 
-// Delete an existing post
 exports.deletePost = catchAsync(async (req, res, next) => {
   const { postId } = req.params;
-
   const post = await Post.findById(postId);
-  if (!post) {
-    return next(new ApiError(404, 'Post not found'));
-  }
-
-  // Check ownership
+  if (!post) return next(new ApiError(404, 'Post not found'));
   if (post.creatorId.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
     return next(new ApiError(403, 'You do not have permission to delete this post'));
   }
-
+  const mediaUrls = [];
+  (post.media || []).forEach((m) => { mediaUrls.push(m.url); if (m.thumbnailUrl) mediaUrls.push(m.thumbnailUrl); });
+  await awsService.deleteS3Media(mediaUrls);
   await Post.findByIdAndDelete(postId);
-
-  res.status(200).json({
-    status: 'success',
-    message: 'Post successfully deleted'
-  });
+  res.status(200).json({ status: 'success', message: 'Post successfully deleted' });
 });
 
-// Delete a comment on a post
 exports.deleteComment = catchAsync(async (req, res, next) => {
   const { postId, commentId } = req.params;
-
   const post = await Post.findById(postId);
-  if (!post) {
-    return next(new ApiError(404, 'Post not found'));
-  }
-
+  if (!post) return next(new ApiError(404, 'Post not found'));
   const comment = post.comments.id(commentId);
-  if (!comment) {
-    return next(new ApiError(404, 'Comment not found'));
-  }
-
-  // Authorize: post owner or comment author
+  if (!comment) return next(new ApiError(404, 'Comment not found'));
   const isPostOwner = post.creatorId.toString() === req.user._id.toString();
   const isCommentAuthor = comment.userId.toString() === req.user._id.toString();
   const isAdmin = req.user.role === 'admin';
-
-  if (!isPostOwner && !isCommentAuthor && !isAdmin) {
-    return next(new ApiError(403, 'You do not have permission to delete this comment'));
-  }
-
+  if (!isPostOwner && !isCommentAuthor && !isAdmin) return next(new ApiError(403, 'You do not have permission to delete this comment'));
   post.comments.pull(commentId);
   await post.save({ validateBeforeSave: false });
-
-  const updatedPost = await Post.findById(postId)
-    .populate('comments.userId', 'username displayName avatarUrl');
-
-  res.status(200).json({
-    status: 'success',
-    comments: updatedPost.comments
-  });
+  const updatedPost = await Post.findById(postId).populate('comments.userId', 'username displayName avatarUrl');
+  res.status(200).json({ status: 'success', comments: updatedPost.comments });
 });

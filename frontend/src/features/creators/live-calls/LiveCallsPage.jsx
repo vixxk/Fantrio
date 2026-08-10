@@ -1,9 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../../../context/AppContext';
+import ShimmerSkeleton from '../../../components/ShimmerSkeleton/ShimmerSkeleton';
 import {
-  ArrowDown,
   ArrowRight,
-  ArrowUp,
   ChevronDown,
   MoreVertical,
   Phone,
@@ -14,8 +13,17 @@ import {
   Clock,
   PhoneOff,
   Lightbulb,
+  Info,
+  X,
+  Loader2,
+  Play,
 } from 'lucide-react';
+import { api } from '../../../services/api';
+import { useToast } from '../../../components/Toast/Toast';
 import { PeriodDropdown } from '../analytics/PeriodDropdown';
+import { CallRateDialog } from '../calls/CallRateDialog';
+import { ConfirmToggleDialog } from '../../../components/ConfirmToggleDialog/ConfirmToggleDialog';
+import { buildCallInsights } from '../callInsights';
 import styles from './LiveCallsPage.module.css';
 
 const iconMap = {
@@ -26,231 +34,471 @@ const iconMap = {
   missed: PhoneOff,
 };
 
-const callRows = [
-  {
-    id: 1,
-    fan: { name: 'Bella Rose', isVerified: true },
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
-    type: 'Video Call',
-    typeIcon: Video,
-    date: 'May 26, 2024',
-    time: '10:24 PM',
-    duration: '18:32',
-    earned: '$9.16',
-    status: 'Completed',
-  },
-  {
-    id: 2,
-    fan: { name: 'Michael_23', isVerified: false },
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80',
-    type: 'Audio Call',
-    typeIcon: Phone,
-    date: 'May 26, 2024',
-    time: '9:41 PM',
-    duration: '12:07',
-    earned: '$6.04',
-    status: 'Completed',
-  },
-  {
-    id: 3,
-    fan: { name: 'ChrisFit', isVerified: true },
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80',
-    type: 'Video Call',
-    typeIcon: Video,
-    date: 'May 26, 2024',
-    time: '8:58 PM',
-    duration: '07:45',
-    earned: '$3.88',
-    status: 'Completed',
-  },
-  {
-    id: 4,
-    fan: { name: 'Alex_World', isVerified: false },
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80',
-    type: 'Audio Call',
-    typeIcon: Phone,
-    date: 'May 26, 2024',
-    time: '8:12 PM',
-    duration: '22:18',
-    earned: '$11.09',
-    status: 'Missed',
-  },
-  {
-    id: 5,
-    fan: { name: 'DannyBoy', isVerified: true },
-    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80',
-    type: 'Video Call',
-    typeIcon: Video,
-    date: 'May 26, 2024',
-    time: '6:55 PM',
-    duration: '05:10',
-    earned: '$2.58',
-    status: 'Completed',
-  },
-  {
-    id: 6,
-    fan: { name: 'Jake_88', isVerified: false },
-    avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=120&q=80',
-    type: 'Audio Call',
-    typeIcon: Phone,
-    date: 'May 26, 2024',
-    time: '6:55 PM',
-    duration: '15:31',
-    earned: '$7.76',
-    status: 'Missed',
-  },
-  {
-    id: 7,
-    fan: { name: 'NickVibes', isVerified: true },
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80',
-    type: 'Video Call',
-    typeIcon: Video,
-    date: 'May 26, 2024',
-    time: '5:35 PM',
-    duration: '10:03',
-    earned: '$5.02',
-    status: 'Completed',
-  },
-  {
-    id: 8,
-    fan: { name: 'FitLover', isVerified: false },
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80',
-    type: 'Audio Call',
-    typeIcon: Phone,
-    date: 'May 26, 2024',
-    time: '4:48 PM',
-    duration: '09:14',
-    earned: '$4.57',
-    status: 'Completed',
-  },
-  {
-    id: 9,
-    fan: { name: 'SunsetKing', isVerified: true },
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80',
-    type: 'Video Call',
-    typeIcon: Video,
-    date: 'May 26, 2024',
-    time: '4:00 PM',
-    duration: '14:20',
-    earned: '$8.52',
-    status: 'Completed',
-  },
-  {
-    id: 10,
-    fan: { name: 'DeepConvo', isVerified: false },
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
-    type: 'Audio Call',
-    typeIcon: Phone,
-    date: 'May 26, 2024',
-    time: '3:20 PM',
-    duration: '07:55',
-    earned: '$4.79',
-    status: 'Missed',
-  },
-  {
-    id: 11,
-    fan: { name: 'QuietStorm', isVerified: true },
-    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&q=80',
-    type: 'Video Call',
-    typeIcon: Video,
-    date: 'May 26, 2024',
-    time: '2:10 PM',
-    duration: '05:30',
-    earned: '$3.30',
-    status: 'Completed',
-  },
-  {
-    id: 12,
-    fan: { name: 'StarGazer', isVerified: false },
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80',
-    type: 'Audio Call',
-    typeIcon: Phone,
-    date: 'May 26, 2024',
-    time: '1:05 PM',
-    duration: '11:42',
-    earned: '$5.85',
-    status: 'Completed',
-  },
-];
-
-const topHours = [
-  { value: 0.28, label: '12am' },
-  { value: 0.50, label: '2am' },
-  { value: 0.74, label: '4am' },
-  { value: 0.42, label: '6am' },
-  { value: 0.70, label: '8am' },
-  { value: 0.62, label: '10am' },
-  { value: 0.52, label: '12pm' },
-  { value: 0.95, label: '2pm' },
-  { value: 0.71, label: '4pm' },
-  { value: 0.57, label: '6pm' },
-  { value: 0.69, label: '8pm' },
-];
-
 export const LiveCallsPage = () => {
   const { darkMode, navigateTo } = useApp();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('All Calls');
+  const [period, setPeriod] = useState('All Time');
   const [visibleCalls, setVisibleCalls] = useState(9);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [detailsRow, setDetailsRow] = useState(null);
+  const [rateTarget, setRateTarget] = useState(null);
+  const [toggling, setToggling] = useState(null);
+  const [confirmTarget, setConfirmTarget] = useState(null);
 
-  const maxHours = Math.ceil(Math.max(...topHours.map(h => h.value)) * 4) / 4;
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('[data-kebab-menu]')) setOpenMenuId(null);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
-  const callStats = useMemo(
-    () => [
+  const toggleMenu = (id) => setOpenMenuId((prev) => (prev === id ? null : id));
+
+  const isAvailable = (type) =>
+    type === 'audio' ? !!(merged && merged.audioAvailable) : !!(merged && merged.videoAvailable);
+
+  // Go Live Now <-> Go Offline. Flips the creator's availability for the
+  // given call type so fans can (or can no longer) request that call.
+  const handleToggleLive = async (type) => {
+    if (toggling || !merged) return;
+    const available = isAvailable(type);
+    setToggling(type);
+    try {
+      const res = await api.post('/creators/profile/toggle-calls', { type, available: !available });
+      if (res.status !== 'success') throw new Error(res.message || 'Failed to update status');
+      const availability = { audioAvailable: res.profile.audioAvailable, videoAvailable: res.profile.videoAvailable };
+      setData((prev) => ({
+        audio: { ...prev.audio, ...availability },
+        video: { ...prev.video, ...availability },
+      }));
+      toast.success(
+        !available
+          ? 'You are now live for ' + (type === 'audio' ? 'audio' : 'video') + ' calls.'
+          : 'You are now offline for ' + (type === 'audio' ? 'audio' : 'video') + ' calls.'
+      );
+    } catch (err) {
+      toast.error(err?.message || 'Could not update status. Please try again.');
+    } finally {
+      setToggling(null);
+    }
+  };
+
+  const handleSaveRate = async (rate) => {
+    const field = rateTarget === 'audio' ? 'audioCallPerMin' : 'videoCallPerMin';
+    const res = await api.put('/creators/profile', { rates: { [field]: rate } });
+    if (res.status !== 'success') {
+      throw new Error(res.message || 'Failed to update rate');
+    }
+    const update = {
+      audioRate: res.profile && res.profile.rates ? res.profile.rates.audioCallPerMin : rateTarget === 'audio' ? rate : undefined,
+      videoRate: res.profile && res.profile.rates ? res.profile.rates.videoCallPerMin : rateTarget === 'video' ? rate : undefined,
+    };
+    setData((prev) => ({
+      audio: { ...prev.audio, ...update },
+      video: { ...prev.video, ...update },
+    }));
+    toast.success((rateTarget === 'audio' ? 'Audio' : 'Video') + ' call rate updated successfully.');
+  };
+
+  useEffect(() => {
+    let mounted = true;
+    Promise.resolve().then(() => {
+      setLoading(true);
+      setError('');
+      Promise.all([
+        api.get(`/creators/panel/calls/audio?period=${encodeURIComponent(period)}`),
+        api.get(`/creators/panel/calls/video?period=${encodeURIComponent(period)}`)
+      ])
+        .then(([audio, video]) => {
+          if (mounted) setData({ audio, video });
+        })
+        .catch(() => { if (mounted) setError('Could not load call stats. Please try again.'); })
+        .finally(() => { if (mounted) setLoading(false); });
+    });
+    return () => { mounted = false; };
+  }, [period]);
+
+  const merged = useMemo(() => {
+    if (!data) return null;
+    const { audio, video } = data;
+
+    const num = (v) => {
+      if (v == null) return 0;
+      const s = String(v).replace(/[^0-9.KkMm]/g, '');
+      if (/[Kk]/.test(s)) return Number(parseFloat(s) * 1000) || 0;
+      if (/[Mm]/.test(s)) return Number(parseFloat(s) * 1000000) || 0;
+      return Number(parseFloat(s)) || 0;
+    };
+    const audioCalls = audio.callStats || [];
+    const videoCalls = video.callStats || [];
+    const get = (arr, id) => arr.find((s) => s.id === id) || {};
+
+    const totalCalls = num(get(audioCalls, 'totalCalls').value) + num(get(videoCalls, 'totalCalls').value);
+    const totalMinutes = num(get(audioCalls, 'totalMinutes').value) + num(get(videoCalls, 'totalMinutes').value);
+    const totalEarned = num(get(audioCalls, 'earnings').value) + num(get(videoCalls, 'earnings').value);
+    const missed = num(get(audioCalls, 'missedCalls').value) + num(get(videoCalls, 'missedCalls').value);
+    const pending = num(get(audioCalls, 'pendingRequests').value) + num(get(videoCalls, 'pendingRequests').value);
+    const completed = Math.max(0, totalCalls - missed - pending);
+
+    const avg = (a, b) => Math.round(((a + b) / 2) * 100) / 100;
+
+    // Week-over-week change, same formula the backend uses for the single-type stats
+    const fmtPct = (cur, prev) => `${prev > 0 ? (cur >= prev ? '+' : '-') : cur > 0 ? '+' : ''}${prev > 0 ? Math.abs(Math.round(((cur - prev) / prev) * 100)) : cur > 0 ? 100 : 0}%`;
+
+
+    // Combined raw totals so the aggregate cards derive real changes (no hardcoding)
+    const aRaw = audio.rawTotals || {};
+    const vRaw = video.rawTotals || {};
+    const raw = {
+      totalCalls: (aRaw.totalCalls || 0) + (vRaw.totalCalls || 0),
+      totalMinutes: (aRaw.totalMinutes || 0) + (vRaw.totalMinutes || 0),
+      totalEarned: (aRaw.totalEarned || 0) + (vRaw.totalEarned || 0),
+      missedCalls: (aRaw.missedCalls || 0) + (vRaw.missedCalls || 0),
+      pendingCalls: (aRaw.pendingCalls || 0) + (vRaw.pendingCalls || 0),
+      prevTotalCalls: (aRaw.prevTotalCalls || 0) + (vRaw.prevTotalCalls || 0),
+      prevTotalMinutes: (aRaw.prevTotalMinutes || 0) + (vRaw.prevTotalMinutes || 0),
+      prevEarned: (aRaw.prevEarned || 0) + (vRaw.prevEarned || 0),
+      prevMissed: (aRaw.prevMissed || 0) + (vRaw.prevMissed || 0),
+    };
+    const prevCompleted = Math.max(0, raw.prevTotalCalls - raw.prevMissed);
+    // Comparison label comes from the backend ('' for All Time, when no change is shown)
+    const audioPeriod = get(audioCalls, 'totalCalls').period || get(audioCalls, 'totalMinutes').period || '';
+    const videoPeriod = get(videoCalls, 'totalCalls').period || get(videoCalls, 'totalMinutes').period || '';
+    const prevLabel = audioPeriod || videoPeriod;
+    const showChange = prevLabel !== '';
+    const missedChange = showChange ? fmtPct(missed, raw.prevMissed) : '';
+
+    const callStats = [
       {
         id: 'completed',
         label: 'Completed Calls',
-        value: '86',
-        change: '+18%',
+        value: String(completed),
+        change: showChange ? fmtPct(completed, prevCompleted) : '',
         changeType: 'positive',
-        period: 'vs last week',
+        period: prevLabel,
         icon: 'completed',
         color: '#10b981',
       },
       {
         id: 'minutes',
         label: 'Total Call Minutes',
-        value: '1,250',
-        change: '+18%',
+        value: totalMinutes.toLocaleString(),
+        change: showChange ? fmtPct(totalMinutes, raw.prevTotalMinutes) : '',
         changeType: 'positive',
-        period: 'vs last week',
+        period: prevLabel,
         icon: 'phone',
         color: '#a855f7',
       },
       {
         id: 'earnings',
         label: 'Earnings',
-        value: '$2,540.00',
-        change: '+22%',
+        value: `${totalEarned.toLocaleString()} coins`,
+        change: showChange ? fmtPct(totalEarned, raw.prevEarned) : '',
         changeType: 'positive',
-        period: 'vs last week',
+        period: prevLabel,
         icon: 'earnings',
         color: '#22c55e',
       },
       {
         id: 'missed',
         label: 'Missed Calls',
-        value: '5',
-        change: '17%',
-        changeType: 'negative',
-        period: 'vs last week',
+        value: String(missed),
+        change: missedChange,
+        changeType: missedChange.startsWith('-') ? 'positive' : 'negative',
+        period: prevLabel,
         icon: 'missed',
         color: '#ef4444',
       },
-      {
-        id: 'pending',
-        label: 'Pending Requests',
-        value: '12',
-        link: 'View Requests',
-        icon: 'requests',
-        color: '#f59e0b',
-      },
-    ],
-    []
-  );
+    ];
 
-  const recentCalls = useMemo(() => callRows.slice(0, visibleCalls), [visibleCalls]);
-  const showMore = visibleCalls < callRows.length;
+    // Merge recent calls with a call type so the tabs can filter
+    const recentCalls = [
+      ...(audio.recentCalls || []).map((c) => ({ ...c, key: `audio-${c.id}`, typeLabel: 'Audio Calls', typeIcon: Phone })),
+      ...(video.recentCalls || []).map((c) => ({ ...c, key: `video-${c.id}`, typeLabel: 'Video Calls', typeIcon: Video })),
+    ].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+    // Peak hours: average both charts (use audio as the base shape)
+    const audioHours = (audio.peakHours && audio.peakHours.hours) || [];
+    const videoHours = (video.peakHours && video.peakHours.hours) || [];
+    const topHours = audioHours.map((h, i) => ({
+      value: avg(h.value, (videoHours[i] && videoHours[i].value) || 0) / Math.max(1, (audio.peakHours && audio.peakHours.maxY) || 1),
+      label: h.label,
+    }));
+
+    const completedPct = totalCalls ? Math.round((completed / totalCalls) * 100) : 0;
+    const missedPct = totalCalls ? Math.round((missed / totalCalls) * 100) : 0;
+    const pendingPct = totalCalls ? Math.round((pending / totalCalls) * 100) : 0;
+
+    const earningsAmount = (() => {
+      const a = (audio.earnings && audio.earnings.totalEarnedRaw) || num((audio.earnings && audio.earnings.amount) || '0 coins');
+      const v = (video.earnings && video.earnings.totalEarnedRaw) || num((video.earnings && video.earnings.amount) || '0 coins');
+      return `${(a + v).toLocaleString()} coins`;
+    })();
+    const prevEarned = (() => {
+      const a = (audio.earnings && audio.earnings.prevEarnedRaw) || 0;
+      const v = (video.earnings && video.earnings.prevEarnedRaw) || 0;
+      return a + v;
+    })();
+    const todayChangePct = showChange
+      ? (prevEarned > 0
+          ? Math.round(((num(earningsAmount) - prevEarned) / prevEarned) * 100)
+          : (num(earningsAmount) > 0 ? 100 : 0))
+      : 0;
+    const estimatedPayoutRaw = ((audio.earnings && audio.earnings.estimatedPayoutRaw) || 0) + ((video.earnings && video.earnings.estimatedPayoutRaw) || 0);
+    const todayMinutes = ((audio.earnings && audio.earnings.totalMinutes) || 0) + ((video.earnings && video.earnings.totalMinutes) || 0);
+    const todayCompleted = ((audio.earnings && audio.earnings.completedCalls) || 0) + ((video.earnings && video.earnings.completedCalls) || 0);
+    const todayMissed = ((audio.earnings && audio.earnings.missedCalls) || 0) + ((video.earnings && video.earnings.missedCalls) || 0);
+
+    const peakEntry = topHours.length ? topHours.reduce((best, h) => (h.value > best.value ? h : best), topHours[0]) : null;
+    const peakBoost = ((audio.peakHours && audio.peakHours.boostPercentage) || (video.peakHours && video.peakHours.boostPercentage) || '0%');
+    const boostInsights = buildCallInsights({
+      type: 'Call',
+      peakTime: peakEntry && peakEntry.value > 0 ? peakEntry.label : null,
+      boostPercentage: peakBoost,
+      completionRate: completedPct,
+      completedCount: completed,
+      missedCount: missed,
+      todayChangePct,
+      isOnline: !!(audio.isOnline != null ? audio.isOnline : video.isOnline),
+      rate: (audio.audioRate || 0) + (video.videoRate || 0),
+    });
+
+    return {
+      callStats,
+      recentCalls,
+      topHours,
+      maxHours: 1,
+      todayAmount: earningsAmount,
+      todayChangePct,
+      changeLabel: prevLabel,
+      estimatedPayout: `${estimatedPayoutRaw.toLocaleString()} coins`,
+      todayMinutes,
+      todayCompleted,
+      todayMissed,
+      completedPct,
+      missedPct,
+      pendingPct,
+      totalMinutes,
+      completed,
+      missed,
+      pending,
+      audioRate: audio.audioRate != null ? audio.audioRate : 0,
+      videoRate: video.videoRate != null ? video.videoRate : 0,
+      audioAvailable: audio.audioAvailable != null ? audio.audioAvailable : true,
+      videoAvailable: video.videoAvailable != null ? video.videoAvailable : true,
+      isOnline: !!(audio.isOnline != null ? audio.isOnline : video.isOnline),
+      boostInsights,
+    };
+  }, [data]);
+
+  const filteredRows = useMemo(() => {
+    if (!merged) return [];
+    if (activeTab === 'All Calls') return merged.recentCalls;
+    return merged.recentCalls.filter((r) => r.typeLabel === activeTab);
+  }, [merged, activeTab]);
+
+  const recentCalls = filteredRows.slice(0, visibleCalls);
+  const showMore = visibleCalls < filteredRows.length;
   const tabs = ['All Calls', 'Audio Calls', 'Video Calls'];
+  const callStats = merged ? merged.callStats : [];
+  const maxHours = merged ? merged.maxHours : 1;
+  const topHours = merged ? merged.topHours : [];
+
+  if (loading) {
+    return (
+      <div className={`${styles.liveCallsContainer} ${!darkMode ? styles.light : ''}`}>
+        <div className={styles.mainGrid}>
+          <div className={styles.leftColumn}>
+            <div className={styles.callCardsGrid}>
+              <article className={styles.callCard}>
+                <div className={styles.callCardTop}>
+                  <div className={styles.callIconWrap} style={{ background: 'rgba(16, 185, 129, 0.2)' }}>
+                    <Phone size={28} className={styles.callIcon} />
+                  </div>
+                  <div className={styles.callCopy}>
+                    <ShimmerSkeleton variant="text" width="60%" height="18px" />
+                    <ShimmerSkeleton variant="text" width="80%" height="12px" marginTop="6px" />
+                    <ShimmerSkeleton variant="text" width="45%" height="11px" marginTop="8px" />
+                  </div>
+                </div>
+                <div className={styles.callActions}>
+                  <ShimmerSkeleton variant="button" height="38px" />
+                  <ShimmerSkeleton variant="button" height="38px" />
+                </div>
+              </article>
+
+              <article className={styles.callCard}>
+                <div className={styles.callCardTop}>
+                  <div className={styles.callIconWrap} style={{ background: 'rgba(139, 92, 246, 0.2)' }}>
+                    <Video size={28} className={styles.callIcon} />
+                  </div>
+                  <div className={styles.callCopy}>
+                    <ShimmerSkeleton variant="text" width="55%" height="18px" />
+                    <ShimmerSkeleton variant="text" width="75%" height="12px" marginTop="6px" />
+                    <ShimmerSkeleton variant="text" width="40%" height="11px" marginTop="8px" />
+                  </div>
+                </div>
+                <div className={styles.callActions}>
+                  <ShimmerSkeleton variant="button" height="38px" />
+                  <ShimmerSkeleton variant="button" height="38px" />
+                </div>
+              </article>
+            </div>
+
+            <div className={styles.mobileQuickActions}>
+              <div className={styles.mobileQaCard}>
+                <div className={styles.mobileQaTop}>
+                  <ShimmerSkeleton variant="circle" width="44px" height="44px" />
+                  <div className={styles.mobileQaInfo}>
+                    <ShimmerSkeleton variant="text" width="50%" height="14px" />
+                    <ShimmerSkeleton variant="text" width="35%" height="11px" marginTop="4px" />
+                  </div>
+                </div>
+                <div className={styles.mobileQaButtons}>
+                  <ShimmerSkeleton variant="button" height="36px" />
+                  <ShimmerSkeleton variant="button" height="36px" />
+                </div>
+              </div>
+              <div className={styles.mobileQaCard}>
+                <div className={styles.mobileQaTop}>
+                  <ShimmerSkeleton variant="circle" width="44px" height="44px" />
+                  <div className={styles.mobileQaInfo}>
+                    <ShimmerSkeleton variant="text" width="50%" height="14px" />
+                    <ShimmerSkeleton variant="text" width="35%" height="11px" marginTop="4px" />
+                  </div>
+                </div>
+                <div className={styles.mobileQaButtons}>
+                  <ShimmerSkeleton variant="button" height="36px" />
+                  <ShimmerSkeleton variant="button" height="36px" />
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.statsGrid}>
+              {Array.from({ length: 4 }).map((_, idx) => (
+                <div key={idx} className={styles.statCard}>
+                  <div className={styles.statIconWrap}>
+                    <ShimmerSkeleton variant="circle" width="36px" height="36px" />
+                  </div>
+                  <div className={styles.statContent}>
+                    <ShimmerSkeleton variant="text" width="60%" height="11px" />
+                    <ShimmerSkeleton variant="text" width="40%" height="18px" marginTop="4px" />
+                    <ShimmerSkeleton variant="text" width="25%" height="10px" marginTop="4px" />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <section className={styles.activityCard}>
+              <div className={styles.activityHeader}>
+                <ShimmerSkeleton variant="text" width="30%" height="16px" />
+                <div className={styles.activityTabs}>
+                  <ShimmerSkeleton variant="chip" width="60px" height="28px" />
+                  <ShimmerSkeleton variant="chip" width="70px" height="28px" />
+                  <ShimmerSkeleton variant="chip" width="80px" height="28px" />
+                </div>
+              </div>
+              <div className={styles.tableWrap}>
+                {Array.from({ length: 4 }).map((_, idx) => (
+                  <div key={idx} className={styles.tableRow} style={{ display: 'flex', gap: '0.75rem', padding: '0.75rem 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    <ShimmerSkeleton variant="circle" width="36px" height="36px" />
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                      <ShimmerSkeleton variant="text" width="55%" height="12px" />
+                      <ShimmerSkeleton variant="text" width="30%" height="10px" />
+                    </div>
+                    <ShimmerSkeleton variant="text" width="60px" height="12px" />
+                    <ShimmerSkeleton variant="text" width="50px" height="12px" />
+                    <ShimmerSkeleton variant="chip" width="55px" height="22px" />
+                    <ShimmerSkeleton variant="circle" width="28px" height="28px" />
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+
+          <aside className={styles.rightSidebar}>
+            <section className={`${styles.sidebarCard} ${styles.desktopEarningsCard}`}>
+              <div className={styles.earningsHeader}>
+                <ShimmerSkeleton variant="text" width="45%" height="14px" />
+              </div>
+              <ShimmerSkeleton variant="text" width="35%" height="28px" marginTop="0.75rem" />
+              <ShimmerSkeleton variant="text" width="50%" height="11px" marginTop="0.5rem" />
+              <div className={styles.earningsStats}>
+                {Array.from({ length: 4 }).map((_, idx) => (
+                  <div key={idx} className={styles.earningsStat}>
+                    <ShimmerSkeleton variant="text" width="55%" height="10px" />
+                    <ShimmerSkeleton variant="text" width="35%" height="14px" marginTop="4px" />
+                  </div>
+                ))}
+              </div>
+              <ShimmerSkeleton variant="button" height="36px" marginTop="1rem" />
+            </section>
+
+            <section className={`${styles.sidebarCard} ${styles.callPerformanceCard}`}>
+              <ShimmerSkeleton variant="text" width="40%" height="14px" />
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                <ShimmerSkeleton variant="circle" width="100px" height="100px" />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>
+                  {Array.from({ length: 3 }).map((_, idx) => (
+                    <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <ShimmerSkeleton variant="circle" width="10px" height="10px" />
+                      <ShimmerSkeleton variant="text" width="70%" height="10px" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <section className={`${styles.sidebarCard} ${styles.topCallHoursCard}`}>
+              <ShimmerSkeleton variant="text" width="35%" height="14px" />
+              <div style={{ display: 'flex', gap: '0.25rem', marginTop: '1rem', alignItems: 'flex-end', height: '120px' }}>
+                {Array.from({ length: 24 }).map((_, idx) => (
+                  <ShimmerSkeleton key={idx} variant="text" width="4px" height={`${20 + Math.random() * 80}px`} style={{ flex: 1 }} />
+                ))}
+              </div>
+            </section>
+
+            <section className={`${styles.sidebarCard} ${styles.tipsCard}`}>
+              <ShimmerSkeleton variant="text" width="55%" height="14px" />
+              {Array.from({ length: 3 }).map((_, idx) => (
+                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+                  <ShimmerSkeleton variant="circle" width="14px" height="14px" />
+                  <ShimmerSkeleton variant="text" width="80%" height="11px" />
+                </div>
+              ))}
+              <ShimmerSkeleton variant="text" width="40%" height="12px" marginTop="0.75rem" />
+            </section>
+          </aside>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && !merged) {
+    return (
+      <div className={`${styles.liveCallsContainer} ${!darkMode ? styles.light : ''}`}>
+        <div className={styles.mainGrid}>
+          <div className={styles.leftColumn}>
+            <div className={styles.callCardsGrid}>
+              <article className={styles.callCard}>
+                <div className={styles.callCardTop}>
+                  <div className={styles.callCopy}>
+                    <h3 className={styles.callTitle}>Live Calls</h3>
+                    <p className={styles.callDesc} style={{ color: '#ef4444' }}>{error}</p>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`${styles.liveCallsContainer} ${!darkMode ? styles.light : ''}`}>
@@ -267,21 +515,37 @@ export const LiveCallsPage = () => {
                   <p className={styles.callDesc}>Connect with fans through private audio calls.</p>
                   <div className={styles.rateLine}>
                     <span className={styles.rateLabel}>Your rate:</span>
-                    <span className={styles.rateValue}>$0.50</span>
-                    <span className={styles.rateUnit}>/ min</span>
+                    <span className={styles.rateValue}>{merged?.audioRate != null ? merged.audioRate : '0'}</span>
+                    <span className={styles.rateUnit}>coins / min</span>
                   </div>
                   <div className={styles.onlineLine}>
-                    <span className={styles.onlineDot} />
-                    <span>Online Now</span>
+                    <span className={merged?.audioAvailable ? styles.onlineDot : styles.offlineDot} />
+                    <span className={merged?.audioAvailable ? '' : styles.offlineText}>
+                      {merged?.audioAvailable ? 'Online Now' : 'Offline'}
+                    </span>
                   </div>
                 </div>
               </div>
 
               <div className={styles.callActions}>
-                <button className={styles.primaryAction} type="button" style={{ background: 'linear-gradient(135deg, #047857 0%, #047857 90%, #ffffff 100%)' }}>
-                  Go Live Now
+                <button
+                  className={`${styles.primaryAction} ${merged?.audioAvailable ? styles.offlineAction : ''}`}
+                  type="button"
+                  disabled={!!toggling}
+                  onClick={() => setConfirmTarget('audio')}
+                  style={merged?.audioAvailable ? undefined : { background: 'linear-gradient(135deg, #047857 0%, #047857 90%, #ffffff 100%)' }}
+                >
+                  {toggling === 'audio' ? (
+                    <Loader2 size={16} className={styles.toggleSpinner} />
+                  ) : merged?.audioAvailable ? (
+                    'Go Offline'
+                  ) : (
+                    <>
+                      <Play size={16} /> Go Live Now
+                    </>
+                  )}
                 </button>
-                <button className={styles.secondaryAction} type="button" style={{ borderColor: 'rgba(16, 185, 129, 0.5)', color: '#10b981' }}>
+                <button className={styles.secondaryAction} type="button" style={{ borderColor: 'rgba(16, 185, 129, 0.5)', color: '#10b981' }} onClick={() => setRateTarget('audio')}>
                   Edit Rate
                 </button>
               </div>
@@ -297,21 +561,37 @@ export const LiveCallsPage = () => {
                   <p className={styles.callDesc}>Connect face-to-face with your fans.</p>
                   <div className={styles.rateLine}>
                     <span className={styles.rateLabel}>Your rate:</span>
-                    <span className={styles.rateValue}>$2.00</span>
-                    <span className={styles.rateUnit}>/ min</span>
+                    <span className={styles.rateValue}>{merged?.videoRate != null ? merged.videoRate : '0'}</span>
+                    <span className={styles.rateUnit}>coins / min</span>
                   </div>
                   <div className={styles.onlineLine}>
-                    <span className={styles.onlineDot} />
-                    <span>Online Now</span>
+                    <span className={merged?.videoAvailable ? styles.onlineDot : styles.offlineDot} />
+                    <span className={merged?.videoAvailable ? '' : styles.offlineText}>
+                      {merged?.videoAvailable ? 'Online Now' : 'Offline'}
+                    </span>
                   </div>
                 </div>
               </div>
 
               <div className={styles.callActions}>
-                <button className={styles.primaryAction} type="button" style={{ background: 'linear-gradient(135deg, #2563eb 0%, #2563eb 90%, #ffffff 100%)' }}>
-                  Go Live Now
+                <button
+                  className={`${styles.primaryAction} ${merged?.videoAvailable ? styles.offlineAction : ''}`}
+                  type="button"
+                  disabled={!!toggling}
+                  onClick={() => setConfirmTarget('video')}
+                  style={merged?.videoAvailable ? undefined : { background: 'linear-gradient(135deg, #2563eb 0%, #2563eb 90%, #ffffff 100%)' }}
+                >
+                  {toggling === 'video' ? (
+                    <Loader2 size={16} className={styles.toggleSpinner} />
+                  ) : merged?.videoAvailable ? (
+                    'Go Offline'
+                  ) : (
+                    <>
+                      <Play size={16} /> Go Live Now
+                    </>
+                  )}
                 </button>
-                <button className={styles.secondaryAction} type="button" style={{ borderColor: 'rgba(59, 130, 246, 0.5)', color: '#3b82f6' }}>
+                <button className={styles.secondaryAction} type="button" style={{ borderColor: 'rgba(59, 130, 246, 0.5)', color: '#3b82f6' }} onClick={() => setRateTarget('video')}>
                   Edit Rate
                 </button>
               </div>
@@ -329,17 +609,32 @@ export const LiveCallsPage = () => {
                   <div className={styles.mobileQaHeaderRow}>
                     <h3 className={styles.mobileQaTitle}>Audio Calls</h3>
                     <div className={styles.mobileQaStatus}>
-                      <span className={styles.mobileQaDot} /> Online
+                      <span className={merged?.audioAvailable ? styles.mobileQaDot : styles.mobileQaDotOff} />
+                      {merged?.audioAvailable ? 'Online' : 'Offline'}
                     </div>
                   </div>
-                  <p className={styles.mobileQaRate}>Your rate: <strong style={{ color: '#10b981' }}>$0.50</strong> / min</p>
+                  <p className={styles.mobileQaRate}>Your rate: <strong style={{ color: '#10b981' }}>{merged?.audioRate ?? 0}</strong> coins / min</p>
                 </div>
               </div>
               <div className={styles.mobileQaButtons}>
-                <button className={styles.mobileGoLiveBtn} type="button" style={{ background: 'linear-gradient(135deg, #10b981 0%, #10b981 90%, #ffffff 100%)' }}>
-                  Go Live Now
+                <button
+                  className={styles.mobileGoLiveBtn}
+                  type="button"
+                  disabled={!!toggling}
+                  onClick={() => setConfirmTarget('audio')}
+                  style={merged?.audioAvailable
+                    ? { background: 'rgba(248, 113, 113, 0.08)', border: '1px solid rgba(248, 113, 113, 0.25)', color: '#f87171' }
+                    : { background: 'linear-gradient(135deg, #10b981 0%, #10b981 90%, #ffffff 100%)' }}
+                >
+                  {toggling === 'audio' ? (
+                    <Loader2 size={14} className={styles.toggleSpinner} />
+                  ) : merged?.audioAvailable ? (
+                    'Go Offline'
+                  ) : (
+                    'Go Live Now'
+                  )}
                 </button>
-                <button className={styles.mobileEditRateBtn} type="button" style={{ borderColor: 'rgba(16, 185, 129, 0.5)', color: '#10b981' }}>
+                <button className={styles.mobileEditRateBtn} type="button" style={{ borderColor: 'rgba(16, 185, 129, 0.5)', color: '#10b981' }} onClick={() => setRateTarget('audio')}>
                   Edit Rate
                 </button>
               </div>
@@ -353,17 +648,32 @@ export const LiveCallsPage = () => {
                   <div className={styles.mobileQaHeaderRow}>
                     <h3 className={styles.mobileQaTitle}>Video Calls</h3>
                     <div className={styles.mobileQaStatus}>
-                      <span className={styles.mobileQaDot} /> Online
+                      <span className={merged?.videoAvailable ? styles.mobileQaDot : styles.mobileQaDotOff} />
+                      {merged?.videoAvailable ? 'Online' : 'Offline'}
                     </div>
                   </div>
-                  <p className={styles.mobileQaRate}>Your rate: <strong style={{ color: '#3b82f6' }}>$2.00</strong> / min</p>
+                  <p className={styles.mobileQaRate}>Your rate: <strong style={{ color: '#3b82f6' }}>{merged?.videoRate ?? 0}</strong> coins / min</p>
                 </div>
               </div>
               <div className={styles.mobileQaButtons}>
-                <button className={styles.mobileGoLiveBtn} type="button" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #3b82f6 90%, #ffffff 100%)' }}>
-                  Go Live Now
+                <button
+                  className={styles.mobileGoLiveBtn}
+                  type="button"
+                  disabled={!!toggling}
+                  onClick={() => setConfirmTarget('video')}
+                  style={merged?.videoAvailable
+                    ? { background: 'rgba(248, 113, 113, 0.08)', border: '1px solid rgba(248, 113, 113, 0.25)', color: '#f87171' }
+                    : { background: 'linear-gradient(135deg, #3b82f6 0%, #3b82f6 90%, #ffffff 100%)' }}
+                >
+                  {toggling === 'video' ? (
+                    <Loader2 size={14} className={styles.toggleSpinner} />
+                  ) : merged?.videoAvailable ? (
+                    'Go Offline'
+                  ) : (
+                    'Go Live Now'
+                  )}
                 </button>
-                <button className={styles.mobileEditRateBtn} type="button" style={{ borderColor: 'rgba(59, 130, 246, 0.5)', color: '#3b82f6' }}>
+                <button className={styles.mobileEditRateBtn} type="button" style={{ borderColor: 'rgba(59, 130, 246, 0.5)', color: '#3b82f6' }} onClick={() => setRateTarget('video')}>
                   Edit Rate
                 </button>
               </div>
@@ -373,7 +683,7 @@ export const LiveCallsPage = () => {
           <section className={styles.statsGrid}>
             {callStats.map((stat) => {
               const Icon = iconMap[stat.icon];
-              const changeNum = stat.change ? stat.change.replace(/[+\-]/g, '') : '';
+              const changeNum = stat.change ? stat.change.replace(/[+-]/g, '') : '';
               return (
                 <div key={stat.id} className={`${styles.statCard} ${stat.id === 'missed' ? styles.missedStatMobile : ''}`}>
                   <div className={styles.statIconWrap} style={{ background: `${stat.color}20` }}>
@@ -384,11 +694,11 @@ export const LiveCallsPage = () => {
                     <span className={styles.statValue}>{stat.value}</span>
                     {stat.change ? (
                       <span className={`${styles.statChange} ${stat.changeType === 'positive' ? styles.positive : styles.negative}`}>
-                        ↑ {changeNum} <span className={styles.statPeriod}>{stat.period}</span>
+                        {stat.change.startsWith('-') ? '↓' : '↑'} {changeNum} <span className={styles.statPeriod}>{stat.period}</span>
                       </span>
-                    ) : (
+                    ) : stat.period ? (
                       <span className={styles.statSubtitle}>{stat.period}</span>
-                    )}
+                    ) : null}
                   </div>
                   {stat.link && (
                     <span className={styles.statLink}>
@@ -409,7 +719,7 @@ export const LiveCallsPage = () => {
                     key={tab}
                     type="button"
                     className={`${styles.activityTab} ${activeTab === tab ? styles.activityTabActive : ''}`}
-                    onClick={() => setActiveTab(tab)}
+                    onClick={() => { setActiveTab(tab); setVisibleCalls(9); }}
                   >
                     {tab}
                   </button>
@@ -432,12 +742,13 @@ export const LiveCallsPage = () => {
                 </thead>
                 <tbody>
                   {recentCalls.map((row) => {
-                    const TypeIcon = row.typeIcon;
+                    const TypeIcon = row.typeIcon || Phone;
+                    const [date, time] = (row.dateTime || '\n').split('\n');
                     return (
-                      <tr key={row.id}>
+                      <tr key={row.key}>
                         <td>
                           <div className={styles.fanInfo}>
-                            <img src={row.avatar} alt={row.fan.name} className={styles.fanAvatar} />
+                            <img src={row.fan.avatar} alt={row.fan.name} className={styles.fanAvatar} />
                             <div className={styles.fanDetails}>
                               <span className={styles.fanName}>
                                 {row.fan.name}
@@ -446,10 +757,10 @@ export const LiveCallsPage = () => {
                           </div>
                         </td>
                       <td>
-                        <TypeIcon size={16} style={{ color: row.type === 'Video Call' ? '#a78bfa' : '#34d399', verticalAlign: 'middle' }} />
+                        <TypeIcon size={16} style={{ color: row.typeLabel === 'Video Calls' ? '#a78bfa' : '#34d399', verticalAlign: 'middle' }} />
                       </td>
                         <td>
-                          <span className={styles.dateTime}>{`${row.date}\n${row.time}`}</span>
+                          <span className={styles.dateTime}>{`${date}\n${time || ''}`}</span>
                         </td>
                         <td>{row.duration}</td>
                         <td className={styles.earnedCell}>{row.earned}</td>
@@ -459,23 +770,42 @@ export const LiveCallsPage = () => {
                           </span>
                         </td>
                         <td>
-                          <button className={styles.moreBtn} type="button" aria-label="More actions">
-                            <MoreVertical size={16} />
-                          </button>
+                          <div className={styles.menuWrap} data-kebab-menu>
+                            <button className={styles.moreBtn} type="button" aria-label="More actions" onClick={() => toggleMenu(row.key)}>
+                              <MoreVertical size={16} />
+                            </button>
+                            {openMenuId === row.key && (
+                              <div className={styles.actionMenu}>
+                                <button className={styles.actionMenuItem} type="button" onClick={() => { setOpenMenuId(null); setDetailsRow(row); }}>
+                                  <Info size={13} /> View Details
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );
                   })}
+                  {recentCalls.length === 0 && (
+                    <tr>
+                      <td colSpan={7} style={{ textAlign: 'center', padding: '32px 0', opacity: 0.6 }}>
+                        No {activeTab === 'All Calls' ? '' : activeTab.toLowerCase() + ' '}calls yet.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
 
             <div className={styles.mobileActivityList}>
-              {recentCalls.map((row) => (
-                <article key={row.id} className={styles.mobileActivityCard}>
+              {recentCalls.map((row) => {
+                const TypeIcon = row.typeIcon || Phone;
+                const [date, time] = (row.dateTime || '\n').split('\n');
+                return (
+                <article key={row.key} className={styles.mobileActivityCard}>
                   <div className={styles.mobileActivityTop}>
                     <div className={styles.fanInfo}>
-                      <img src={row.avatar} alt={row.fan.name} className={styles.fanAvatar} />
+                      <img src={row.fan.avatar} alt={row.fan.name} className={styles.fanAvatar} />
                       <div className={styles.fanDetails}>
                         <span className={styles.fanName}>
                           {row.fan.name}
@@ -483,15 +813,24 @@ export const LiveCallsPage = () => {
                       </div>
                     </div>
                     <div className={styles.mobileTopActions}>
-                      <row.typeIcon size={16} className={styles.mobileTypeIcon} style={{ color: row.type === 'Video Call' ? '#3b82f6' : '#22c55e' }} />
-                      <button className={styles.moreBtn} type="button" aria-label="More actions">
-                        <MoreVertical size={16} />
-                      </button>
+                      <TypeIcon size={16} className={styles.mobileTypeIcon} style={{ color: row.typeLabel === 'Video Calls' ? '#3b82f6' : '#22c55e' }} />
+                      <div className={styles.menuWrap} data-kebab-menu>
+                        <button className={styles.moreBtn} type="button" aria-label="More actions" onClick={() => toggleMenu(row.key)}>
+                          <MoreVertical size={16} />
+                        </button>
+                        {openMenuId === row.key && (
+                          <div className={styles.actionMenu}>
+                            <button className={styles.actionMenuItem} type="button" onClick={() => { setOpenMenuId(null); setDetailsRow(row); }}>
+                              <Info size={13} /> View Details
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
                   <div className={styles.mobileActivityMeta}>
-                    <span className={styles.mobileMetaLine}>{row.date} · {row.time}</span>
+                    <span className={styles.mobileMetaLine}>{date} · {time}</span>
                     <span className={styles.mobileMetaLine}>{row.duration}</span>
                   </div>
 
@@ -502,11 +841,12 @@ export const LiveCallsPage = () => {
                     </span>
                   </div>
                 </article>
-              ))}
+                );
+              })}
             </div>
 
             {showMore && (
-              <button className={styles.loadMoreBtn} type="button" onClick={() => setVisibleCalls((count) => Math.min(count + 5, callRows.length))}>
+              <button className={styles.loadMoreBtn} type="button" onClick={() => setVisibleCalls((count) => Math.min(count + 5, filteredRows.length))}>
                 Load More <ChevronDown size={16} />
               </button>
             )}
@@ -521,31 +861,35 @@ export const LiveCallsPage = () => {
                 <div className={styles.earningsIconWrap}>
                   <Wallet size={20} className={styles.earningsIcon} />
                 </div>
-                <h3 className={styles.earningsTitle}>Today's Call Earnings</h3>
+                <h3 className={styles.earningsTitle}>Call Earnings</h3>
               </div>
-              <PeriodDropdown variant="text" />
+              <PeriodDropdown variant="text" value={period} onChange={setPeriod} />
             </div>
-            <div className={styles.earningsAmount}>$412.80</div>
-            <div className={styles.earningsChange}>
-              <span className={styles.earningsUp}>↑ 26%</span>
-              <span className={styles.changeLabel}>vs last yesterday</span>
-            </div>
+            <div className={styles.earningsAmount}>{merged ? merged.todayAmount : '0 coins'}</div>
+            {merged && merged.changeLabel && (
+              <div className={styles.earningsChange}>
+                <span className={(merged ? merged.todayChangePct : 0) < 0 ? styles.earningsDown : styles.earningsUp}>
+                  {(merged ? merged.todayChangePct : 0) < 0 ? '↓' : '↑'} {Math.abs(merged ? merged.todayChangePct : 0)}%
+                </span>
+                <span className={styles.changeLabel}>{merged.changeLabel}</span>
+              </div>
+            )}
             <div className={styles.earningsStats}>
               <div className={styles.earningsStat}>
                 <span className={styles.earningsStatLabel}>Total Minutes</span>
-                <span className={styles.earningsStatValue}>1,250 min</span>
+                <span className={styles.earningsStatValue}>{merged ? merged.todayMinutes : 0} min</span>
               </div>
               <div className={styles.earningsStat}>
                 <span className={styles.earningsStatLabel}>Completed Calls</span>
-                <span className={styles.earningsStatValue}>86</span>
+                <span className={styles.earningsStatValue}>{merged ? merged.todayCompleted : 0}</span>
               </div>
               <div className={styles.earningsStat}>
                 <span className={styles.earningsStatLabel}>Missed Calls</span>
-                <span className={styles.earningsStatValue}>5</span>
+                <span className={styles.earningsStatValue}>{merged ? merged.todayMissed : 0}</span>
               </div>
               <div className={styles.earningsStat}>
                 <span className={styles.earningsStatLabel}>Estimated Payout</span>
-                <span className={styles.earningsStatValue}>$330.24</span>
+                <span className={styles.earningsStatValue}>{merged ? merged.estimatedPayout : '0 coins'}</span>
               </div>
             </div>
             <button className={styles.viewEarningsBtn} type="button" onClick={() => navigateTo('/creators/dashboard')}>
@@ -558,17 +902,17 @@ export const LiveCallsPage = () => {
           <section className={`${styles.sidebarCard} ${styles.callPerformanceCard}`}>
             <div className={styles.sidebarHeader}>
               <h3 className={styles.sidebarTitle}>Call Performance</h3>
-              <PeriodDropdown variant="text" />
+              <PeriodDropdown variant="text" value={period} onChange={setPeriod} />
             </div>
             <div className={styles.performanceBody}>
               <div className={styles.donutContainer}>
                 <div className={styles.donutChart}>
                   <svg viewBox="0 0 100 100" className={styles.donutSvg}>
                     <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="12" />
-                    <circle cx="50" cy="50" r="40" fill="none" stroke="#10b981" strokeWidth="12" strokeDasharray="173.19 77.81" strokeDashoffset="62.75" strokeLinecap="round" />
-                    <circle cx="50" cy="50" r="40" fill="none" stroke="#ef4444" strokeWidth="12" strokeDasharray="10.04 240.96" strokeDashoffset="-110.44" strokeLinecap="round" />
-                    <circle cx="50" cy="50" r="40" fill="none" stroke="#f59e0b" strokeWidth="12" strokeDasharray="67.77 183.23" strokeDashoffset="-120.48" strokeLinecap="round" />
-                    <text x="50" y="48" textAnchor="middle" className={styles.donutValue}>1,250</text>
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="#10b981" strokeWidth="12" strokeDasharray={`${(merged?.completedPct || 0) * 2.51} ${251 - (merged?.completedPct || 0) * 2.51}`} strokeDashoffset="62.75" strokeLinecap="round" />
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="#ef4444" strokeWidth="12" strokeDasharray={`${(merged?.missedPct || 0) * 2.51} ${251 - (merged?.missedPct || 0) * 2.51}`} strokeDashoffset={62.75 - (merged?.completedPct || 0) * 2.51} strokeLinecap="round" />
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="#f59e0b" strokeWidth="12" strokeDasharray={`${(merged?.pendingPct || 0) * 2.51} ${251 - (merged?.pendingPct || 0) * 2.51}`} strokeDashoffset={62.75 - ((merged?.completedPct || 0) + (merged?.missedPct || 0)) * 2.51} strokeLinecap="round" />
+                    <text x="50" y="48" textAnchor="middle" className={styles.donutValue}>{(merged?.totalMinutes || 0).toLocaleString()}</text>
                     <text x="50" y="58" textAnchor="middle" className={styles.donutLabel}>Total Minutes</text>
                   </svg>
                 </div>
@@ -578,21 +922,21 @@ export const LiveCallsPage = () => {
                   <span className={styles.legendDot} style={{ background: '#10b981' }} />
                   <div className={styles.legendText}>
                     <span className={styles.legendLabel}>Completed</span>
-                    <span className={styles.legendValue}>860 min (69%)</span>
+                    <span className={styles.legendValue}>{merged?.completed || 0} calls ({merged?.completedPct || 0}%)</span>
                   </div>
                 </div>
                 <div className={styles.legendItem}>
                   <span className={styles.legendDot} style={{ background: '#ef4444' }} />
                   <div className={styles.legendText}>
                     <span className={styles.legendLabel}>Missed</span>
-                    <span className={styles.legendValue}>50 min (4%)</span>
+                    <span className={styles.legendValue}>{merged?.missed || 0} calls ({merged?.missedPct || 0}%)</span>
                   </div>
                 </div>
                 <div className={styles.legendItem}>
                   <span className={styles.legendDot} style={{ background: '#f59e0b' }} />
                   <div className={styles.legendText}>
                     <span className={styles.legendLabel}>Pending</span>
-                    <span className={styles.legendValue}>340 min (27%)</span>
+                    <span className={styles.legendValue}>{merged?.pending || 0} calls ({merged?.pendingPct || 0}%)</span>
                   </div>
                 </div>
               </div>
@@ -602,7 +946,7 @@ export const LiveCallsPage = () => {
           <section className={`${styles.sidebarCard} ${styles.topCallHoursCard}`}>
             <div className={styles.sidebarHeader}>
               <h3 className={styles.sidebarTitle}>Top Call Hours</h3>
-              <PeriodDropdown variant="text" />
+              <PeriodDropdown variant="text" value={period} onChange={setPeriod} />
             </div>
             <div className={styles.hoursChartWrapper}>
               <div className={styles.hoursYAxis}>
@@ -613,7 +957,7 @@ export const LiveCallsPage = () => {
               <div className={styles.hoursChart}>
                 {topHours.map((hour, index) => (
                   <div key={index} className={styles.hoursBar}>
-                    <div className={styles.hoursBarFill} style={{ height: `${(hour.value / maxHours) * 100}%` }} />
+                    <div className={styles.hoursBarFill} style={{ height: `${Math.min(100, hour.value * 100)}%` }} />
                     <span className={styles.hoursBarLabel}>{hour.label}</span>
                   </div>
                 ))}
@@ -626,36 +970,121 @@ export const LiveCallsPage = () => {
               <div className={styles.tipsIconWrap}>
                 <Lightbulb size={14} className={styles.tipsIcon} fill="currentColor" />
               </div>
-              <h3 className={styles.tipsTitle}>Tips to Boost Call Earnings</h3>
+              <h3 className={styles.tipsTitle}>Boost Call Earnings</h3>
             </div>
             <ul className={styles.tipsList}>
-              <li className={styles.tipItem}>
-                <span className={styles.tipCheck}><Check size={14} className={styles.tipCheckIcon} /></span>
-                Go live during peak hours (6PM - 12AM)
-              </li>
-              <li className={styles.tipItem}>
-                <span className={styles.tipCheck}><Check size={14} className={styles.tipCheckIcon} /></span>
-                Keep your online status active
-              </li>
-              <li className={styles.tipItem}>
-                <span className={styles.tipCheck}><Check size={14} className={styles.tipCheckIcon} /></span>
-                Offer engaging conversations
-              </li>
-              <li className={styles.tipItem}>
-                <span className={styles.tipCheck}><Check size={14} className={styles.tipCheckIcon} /></span>
-                Promote your call rate on feed
-              </li>
-              <li className={styles.tipItem}>
-                <span className={styles.tipCheck}><Check size={14} className={styles.tipCheckIcon} /></span>
-                Respond to call requests quickly
-              </li>
+              {(merged ? merged.boostInsights : []).map((ins) => (
+                <li key={ins.id} className={styles.tipItem}>
+                  <span className={`${styles.boostDot} ${styles[`tone${ins.tone.charAt(0).toUpperCase()}${ins.tone.slice(1)}`]}`} />
+                  <div className={styles.boostBody}>
+                    <span className={styles.boostTitle}>{ins.title}</span>
+                    <span className={styles.boostDetail}>{ins.detail}</span>
+                  </div>
+                </li>
+              ))}
             </ul>
-            <button className={styles.viewAllTipsBtn} type="button">
-              View All Tips <ArrowRight size={14} />
+            <button className={styles.viewAllTipsBtn} type="button" onClick={() => navigateTo('/creators/analytics')}>
+              More Insights <ArrowRight size={14} />
             </button>
           </section>
         </aside>
       </div>
+
+      {/* Call details modal */}
+      {detailsRow && (
+        <div className={styles.detailsOverlay} onClick={() => setDetailsRow(null)}>
+          <div className={styles.detailsModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.detailsHeader}>
+              <h3 className={styles.detailsTitle}>Call Details</h3>
+              <button className={styles.detailsClose} type="button" onClick={() => setDetailsRow(null)}>
+                <X size={18} />
+              </button>
+            </div>
+            <div className={styles.detailsBody}>
+              {(() => {
+                const [dDate, dTime] = (detailsRow.dateTime || '\n').split('\n');
+                return (
+                  <>
+                    <div className={styles.detailRow}>
+                      <span className={styles.detailLabel}>Fan</span>
+                      <span className={styles.detailValue}>
+                        <img src={detailsRow.fan.avatar} alt={detailsRow.fan.name} className={styles.detailAvatar} />
+                        {detailsRow.fan.name}
+                      </span>
+                    </div>
+                    <div className={styles.detailRow}>
+                      <span className={styles.detailLabel}>Type</span>
+                      <span className={styles.detailValue}>{detailsRow.typeLabel || detailsRow.type}</span>
+                    </div>
+                    <div className={styles.detailRow}>
+                      <span className={styles.detailLabel}>Date</span>
+                      <span className={styles.detailValue}>{dDate}{dTime ? ` · ${dTime}` : ''}</span>
+                    </div>
+                    <div className={styles.detailRow}>
+                      <span className={styles.detailLabel}>Duration</span>
+                      <span className={styles.detailValue}>{detailsRow.duration}</span>
+                    </div>
+                    <div className={styles.detailRow}>
+                      <span className={styles.detailLabel}>Earned</span>
+                      <span className={styles.detailValue}>{detailsRow.earned}</span>
+                    </div>
+                    <div className={styles.detailRow}>
+                      <span className={styles.detailLabel}>Status</span>
+                      <span className={styles.detailValue}>
+                        <span className={`${styles.statusBadge} ${detailsRow.status === 'Completed' ? styles.statusCompleted : styles.statusMissed}`}>
+                          {detailsRow.status}
+                        </span>
+                      </span>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit call rate dialog */}
+      <CallRateDialog
+        callType={rateTarget}
+        currentRate={rateTarget === 'audio' ? (merged?.audioRate ?? 0) : (merged?.videoRate ?? 0)}
+        darkMode={darkMode}
+        onClose={() => setRateTarget(null)}
+        onSave={handleSaveRate}
+      />
+
+      {/* Go Live / Go Offline confirmation */}
+      <ConfirmToggleDialog
+        open={!!confirmTarget}
+        title={confirmTarget && isAvailable(confirmTarget) ? 'Go Offline?' : 'Go Live Now?'}
+        message={
+          confirmTarget
+            ? (isAvailable(confirmTarget)
+                ? `Fans won't be able to request ${confirmTarget === 'audio' ? 'audio' : 'video'} calls while you're offline. Your rate stays the same.`
+                : `Go live for ${confirmTarget === 'audio' ? 'audio' : 'video'} calls so fans can request private calls at your current rate.`)
+            : ''
+        }
+        confirmLabel={confirmTarget && isAvailable(confirmTarget) ? 'Go Offline' : 'Go Live Now'}
+        icon={
+          confirmTarget
+            ? (isAvailable(confirmTarget)
+                ? <PhoneOff size={22} />
+                : confirmTarget === 'audio' ? <Phone size={22} /> : <Video size={22} />)
+            : null
+        }
+        accent={
+          confirmTarget
+            ? (isAvailable(confirmTarget)
+                ? '#f87171'
+                : confirmTarget === 'audio' ? '#10b981' : '#3b82f6')
+            : '#e10075'
+        }
+        busy={!!toggling}
+        busyLabel="Updating…"
+        darkMode={darkMode}
+        onCancel={() => setConfirmTarget(null)}
+        onConfirm={() => { const t = confirmTarget; setConfirmTarget(null); handleToggleLive(t); }}
+      />
     </div>
   );
 };

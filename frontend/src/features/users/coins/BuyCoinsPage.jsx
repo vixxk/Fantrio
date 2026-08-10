@@ -1,24 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { api } from '../../../services/api';
 import { useApp } from '../../../context/AppContext';
-import { 
-  Percent, 
-  Lock, 
-  Heart, 
-  Gift, 
-  Phone, 
-  ShieldCheck, 
+import { useToast } from '../../../components/Toast/Toast';
+import {
+  Lock,
   ChevronRight,
-  CheckCircle2,
-  X
+  CheckCircle2
 } from 'lucide-react';
 import styles from './BuyCoinsPage.module.css';
 
 export const BuyCoinsPage = () => {
-  const { balance, addCoins, darkMode, setActiveTab } = useApp();
-  
+  const { balance, purchaseCoins, redeemPromo, darkMode, setActiveTab } = useApp();
+  const { toast } = useToast();
+
+  // Data from backend
+  const [packages, setPackages] = useState([]);
+  const [offer, setOffer] = useState({ isActive: false, bonusPercent: 0, endsAt: null });
+  const [availablePromos, setAvailablePromos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
+
   // Timer State (Offer Countdown)
-  const [timeLeft, setTimeLeft] = useState({ days: 2, hours: 13, minutes: 36, seconds: 45 });
-  
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
   // Modal State for Coin Purchase
   const [selectedPack, setSelectedPack] = useState(null);
   const [purchasing, setPurchasing] = useState(false);
@@ -27,68 +31,90 @@ export const BuyCoinsPage = () => {
   // Promo Code State
   const [promoCode, setPromoCode] = useState('');
   const [promoMessage, setPromoMessage] = useState('');
+  const [redeeming, setRedeeming] = useState(false);
 
-  // Countdown timer effect
+  const fetchPackages = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get('/wallet/packages');
+      if (res.status === 'success') {
+        setPackages(res.packages || []);
+        setOffer(res.offer || { isActive: false, bonusPercent: 0, endsAt: null });
+        setAvailablePromos(res.promoCodes || []);
+      }
+    } catch (err) {
+      console.error('Failed to load coin packages:', err);
+      setLoadError(err.message || 'Failed to load coin packages.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev.seconds > 0) return { ...prev, seconds: prev.seconds - 1 };
-        if (prev.minutes > 0) return { ...prev, minutes: 59, seconds: 59 };
-        if (prev.hours > 0) return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 };
-        if (prev.days > 0) return { ...prev, days: prev.days - 1, hours: 23, minutes: 59, seconds: 59 };
-        return prev;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
+    Promise.resolve().then(() => {
+      fetchPackages();
+    });
   }, []);
 
-  // 12 Coin Packs configuration matching screenshot
-  const coinPacks = [
-    { id: 1, coins: 100, oldPrice: '1.99$', price: '1.59$', img: '/1 stack.png', isPopular: true },
-    { id: 2, coins: 200, oldPrice: '1.99$', price: '1.59$', img: '/2 stack.png', isPopular: false },
-    { id: 3, coins: 300, oldPrice: '1.99$', price: '1.59$', img: '/3 stack.png', isPopular: false },
-    { id: 4, coins: 400, oldPrice: '1.99$', price: '1.59$', img: '/chest.png', isPopular: false },
-    { id: 5, coins: 500, oldPrice: '1.99$', price: '1.59$', img: '/Gift & Coins.png', isPopular: false },
-    { id: 6, coins: 600, oldPrice: '1.99$', price: '1.59$', img: '/Gift & Coins.png', isPopular: false },
-    { id: 7, coins: 700, oldPrice: '1.99$', price: '1.59$', img: '/Gift & Coins.png', isPopular: false },
-    { id: 8, coins: 800, oldPrice: '1.99$', price: '1.59$', img: '/Gift & Coins.png', isPopular: false },
-    { id: 9, coins: 900, oldPrice: '1.99$', price: '1.59$', img: '/Gift & Coins.png', isPopular: false },
-    { id: 10, coins: 950, oldPrice: '1.99$', price: '1.59$', img: '/Gift & Coins.png', isPopular: false },
-    { id: 11, coins: 1000, oldPrice: '1.99$', price: '1.59$', img: '/Gift & Coins.png', isPopular: false },
-    { id: 12, coins: 1100, oldPrice: '1.99$', price: '1.59$', img: '/Gift & Coins.png', isPopular: false }
-  ];
+  // Countdown timer driven by the backend offer end time
+  const offerEndsAt = useMemo(() => (offer.isActive && offer.endsAt ? new Date(offer.endsAt).getTime() : null), [offer]);
+
+  useEffect(() => {
+    if (!offerEndsAt) return;
+
+    const updateTimer = () => {
+      const diff = offerEndsAt - Date.now();
+      if (diff <= 0) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+      setTimeLeft({
+        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((diff / (1000 * 60)) % 60),
+        seconds: Math.floor((diff / 1000) % 60)
+      });
+    };
+
+    updateTimer();
+    const timer = setInterval(updateTimer, 1000);
+    return () => clearInterval(timer);
+  }, [offerEndsAt]);
 
   const handleConfirmPurchase = async () => {
     if (!selectedPack) return;
     setPurchasing(true);
 
     try {
-      await addCoins(selectedPack.coins);
-      setPurchaseSuccess(`${selectedPack.coins} coins added to your wallet!`);
+      const res = await purchaseCoins(selectedPack.id);
+      setPurchaseSuccess(`${res.transaction.amountCoins} coins added to your wallet!`);
+      fetchPackages();
       setTimeout(() => {
         setSelectedPack(null);
         setPurchaseSuccess(null);
       }, 1500);
     } catch (err) {
-      alert('Purchase failed: ' + err.message);
+      toast.error('Purchase failed: ' + err.message);
     } finally {
       setPurchasing(false);
     }
   };
 
-  const handleRedeemPromo = (e) => {
+  const handleRedeemPromo = async (e) => {
     e.preventDefault();
     if (!promoCode.trim()) return;
-    if (promoCode.toUpperCase() === 'FANTRIO20' || promoCode.toUpperCase() === 'BONUS') {
-      addCoins(200);
-      setPromoMessage('Promo code applied! 200 bonus coins added.');
+    setRedeeming(true);
+    try {
+      const res = await redeemPromo(promoCode);
+      setPromoMessage(res.message || 'Promo code applied!');
       setPromoCode('');
-    } else {
-      setPromoMessage('Invalid or expired promo code.');
+      fetchPackages();
+    } catch (err) {
+      setPromoMessage(err.message || 'Invalid or expired promo code.');
+    } finally {
+      setRedeeming(false);
     }
-
-    setTimeout(() => setPromoMessage(''), 3000);
+    setTimeout(() => setPromoMessage(''), 4000);
   };
 
   const formattedBalance = balance.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
@@ -96,10 +122,10 @@ export const BuyCoinsPage = () => {
   return (
     <div className={`${styles.buyCoinsContainer} ${!darkMode ? styles.light : ''}`}>
       <div className={styles.buyCoinsShell}>
-        
+
         {/* ================= LEFT MAIN SECTION ================= */}
         <div className={styles.mainSection}>
-          
+
           {/* Header */}
           <div className={styles.headerSection}>
             <div className={styles.titleRow}>
@@ -110,81 +136,123 @@ export const BuyCoinsPage = () => {
           </div>
 
           {/* Limited Time Offer Banner */}
-          <div className={styles.offerBanner}>
-            <div className={styles.offerLeft}>
-              <img src="/offer.png" alt="Offer" className={styles.offerIconImg} />
-              <span className={styles.offerText}>
-                <strong>Limited Time Offer:</strong> Get 20% extra coins on selected products!
-              </span>
-            </div>
+          {offer.isActive && (
+            <div className={styles.offerBanner}>
+              <div className={styles.offerLeft}>
+                <img src="/offer.png" alt="Offer" className={styles.offerIconImg} />
+                <span className={styles.offerText}>
+                  <strong>Limited Time Offer:</strong> Get {offer.bonusPercent}% extra coins on selected products!
+                </span>
+              </div>
 
-            {/* Timer */}
-            <div className={styles.offerTimer}>
-              <span className={styles.timerLabel}>Offer Ends In</span>
-              <div className={styles.timerGroup}>
-                <div className={styles.timerBoxWrapper}>
-                  <div className={styles.timerBox}>
-                    <span className={styles.timerNum}>{String(timeLeft.days).padStart(2, '0')}</span>
+              {/* Timer */}
+              <div className={styles.offerTimer}>
+                <span className={styles.timerLabel}>Offer Ends In</span>
+                <div className={styles.timerGroup}>
+                  <div className={styles.timerBoxWrapper}>
+                    <div className={styles.timerBox}>
+                      <span className={styles.timerNum}>{String(timeLeft.days).padStart(2, '0')}</span>
+                    </div>
+                    <span className={styles.timerUnit}>DAYS</span>
                   </div>
-                  <span className={styles.timerUnit}>DAYS</span>
-                </div>
 
-                <span className={styles.timerColon}>:</span>
+                  <span className={styles.timerColon}>:</span>
 
-                <div className={styles.timerBoxWrapper}>
-                  <div className={styles.timerBox}>
-                    <span className={styles.timerNum}>{String(timeLeft.minutes).padStart(2, '0')}</span>
+                  <div className={styles.timerBoxWrapper}>
+                    <div className={styles.timerBox}>
+                      <span className={styles.timerNum}>{String(timeLeft.hours).padStart(2, '0')}</span>
+                    </div>
+                    <span className={styles.timerUnit}>Hrs</span>
                   </div>
-                  <span className={styles.timerUnit}>Mins</span>
-                </div>
 
-                <span className={styles.timerColon}>:</span>
+                  <span className={styles.timerColon}>:</span>
 
-                <div className={styles.timerBoxWrapper}>
-                  <div className={styles.timerBox}>
-                    <span className={styles.timerNum}>{String(timeLeft.seconds).padStart(2, '0')}</span>
+                  <div className={styles.timerBoxWrapper}>
+                    <div className={styles.timerBox}>
+                      <span className={styles.timerNum}>{String(timeLeft.minutes).padStart(2, '0')}</span>
+                    </div>
+                    <span className={styles.timerUnit}>Mins</span>
                   </div>
-                  <span className={styles.timerUnit}>Secs</span>
+
+                  <span className={styles.timerColon}>:</span>
+
+                  <div className={styles.timerBoxWrapper}>
+                    <div className={styles.timerBox}>
+                      <span className={styles.timerNum}>{String(timeLeft.seconds).padStart(2, '0')}</span>
+                    </div>
+                    <span className={styles.timerUnit}>Secs</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Coin Packs Grid */}
-          <div className={styles.coinGrid}>
-            {coinPacks.map((pack) => (
-              <div 
-                key={pack.id} 
-                className={`${styles.coinCard} ${pack.isPopular ? styles.popularCard : ''}`}
-              >
-                {pack.isPopular && (
-                  <div className={styles.popularBadge}>Most Popular</div>
-                )}
-                
-                <div className={styles.imgWrapper}>
-                  <img 
-                    src={pack.img} 
-                    alt={`${pack.coins} Coins`} 
-                    className={`${styles.packImg} ${pack.img.includes('Gift') ? styles.giftCoinsImg : ''}`} 
-                  />
-                </div>
+          {loading ? (
+            <div className={styles.coinGrid}>
+              {Array.from({ length: 8 }).map((_, idx) => (
+                <div key={idx} className={styles.coinCard} style={{ minHeight: '210px' }} />
+              ))}
+            </div>
+          ) : loadError ? (
+            <div className={styles.paymentNotice} style={{ justifyContent: 'center', padding: '2rem 0' }}>
+              <span>{loadError}</span>
+            </div>
+          ) : packages.length === 0 ? (
+            <div className={styles.paymentNotice} style={{ justifyContent: 'center', padding: '2rem 0' }}>
+              <span>No coin packs are currently available.</span>
+            </div>
+          ) : (
+            <div className={styles.coinGrid}>
+              {packages.map((pack) => {
+                const packBonus = pack.bonusCoins || 0;
+                const offerBonus = offer.isActive && offer.bonusPercent > 0
+                  ? Math.round((pack.coins * offer.bonusPercent) / 100)
+                  : 0;
+                const totalBonus = packBonus + offerBonus;
+                return (
+                  <div
+                    key={pack.id}
+                    className={`${styles.coinCard} ${pack.isPopular ? styles.popularCard : ''}`}
+                  >
+                    {pack.isPopular && (
+                      <div className={styles.popularBadge}>Most Popular</div>
+                    )}
 
-                <h3 className={styles.packTitle}>{pack.coins} Coins</h3>
+                    <div className={styles.imgWrapper}>
+                      <img
+                        src={pack.image || '/coin.png'}
+                        alt={`${pack.coins} Coins`}
+                        className={`${styles.packImg} ${pack.image && pack.image.includes('Gift') ? styles.giftCoinsImg : ''}`}
+                      />
+                    </div>
 
-                <div className={styles.priceRow}>
-                  <span className={styles.oldPrice}>{pack.oldPrice}</span>
-                  <span className={styles.newPrice}>{pack.price}</span>
-                </div>
+                    <h3 className={styles.packTitle}>{pack.coins} Coins</h3>
 
-                <button 
-                  className={styles.buyBtn}
-                  onClick={() => setSelectedPack(pack)}
-                >
-                  Buy
-                </button>
-              </div>
-            ))}
-          </div>
+                    {totalBonus > 0 && (
+                      <p className={styles.offerText} style={{ fontSize: '0.78rem', margin: '0 0 0.4rem 0', textAlign: 'center' }}>
+                        +{totalBonus} bonus coins
+                      </p>
+                    )}
+
+                    <div className={styles.priceRow}>
+                      {pack.oldPriceUSD != null && (
+                        <span className={styles.oldPrice}>${pack.oldPriceUSD.toFixed(2)}</span>
+                      )}
+                      <span className={styles.newPrice}>${pack.priceUSD.toFixed(2)}</span>
+                    </div>
+
+                    <button
+                      className={styles.buyBtn}
+                      onClick={() => setSelectedPack(pack)}
+                    >
+                      Buy
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* Secure Payment Footer */}
           <div className={styles.paymentFooter}>
@@ -198,7 +266,7 @@ export const BuyCoinsPage = () => {
 
         {/* ================= RIGHT SIDEBAR ================= */}
         <div className={styles.rightSidebar}>
-          
+
           {/* Widget 1: My Wallet */}
           <div className={styles.widgetCard}>
             <h3 className={styles.widgetTitle}>My Wallet</h3>
@@ -206,9 +274,9 @@ export const BuyCoinsPage = () => {
               <img src="/coin.png" alt="Coin" className={styles.walletCoinImg} />
               <span className={styles.walletCoinsText}>{formattedBalance} Coins</span>
             </div>
-            <button 
+            <button
               className={styles.transHistoryBtn}
-              onClick={() => alert('Viewing transaction history...')}
+              onClick={() => setActiveTab('Transaction History')}
             >
               View Transaction History
             </button>
@@ -245,25 +313,53 @@ export const BuyCoinsPage = () => {
           <div className={styles.widgetCard}>
             <h3 className={styles.widgetTitle}>Redeem Promo Code</h3>
             <form onSubmit={handleRedeemPromo} className={styles.promoInputRow}>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 placeholder="Enter promo..."
                 value={promoCode}
                 onChange={(e) => setPromoCode(e.target.value)}
                 className={styles.promoInput}
               />
-              <button type="submit" className={styles.redeemBtn}>Redeem</button>
+              <button type="submit" className={styles.redeemBtn} disabled={redeeming}>
+                {redeeming ? '...' : 'Redeem'}
+              </button>
             </form>
             {promoMessage && (
-              <p style={{ fontSize: '0.78rem', color: promoMessage.includes('applied') ? '#22c55e' : '#ef4444', margin: '0 0 0.5rem 0' }}>
+              <p style={{ fontSize: '0.78rem', color: promoMessage.toLowerCase().includes('invalid') || promoMessage.toLowerCase().includes('already') ? '#ef4444' : '#22c55e', margin: '0 0 0.5rem 0' }}>
                 {promoMessage}
               </p>
             )}
 
-            <div className={styles.yourCodesRow} onClick={() => alert('Code FANTRIO20 available!')}>
-              <span>Your Codes</span>
-              <ChevronRight size={16} />
-            </div>
+            {availablePromos.length > 0 && (
+              <div className={styles.yourCodesRow}>
+                <span>Available Codes</span>
+                <ChevronRight size={16} />
+              </div>
+            )}
+            {availablePromos.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginTop: '0.4rem' }}>
+                {availablePromos.map((p) => (
+                  <div
+                    key={p.code}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      background: 'rgba(126, 0, 243, 0.12)',
+                      border: '1px solid rgba(126, 0, 243, 0.25)',
+                      borderRadius: '10px',
+                      padding: '0.45rem 0.7rem',
+                      fontSize: '0.8rem',
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => setPromoCode(p.code)}
+                  >
+                    <span style={{ fontWeight: 700, color: '#e10075' }}>{p.code}</span>
+                    <span style={{ color: 'rgba(255,255,255,0.7)' }}>+{p.bonusCoins} coins</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Widget 4: Safe & Secure */}
@@ -285,8 +381,8 @@ export const BuyCoinsPage = () => {
       {selectedPack && (
         <div className={styles.modalOverlay} onClick={() => setSelectedPack(null)}>
           <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
-            <img src={selectedPack.img} alt="Coins" className={styles.modalImg} />
-            
+            <img src={selectedPack.image || '/coin.png'} alt="Coins" className={styles.modalImg} />
+
             {purchaseSuccess ? (
               <>
                 <CheckCircle2 size={48} color="#22c55e" style={{ marginBottom: '1rem' }} />
@@ -297,18 +393,21 @@ export const BuyCoinsPage = () => {
               <>
                 <h3 className={styles.modalTitle}>Purchase {selectedPack.coins} Coins</h3>
                 <p className={styles.modalDesc}>
-                  Total Price: <strong>{selectedPack.price}</strong>
+                  Total Price: <strong>${selectedPack.priceUSD.toFixed(2)}</strong>
+                  {selectedPack.oldPriceUSD != null && (
+                    <> <span style={{ textDecoration: 'line-through', color: 'rgba(255,255,255,0.4)' }}>${selectedPack.oldPriceUSD.toFixed(2)}</span></>
+                  )}
                 </p>
 
                 <div className={styles.modalBtnGroup}>
-                  <button 
+                  <button
                     className={styles.modalConfirmBtn}
                     onClick={handleConfirmPurchase}
                     disabled={purchasing}
                   >
                     {purchasing ? 'Processing...' : 'Confirm Payment'}
                   </button>
-                  <button 
+                  <button
                     className={styles.modalCancelBtn}
                     onClick={() => setSelectedPack(null)}
                     disabled={purchasing}
@@ -321,6 +420,7 @@ export const BuyCoinsPage = () => {
           </div>
         </div>
       )}
+
     </div>
   );
 };

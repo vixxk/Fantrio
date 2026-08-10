@@ -8,7 +8,10 @@ router.use(protect);
 
 router.get('/balance', walletController.getBalance);
 router.get('/transactions', walletController.getTransactions);
-router.post('/add-mock-coins', walletController.addMockCoins);
+router.get('/packages', walletController.getCoinPackages);
+router.post('/purchase', walletController.purchaseCoins);
+router.post('/redeem-promo', walletController.redeemPromo);
+router.post('/spend', walletController.spendCoins);
 router.post('/recharge', walletController.rechargeWallet);
 
 module.exports = router;

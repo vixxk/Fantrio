@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useApp } from '../../context/AppContext';
+import { api } from '../../services/api';
 import { 
   Home, 
   MessageSquare, 
@@ -17,7 +18,7 @@ import {
   BadgeCheck,
   Menu,
   Mic,
-  Camera,
+  Camera
 } from 'lucide-react';
 import styles from './CreatorSidebar.module.css';
 
@@ -26,13 +27,36 @@ export const CreatorSidebar = ({ onClose }) => {
     activeTab, 
     setActiveTab, 
     darkMode,
-    setDarkMode
+    setDarkMode,
+    logout,
+    navigateTo
   } = useApp();
 
   const [liveCallsExpanded, setLiveCallsExpanded] = useState(true);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Fetch total unread message count from the chat API
+  const loadUnreadCount = useCallback(async () => {
+    try {
+      const res = await api.get('/chat/conversations');
+      const conversations = res.conversations || [];
+      const total = conversations.filter(c => (c.unreadCount || 0) > 0).length;
+      setUnreadCount(total);
+    } catch (err) {
+      console.error('Failed to load unread count:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadUnreadCount();
+  }, [loadUnreadCount, activeTab]);
 
   // Automatically expand Live Calls if we are on the overview or call pages
-  useEffect(() => {
+  // Auto-expand live-calls group when a call tab is active — adjusted during render
+  const [prevActiveTab, setPrevActiveTab] = useState(activeTab);
+  if (activeTab !== prevActiveTab) {
+    setPrevActiveTab(activeTab);
     if (
       activeTab === 'Creator Live Calls' ||
       activeTab === 'Creator Audio Calls' ||
@@ -40,11 +64,11 @@ export const CreatorSidebar = ({ onClose }) => {
     ) {
       setLiveCallsExpanded(true);
     }
-  }, [activeTab]);
+  }
 
   const menuItems = [
     { name: 'Creator Dashboard', label: 'Dashboard', icon: Home, tab: 'Creator Dashboard' },
-    { name: 'Creator Messages', label: 'Messages', icon: MessageSquare, tab: 'Creator Messages', badge: 24 },
+    { name: 'Creator Messages', label: 'Messages', icon: MessageSquare, tab: 'Creator Messages', badge: unreadCount },
     { name: 'Creator Content', label: 'Content', icon: FileText, tab: 'Creator Content' },
     { name: 'Creator Subscribers', label: 'Subscribers', icon: Users, tab: 'Creator Subscribers' },
     { name: 'Creator PPV Content', label: 'PPV Content', icon: Film, tab: 'Creator PPV Content' },
@@ -62,8 +86,7 @@ export const CreatorSidebar = ({ onClose }) => {
     { name: 'Creator Earnings', label: 'Earnings', icon: DollarSign, tab: 'Creator Earnings' },
     { name: 'Creator Analytics', label: 'Analytics', icon: BarChart3, tab: 'Creator Analytics' },
     { name: 'Creator Store', label: 'Store', icon: ShoppingBag, tab: 'Creator Store' },
-    { name: 'Creator Settings', label: 'Settings', icon: Settings, tab: 'Creator Settings' },
-    { name: 'User Dashboard', label: 'User', icon: Home, tab: 'User Dashboard', href: '/discover' }
+    { name: 'Creator Settings', label: 'Settings', icon: Settings, tab: 'Creator Settings' }
   ];
 
   const handleItemClick = (tab) => {
@@ -219,7 +242,43 @@ export const CreatorSidebar = ({ onClose }) => {
         >
           View Profile
         </button>
+        
+        <button 
+          className={styles.logoutButton} 
+          onClick={() => setShowLogoutConfirm(true)}
+        >
+          <span>Logout</span>
+          <img src="/arrow.png" alt="Logout" className={styles.logoutIcon} />
+        </button>
       </div>
+
+      {showLogoutConfirm && (
+        <div className={styles.logoutConfirmOverlay} onClick={() => setShowLogoutConfirm(false)}>
+          <div className={styles.logoutConfirmDialog} onClick={e => e.stopPropagation()}>
+            <h3 className={styles.logoutConfirmTitle}>Confirm Logout</h3>
+            <p className={styles.logoutConfirmText}>Are you sure you want to logout from Fantrio?</p>
+            <div className={styles.logoutConfirmActions}>
+              <button 
+                className={styles.logoutCancelBtn} 
+                onClick={() => setShowLogoutConfirm(false)}
+              >
+                Cancel
+              </button>
+               <button 
+                 className={styles.logoutConfirmBtn} 
+                 onClick={() => {
+                   setShowLogoutConfirm(false);
+                   logout();
+                   navigateTo('/login');
+                 }}
+               >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )
+      }
     </aside>
   );
 };

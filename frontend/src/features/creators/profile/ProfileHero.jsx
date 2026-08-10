@@ -1,6 +1,4 @@
-import React from 'react';
 import { BadgeCheck, Users, Heart, Eye, DollarSign, FileText, Star, MessageSquare, Phone, Video, Gift } from 'lucide-react';
-import { creatorProfile, profileStats, actionButtons } from './mockData';
 import styles from './ProfilePage.module.css';
 
 const statIcons = {
@@ -19,7 +17,7 @@ const buttonIcons = {
   gift: Gift,
 };
 
-export const ProfileHero = ({ isDark }) => {
+export const ProfileHero = ({ isDark, creatorProfile, profileStats = [], actionButtons = [] }) => {
   return (
     <div className={`${styles.heroCard} ${!isDark ? styles.light : ''}`}>
       {/* Cover Image */}
@@ -66,7 +64,7 @@ export const ProfileHero = ({ isDark }) => {
         {/* Stats Row */}
         <div className={styles.statsRow}>
           {profileStats.map((stat, index) => {
-            const Icon = statIcons[stat.icon];
+            const Icon = statIcons[stat.icon] || Eye;
             return (
               <div key={index} className={styles.statItem}>
                 <Icon size={18} className={styles.statIcon} />
@@ -82,11 +80,11 @@ export const ProfileHero = ({ isDark }) => {
         {/* Action Buttons */}
         <div className={styles.actionButtons}>
           {actionButtons.map((btn, index) => {
-            const Icon = buttonIcons[btn.icon];
+            const Icon = buttonIcons[btn.icon] || Star;
             return (
               <button
                 key={index}
-                className={`${styles.actionBtn} ${styles[btn.variant]}`}
+                className={`${styles.actionBtn} ${styles[btn.variant] || styles.outline}`}
               >
                 <Icon size={18} />
                 <div className={styles.btnContent}>

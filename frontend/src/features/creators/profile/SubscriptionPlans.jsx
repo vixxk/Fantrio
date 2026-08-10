@@ -1,17 +1,16 @@
-import React from 'react';
 import { Check } from 'lucide-react';
-import { subscriptionPlans } from './mockData';
 import styles from './ProfilePage.module.css';
 
-export const SubscriptionPlans = ({ isDark }) => {
+export const SubscriptionPlans = ({ isDark, subscriptionPlans }) => {
+  const plans = subscriptionPlans || { title: 'Subscription Plans', subtitle: '', plans: [] };
   return (
     <div className={`${styles.plansCard} ${!isDark ? styles.light : ''}`}>
       <div className={styles.plansHeader}>
-        <h3 className={styles.sectionTitle}>{subscriptionPlans.title}</h3>
-        <p className={styles.sectionSubtitle}>{subscriptionPlans.subtitle}</p>
+        <h3 className={styles.sectionTitle}>{plans.title}</h3>
+        <p className={styles.sectionSubtitle}>{plans.subtitle}</p>
       </div>
       <div className={styles.plansGrid}>
-        {subscriptionPlans.plans.map((plan, index) => (
+        {plans.plans.map((plan, index) => (
           <div key={index} className={styles.planCard}>
             <div className={styles.planHeader}>
               <h4 className={styles.planName}>{plan.name}</h4>
@@ -21,7 +20,7 @@ export const SubscriptionPlans = ({ isDark }) => {
               </div>
             </div>
             <ul className={styles.planFeatures}>
-              {plan.features.map((feature, i) => (
+              {(plan.features || []).map((feature, i) => (
                 <li key={i} className={styles.planFeature}>
                   <Check size={16} className={styles.checkIcon} />
                   {feature}

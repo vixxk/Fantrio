@@ -1449,3 +1449,77 @@
     height: 12px !important;
   }
 }
+
+/* Gift + recharge controls inside the active call overlay */
+.callTopBar {
+  position: absolute;
+  top: 14px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 4;
+}
+
+.callBalanceChip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 6px 8px 6px 12px;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 800;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+}
+
+.callCoinImg {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.callRechargeBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(90deg, #ff007f, #7e00f3);
+  border: none;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.callRechargeBtn:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
+}
+
+.controlBtnGift {
+  background: linear-gradient(135deg, rgba(225, 0, 117, 0.35), rgba(126, 0, 243, 0.35));
+  border-color: rgba(255, 0, 127, 0.45);
+  color: #ff7ab8;
+}
+
+.controlBtnGift:hover {
+  background: linear-gradient(135deg, rgba(225, 0, 117, 0.55), rgba(126, 0, 243, 0.55));
+  color: #fff;
+}
+
+.controlBtnCoins {
+  background: rgba(255, 215, 102, 0.12);
+  border-color: rgba(255, 215, 102, 0.4);
+  color: #ffd166;
+}
+
+.controlBtnCoins:hover {
+  background: rgba(255, 215, 102, 0.22);
+  color: #fff;
+}

@@ -7,6 +7,24 @@
   font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
+.emptyContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  gap: 1rem;
+}
+
+.emptyText {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.95rem;
+}
+
+.light .emptyText {
+  color: rgba(26, 22, 37, 0.5);
+}
+
 /* ================= PAGE HEADER ================= */
 .pageHeader {
   display: flex;
@@ -255,6 +273,46 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
+.filterBtnActive {
+  background: rgba(225, 0, 117, 0.12);
+  border-color: rgba(225, 0, 117, 0.45);
+  color: #e10075;
+}
+
+.filterBtnActive:hover {
+  background: rgba(225, 0, 117, 0.18);
+}
+
+.filterBtnBadge {
+  background: #e10075;
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 99px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clearFiltersBtn {
+  background: rgba(225, 0, 117, 0.12);
+  border: 1px solid rgba(225, 0, 117, 0.4);
+  color: #e10075;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.5rem 1.1rem;
+  border-radius: 99px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.clearFiltersBtn:hover {
+  background: rgba(225, 0, 117, 0.2);
+}
+
 .sortLabel {
   display: inline;
 }
@@ -354,6 +412,13 @@
   padding: 1rem 1rem 0.75rem 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* Center the PLAN header over the plan cards so the card's middle lines
+   up with the header text's middle. */
+.planTh {
+  text-align: center;
 }
 
 .tableRow {
@@ -410,13 +475,18 @@
   display: inline-flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 0.1rem;
-  padding: 0.3rem 0.7rem;
+  width: 100%;
+  min-width: 64px;
+  box-sizing: border-box;
+  padding: 0.3rem 0.4rem;
   border-radius: 6px;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.03em;
   line-height: 1.3;
+  text-align: center;
 }
 
 .planPriceLine {
@@ -492,6 +562,24 @@
 .actionBtn:hover {
   background: rgba(255, 255, 255, 0.06);
   color: rgba(255, 255, 255, 0.8);
+}
+
+.actionBtn.actionBtnDanger {
+  color: rgba(248, 113, 113, 0.8);
+}
+
+.actionBtn.actionBtnDanger:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+}
+
+.light .actionBtn.actionBtnDanger {
+  color: rgba(220, 38, 38, 0.75);
+}
+
+.light .actionBtn.actionBtnDanger:hover {
+  background: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
 }
 
 /* ================= PAGINATION ================= */
@@ -946,6 +1034,26 @@
   color: #1a1625;
 }
 
+.light .filterBtnActive {
+  background: rgba(225, 0, 117, 0.1);
+  border-color: rgba(225, 0, 117, 0.4);
+  color: #e10075;
+}
+
+.light .filterBtnActive:hover {
+  background: rgba(225, 0, 117, 0.15);
+}
+
+.light .clearFiltersBtn {
+  background: rgba(225, 0, 117, 0.08);
+  border-color: rgba(225, 0, 117, 0.4);
+  color: #d1006b;
+}
+
+.light .clearFiltersBtn:hover {
+  background: rgba(225, 0, 117, 0.15);
+}
+
 .light .th {
   color: rgba(26, 22, 37, 0.4);
   border-bottom-color: rgba(0, 0, 0, 0.06);
@@ -1363,6 +1471,12 @@
     border-color: rgba(255, 255, 255, 0.25);
   }
 
+  .filterBtn.filterBtnActive {
+    background: rgba(225, 0, 117, 0.18);
+    border-color: rgba(225, 0, 117, 0.5);
+    color: #e10075;
+  }
+
   .hideMobile {
     display: none !important;
   }
@@ -1476,11 +1590,15 @@
   }
 
   .insightsHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
     margin-bottom: 0.75rem;
   }
 
   .insightsTitle {
     font-size: 0.82rem !important;
+    white-space: nowrap;
   }
 
   .insightsList {

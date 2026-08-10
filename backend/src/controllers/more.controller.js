@@ -1,13 +1,75 @@
+const mongoose = require('mongoose');
 const SupportTicket = require('../models/SupportTicket');
 const Report = require('../models/Report');
 const FeatureRequest = require('../models/FeatureRequest');
 const Announcement = require('../models/Announcement');
 const Referral = require('../models/Referral');
+const Reward = require('../models/Reward');
+const CallLog = require('../models/CallLog');
+const CreatorProfile = require('../models/CreatorProfile');
 const User = require('../models/User');
 const Wallet = require('../models/Wallet');
 const Transaction = require('../models/Transaction');
+const { getHiddenUserIds } = require('../utils/blockFilter');
 const catchAsync = require('../utils/catchAsync');
 const ApiError = require('../utils/apiError');
+
+// ==========================================
+// REWARD DEFINITIONS
+// ==========================================
+const REWARD_DEFINITIONS = [
+  {
+    type: 'first_deposit',
+    title: 'First Wallet Recharge',
+    description: 'Buy a coin pack to top up your wallet balance.',
+    coins: 20,
+    icon: 'card'
+  },
+  {
+    type: 'referral_claimed',
+    title: "Enter Friend's Referral Code",
+    description: 'Support your friend and claim startup bonus.',
+    coins: 50,
+    icon: 'user'
+  },
+  {
+    type: 'first_audio_call',
+    title: 'Make 1:1 Audio Call',
+    description: 'Initiate a call with any online creator.',
+    coins: 30,
+    icon: 'call'
+  }
+];
+
+// Returns true if the current user has completed the reward's criteria.
+const isRewardCompleted = async (type, userId) => {
+  if (type === 'first_deposit') {
+    const purchase = await Transaction.findOne({
+      receiverId: userId,
+      type: 'deposit',
+      status: 'completed',
+      gateway: { $in: ['segpay', 'ccbill'] }
+    });
+    return !!purchase;
+  }
+  if (type === 'referral_claimed') {
+    const referral = await Referral.findOne({ referredId: userId });
+    return !!referral;
+  }
+  if (type === 'first_audio_call') {
+    const call = await CallLog.findOne({
+      callerId: userId,
+      type: 'audio',
+      status: { $in: ['active', 'completed'] }
+    });
+    return !!call;
+  }
+  return false;
+};
+
+// ==========================================
+// SUPPORT TICKETS
+// ==========================================
 
 // ==========================================
 // SUPPORT TICKETS
@@ -48,8 +110,44 @@ exports.getMyTickets = catchAsync(async (req, res, next) => {
 exports.createReport = catchAsync(async (req, res, next) => {
   const { targetType, targetId, reason, description } = req.body;
 
-  if (!targetType || !targetId || !reason) {
-    return next(new ApiError(400, 'targetType, targetId, and reason are required'));
+  if (!['creator', 'content'].includes(targetType)) {
+    return next(new ApiError(400, 'targetType must be "creator" or "content"'));
+  }
+  if (!targetId || !reason) {
+    return next(new ApiError(400, 'targetId and reason are required'));
+  }
+  if (!mongoose.Types.ObjectId.isValid(targetId)) {
+    return next(new ApiError(400, 'Invalid target id'));
+  }
+
+  // Validate that the reported target actually exists
+  if (targetType === 'creator') {
+    const creator = await User.findOne({ _id: targetId, role: 'creator' });
+    if (!creator) {
+      return next(new ApiError(404, 'Creator not found'));
+    }
+    if (creator._id.toString() === req.user._id.toString()) {
+      return next(new ApiError(400, 'You cannot report yourself'));
+    }
+  } else {
+    const Post = require('../models/Post');
+    const post = await Post.findById(targetId);
+    if (!post) {
+      return next(new ApiError(404, 'Content not found'));
+    }
+    if (post.creatorId.toString() === req.user._id.toString()) {
+      return next(new ApiError(400, 'You cannot report your own content'));
+    }
+  }
+
+  // Prevent duplicate reports from the same user against the same target
+  const existing = await Report.findOne({
+    reporterId: req.user._id,
+    targetType,
+    targetId
+  });
+  if (existing) {
+    return next(new ApiError(400, 'You have already reported this. Our team will review it shortly.'));
   }
 
   const report = await Report.create({
@@ -57,7 +155,7 @@ exports.createReport = catchAsync(async (req, res, next) => {
     targetType,
     targetId,
     reason,
-    description
+    description: description || ''
   });
 
   res.status(201).json({
@@ -94,9 +192,17 @@ exports.getFeatureRequests = catchAsync(async (req, res, next) => {
     .populate('userId', 'username displayName avatarUrl')
     .sort({ createdAt: -1 });
 
+  const userIdStr = req.user._id.toString();
+
+  const data = features.map((f) => ({
+    ...f.toObject(),
+    votesCount: f.votes.length,
+    hasVoted: f.votes.some((v) => v.toString() === userIdStr)
+  }));
+
   res.status(200).json({
     status: 'success',
-    features
+    features: data
   });
 });
 
@@ -230,5 +336,102 @@ exports.claimReferral = catchAsync(async (req, res, next) => {
     status: 'success',
     message: 'Referral claimed successfully! You received 50 coins, and your friend received 100 coins.',
     rewardGranted: true
+  });
+});
+
+// ==========================================
+// REWARDS & MILESTONES
+// ==========================================
+exports.getRewards = catchAsync(async (req, res, next) => {
+  const userId = req.user._id;
+  const userIdStr = userId.toString();
+
+  // Load already-granted rewards for this user
+  const granted = await Reward.find({ userId });
+  const grantedMap = {};
+  granted.forEach((r) => {
+    grantedMap[r.type] = r;
+  });
+
+  const rewards = [];
+  for (const def of REWARD_DEFINITIONS) {
+    const completed = await isRewardCompleted(def.type, userId);
+
+    // Grant coins the first time a reward is completed.
+    // Note: referral_claimed coins are already credited by the referral
+    // claim flow, so it is only marked as granted here (no double credit).
+    let claimed = !!grantedMap[def.type];
+    if (completed && !claimed) {
+      const grantCoins = def.type === 'referral_claimed' ? 0 : def.coins;
+      let wallet = await Wallet.findOne({ userId });
+      if (!wallet) {
+        wallet = await Wallet.create({ userId, balanceCoins: 0 });
+      }
+
+      if (grantCoins > 0) {
+        wallet.balanceCoins = Number((wallet.balanceCoins + grantCoins).toFixed(2));
+        await wallet.save();
+
+        await Transaction.create({
+          senderId: null,
+          receiverId: userId,
+          type: 'deposit',
+          status: 'completed',
+          amountCoins: grantCoins,
+          gateway: 'reward_bonus',
+          metadata: { rewardType: def.type }
+        });
+      }
+
+      const record = await Reward.create({
+        userId,
+        type: def.type,
+        coins: def.coins
+      });
+      grantedMap[def.type] = record;
+      claimed = true;
+    }
+
+    rewards.push({
+      type: def.type,
+      title: def.title,
+      description: def.description,
+      coins: def.coins,
+      icon: def.icon,
+      completed,
+      claimed,
+      grantedAt: claimed && grantedMap[def.type] ? grantedMap[def.type].grantedAt : null
+    });
+  }
+
+  res.status(200).json({
+    status: 'success',
+    rewards
+  });
+});
+
+// ==========================================
+// REPORT SUPPORT DATA
+// ==========================================
+// Lightweight list of reportable creators for the "Report A Creator" form.
+exports.getReportCreators = catchAsync(async (req, res, next) => {
+  const hiddenIds = await getHiddenUserIds(req.user._id);
+
+  const filter = { verificationStatus: 'approved', userId: { $nin: [...hiddenIds, req.user._id] } };
+
+  const creators = await CreatorProfile.find(filter)
+    .select('userId username displayName avatarUrl followerCount')
+    .sort({ followerCount: -1 })
+    .limit(200)
+    .lean();
+
+  res.status(200).json({
+    status: 'success',
+    creators: creators.map((c) => ({
+      userId: c.userId,
+      username: c.username,
+      displayName: c.displayName || c.username,
+      avatarUrl: c.avatarUrl || ''
+    }))
   });
 });

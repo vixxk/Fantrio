@@ -36,6 +36,9 @@ app.use('/api/v1/calls', require('./routes/call.routes'));
 // app.use('/api/v1/verification', require('./routes/verification.routes'));
 app.use('/api/v1/admin', require('./admin/admin.routes'));
 app.use('/api/v1/more', require('./routes/more.routes'));
+app.use('/api/v1/settings', require('./routes/settings.routes'));
+app.use('/api/v1/block', require('./routes/block.routes'));
+app.use('/api/v1/store', require('./routes/store.routes'));
 
 // Global 404 Route handler
 app.all('*', (req, res, next) => {

@@ -1,0 +1,144 @@
+.header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 88px;
+  padding: 0 2.5rem;
+  flex-shrink: 0;
+}
+
+/* ---------- Brand ---------- */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.logo {
+  height: 120px;
+  width: 120px;
+  object-fit: contain;
+  display: block;
+  margin-left: -26px; /* visually center the sparkle artwork inside the padded PNG */
+  margin-right: -24px;
+  transform: translateY(1px);
+  filter: drop-shadow(0 0 14px rgba(225, 0, 117, 0.35));
+  transition: transform 0.25s ease;
+}
+
+.brand:hover .logo {
+  transform: translateY(1px) scale(1.05) rotate(-3deg);
+}
+
+.brandName {
+  font-family: 'Unbounded', 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.9rem;
+  font-weight: 1000;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: #ffffff;
+  text-shadow: 0 0 24px rgba(225, 0, 117, 0.3);
+  /* Vertically center the text against the sparkle artwork inside the padded logo PNG */
+  transform: translateY(-5px);
+}
+
+.brandPink {
+  background: linear-gradient(135deg, #ff2d8f 0%, #9d4dff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ---------- Theme toggle ---------- */
+.themeToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  font-family: inherit;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.25s ease;
+}
+
+.themeToggle:hover {
+  border-color: rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.09);
+  transform: translateY(-1px);
+}
+
+.themeToggle:active {
+  transform: scale(0.94);
+}
+
+.themeToggle svg {
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.themeToggle:hover svg {
+  transform: rotate(25deg) scale(1.12);
+  stroke: url(#themeToggleGrad);
+}
+
+/* ---------- Light mode ---------- */
+.light .logo {
+  filter: drop-shadow(0 0 10px rgba(225, 0, 117, 0.2));
+}
+
+.light .brandName {
+  color: #1a1625;
+  text-shadow: none;
+  font-weight: 1000;
+}
+
+.light .themeToggle {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  color: #1a1625;
+  box-shadow: 0 2px 12px rgba(26, 22, 37, 0.06);
+}
+
+.light .themeToggle:hover {
+  background: #f2eff8;
+  border-color: rgba(0, 0, 0, 0.18);
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 640px) {
+  .header {
+    height: clamp(48px, 7vh, 60px);
+    padding: 0 1rem;
+  }
+
+  .brand {
+    gap: 0;
+  }
+
+  .logo {
+    height: clamp(42px, 6vh, 52px);
+    width: clamp(42px, 6vh, 52px);
+    margin-left: -14px;
+    margin-right: -12px;
+  }
+
+  .brandName {
+    font-size: clamp(0.95rem, 2.9vh, 1.2rem);
+    transform: translateY(-3px);
+  }
+
+  .themeToggle {
+    width: clamp(32px, 4.6vh, 40px);
+    height: clamp(32px, 4.6vh, 40px);
+  }
+}

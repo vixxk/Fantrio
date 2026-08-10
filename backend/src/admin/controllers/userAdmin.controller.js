@@ -1,12 +1,14 @@
+const mongoose = require('mongoose');
 const User = require('../../models/User');
 const CreatorProfile = require('../../models/CreatorProfile');
 const Wallet = require('../../models/Wallet');
 const ApiError = require('../../utils/apiError');
 const catchAsync = require('../../utils/catchAsync');
+const { buildDateRangeQuery } = require('../../utils/dateRange');
 
-// Fetch all users with search, role, and suspension filters
+// Fetch all users with search, role, suspension, and period filters
 exports.getUsersList = catchAsync(async (req, res, next) => {
-  const { search, role, status } = req.query;
+  const { search, role, status, from, to } = req.query;
   const page = parseInt(req.query.page || '1', 10);
   const limit = parseInt(req.query.limit || '10', 10);
   const skip = (page - 1) * limit;
@@ -21,11 +23,16 @@ exports.getUsersList = catchAsync(async (req, res, next) => {
     query.isSuspended = status === 'suspended';
   }
 
-  if (search) {
+  // Period filter (inclusive YYYY-MM-DD range on the account creation date)
+  Object.assign(query, buildDateRangeQuery(from, to));
+
+  if (search && search.trim()) {
+    const regex = { $regex: search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' };
     query.$or = [
-      { email: { $regex: search, $options: 'i' } },
-      { username: { $regex: search, $options: 'i' } },
-      { displayName: { $regex: search, $options: 'i' } }
+      { email: regex },
+      { username: regex },
+      { displayName: regex },
+      { bio: regex }
     ];
   }
 
@@ -37,12 +44,30 @@ exports.getUsersList = catchAsync(async (req, res, next) => {
 
   const total = await User.countDocuments(query);
 
+  // Enrich every user with their wallet balance and block-list size so the admin
+  // panel can show the full listener picture (wallet, status, activity).
+  const userIds = users.map((u) => u._id);
+  const wallets = userIds.length
+    ? await Wallet.find({ userId: { $in: userIds } }).select('userId balanceCoins').lean()
+    : [];
+  const walletMap = {};
+  wallets.forEach((w) => { walletMap[String(w.userId)] = w.balanceCoins || 0; });
+
+  const enriched = users.map((u) => {
+    const plain = u.toObject ? u.toObject() : u;
+    return {
+      ...plain,
+      walletBalanceCoins: walletMap[String(u._id)] || 0,
+      blockedCount: (u.blockedUsers || []).length
+    };
+  });
+
   res.status(200).json({
     status: 'success',
     total,
     page,
     limit,
-    users
+    users: enriched
   });
 });
 
@@ -53,7 +78,7 @@ exports.updateUser = catchAsync(async (req, res, next) => {
 
   const user = await User.findById(userId);
   if (!user) {
-    return next(new ApiError(404, 'User not found'));
+    return next(new ApiError(404, 'Fan not found'));
   }
 
   if (email) user.email = email;
@@ -76,7 +101,7 @@ exports.toggleUserSuspension = catchAsync(async (req, res, next) => {
 
   const user = await User.findById(userId);
   if (!user) {
-    return next(new ApiError(404, 'User not found'));
+    return next(new ApiError(404, 'Fan not found'));
   }
 
   if (user.role === 'admin') {
@@ -88,18 +113,20 @@ exports.toggleUserSuspension = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    message: `User account successfully ${user.isSuspended ? 'suspended' : 'activated'}`,
+    message: `Fan account successfully ${user.isSuspended ? 'suspended' : 'activated'}`,
     isSuspended: user.isSuspended
   });
 });
 
-// Delete user and clean up all data
+// Delete user and clean up all data — including removing any media the user
+// uploaded to S3 (stories, posts, chat attachments) so deleting an account
+// doesn't leave orphaned files behind.
 exports.deleteUser = catchAsync(async (req, res, next) => {
   const { userId } = req.params;
 
   const user = await User.findById(userId);
   if (!user) {
-    return next(new ApiError(404, 'User not found'));
+    return next(new ApiError(404, 'Fan not found'));
   }
 
   const Story = require('../../models/Story');
@@ -108,6 +135,30 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
   const Subscription = require('../../models/Subscription');
   const Message = require('../../models/Message');
   const CallLog = require('../../models/CallLog');
+  const awsService = require('../../services/aws.service');
+
+  // Collect every S3 URL the user owns so we can purge the files after the
+  // database records are removed. deleteS3Media skips non-S3 (seeded) URLs.
+  const [stories, posts, messages, streams] = await Promise.all([
+    Story.find({ creatorId: userId }).select('mediaUrl').lean(),
+    Post.find({ creatorId: userId }).select('media').lean(),
+    Message.find({
+      $or: [{ senderId: userId }, { receiverId: userId }],
+      mediaUrl: { $ne: '' }
+    }).select('mediaUrl').lean(),
+    LiveStream.find({ creatorId: userId }).select('coverUrl').lean()
+  ]);
+
+  const mediaUrls = [];
+  stories.forEach((s) => mediaUrls.push(s.mediaUrl));
+  posts.forEach((p) => {
+    (p.media || []).forEach((m) => {
+      mediaUrls.push(m.url);
+      if (m.thumbnailUrl) mediaUrls.push(m.thumbnailUrl);
+    });
+  });
+  messages.forEach((msg) => mediaUrls.push(msg.mediaUrl));
+  streams.forEach((s) => mediaUrls.push(s.coverUrl));
 
   await CreatorProfile.findOneAndDelete({ userId });
   await Story.deleteMany({ creatorId: userId });
@@ -127,11 +178,14 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
     $or: [{ callerId: userId }, { receiverId: userId }]
   });
 
+  // Purge the user's media from S3 (best-effort; external URLs are skipped).
+  await awsService.deleteS3Media(mediaUrls);
+
   await User.findByIdAndDelete(userId);
 
   res.status(200).json({
     status: 'success',
-    message: 'User and all associated data deleted successfully'
+    message: 'Fan and all associated data deleted successfully'
   });
 });
 
@@ -159,5 +213,99 @@ exports.adjustUserBalance = catchAsync(async (req, res, next) => {
     status: 'success',
     message: `Wallet balance adjusted by ${amountCoins} coins. New balance is ${wallet.balanceCoins} coins.`,
     balanceCoins: wallet.balanceCoins
+  });
+});
+
+// Aggregated listener activity: subscriptions, transactions, posts, calls, blocked list.
+// Powers the admin user-detail drawer so a moderator sees a user's full footprint.
+exports.getUserActivity = catchAsync(async (req, res, next) => {
+  const { userId } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    return next(new ApiError(400, 'Invalid user id'));
+  }
+
+  const Subscription = require('../../models/Subscription');
+  const Transaction = require('../../models/Transaction');
+  const Post = require('../../models/Post');
+  const CallLog = require('../../models/CallLog');
+
+  const [subscriptions, transactions, posts, calls, blockedUser] = await Promise.all([
+    Subscription.find({ userId })
+      .populate('creatorId', 'username displayName avatarUrl')
+      .sort({ createdAt: -1 })
+      .limit(20)
+      .lean(),
+    Transaction.find({ $or: [{ senderId: userId }, { receiverId: userId }] })
+      .populate('senderId', 'username displayName avatarUrl')
+      .populate('receiverId', 'username displayName avatarUrl')
+      .sort({ createdAt: -1 })
+      .limit(30)
+      .lean(),
+    Post.find({ creatorId: userId })
+      .select('content media postType coinPrice likes commentCount sharesCount isPublished isHidden createdAt')
+      .sort({ createdAt: -1 })
+      .limit(20)
+      .lean(),
+    CallLog.find({ $or: [{ callerId: userId }, { receiverId: userId }] })
+      .populate('callerId', 'username displayName avatarUrl')
+      .populate('receiverId', 'username displayName avatarUrl')
+      .sort({ createdAt: -1 })
+      .limit(30)
+      .lean(),
+    User.findById(userId)
+      .select('blockedUsers')
+      .populate('blockedUsers', 'username displayName avatarUrl email role')
+      .lean()
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    activity: {
+      subscriptions,
+      transactions,
+      posts,
+      calls,
+      blockedUsers: (blockedUser && blockedUser.blockedUsers) || []
+    }
+  });
+});
+
+// List users that a given user has blocked
+exports.getUserBlockedList = catchAsync(async (req, res, next) => {
+  const { userId } = req.params;
+
+  const user = await User.findById(userId)
+    .populate('blockedUsers', 'username displayName avatarUrl role email');
+
+  if (!user) {
+    return next(new ApiError(404, 'Fan not found'));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    blockedUsers: user.blockedUsers
+  });
+});
+
+// Admin force-unblock: remove a blocked user relationship
+exports.adminUnblockUser = catchAsync(async (req, res, next) => {
+  const { userId, blockedId } = req.params;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    return next(new ApiError(404, 'Fan not found'));
+  }
+
+  if (!user.blockedUsers.includes(blockedId)) {
+    return next(new ApiError(400, 'This fan is not currently blocked'));
+  }
+
+  user.blockedUsers.pull(blockedId);
+  await user.save({ validateBeforeSave: false });
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Block removed successfully',
+    isBlocked: false
   });
 });

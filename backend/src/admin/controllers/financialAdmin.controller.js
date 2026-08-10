@@ -4,12 +4,13 @@ const Wallet = require('../../models/Wallet');
 const SystemSetting = require('../../models/SystemSetting');
 const ApiError = require('../../utils/apiError');
 const catchAsync = require('../../utils/catchAsync');
+const { buildDateRangeQuery } = require('../../utils/dateRange');
 
 // Retrieve all transactions
 exports.getAllTransactions = catchAsync(async (req, res, next) => {
-  const { search } = req.query;
+  const { search, from, to } = req.query;
 
-  const transactions = await Transaction.find()
+  const transactions = await Transaction.find(buildDateRangeQuery(from, to))
     .populate('senderId', 'username displayName email')
     .populate('receiverId', 'username displayName email')
     .sort({ createdAt: -1 });
@@ -54,7 +55,7 @@ exports.refundTransaction = catchAsync(async (req, res, next) => {
     const commRate = systemSetting ? systemSetting.commissionRate : 0.20;
 
     let netAmount = tx.amountCoins;
-    if (['subscription', 'tip', 'ppv_unlock', 'call_billing'].includes(tx.type)) {
+    if (['subscription', 'tip', 'gift', 'ppv_unlock', 'call_billing'].includes(tx.type)) {
       netAmount = tx.amountCoins * (1 - commRate);
     }
 
@@ -99,9 +100,9 @@ exports.refundTransaction = catchAsync(async (req, res, next) => {
 
 // Retrieve all withdrawal requests
 exports.getWithdrawals = catchAsync(async (req, res, next) => {
-  const { search } = req.query;
+  const { search, from, to } = req.query;
 
-  const withdrawals = await Transaction.find({ type: 'withdrawal' })
+  const withdrawals = await Transaction.find({ type: 'withdrawal', ...buildDateRangeQuery(from, to) })
     .populate('senderId', 'username displayName email')
     .sort({ createdAt: -1 });
 
@@ -116,6 +117,101 @@ exports.getWithdrawals = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     withdrawals: filtered
+  });
+});
+
+// List promo codes
+exports.getPromoCodes = catchAsync(async (req, res, next) => {
+  const settings = await SystemSetting.findOne();
+  res.status(200).json({
+    status: 'success',
+    promoCodes: settings ? settings.promoCodes : []
+  });
+});
+
+// Create a promo code
+exports.createPromoCode = catchAsync(async (req, res, next) => {
+  const { code, bonusCoins, description, maxRedemptions, expiresAt, isActive } = req.body;
+
+  if (!code || !bonusCoins) {
+    return next(new ApiError(400, 'Code and bonusCoins are required'));
+  }
+
+  let settings = await SystemSetting.findOne();
+  if (!settings) {
+    settings = await SystemSetting.create({ commissionRate: 0.20, coinPackages: [] });
+  }
+
+  const existing = settings.promoCodes.find(
+    (p) => String(p.code).toLowerCase() === String(code).trim().toLowerCase()
+  );
+  if (existing) {
+    return next(new ApiError(400, 'A promo code with this name already exists'));
+  }
+
+  settings.promoCodes.push({
+    code: String(code).trim().toUpperCase(),
+    bonusCoins,
+    description: description || '',
+    maxRedemptions: maxRedemptions != null ? maxRedemptions : null,
+    expiresAt: expiresAt ? new Date(expiresAt) : null,
+    isActive: isActive !== undefined ? isActive : true
+  });
+  await settings.save();
+
+  res.status(201).json({
+    status: 'success',
+    promoCode: settings.promoCodes[settings.promoCodes.length - 1]
+  });
+});
+
+// Update a promo code
+exports.updatePromoCode = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const settings = await SystemSetting.findOne();
+  if (!settings) {
+    return next(new ApiError(404, 'No settings found'));
+  }
+
+  const promo = settings.promoCodes.id(id);
+  if (!promo) {
+    return next(new ApiError(404, 'Promo code not found'));
+  }
+
+  const { bonusCoins, description, maxRedemptions, expiresAt, isActive } = req.body;
+  if (bonusCoins !== undefined) promo.bonusCoins = bonusCoins;
+  if (description !== undefined) promo.description = description;
+  if (maxRedemptions !== undefined) promo.maxRedemptions = maxRedemptions;
+  if (expiresAt !== undefined) promo.expiresAt = expiresAt ? new Date(expiresAt) : null;
+  if (isActive !== undefined) promo.isActive = isActive;
+
+  await settings.save();
+
+  res.status(200).json({
+    status: 'success',
+    promoCode: promo
+  });
+});
+
+// Delete a promo code
+exports.deletePromoCode = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const settings = await SystemSetting.findOne();
+  if (!settings) {
+    return next(new ApiError(404, 'No settings found'));
+  }
+
+  const promo = settings.promoCodes.id(id);
+  if (!promo) {
+    return next(new ApiError(404, 'Promo code not found'));
+  }
+
+  promo.remove();
+  await settings.save();
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Promo code deleted'
   });
 });
 

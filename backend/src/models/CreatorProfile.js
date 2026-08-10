@@ -68,6 +68,33 @@ const creatorProfileSchema = new mongoose.Schema(
         min: [0, 'Video call rate cannot be negative']
       }
     },
+    // Subscription plan tiers. `subscriptionMonthly` remains the default (Premium) price
+    // when no explicit tiers are configured.
+    subscriptionPlans: {
+      type: [
+        {
+          name: {
+            type: String,
+            enum: ['Basic', 'Premium', 'VIP'],
+            default: 'Premium'
+          },
+          priceCoins: {
+            type: Number,
+            default: 0,
+            min: [0, 'Plan price cannot be negative']
+          },
+          features: {
+            type: [String],
+            default: []
+          },
+          isActive: {
+            type: Boolean,
+            default: true
+          }
+        }
+      ],
+      default: []
+    },
     seoTags: {
       metaTitle: {
         type: String,
@@ -84,6 +111,11 @@ const creatorProfileSchema = new mongoose.Schema(
       }
     },
     followerCount: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+    profileViews: {
       type: Number,
       default: 0,
       min: 0
@@ -119,6 +151,40 @@ const creatorProfileSchema = new mongoose.Schema(
       type: Boolean,
       default: true
     },
+    // Privacy & preference settings (stored on the profile so the real
+    // presence flag `isOnline` stays untouched by the settings page)
+    showOnlineStatus: {
+      type: Boolean,
+      default: true
+    },
+    allowDirectMessages: {
+      type: Boolean,
+      default: true
+    },
+    profileVisibility: {
+      type: String,
+      enum: ['Public', 'Private', 'Subscribers Only'],
+      default: 'Public'
+    },
+    defaultStreamType: {
+      type: String,
+      enum: ['Live Video', 'Audio Only'],
+      default: 'Live Video'
+    },
+    defaultCallType: {
+      type: String,
+      enum: ['Audio Call', 'Video Call'],
+      default: 'Audio Call'
+    },
+    timezone: {
+      type: String,
+      default: '(GMT-05:00) Eastern Time'
+    },
+    contentMaturity: {
+      type: String,
+      enum: ['General Audience', 'Mature Audience'],
+      default: 'General Audience'
+    },
     country: {
       type: String,
       default: 'United States'
@@ -137,6 +203,9 @@ const creatorProfileSchema = new mongoose.Schema(
     timestamps: true
   }
 );
+
+// Index used by profile-visibility enforcement (feed/story/live filtering)
+creatorProfileSchema.index({ profileVisibility: 1, userId: 1 });
 
 const CreatorProfile = mongoose.model('CreatorProfile', creatorProfileSchema);
 

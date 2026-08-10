@@ -71,6 +71,12 @@
   margin-bottom: 1.25rem;
 }
 
+@media (min-width: 769px) {
+  .chatsHeader {
+    display: none;
+  }
+}
+
 .headerRightActions {
   display: flex;
   align-items: center;
@@ -111,6 +117,7 @@
 }
 
 .chatsTitle {
+  display: none;
   font-size: 1.35rem;
   font-weight: 700;
   color: #ffffff;
@@ -148,6 +155,9 @@
 /* Search Wrapper */
 .searchWrapper {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   width: 100%;
   margin-bottom: 1rem;
 }
@@ -161,7 +171,7 @@
 }
 
 .searchInput {
-  width: 100%;
+  flex: 1;
   background: #121212;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 99px;
@@ -171,10 +181,70 @@
   outline: none;
   transition: border-color 0.2s;
   box-sizing: border-box;
+  min-width: 0;
 }
 
 .searchInput:focus {
   border-color: rgba(126, 0, 243, 0.6);
+}
+
+.filterBtn {
+  position: relative;
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.6);
+  border-radius: 99px;
+  padding: 0.55rem 0.65rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.filterBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+}
+
+.filterBtnActive {
+  background: rgba(126, 0, 243, 0.18) !important;
+  border-color: rgba(126, 0, 243, 0.45) !important;
+  color: #7e00f3 !important;
+}
+
+.filterBadge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #e10075, #7e00f3);
+  border: 2px solid #0a0a0a;
+  box-sizing: content-box;
+}
+
+.light .filterBtn {
+  background: #f1edf7;
+  border-color: rgba(0, 0, 0, 0.08);
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .filterBtn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #1a1625;
+}
+
+.light .filterBtnActive {
+  background: rgba(126, 0, 243, 0.1) !important;
+  border-color: rgba(126, 0, 243, 0.35) !important;
+  color: #7e00f3 !important;
+}
+
+.light .filterBadge {
+  border-color: #faf8fc;
 }
 
 /* Filter Pills */
@@ -1979,6 +2049,7 @@
   }
 
   .chatsTitle {
+    display: block;
     font-size: 1.2rem;
   }
 
@@ -2253,6 +2324,7 @@
 }
 
 .mobileFilterBtn {
+  position: relative;
   background: #0a0a0a;
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.6);
@@ -2271,6 +2343,12 @@
   color: #ffffff;
 }
 
+.mobileFilterBtnActive {
+  background: rgba(126, 0, 243, 0.18) !important;
+  border-color: rgba(126, 0, 243, 0.45) !important;
+  color: #7e00f3 !important;
+}
+
 .lightMobile .mobileFilterBtn {
   background: #f1edf7;
   border-color: rgba(0, 0, 0, 0.08);
@@ -2280,6 +2358,16 @@
 .lightMobile .mobileFilterBtn:hover {
   background: rgba(0, 0, 0, 0.06);
   color: #1a1625;
+}
+
+.lightMobile .mobileFilterBtnActive {
+  background: rgba(126, 0, 243, 0.1) !important;
+  border-color: rgba(126, 0, 243, 0.35) !important;
+  color: #7e00f3 !important;
+}
+
+.lightMobile .filterBadge {
+  border-color: #faf8fc;
 }
 
 .lightMobile .mobileSearchInput {
@@ -2778,4 +2866,14 @@
 
 .lightMobile .composeIconImg {
   filter: invert(0.9) brightness(0.2) contrast(1.2) !important;
+}
+
+/* ================= MEDIA IN MESSAGE BUBBLES ================= */
+.msgMedia {
+  display: block;
+  width: min(260px, 100%);
+  max-height: 260px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 0.4rem;
 }

@@ -13,6 +13,10 @@ router.get('/tickets', moreController.getMyTickets);
 
 // Reports routes
 router.post('/reports', moreController.createReport);
+router.get('/creators', moreController.getReportCreators);
+
+// Rewards routes
+router.get('/rewards', moreController.getRewards);
 
 // Feature Request routes
 router.post('/features', moreController.createFeatureRequest);

@@ -1,0 +1,168 @@
+/* ============================================================
+   Pinned "Top Gifters" strip — lives above the stream chat
+   ============================================================ */
+
+.strip {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 9px 12px 8px;
+  background: linear-gradient(90deg, rgba(225, 0, 117, 0.1), rgba(126, 0, 243, 0.08));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trophy {
+  color: #ffd166;
+  flex-shrink: 0;
+}
+
+.moreCount {
+  margin-left: auto;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.title {
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.ranks {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.rank {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  font-size: 0.62rem;
+  font-weight: 900;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.rank1 {
+  background: linear-gradient(135deg, #ffd166, #f59e0b);
+  color: #3a2400;
+}
+
+.rank2 {
+  background: linear-gradient(135deg, #e2e8f0, #94a3b8);
+  color: #1e293b;
+}
+
+.rank3 {
+  background: linear-gradient(135deg, #d9a06b, #a16207);
+  color: #fff8f0;
+}
+
+.avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
+}
+
+.avatarFallback {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e10075, #7e00f3);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.info {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  min-width: 0;
+}
+
+.name {
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+.coins {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #ffd166;
+  flex-shrink: 0;
+}
+
+.coinImg {
+  width: 11px;
+  height: 11px;
+  object-fit: contain;
+}
+
+.giftCount {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Light theme */
+.light .strip {
+  background: rgba(225, 0, 117, 0.05);
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .title {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .rank {
+  background: rgba(0, 0, 0, 0.08);
+  color: rgba(26, 22, 37, 0.75);
+}
+
+.light .name {
+  color: rgba(26, 22, 37, 0.9);
+}
+
+.light .moreCount,
+.light .giftCount {
+  color: rgba(26, 22, 37, 0.5);
+}

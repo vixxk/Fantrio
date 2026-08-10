@@ -59,6 +59,10 @@
   width: 68px;
   cursor: pointer;
   transition: transform 0.2s ease;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
 }
 
 .storyBubble:hover {
@@ -77,12 +81,23 @@
   box-sizing: border-box;
 }
 
-.liveRing {
+.storyRing {
   background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
 }
 
-.storyRing {
-  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
+/* Already-viewed stories get a greyish, dimmed ring so fans can tell
+   at a glance which creator stories they have already seen. */
+.viewedRing {
+  background: #45424e;
+}
+
+.storyAvatarViewed {
+  opacity: 0.5;
+  filter: grayscale(0.7);
+}
+
+.storyNameViewed {
+  color: rgba(255, 255, 255, 0.38);
 }
 
 .storyAvatar {
@@ -91,23 +106,6 @@
   border-radius: 50%;
   object-fit: cover;
   border: 1.5px solid #0b0813; /* thinner separation border */
-}
-
-.liveBadge {
-  position: absolute;
-  bottom: -3px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #ff3b30;
-  color: #ffffff;
-  font-size: 0.6rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  padding: 0.1rem 0.35rem;
-  border-radius: 4px;
-  letter-spacing: 0.5px;
-  border: 1.5px solid #0b0813;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .onlineDot {
@@ -166,8 +164,12 @@
   border-color: #f7f6fb;
 }
 
-.light .liveBadge {
-  border-color: #f7f6fb;
+.light .viewedRing {
+  background: #d6d3dd;
+}
+
+.light .storyNameViewed {
+  color: rgba(26, 22, 37, 0.4);
 }
 
 .light .onlineDot {
@@ -189,4 +191,222 @@
 
 .light .moreText {
   color: #1a1625;
+}
+
+/* ===== Full-screen Story Viewer ===== */
+.viewerOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(5, 3, 10, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+}
+
+.viewerCard {
+  position: relative;
+  width: min(92vw, 420px);
+  height: min(78vh, 760px);
+  border-radius: 16px;
+  overflow: hidden;
+  background: #0b0813;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+}
+
+.progressRow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  display: flex;
+  gap: 4px;
+  padding: 12px 12px 0;
+}
+
+.progressTrack {
+  flex: 1;
+  height: 3px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.28);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 4px;
+  background: #ffffff;
+  transition: width 0.05s linear;
+}
+
+.viewerHead {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 26px 14px 10px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), transparent);
+}
+
+.viewerUser {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.viewerAvatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+}
+
+.viewerName {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
+.verifiedIcon {
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+
+.viewerTime {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.viewerClose {
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  color: #ffffff;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.viewerClose:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.viewerMediaArea {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.viewerMedia {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Interaction hint pill (top center of the viewer) */
+.viewerHint {
+  position: absolute;
+  top: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 7;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+  white-space: nowrap;
+  animation: hintPop 0.25s ease;
+}
+
+@keyframes hintPop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -6px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.viewerNav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 6;
+  background: rgba(255, 255, 255, 0.14);
+  border: none;
+  color: #ffffff;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+  backdrop-filter: blur(4px);
+}
+
+.viewerNav:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.viewerNav:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.viewerNavPrev {
+  left: 10px;
+}
+
+.viewerNavNext {
+  right: 10px;
+}
+
+/* Mobile: viewer fills the whole screen edge-to-edge */
+@media (max-width: 640px) {
+  .viewerOverlay {
+    padding: 0;
+  }
+
+  .viewerCard {
+    width: 100vw;
+    height: 100dvh;
+    border-radius: 0;
+  }
 }

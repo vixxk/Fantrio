@@ -11,7 +11,8 @@
 .mainGrid {
   display: grid;
   grid-template-columns: 1fr 340px;
-  gap: 1.5rem;
+  column-gap: 1.5rem;
+  row-gap: 0;
   align-items: start;
 }
 
@@ -159,26 +160,6 @@
 
 .mobileFilterRow {
   display: none;
-}
-
-.viewStoreBtn {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.7);
-  padding: 0.6rem 1rem;
-  border-radius: 8px;
-  font-size: 0.82rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.viewStoreBtn:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .addProductBtn {
@@ -421,6 +402,11 @@
   color: #ef4444;
 }
 
+.statusDraft {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
 .actions {
   display: flex;
   align-items: center;
@@ -462,6 +448,72 @@
 .moreBtn:hover {
   background: rgba(255, 255, 255, 0.05);
   color: rgba(255, 255, 255, 0.8);
+}
+
+.menuWrap {
+  position: relative;
+}
+
+.actionMenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 130px;
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 0.3rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  z-index: 60;
+}
+
+.actionMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.78rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.actionMenuItem:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.actionMenuDanger {
+  color: #f87171;
+}
+
+.actionMenuDanger:hover {
+  background: rgba(248, 113, 113, 0.1);
+}
+
+.light .actionMenu {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.light .actionMenuItem {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .actionMenuItem:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.light .actionMenuDanger {
+  color: #dc2626;
+}
+
+.light .actionMenuDanger:hover {
+  background: rgba(220, 38, 38, 0.08);
 }
 
 /* ================= PAGINATION ================= */
@@ -536,20 +588,6 @@
   font-weight: 700;
   color: rgba(255, 255, 255, 0.9);
   margin: 0;
-}
-
-.viewAllBtn {
-  background: transparent;
-  border: none;
-  color: #e10075;
-  font-size: 0.72rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-.viewAllBtn:hover {
-  opacity: 0.8;
 }
 
 /* ================= STORE OVERVIEW ================= */
@@ -912,16 +950,6 @@
   color: rgba(26, 22, 37, 0.4);
 }
 
-.light .viewStoreBtn {
-  border-color: rgba(0, 0, 0, 0.15);
-  color: rgba(26, 22, 37, 0.7);
-}
-
-.light .viewStoreBtn:hover {
-  background: rgba(0, 0, 0, 0.04);
-  border-color: rgba(0, 0, 0, 0.25);
-}
-
 .light .tabsRow {
   border-bottom-color: rgba(0, 0, 0, 0.08);
 }
@@ -1051,10 +1079,6 @@
   background: rgba(225, 0, 117, 0.15);
 }
 
-.light .viewAllBtn {
-  color: #e10075;
-}
-
 .light .topProductName {
   color: rgba(26, 22, 37, 0.8);
 }
@@ -1150,7 +1174,7 @@
 
   .mainGrid > .statsRow { grid-row: 1; }
   .mainGrid > .leftColumn { grid-row: 2; }
-  .mainGrid > .rightSidebar { grid-row: 3; }
+  .mainGrid > .rightSidebar { grid-row: 3; margin-top: 1.5rem; }
 
   .statsRow {
     grid-template-columns: repeat(2, 1fr);
@@ -1180,7 +1204,8 @@
   .mainGrid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 0.75rem;
+    column-gap: 0.75rem;
+    row-gap: 0;
   }
 
   .mainGrid > .statsRow {
@@ -1204,6 +1229,7 @@
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
     gap: 0 !important;
+    margin-top: 0.75rem;
   }
 
   .statCard {
@@ -1341,7 +1367,6 @@
     cursor: pointer;
   }
 
-  .viewStoreBtn,
   .addProductBtn {
     flex: 1;
     justify-content: center;
@@ -1570,14 +1595,13 @@
     font-size: 0.92rem !important;
   }
 
-  .viewStoreBtn,
   .addProductBtn {
     padding: 0.25rem 0.4rem !important;
     font-size: 0.62rem !important;
     gap: 0.2rem !important;
   }
 
-  .viewStoreBtn svg {
+  .addProductBtn svg {
     width: 10px !important;
     height: 10px !important;
   }
@@ -1642,5 +1666,319 @@
   .rightSidebar > .topProductsCard,
   .rightSidebar > .recentOrdersCard {
     padding: 0.75rem !important;
+  }
+}
+
+/* ================= PRODUCT MODAL ================= */
+.productModalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.productModal {
+  background: #17171a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  animation: productModalIn 0.22s ease;
+  box-sizing: border-box;
+}
+
+@keyframes productModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.productModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem 0.75rem;
+}
+
+.productModalHeader h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.productModalClose {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.6);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.productModalClose:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.productModalBody {
+  padding: 0.5rem 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.productThumbPick {
+  width: 100%;
+  height: 130px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1.5px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  padding: 0;
+}
+
+.productThumbPick:hover {
+  border-color: rgba(225, 0, 117, 0.6);
+  background: rgba(225, 0, 117, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.productInput {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #ffffff;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.productInput:focus {
+  border-color: rgba(225, 0, 117, 0.5);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.productInput::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.productInput option {
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
+.productModalRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.productCheckboxRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  user-select: none;
+}
+
+.productCheckboxRow input {
+  width: 16px;
+  height: 16px;
+  accent-color: #e10075;
+  cursor: pointer;
+}
+
+.productModalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.productCancelBtn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.productCancelBtn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.productSaveBtn {
+  background: #e10075;
+  border: none;
+  color: #ffffff;
+  padding: 0.6rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.productSaveBtn:hover:not(:disabled) {
+  background: #c5006a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(225, 0, 117, 0.3);
+}
+
+.productSaveBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.productSpin {
+  animation: productSpin 0.8s linear infinite;
+}
+
+@keyframes productSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.light .productModal {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+}
+
+.light .productModalHeader h3 {
+  color: #1a1625;
+}
+
+.light .productModalClose {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .productModalClose:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: #1a1625;
+}
+
+.light .productThumbPick {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.15);
+  color: rgba(26, 22, 37, 0.45);
+}
+
+.light .productThumbPick:hover {
+  border-color: rgba(225, 0, 117, 0.5);
+  background: rgba(225, 0, 117, 0.05);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .productInput {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #1a1625;
+}
+
+.light .productInput:focus {
+  border-color: rgba(225, 0, 117, 0.5);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.light .productInput::placeholder {
+  color: rgba(26, 22, 37, 0.35);
+}
+
+.light .productInput option {
+  background: #ffffff;
+  color: #1a1625;
+}
+
+.light .productCheckboxRow {
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .productModalFooter {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .productCancelBtn {
+  border-color: rgba(0, 0, 0, 0.15);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .productCancelBtn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.25);
+}
+
+@media (max-width: 480px) {
+  .productModal {
+    max-width: 100%;
+  }
+
+  .productModalHeader {
+    padding: 1rem 1rem 0.5rem;
+  }
+
+  .productModalBody {
+    padding: 0.5rem 1rem 0.75rem;
+  }
+
+  .productModalRow {
+    grid-template-columns: 1fr;
+  }
+
+  .productModalFooter {
+    padding: 0.85rem 1rem 1rem;
+  }
+
+  .productThumbPick {
+    height: 110px;
   }
 }

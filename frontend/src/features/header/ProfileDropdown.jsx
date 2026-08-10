@@ -1,11 +1,14 @@
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useToast } from '../../components/Toast/Toast';
 import { User, Wallet, Star, Settings, LayoutGrid, Moon, Globe, CornerUpRight, BadgeCheck } from 'lucide-react';
 import styles from './ProfileDropdown.module.css';
 
 export const ProfileDropdown = ({ isOpen, onClose }) => {
-  const { user, balance, darkMode, setDarkMode, logout, setActiveTab } = useApp();
+  const { user, balance, darkMode, setDarkMode, logout, setActiveTab, navigateTo } = useApp();
+  const { toast } = useToast();
   const dropdownRef = useRef(null);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -34,9 +37,15 @@ export const ProfileDropdown = ({ isOpen, onClose }) => {
   };
 
   const handleLogoutClick = () => {
-    logout();
-    onClose();
+    setShowLogoutConfirm(true);
   };
+
+   const handleLogoutConfirm = () => {
+     logout();
+     setShowLogoutConfirm(false);
+     onClose();
+     navigateTo('/login');
+   };
 
   return (
     <div 
@@ -55,10 +64,10 @@ export const ProfileDropdown = ({ isOpen, onClose }) => {
         </div>
         <div className={styles.profileDetails}>
           <div className={styles.nameRow}>
-            <span className={styles.displayName}>{user?.displayName || 'Jessica'}</span>
+            <span className={styles.displayName}>{user?.displayName || user?.username || 'User'}</span>
             {user?.role === 'creator' && <BadgeCheck className={styles.verifiedBadge} size={16} />}
           </div>
-          <span className={styles.username}>@{user?.username || 'jessica_official'}</span>
+          <span className={styles.username}>@{user?.username || 'user'}</span>
           <span className={styles.viewProfile}>View My Profile</span>
         </div>
       </div>
@@ -130,7 +139,7 @@ export const ProfileDropdown = ({ isOpen, onClose }) => {
           </label>
         </div>
 
-        <button className={styles.menuItem} onClick={() => alert('Language settings coming soon!')}>
+        <button className={styles.menuItem} onClick={() => toast.info('Language settings coming soon!')}>
           <div className={styles.menuItemLeft}>
             <Globe size={18} className={styles.icon} />
             <span className={styles.label}>Language</span>
@@ -145,6 +154,29 @@ export const ProfileDropdown = ({ isOpen, onClose }) => {
           <span className={styles.logoutLabel}>Logout</span>
           <CornerUpRight size={18} className={styles.logoutIcon} />
         </button>
+
+        {showLogoutConfirm && (
+          <div className={styles.logoutConfirmOverlay} onClick={() => setShowLogoutConfirm(false)}>
+            <div className={styles.logoutConfirmDialog} onClick={e => e.stopPropagation()}>
+              <h3 className={styles.logoutConfirmTitle}>Confirm Logout</h3>
+              <p className={styles.logoutConfirmText}>Are you sure you want to logout from Fantrio?</p>
+              <div className={styles.logoutConfirmActions}>
+                <button 
+                  className={styles.logoutCancelBtn} 
+                  onClick={() => setShowLogoutConfirm(false)}
+                >
+                  Cancel
+                </button>
+                <button 
+                  className={styles.logoutConfirmBtn} 
+                  onClick={handleLogoutConfirm}
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

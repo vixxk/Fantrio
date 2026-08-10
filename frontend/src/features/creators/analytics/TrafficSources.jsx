@@ -1,14 +1,13 @@
-import React from 'react';
-import { trafficSources } from './mockData';
+
 import { PeriodDropdown } from './PeriodDropdown';
 import styles from './AnalyticsPage.module.css';
 
-export const TrafficSources = ({ isDark }) => {
+export const TrafficSources = ({ isDark, trafficSources = [], value, onPeriodChange }) => {
   return (
     <div className={`${styles.trafficCard} ${!isDark ? styles.light : ''}`}>
       <div className={styles.trafficHeader}>
         <h3 className={styles.trafficTitle}>Top Traffic Sources</h3>
-        <PeriodDropdown variant="text" />
+        <PeriodDropdown variant="text" value={value} onChange={onPeriodChange} />
       </div>
       <div className={styles.trafficTable}>
         <div className={styles.trafficTableRow}>
@@ -23,10 +22,7 @@ export const TrafficSources = ({ isDark }) => {
               <div className={styles.progressBar}>
                 <div
                   className={styles.progressFill}
-                  style={{
-                    width: `${source.percentage}%`,
-                    background: source.color,
-                  }}
+                  style={{ width: `${source.percentage}%`, background: source.color }}
                 />
               </div>
               <span className={styles.trafficViews} style={{ marginLeft: 'auto' }}>{source.views}</span>

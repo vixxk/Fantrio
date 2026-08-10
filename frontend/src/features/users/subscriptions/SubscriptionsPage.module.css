@@ -1496,3 +1496,181 @@
   background-color: rgba(0, 0, 0, 0.06);
 }
 
+/* Spending history modal */
+.spendingModalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  padding: 1rem;
+}
+
+.spendingModal {
+  background: #121212;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.spendingModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.spendingModalTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.spendingModalIcon {
+  color: #e10075;
+}
+
+.spendingModalTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.spendingCloseBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.spendingCloseBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.spendingList {
+  padding: 0.5rem 1.5rem 1.25rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.spendingItem {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.spendingItem:last-child {
+  border-bottom: none;
+}
+
+.spendingAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.spendingInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.spendingName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.spendingDate {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.spendingAmount {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.spendingEmpty {
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9rem;
+}
+
+.light .spendingModal {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .spendingModalHeader {
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .spendingModalTitle {
+  color: #1a1625;
+}
+
+.light .spendingCloseBtn {
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .spendingCloseBtn:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: #1a1625;
+}
+
+.light .spendingItem {
+  border-color: rgba(0, 0, 0, 0.05);
+}
+
+.light .spendingName {
+  color: #1a1625;
+}
+
+.light .spendingDate {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .spendingAmount {
+  color: #1a1625;
+}
+
+.light .spendingEmpty {
+  color: rgba(26, 22, 37, 0.5);
+}
+

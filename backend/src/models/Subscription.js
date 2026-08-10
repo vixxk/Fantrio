@@ -17,6 +17,11 @@ const subscriptionSchema = new mongoose.Schema(
       enum: ['active', 'expired', 'cancelled'],
       default: 'active'
     },
+    plan: {
+      type: String,
+      enum: ['Basic', 'Premium', 'VIP'],
+      default: 'Premium'
+    },
     startDate: {
       type: Date,
       default: Date.now
@@ -37,6 +42,7 @@ const subscriptionSchema = new mongoose.Schema(
 
 // Indexing for quick verification queries
 subscriptionSchema.index({ userId: 1, creatorId: 1, status: 1 });
+subscriptionSchema.index({ creatorId: 1, status: 1 });
 
 const Subscription = mongoose.model('Subscription', subscriptionSchema);
 

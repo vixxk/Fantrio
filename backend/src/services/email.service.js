@@ -52,8 +52,25 @@ const sendPasswordResetEmail = async (email, resetToken) => {
   await sendEmail(email, subject, text, html);
 };
 
+const send2FACode = async (email, code) => {
+  const subject = 'Your Fantrio 2FA Verification Code';
+  const text = `Your two-factor authentication code is: ${code}. It is valid for 10 minutes.`;
+  const html = `
+    <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
+      <h2>Two-Factor Authentication</h2>
+      <p>Your Fantrio two-factor authentication code is:</p>
+      <div style="font-size: 24px; font-weight: bold; background: #f4f4f4; padding: 10px 20px; display: inline-block; letter-spacing: 2px; border-radius: 5px; margin: 10px 0;">
+        ${code}
+      </div>
+      <p>This code will expire in 10 minutes. If you did not attempt to sign in, please secure your account immediately.</p>
+    </div>
+  `;
+  await sendEmail(email, subject, text, html);
+};
+
 module.exports = {
   sendEmail,
   sendOTP,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  send2FACode
 };

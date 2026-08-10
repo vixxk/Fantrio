@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { LogIn, ArrowLeft } from 'lucide-react';
 import styles from './AdminPage.module.css';
@@ -73,7 +73,7 @@ export const AdminLogin = () => {
 
         <button className={styles.loginBack} onClick={() => navigateTo('/discover')}>
           <ArrowLeft size={14} />
-          Back to user site
+          Back to main site
         </button>
       </div>
     </div>

@@ -1,10 +1,11 @@
 const SupportTicket = require('../../models/SupportTicket');
 const ApiError = require('../../utils/apiError');
 const catchAsync = require('../../utils/catchAsync');
+const { buildDateRangeQuery } = require('../../utils/dateRange');
 
 // Retrieve all support tickets
 exports.getTickets = catchAsync(async (req, res, next) => {
-  const { search } = req.query;
+  const { search, status, from, to } = req.query;
   const query = {};
   if (search) {
     query.$or = [
@@ -12,6 +13,11 @@ exports.getTickets = catchAsync(async (req, res, next) => {
       { message: { $regex: search, $options: 'i' } }
     ];
   }
+  // Status filter matching the SupportTicket schema enum
+  if (status && ['open', 'in-progress', 'closed'].includes(status)) {
+    query.status = status;
+  }
+  Object.assign(query, buildDateRangeQuery(from, to));
 
   const tickets = await SupportTicket.find(query)
     .populate('userId', 'username displayName email')

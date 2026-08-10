@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.use(protect);
 
+router.get('/creators', callController.getCallableCreators);
 router.post('/initiate', callController.initiateCall);
 router.post('/accept/:callLogId', callController.acceptCall);
 router.post('/reject/:callLogId', callController.rejectCall);

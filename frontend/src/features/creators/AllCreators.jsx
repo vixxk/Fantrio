@@ -1,234 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { api } from '../../services/api';
 import { useApp } from '../../context/AppContext';
+import ShimmerSkeleton from '../../components/ShimmerSkeleton/ShimmerSkeleton';
 import { 
   Search, Grid, List, Phone, Video, Radio, 
   ChevronDown, ChevronLeft, ChevronRight, Check, X,
-  BadgeCheck, Star, Users, RefreshCw, MoreVertical
+  BadgeCheck, Star, Users, MoreVertical, Ban
 } from 'lucide-react';
+import { ConfirmDeleteDialog } from '../../components/ConfirmDeleteDialog/ConfirmDeleteDialog';
+import { useConfirmDelete } from '../../hooks/useConfirmDelete';
+import { useToast } from '../../components/Toast/Toast';
+import { useAppDialog } from '../../components/AppDialog/AppDialog';
 import styles from './AllCreators.module.css';
 
-const MOCK_CREATORS = [
-  {
-    _id: 'mock1',
-    displayName: 'Savannah Nguyen',
-    username: 'savannah_nguyen',
-    avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80',
-    categories: ['Model', 'Influencer'],
-    isVerifiedBadge: true,
-    rating: 4.9,
-    ratingCount: 12500,
-    followerCount: 50000,
-    isOnline: true,
-    isLive: true,
-    audioAvailable: true,
-    videoAvailable: true,
-    country: 'United States',
-    language: 'English',
-    contentType: ['Photos', 'Videos', 'PPV']
-  },
-  {
-    _id: 'mock2',
-    displayName: 'Leslie Alexander',
-    username: 'leslie_alexander',
-    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
-    categories: ['Fashion', 'Lifestyle'],
-    isVerifiedBadge: true,
-    rating: 4.8,
-    ratingCount: 15400,
-    followerCount: 12500,
-    isOnline: true,
-    isLive: false,
-    audioAvailable: true,
-    videoAvailable: false,
-    country: 'United States',
-    language: 'English',
-    contentType: ['Photos']
-  },
-  {
-    _id: 'mock3',
-    displayName: 'Jenny Wilson',
-    username: 'jenny_wilson',
-    avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80',
-    categories: ['Gaming', 'Lifestyle'],
-    isVerifiedBadge: true,
-    rating: 4.9,
-    ratingCount: 9500,
-    followerCount: 22000,
-    isOnline: false,
-    isLive: false,
-    audioAvailable: true,
-    videoAvailable: true,
-    country: 'Canada',
-    language: 'English',
-    contentType: ['Videos']
-  },
-  {
-    _id: 'mock4',
-    displayName: 'Kristin Watson',
-    username: 'kristin_watson',
-    avatarUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=300&q=80',
-    categories: ['Music', 'Entertainment'],
-    isVerifiedBadge: true,
-    rating: 4.7,
-    ratingCount: 11000,
-    followerCount: 18500,
-    isOnline: true,
-    isLive: false,
-    audioAvailable: false,
-    videoAvailable: true,
-    country: 'United Kingdom',
-    language: 'English',
-    contentType: ['Photos', 'Videos']
-  },
-  {
-    _id: 'mock5',
-    displayName: 'Dianne Russell',
-    username: 'dianne_russell',
-    avatarUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=300&q=80',
-    categories: ['Dance', 'Lifestyle'],
-    isVerifiedBadge: true,
-    rating: 4.6,
-    ratingCount: 8400,
-    followerCount: 9500,
-    isOnline: false,
-    isLive: false,
-    audioAvailable: true,
-    videoAvailable: true,
-    country: 'Australia',
-    language: 'English',
-    contentType: ['Photos']
-  },
-  {
-    _id: 'mock6',
-    displayName: 'Molly Jane',
-    username: 'mollyjane',
-    avatarUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80',
-    categories: ['Fitness', 'Lifestyle'],
-    isVerifiedBadge: true,
-    rating: 4.9,
-    ratingCount: 15430,
-    followerCount: 34200,
-    isOnline: true,
-    isLive: true,
-    audioAvailable: true,
-    videoAvailable: true,
-    country: 'United States',
-    language: 'English',
-    contentType: ['Photos', 'Videos']
-  },
-  {
-    _id: 'mock7',
-    displayName: 'Jessica Williams',
-    username: 'jessica_w',
-    avatarUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=300&q=80',
-    categories: ['Model'],
-    isVerifiedBadge: false,
-    rating: 4.5,
-    ratingCount: 3100,
-    followerCount: 15000,
-    isOnline: true,
-    isLive: false,
-    audioAvailable: true,
-    videoAvailable: true,
-    country: 'Spain',
-    language: 'Spanish',
-    contentType: ['Photos', 'Videos']
-  },
-  {
-    _id: 'mock8',
-    displayName: 'Emily Smith',
-    username: 'emily_s',
-    avatarUrl: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=300&q=80',
-    categories: ['Gaming'],
-    isVerifiedBadge: true,
-    rating: 4.8,
-    ratingCount: 7800,
-    followerCount: 32000,
-    isOnline: false,
-    isLive: true,
-    audioAvailable: true,
-    videoAvailable: false,
-    country: 'Germany',
-    language: 'German',
-    contentType: ['Videos']
-  },
-  {
-    _id: 'mock9',
-    displayName: 'Sophia Martinez',
-    username: 'sophia_m',
-    avatarUrl: 'https://images.unsplash.com/photo-1548142813-c348350df52b?auto=format&fit=crop&w=300&q=80',
-    categories: ['Lifestyle'],
-    isVerifiedBadge: true,
-    rating: 4.7,
-    ratingCount: 12000,
-    followerCount: 29000,
-    isOnline: true,
-    isLive: false,
-    audioAvailable: false,
-    videoAvailable: true,
-    country: 'France',
-    language: 'French',
-    contentType: ['Photos']
-  },
-  {
-    _id: 'mock10',
-    displayName: 'Angelina Jolie',
-    username: 'angelina_j',
-    avatarUrl: 'https://images.unsplash.com/photo-1554151228-14d9def656e4?auto=format&fit=crop&w=300&q=80',
-    categories: ['Fitness'],
-    isVerifiedBadge: true,
-    rating: 4.9,
-    ratingCount: 22000,
-    followerCount: 88000,
-    isOnline: true,
-    isLive: true,
-    audioAvailable: true,
-    videoAvailable: true,
-    country: 'United States',
-    language: 'English',
-    contentType: ['Photos', 'Videos']
-  },
-  {
-    _id: 'mock11',
-    displayName: 'Mia Conti',
-    username: 'mia_c',
-    avatarUrl: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=300&q=80',
-    categories: ['Art'],
-    isVerifiedBadge: false,
-    rating: 4.4,
-    ratingCount: 1900,
-    followerCount: 5000,
-    isOnline: false,
-    isLive: false,
-    audioAvailable: true,
-    videoAvailable: true,
-    country: 'Italy',
-    language: 'Italian',
-    contentType: ['Photos']
-  },
-  {
-    _id: 'mock12',
-    displayName: 'Luna Star',
-    username: 'luna_s',
-    avatarUrl: 'https://images.unsplash.com/photo-1552058544-f2b08422138a?auto=format&fit=crop&w=300&q=80',
-    categories: ['Astrology'],
-    isVerifiedBadge: true,
-    rating: 4.8,
-    ratingCount: 6500,
-    followerCount: 14000,
-    isOnline: true,
-    isLive: false,
-    audioAvailable: true,
-    videoAvailable: true,
-    country: 'United States',
-    language: 'English',
-    contentType: ['Photos', 'Videos']
-  }
-];
-
 export const AllCreators = () => {
-  const { darkMode, addCoins } = useApp();
+  const { darkMode, navigateTo } = useApp();
+  const { toast } = useToast();
+  const { prompt } = useAppDialog();
   const [creators, setCreators] = useState([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -258,6 +46,9 @@ export const AllCreators = () => {
   const [languageOpen, setLanguageOpen] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [activeKebabCreatorId, setActiveKebabCreatorId] = useState(null);
+  const sortRef = useRef(null);
+  const filtersRef = useRef(null);
+  const mobileFiltersRef = useRef(null);
 
   useEffect(() => {
     const handleWindowClick = () => {
@@ -265,6 +56,22 @@ export const AllCreators = () => {
     };
     window.addEventListener('click', handleWindowClick);
     return () => window.removeEventListener('click', handleWindowClick);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      const inside =
+        (sortRef.current && sortRef.current.contains(e.target)) ||
+        (filtersRef.current && filtersRef.current.contains(e.target)) ||
+        (mobileFiltersRef.current && mobileFiltersRef.current.contains(e.target));
+      if (inside) return;
+      setSortOpen(false);
+      setCategoryOpen(false);
+      setCountryOpen(false);
+      setLanguageOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const toggleDropdown = (name) => {
@@ -323,94 +130,20 @@ export const AllCreators = () => {
       queryParams.append('maxFollowers', followerRange);
 
       const res = await api.get(`/creators/discover?${queryParams.toString()}`);
-      if (res.status === 'success' && res.creators && res.creators.length > 0) {
-        setCreators(res.creators);
-        setTotal(res.total);
+      if (res.status === 'success') {
+        setCreators(res.creators || []);
+        setTotal(res.total || 0);
         setTotalPages(res.totalPages || 1);
       } else {
-        // Fallback to mock data filtered client-side for rich preview
-        let filtered = [...MOCK_CREATORS];
-        if (searchQuery) {
-          filtered = filtered.filter(c => 
-            c.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            c.username.toLowerCase().includes(searchQuery.toLowerCase())
-          );
-        }
-        if (category !== 'All Categories') {
-          filtered = filtered.filter(c => c.categories.includes(category));
-        }
-        if (country !== 'All Countries') {
-          filtered = filtered.filter(c => c.country === country);
-        }
-        if (language !== 'All Languages') {
-          filtered = filtered.filter(c => c.language === language);
-        }
-        if (statusFilter === 'online') {
-          filtered = filtered.filter(c => c.isOnline);
-        }
-        if (statusFilter === 'live') {
-          filtered = filtered.filter(c => c.isLive);
-        }
-        if (statusFilter === 'audio') {
-          filtered = filtered.filter(c => c.audioAvailable);
-        }
-        if (statusFilter === 'video') {
-          filtered = filtered.filter(c => c.videoAvailable);
-        }
-        filtered = filtered.filter(c => c.followerCount <= followerRange);
-
-        const mockLimit = 8;
-        const totalItems = filtered.length;
-        const pages = Math.ceil(totalItems / mockLimit);
-        setTotalPages(pages || 1);
-        
-        const startIndex = (page - 1) * mockLimit;
-        const endIndex = startIndex + mockLimit;
-        setCreators(filtered.slice(startIndex, endIndex));
-        setTotal(totalItems);
+        setCreators([]);
+        setTotal(0);
+        setTotalPages(1);
       }
     } catch (err) {
-      console.error('Error loading discover creators, falling back to mock data:', err);
-      // Fallback to mock data filtered client-side
-      let filtered = [...MOCK_CREATORS];
-      if (searchQuery) {
-        filtered = filtered.filter(c => 
-          c.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          c.username.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-      }
-      if (category !== 'All Categories') {
-        filtered = filtered.filter(c => c.categories.includes(category));
-      }
-      if (country !== 'All Countries') {
-        filtered = filtered.filter(c => c.country === country);
-      }
-      if (language !== 'All Languages') {
-        filtered = filtered.filter(c => c.language === language);
-      }
-      if (statusFilter === 'online') {
-        filtered = filtered.filter(c => c.isOnline);
-      }
-      if (statusFilter === 'live') {
-        filtered = filtered.filter(c => c.isLive);
-      }
-      if (statusFilter === 'audio') {
-        filtered = filtered.filter(c => c.audioAvailable);
-      }
-      if (statusFilter === 'video') {
-        filtered = filtered.filter(c => c.videoAvailable);
-      }
-      filtered = filtered.filter(c => c.followerCount <= followerRange);
-
-      const mockLimit = 8;
-      const totalItems = filtered.length;
-      const pages = Math.ceil(totalItems / mockLimit);
-      setTotalPages(pages || 1);
-      
-      const startIndex = (page - 1) * mockLimit;
-      const endIndex = startIndex + mockLimit;
-      setCreators(filtered.slice(startIndex, endIndex));
-      setTotal(totalItems);
+      console.error('Error loading discover creators:', err);
+      setCreators([]);
+      setTotal(0);
+      setTotalPages(1);
     } finally {
       // Add artificial delay for smoother loading UX
       await new Promise(resolve => setTimeout(resolve, 600));
@@ -419,7 +152,8 @@ export const AllCreators = () => {
   };
 
   useEffect(() => {
-    fetchCreators();
+    Promise.resolve().then(() => fetchCreators());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, searchQuery, sortBy, statusFilter, category, contentType, country, language, followerRange]);
 
   const handleResetFilters = () => {
@@ -438,20 +172,80 @@ export const AllCreators = () => {
     setLanguageOpen(false);
   };
 
-  const handleSubscribe = async (creatorId) => {
+  const handleSubscribe = async (creator) => {
     try {
-      const res = await api.post(`/creators/follow/${creatorId}`);
+      const res = await api.post(`/creators/follow/${creator.userId?._id || creator._id}`);
       if (res.status === 'success') {
-        alert('Subscribed successfully!');
+        toast.success(res.following ? 'Subscribed successfully!' : 'Unsubscribed.');
         fetchCreators();
       }
     } catch (err) {
-      alert(err.message || 'Subscription failed');
+      toast.error(err.message || 'Subscription failed');
     }
   };
 
+  const handleUnfollow = async (creator) => {
+    try {
+      const res = await api.post(`/creators/follow/${creator.userId?._id || creator._id}`);
+      if (res.status === 'success') {
+        toast.success(res.following ? 'Subscribed to creator!' : `Unfollowed @${creator.username}`);
+        fetchCreators();
+      }
+    } catch (err) {
+      toast.error(err.message || 'Failed to update follow status');
+    }
+    setActiveKebabCreatorId(null);
+  };
+
+  // Block creator — shared confirm dialog state machine
+  const {
+    target: blockTarget,
+    open: openBlock,
+    close: closeBlock,
+    confirm: confirmBlock,
+    deleting: blocking,
+  } = useConfirmDelete({
+    onConfirm: (creator) => api.post(`/block/${creator.userId?._id || creator._id}`),
+    successMessage: 'Creator blocked successfully.',
+    errorMessage: 'Failed to block creator',
+    onSuccess: (creator) => {
+      setCreators((prev) => prev.filter((c) => c._id !== creator._id));
+    },
+  });
+
+  const handleBlock = (creator) => {
+    setActiveKebabCreatorId(null);
+    openBlock(creator);
+  };
+
+  const handleReport = async (creator) => {
+    const reason = await prompt({
+      title: 'Report Creator',
+      message: `Why are you reporting @${creator.username}?`,
+      placeholder: 'Reason for reporting...',
+      confirmLabel: 'Submit Report'
+    });
+    if (!reason || !reason.trim()) {
+      setActiveKebabCreatorId(null);
+      return;
+    }
+    try {
+      const res = await api.post('/more/reports', {
+        targetType: 'creator',
+        targetId: creator.userId?._id || creator._id,
+        reason: reason.trim()
+      });
+      if (res.status === 'success') {
+        toast.success('Creator reported. Our team will review it shortly.');
+      }
+    } catch (err) {
+      toast.error(err.message || 'Failed to report creator');
+    }
+    setActiveKebabCreatorId(null);
+  };
+
   const handleViewProfile = (username) => {
-    alert(`Viewing profile for @${username}`);
+    navigateTo(`/listener-profile/${username}`);
   };
 
   return (
@@ -482,7 +276,7 @@ export const AllCreators = () => {
             {/* Sort & Filter Controls Row */}
             <div className={styles.controlsRow}>
               {/* Sort Dropdown */}
-              <div className={styles.sortWrapper}>
+              <div className={styles.sortWrapper} ref={sortRef}>
                 <button 
                   className={styles.sortButton}
                   onClick={() => toggleDropdown('sort')}
@@ -587,25 +381,34 @@ export const AllCreators = () => {
             </div>
           </div>
 
-          {/* Creators display container */}
-          {loading ? (
-            <div className={viewMode === 'grid' ? styles.creatorsGrid : styles.creatorsList}>
-              {Array.from({ length: 8 }).map((_, idx) => (
-                <div key={idx} className="skeleton-card" style={{ height: '320px' }}>
-                  <div className="skeleton-box skeleton-media" style={{ height: '140px', marginTop: 0 }} />
-                  <div className="skeleton-header">
-                    <div className="skeleton-box skeleton-avatar" style={{ width: '40px', height: '40px' }} />
-                    <div>
-                      <div className="skeleton-box skeleton-title" style={{ width: '120px' }} />
-                      <div className="skeleton-box skeleton-subtitle" style={{ width: '80px' }} />
-                    </div>
-                  </div>
-                  <div className="skeleton-box skeleton-content-line" />
-                  <div className="skeleton-box skeleton-content-line short" />
-                </div>
-              ))}
-            </div>
-          ) : creators.length === 0 ? (
+           {/* Creators display container */}
+           {loading ? (
+             <div className={viewMode === 'grid' ? styles.creatorsGrid : styles.creatorsList}>
+               {Array.from({ length: 8 }).map((_, idx) => (
+                 <div key={idx} className="skeleton-card" style={{ height: viewMode === 'grid' ? '320px' : 'auto', padding: '1rem' }}>
+                   <ShimmerSkeleton variant="media" height="140px" marginTop="0" />
+                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.75rem' }}>
+                     <ShimmerSkeleton variant="avatar" width="40px" height="40px" />
+                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                       <ShimmerSkeleton variant="text" width="55%" height="14px" />
+                       <ShimmerSkeleton variant="text" width="35%" height="11px" />
+                     </div>
+                   </div>
+                   <ShimmerSkeleton variant="text" width="100%" height="12px" marginTop="0.5rem" />
+                   <ShimmerSkeleton variant="text" width="60%" height="12px" marginTop="0.35rem" />
+                   <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
+                     <ShimmerSkeleton variant="chip" width="55px" height="22px" />
+                     <ShimmerSkeleton variant="chip" width="50px" height="22px" />
+                     <ShimmerSkeleton variant="chip" width="45px" height="22px" />
+                   </div>
+                   <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
+                     <ShimmerSkeleton variant="button" height="32px" />
+                     <ShimmerSkeleton variant="button" height="32px" />
+                   </div>
+                 </div>
+               ))}
+             </div>
+           ) : creators.length === 0 ? (
             <div className={styles.emptyContainer}>
               <Users size={48} />
               <h3>No Creators Found</h3>
@@ -642,7 +445,7 @@ export const AllCreators = () => {
                           className={styles.kebabOption} 
                           onClick={() => {
                             navigator.clipboard.writeText(`${window.location.origin}/creator/${creator.username}`);
-                            alert('Creator profile link copied to clipboard!');
+                            toast.success('Creator profile link copied to clipboard!');
                             setActiveKebabCreatorId(null);
                           }}
                         >
@@ -651,30 +454,21 @@ export const AllCreators = () => {
                         <div className={styles.kebabDivider} />
                         <button 
                           className={styles.kebabOption} 
-                          onClick={() => {
-                            alert(`Unfollowed creator @${creator.username}`);
-                            setActiveKebabCreatorId(null);
-                          }}
+                          onClick={() => handleUnfollow(creator)}
                         >
                           Unfollow
                         </button>
                         <div className={styles.kebabDivider} />
                         <button 
                           className={styles.kebabOption} 
-                          onClick={() => {
-                            alert(`Blocked creator @${creator.username}`);
-                            setActiveKebabCreatorId(null);
-                          }}
+                          onClick={() => handleBlock(creator)}
                         >
                           Block
                         </button>
                         <div className={styles.kebabDivider} />
                         <button 
                           className={`${styles.kebabOption} ${styles.kebabDanger}`} 
-                          onClick={() => {
-                            alert(`Reported creator @${creator.username}`);
-                            setActiveKebabCreatorId(null);
-                          }}
+                          onClick={() => handleReport(creator)}
                         >
                           Report
                         </button>
@@ -740,10 +534,10 @@ export const AllCreators = () => {
                         View Profile
                       </button>
                       <button 
-                        onClick={() => handleSubscribe(creator.userId?._id || creator._id)} 
+                        onClick={() => handleSubscribe(creator)} 
                         className={styles.subscribeCardBtn}
                       >
-                        Subscribe
+                        {creator.isFollowing ? 'Subscribed' : 'Subscribe'}
                       </button>
                     </div>
                   </div>
@@ -795,7 +589,7 @@ export const AllCreators = () => {
         </div>
 
         {/* Right Sidebar Filters */}
-        <div className={`${styles.filtersSidebar} ${styles.desktopFiltersSidebar}`}>
+        <div className={`${styles.filtersSidebar} ${styles.desktopFiltersSidebar}`} ref={filtersRef}>
           <div className={styles.filtersHeader}>
             <h3 className={styles.filtersTitle}>Filters</h3>
             <button onClick={handleResetFilters} className={styles.resetBtn}>Reset</button>
@@ -979,7 +773,7 @@ export const AllCreators = () => {
         {/* Mobile Filters Popup Modal */}
         {mobileFiltersOpen && (
           <div className={styles.mobileFiltersBackdrop} onClick={() => setMobileFiltersOpen(false)}>
-            <div className={styles.mobileFiltersModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.mobileFiltersModal} onClick={(e) => e.stopPropagation()} ref={mobileFiltersRef}>
               <div className={styles.mobileFiltersModalHeader}>
                 <h3 className={styles.mobileFiltersModalTitle}>Filters</h3>
                 <button className={styles.closeFiltersModalBtn} onClick={() => setMobileFiltersOpen(false)}>
@@ -1174,6 +968,21 @@ export const AllCreators = () => {
         )}
 
       </div>
+
+      {/* Block Creator Confirmation */}
+      <ConfirmDeleteDialog
+        open={!!blockTarget}
+        itemName={blockTarget ? blockTarget.displayName : ''}
+        title="Block Creator?"
+        confirmLabel="Block"
+        busyLabel="Blocking…"
+        icon={<Ban size={22} />}
+        message={blockTarget ? <><strong>{blockTarget.displayName}</strong> will no longer appear in your lists.</> : ''}
+        deleting={blocking}
+        darkMode={darkMode}
+        onCancel={closeBlock}
+        onConfirm={confirmBlock}
+      />
     </div>
   );
 };

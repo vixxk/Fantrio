@@ -1,0 +1,207 @@
+/* ============================================================
+   Fantrio Auth — Ambient background layer
+   Aurora, orbs, grid, rings & sparkles (dark + light themes)
+   ============================================================ */
+
+.bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* ---------- Aurora ---------- */
+.aurora {
+  position: absolute;
+  top: -25%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 130%;
+  height: 90%;
+  background: conic-gradient(
+    from 180deg at 50% 50%,
+    rgba(225, 0, 117, 0.05),
+    rgba(126, 0, 243, 0.09) 30%,
+    transparent 50%,
+    rgba(126, 0, 243, 0.09) 70%,
+    rgba(225, 0, 117, 0.05)
+  );
+  filter: blur(60px);
+  animation: auroraDrift 16s ease-in-out infinite alternate;
+}
+
+@keyframes auroraDrift {
+  0% { transform: translateX(-52%) scale(1); }
+  100% { transform: translateX(-48%) scale(1.08); }
+}
+
+.light .aurora {
+  background: conic-gradient(
+    from 180deg at 50% 50%,
+    rgba(225, 0, 117, 0.1),
+    rgba(126, 0, 243, 0.13) 30%,
+    transparent 50%,
+    rgba(126, 0, 243, 0.13) 70%,
+    rgba(225, 0, 117, 0.1)
+  );
+}
+
+/* ---------- Orbs ---------- */
+.orbOne,
+.orbTwo,
+.orbThree {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+}
+
+.orbOne {
+  width: 420px;
+  height: 420px;
+  top: -140px;
+  right: 8%;
+  background: rgba(225, 0, 117, 0.2);
+  animation: floatOrb 14s ease-in-out infinite;
+}
+
+.orbTwo {
+  width: 380px;
+  height: 380px;
+  bottom: -120px;
+  left: 6%;
+  background: rgba(126, 0, 243, 0.22);
+  animation: floatOrb 18s ease-in-out infinite reverse;
+}
+
+.orbThree {
+  width: 340px;
+  height: 340px;
+  top: 55%;
+  right: -110px;
+  background: rgba(157, 77, 255, 0.16);
+  animation: floatOrb 20s ease-in-out infinite;
+}
+
+@keyframes floatOrb {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  50% { transform: translateY(28px) translateX(18px); }
+}
+
+.light .orbOne { background: rgba(225, 0, 117, 0.2); }
+.light .orbTwo { background: rgba(126, 0, 243, 0.2); }
+.light .orbThree { background: rgba(255, 150, 210, 0.18); }
+
+/* ---------- Grid ---------- */
+.gridOverlay {
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 56px 56px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 20%, transparent 70%);
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 20%, transparent 70%);
+}
+
+.light .gridOverlay {
+  opacity: 0.4;
+  background-image:
+    linear-gradient(rgba(26, 22, 37, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26, 22, 37, 0.05) 1px, transparent 1px);
+}
+
+/* ---------- Rings ---------- */
+.rings {
+  position: absolute;
+  inset: 0;
+}
+
+.ring,
+.ringTwo {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(225, 0, 117, 0.16);
+  animation: ringSpin 40s linear infinite;
+}
+
+.ring {
+  width: 420px;
+  height: 420px;
+  top: -90px;
+  right: -120px;
+}
+
+.ringTwo {
+  width: 300px;
+  height: 300px;
+  bottom: 40px;
+  left: -100px;
+  border-color: rgba(126, 0, 243, 0.16);
+  animation-duration: 32s;
+  animation-direction: reverse;
+}
+
+@keyframes ringSpin {
+  to { transform: rotate(360deg); }
+}
+
+.light .ring { border-color: rgba(225, 0, 117, 0.22); }
+.light .ringTwo { border-color: rgba(126, 0, 243, 0.22); }
+
+/* ---------- Sparkles ---------- */
+.sparkles {
+  position: absolute;
+  inset: 0;
+}
+
+.sparkle {
+  position: absolute;
+  background: linear-gradient(135deg, #ff2d8f, #e10075);
+  clip-path: polygon(50% 0%, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0% 50%, 38% 38%);
+  animation: sparkleTwinkle 3.2s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(225, 0, 117, 0.5));
+}
+
+.sparkle:nth-child(3n + 1) {
+  background: linear-gradient(135deg, #b77cff, #7e00f3);
+  filter: drop-shadow(0 0 6px rgba(126, 0, 243, 0.5));
+}
+
+.sparkle:nth-child(3n + 2) {
+  background: linear-gradient(135deg, #ff8ec0, #9d4dff);
+  filter: drop-shadow(0 0 6px rgba(157, 77, 255, 0.5));
+}
+
+@keyframes sparkleTwinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.55) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.1) rotate(45deg); }
+}
+
+.light .sparkle {
+  filter: drop-shadow(0 0 5px rgba(225, 0, 117, 0.4));
+}
+
+.light .sparkle:nth-child(3n + 1) {
+  filter: drop-shadow(0 0 5px rgba(126, 0, 243, 0.4));
+}
+
+.light .sparkle:nth-child(3n + 2) {
+  filter: drop-shadow(0 0 5px rgba(157, 77, 255, 0.4));
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .aurora,
+  .orbOne,
+  .orbTwo,
+  .orbThree,
+  .ring,
+  .ringTwo,
+  .sparkle {
+    animation: none;
+  }
+
+  .sparkle { opacity: 0.7; }
+}

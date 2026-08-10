@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { AdminOverview } from './AdminOverview';
 import { AdminUsers } from './AdminUsers';
@@ -8,6 +8,7 @@ import { AdminFinance } from './AdminFinance';
 import { AdminTickets } from './AdminTickets';
 import { AdminChats } from './AdminChats';
 import { AdminCalls } from './AdminCalls';
+import { AdminLiveStreams } from './AdminLiveStreams';
 import { AdminUIProvider, useAdminUI } from './AdminUI';
 import {
   BarChart,
@@ -18,6 +19,7 @@ import {
   LifeBuoy,
   MessageSquare,
   PhoneCall,
+  Radio,
   Menu,
   LogOut
 } from 'lucide-react';
@@ -38,12 +40,13 @@ const AdminShell = () => {
 
   const tabs = [
     { name: 'Overview', slug: 'overview', icon: BarChart, component: AdminOverview },
-    { name: 'Users', slug: 'users', icon: Users, component: AdminUsers },
+    { name: 'Fans', slug: 'users', icon: Users, component: AdminUsers },
     { name: 'Creators', slug: 'creators', icon: Video, component: AdminCreators },
     { name: 'Posts', slug: 'posts', icon: Image, component: AdminPosts },
     { name: 'Finance', slug: 'finance', icon: DollarSign, component: AdminFinance },
     { name: 'Chats', slug: 'chats', icon: MessageSquare, component: AdminChats },
-    { name: 'Calls & Streams', slug: 'calls', icon: PhoneCall, component: AdminCalls },
+    { name: 'Calls', slug: 'calls', icon: PhoneCall, component: AdminCalls },
+    { name: 'Live Streams', slug: 'streams', icon: Radio, component: AdminLiveStreams },
     { name: 'Support', slug: 'support', icon: LifeBuoy, component: AdminTickets }
   ];
 
@@ -53,19 +56,20 @@ const AdminShell = () => {
   };
 
   const activeSlug = getSectionFromPath(currentPath);
-  const ActiveComponent = tabs.find((t) => t.slug === activeSlug)?.component || AdminOverview;
+  const activeTab = tabs.find((t) => t.slug === activeSlug);
+  const ActiveComponent = activeTab?.component || AdminOverview;
 
   const handleLogout = async () => {
     const ok = await confirm({
       title: 'Log out of admin?',
-      message: 'You will be returned to the user site and lose admin access until you sign back in.',
+      message: 'You will be returned to the main site and lose admin access until you sign back in.',
       confirmText: 'Log Out',
       cancelText: 'Stay',
       variant: 'logout'
     });
-    if (!ok) return;
-    await logout();
-    navigateTo('/discover');
+     if (!ok) return;
+     await logout();
+     navigateTo('/login');
   };
 
   const goToSection = (slug) => {
@@ -89,6 +93,13 @@ const AdminShell = () => {
     );
   };
 
+  const renderLogout = () => (
+    <button className={`${styles.navButton} ${styles.navLogout}`} onClick={handleLogout} aria-label="Log out of admin">
+      <LogOut size={18} />
+      <span>Logout</span>
+    </button>
+  );
+
   return (
     <div className={`${styles.adminWrapper} ${!darkMode ? styles.light : ''}`}>
 
@@ -107,13 +118,7 @@ const AdminShell = () => {
           </div>
           <span className={styles.brandName}>Fantrio <span>Admin</span></span>
         </div>
-
-        <div className={styles.actionGroup}>
-          <button className={`${styles.buttonControl} ${styles.btnDanger}`} onClick={handleLogout}>
-            <LogOut size={16} />
-            <span className={styles.btnLabel}>Logout</span>
-          </button>
-        </div>
+        <h2 className={styles.headerPageTitle}>{activeTab?.name || 'Overview'}</h2>
       </header>
 
       {/* Grid Content Layout */}
@@ -122,9 +127,10 @@ const AdminShell = () => {
         {/* Desktop Sidebar Navigation */}
         <aside className={styles.navSidebar}>
           <div className={styles.navLabel}>Management</div>
-          {tabs.slice(0, 7).map((tab) => renderNavItem(tab))}
+          {tabs.slice(0, 8).map((tab) => renderNavItem(tab))}
           <div className={styles.navLabel}>Engagement</div>
-          {tabs.slice(7).map((tab) => renderNavItem(tab))}
+          {tabs.slice(8).map((tab) => renderNavItem(tab))}
+          {renderLogout()}
         </aside>
 
         {/* Mobile Navigation Drawer */}
@@ -142,6 +148,7 @@ const AdminShell = () => {
                 </button>
               </div>
               {tabs.map((tab) => renderNavItem(tab))}
+              {renderLogout()}
             </div>
           </>
         )}

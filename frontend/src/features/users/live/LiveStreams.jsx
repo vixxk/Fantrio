@@ -1,111 +1,72 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { api } from '../../../services/api';
 import { useApp } from '../../../context/AppContext';
+import { useLiveStreamSocket } from '../../../hooks/useLiveStreamSocket';
 import { Eye, BadgeCheck } from 'lucide-react';
 import styles from './LiveStreams.module.css';
 
 export const LiveStreams = () => {
   const { darkMode, setActiveTab } = useApp();
   const [streams, setStreams] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchStreams = async () => {
-      try {
-        const res = await api.get('/creators/live');
-        if (res.status === 'success') {
-          setStreams(res.liveStreams || []);
-        }
-      } catch (err) {
-        console.error('Failed to fetch streams from backend:', err);
-        setStreams([
-          {
-            _id: '1',
-            displayName: 'Molly Jane',
-            username: '@mollyjane',
-            viewerCount: '862',
-            coverUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80',
-            isVerified: true
-          },
-          {
-            _id: '2',
-            displayName: 'Leslie Alexander',
-            username: '@lesliealexander',
-            viewerCount: '712',
-            coverUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
-            isVerified: true
-          },
-          {
-            _id: '3',
-            displayName: 'Jenny Wilson',
-            username: '@jennywilson',
-            viewerCount: '524',
-            coverUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80',
-            isVerified: true
-          },
-          {
-            _id: '4',
-            displayName: 'Kristin Watson',
-            username: '@kristinwatson',
-            viewerCount: '342',
-            coverUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=300&q=80',
-            isVerified: true
-          },
-          {
-            _id: '5',
-            displayName: 'Savanna',
-            username: '@savanna',
-            viewerCount: '432',
-            coverUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=300&q=80',
-            isVerified: true
-          },
-          {
-            _id: '6',
-            displayName: 'Charlotte',
-            username: '@charlotte',
-            viewerCount: '310',
-            coverUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
-            isVerified: true
-          },
-          {
-            _id: '7',
-            displayName: 'Harper Live',
-            username: '@harper_live',
-            viewerCount: '290',
-            coverUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=300&q=80',
-            isVerified: true
-          },
-          {
-            _id: '8',
-            displayName: 'Amelia Star',
-            username: '@amelia_star',
-            viewerCount: '280',
-            coverUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80',
-            isVerified: true
-          },
-          {
-            _id: '9',
-            displayName: 'Evelyn Game',
-            username: '@evelyn_game',
-            viewerCount: '210',
-            coverUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=300&q=80',
-            isVerified: true
-          },
-          {
-            _id: '10',
-            displayName: 'Grace VIP',
-            username: '@grace_vip',
-            viewerCount: '195',
-            coverUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=300&q=80',
-            isVerified: true
-          }
-        ]);
+  const fetchStreams = useCallback(async () => {
+    try {
+      const res = await api.get('/creators/live?availability=live');
+      if (res.status === 'success') {
+        setStreams(res.liveStreams || []);
       }
-    };
-
-    fetchStreams();
+    } catch (err) {
+      console.error('Failed to fetch streams from backend:', err);
+      setStreams([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const dataList = (streams && streams.length > 0) ? streams : [];
+  useEffect(() => {
+    Promise.resolve().then(() => {
+      fetchStreams();
+    });
+  }, [fetchStreams]);
+
+  // Keep the Live Now ribbon's viewer counts fresh in real time
+  useLiveStreamSocket({
+    streamIds: streams.map((s) => s._id),
+    onViewerUpdate: (payload) => {
+      if (!payload || !payload.streamId) return;
+      setStreams((prev) => prev.map((s) =>
+        s._id === payload.streamId ? { ...s, viewerCount: payload.viewerCount, isLive: payload.isLive } : s
+      ));
+    },
+    onStreamEvent: () => {
+      // A stream went live or ended — refresh the ribbon
+      fetchStreams();
+    }
+  });
+
+  if (loading) {
+    return (
+      <section className={`${styles.liveSection} ${darkMode ? styles.dark : styles.light}`}>
+        <div className={styles.liveHeader}>
+          <h2 className={styles.sectionTitle}>Live Now</h2>
+        </div>
+        <div className={styles.streamsScrollContainer}>
+          <div className={styles.streamsScroll}>
+            {Array.from({ length: 4 }).map((_, idx) => (
+              <div key={idx} className={styles.streamCard}>
+                <div className="skeleton-box skeleton-media" style={{ width: '100%', height: '100%', borderRadius: 14 }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (streams.length === 0) {
+    return null;
+  }
 
   return (
     <section className={`${styles.liveSection} ${darkMode ? styles.dark : styles.light}`}>
@@ -116,7 +77,7 @@ export const LiveStreams = () => {
 
       <div className={styles.streamsScrollContainer}>
         <div className={styles.streamsScroll}>
-          {dataList.map((stream) => {
+          {streams.map((stream) => {
             return (
               <div key={stream._id} className={styles.streamCard}>
                 <div 
@@ -130,7 +91,7 @@ export const LiveStreams = () => {
                     </span>
                     <div className={styles.viewerBadge}>
                       <Eye size={12} />
-                      <span>{stream.viewerCount}</span>
+                      <span>{stream.viewerCount || 0}</span>
                     </div>
                   </div>
 
@@ -146,7 +107,10 @@ export const LiveStreams = () => {
                     </span>
                   </div>
 
-                  <button className={styles.joinButton}>
+                  <button
+                    className={styles.joinButton}
+                    onClick={() => setActiveTab('Live Streams')}
+                  >
                     Join Stream
                   </button>
                 </div>
