@@ -236,44 +236,43 @@ export const AppProvider = ({ children }) => {
   // Load user profile and wallet balance on mount to check for existing session
   useEffect(() => {
     const initAuth = async () => {
-try {
-            const meRes = await api.get('/auth/me');
-            if (meRes.user) {
-              setUser({
-                id: meRes.user.id,
-                username: meRes.user.username,
-                displayName: meRes.user.displayName,
-                email: meRes.user.email,
-                avatarUrl: meRes.user.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
-                role: meRes.user.role
-              });
-              // Redirect the restored session if its current URL is off-limits for
-              // the user's role (creators → creator tabs, users → user tabs,
-              // admins → admin panel). Pass the freshly-fetched role explicitly:
-              // `user` state is still null at this point, so resolveAccessibleTab
-              // can't read it.
-              {
-                const resolved = resolveAccessibleTab(activeTab, meRes.user.role);
-                if (resolved !== activeTab) {
-                  setActiveTabState(resolved);
-                  const homePath = tabToPath[resolved];
-                  if (window.location.pathname !== homePath) {
-                    window.history.replaceState(null, '', homePath);
-                    setCurrentPath(homePath);
-                  }
-                }
-              }
-              // Skip balance fetch for admin users
-              if (meRes.user.role !== 'admin') {
-                try {
-                  const balanceRes = await api.get('/wallet/balance');
-                  setBalance(balanceRes.balanceCoins);
-                } catch (err) {
-                  console.error('Failed to fetch balance:', err);
-                }
+      try {
+        const storedToken = localStorage.getItem('token');
+        if (storedToken) {
+          api.setToken(storedToken);
+          setToken(storedToken);
+        }
+        const meRes = await api.get('/auth/me');
+        if (meRes.user) {
+          setUser({
+            id: meRes.user.id,
+            username: meRes.user.username,
+            displayName: meRes.user.displayName,
+            email: meRes.user.email,
+            avatarUrl: meRes.user.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
+            role: meRes.user.role
+          });
+          {
+            const resolved = resolveAccessibleTab(activeTab, meRes.user.role);
+            if (resolved !== activeTab) {
+              setActiveTabState(resolved);
+              const homePath = tabToPath[resolved];
+              if (window.location.pathname !== homePath) {
+                window.history.replaceState(null, '', homePath);
+                setCurrentPath(homePath);
               }
             }
-          } catch (err) {
+          }
+          if (meRes.user.role !== 'admin') {
+            try {
+              const balanceRes = await api.get('/wallet/balance');
+              setBalance(balanceRes.balanceCoins);
+            } catch (err) {
+              console.error('Failed to fetch balance:', err);
+            }
+          }
+        }
+      } catch (err) {
         console.error('No active session:', err);
       }
       setLoading(false);
@@ -287,6 +286,7 @@ try {
   // send the user back to the login page.
   useEffect(() => {
     const handleAuthExpired = () => {
+      api.setToken('');
       setToken('');
       setUser(null);
       setBalance(0);
@@ -299,7 +299,10 @@ try {
   }, []);
 
   const applyAuth = async (res) => {
-    setToken(res.token);
+    if (res.token) {
+      api.setToken(res.token);
+      setToken(res.token);
+    }
     setUser(res.user);
     // Skip balance fetch for admin users (they don't have a wallet)
     if (res.user?.role === 'admin') {
@@ -385,6 +388,7 @@ try {
   async function logout() {
     // Optimistic: drop the local session immediately so the UI flips to the
     // login screen right after the user confirms — no waiting on the server.
+    api.setToken('');
     setToken('');
     setUser(null);
     setBalance(0);

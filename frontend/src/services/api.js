@@ -2,14 +2,35 @@ const BACKEND_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').re
 const BASE_URL = `${BACKEND_URL}/api/v1`;
 
 class ApiService {
-  constructor() {}
+  constructor() {
+    this.token = localStorage.getItem('token') || '';
+  }
+
+  setToken(token) {
+    this.token = token || '';
+    if (token) {
+      localStorage.setItem('token', token);
+    } else {
+      localStorage.removeItem('token');
+    }
+  }
+
+  getToken() {
+    return this.token || localStorage.getItem('token') || '';
+  }
 
   async request(endpoint, options = {}) {
     const method = options.method || 'GET';
 
     const headers = {
       'Content-Type': 'application/json',
+      ...options.headers,
     };
+
+    const token = this.getToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
 
     const fetchOptions = {
       method,
@@ -25,6 +46,7 @@ class ApiService {
     if (res.status === 401) {
       const isAuthEndpoint = ['/auth/login', '/auth/register', '/auth/verify-2fa'].some((p) => endpoint.startsWith(p));
       if (!isAuthEndpoint) {
+        this.setToken('');
         window.dispatchEvent(new CustomEvent('auth:expired'));
       }
     }
