@@ -43,7 +43,7 @@ const createSendToken = (user, statusCode, res) => {
     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax'
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
   };
 
   res.cookie('token', token, cookieOptions);
@@ -426,7 +426,7 @@ exports.logout = catchAsync(async (req, res, next) => {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax'
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
   };
 
   res.cookie('token', 'loggedout', cookieOptions);
@@ -656,7 +656,7 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax'
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
   };
   res.cookie('token', 'loggedout', cookieOptions);
 
