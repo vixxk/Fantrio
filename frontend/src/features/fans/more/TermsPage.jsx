@@ -5,11 +5,11 @@ export const TermsPage = () => {
   return (
     <div className={styles.subViewGrid}>
       <div className={styles.legalHeroCard}>
-        <div className={styles.legalHeroIconWrap}>
-          <Scale size={28} />
+        <Scale size={120} className={styles.legalBannerWatermark} aria-hidden="true" />
+        <div className={styles.legalHeroContent}>
+          <h3>Terms of Service</h3>
+          <p>Last updated: August 2026. Please read these terms carefully before using the Fantrio platform.</p>
         </div>
-        <h3>Terms of Service</h3>
-        <p>Last updated: August 2026. Please read these terms carefully before using the Fantrio platform.</p>
       </div>
 
       <div className={styles.legalDocCard}>

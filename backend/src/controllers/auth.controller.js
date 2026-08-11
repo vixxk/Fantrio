@@ -63,8 +63,78 @@ const createSendToken = (user, statusCode, res) => {
   });
 };
 
+const Referral = require('../models/Referral');
+const Transaction = require('../models/Transaction');
+
+const applyReferralCode = async (user, referralCodeInput) => {
+  if (!referralCodeInput) return;
+  const cleanCode = String(referralCodeInput).trim().toUpperCase();
+  if (!cleanCode) return;
+
+  // Prevent claiming own code
+  if (user.referralCode === cleanCode || (user.username && user.username.toUpperCase() === cleanCode)) {
+    return;
+  }
+
+  // Find referrer by referralCode (or username fallback)
+  let referrer = await User.findOne({ referralCode: cleanCode });
+  if (!referrer) {
+    referrer = await User.findOne({ username: cleanCode.toLowerCase() });
+  }
+  if (!referrer || referrer._id.toString() === user._id.toString()) {
+    return;
+  }
+
+  // Check if already claimed
+  const existingReferral = await Referral.findOne({ referredId: user._id });
+  if (existingReferral) return;
+
+  // Create referral record
+  await Referral.create({
+    referrerId: referrer._id,
+    referredId: user._id,
+    rewardGranted: true
+  });
+
+  // Credit referrer: 100 coins
+  const Wallet = require('../models/Wallet');
+  let referrerWallet = await Wallet.findOne({ userId: referrer._id });
+  if (!referrerWallet) {
+    referrerWallet = await Wallet.create({ userId: referrer._id, balanceCoins: 0 });
+  }
+  referrerWallet.balanceCoins = Number((referrerWallet.balanceCoins + 100).toFixed(2));
+  await referrerWallet.save();
+
+  await Transaction.create({
+    senderId: null,
+    receiverId: referrer._id,
+    type: 'deposit',
+    status: 'completed',
+    amountCoins: 100,
+    gateway: 'referral_bonus'
+  });
+
+  // Credit new user: 50 coins
+  let userWallet = await Wallet.findOne({ userId: user._id });
+  if (!userWallet) {
+    userWallet = await Wallet.create({ userId: user._id, balanceCoins: 50 });
+  } else {
+    userWallet.balanceCoins = Number((userWallet.balanceCoins + 50).toFixed(2));
+    await userWallet.save();
+  }
+
+  await Transaction.create({
+    senderId: null,
+    receiverId: user._id,
+    type: 'deposit',
+    status: 'completed',
+    amountCoins: 50,
+    gateway: 'referral_bonus'
+  });
+};
+
 exports.register = catchAsync(async (req, res, next) => {
-  const { email, password, role, username, displayName } = req.body;
+  const { email, password, role, username, displayName, referralCode } = req.body;
 
   if (!email || !password) {
     return next(new ApiError(400, 'Please provide email and password'));
@@ -93,7 +163,12 @@ exports.register = catchAsync(async (req, res, next) => {
       displayName: displayName || `Fan ${suffix.slice(0, 4)}`
     });
 
-    // Initialize wallet
+    // Apply referral bonus if code provided
+    if (referralCode) {
+      await applyReferralCode(newUser, referralCode);
+    }
+
+    // Initialize wallet if not created by referral
     const Wallet = require('../models/Wallet');
     const existingWallet = await Wallet.findOne({ userId: newUser._id });
     if (!existingWallet) {
@@ -125,6 +200,7 @@ exports.register = catchAsync(async (req, res, next) => {
     password,
     role: (role === 'user' || !role) ? 'fan' : role,
     isVerified: false,
+    pendingReferralCode: referralCode ? String(referralCode).trim().toUpperCase() : undefined,
     otp: {
       code: otpCode,
       expiresAt: otpExpires
@@ -175,7 +251,11 @@ exports.verifyOtp = catchAsync(async (req, res, next) => {
     user.username = user.role === 'creator' ? `creator_${suffix}` : `fan_${suffix}`;
     user.displayName = user.role === 'creator' ? `Creator ${user._id.toString().slice(-4)}` : `Fan ${user._id.toString().slice(-4)}`;
   }
-  await user.save();
+  if (user.pendingReferralCode) {
+    await applyReferralCode(user, user.pendingReferralCode);
+    user.pendingReferralCode = undefined;
+    await user.save();
+  }
 
   // Initialize Wallet
   const Wallet = require('../models/Wallet');

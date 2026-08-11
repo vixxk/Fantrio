@@ -1072,7 +1072,7 @@
   }
 
   .subtitle {
-    font-size: 0.78rem !important;
+    display: none !important;
   }
 
   .headerCoinIcon {

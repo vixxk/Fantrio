@@ -239,7 +239,7 @@
 
 .creatorCard:hover {
   transform: translateY(-4px);
-  border-color: rgba(225, 0, 117, 0.4);
+  border-color: rgba(0, 112, 243, 0.4);
 }
 
 .cardHeaderStatus {
@@ -297,7 +297,7 @@
   position: absolute;
   top: 0.75rem;
   right: 0.75rem;
-  background: #e10075;
+  background: linear-gradient(90deg, #e10075, #7e00f3);
   color: #ffffff;
   padding: 3px 8px;
   border-radius: 6px;
@@ -416,7 +416,7 @@
 }
 
 .callBtn {
-  background: linear-gradient(90deg, #ff007f, #7e00f3);
+  background: linear-gradient(90deg, #e10075, #7e00f3);
   color: #ffffff;
 }
 

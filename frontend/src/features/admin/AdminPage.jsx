@@ -6,6 +6,8 @@ import { AdminCreators } from './AdminCreators';
 import { AdminPosts } from './AdminPosts';
 import { AdminFinance } from './AdminFinance';
 import { AdminPromoCodes } from './AdminPromoCodes';
+import { AdminAnnouncements } from './AdminAnnouncements';
+import { AdminFeatures } from './AdminFeatures';
 import { AdminTickets } from './AdminTickets';
 import { AdminChats } from './AdminChats';
 import { AdminCalls } from './AdminCalls';
@@ -22,6 +24,8 @@ import {
   PhoneCall,
   Radio,
   BadgePercent,
+  Megaphone,
+  Lightbulb,
   Menu,
   LogOut
 } from 'lucide-react';
@@ -47,6 +51,8 @@ const AdminShell = () => {
     { name: 'Posts', slug: 'posts', icon: Image, component: AdminPosts },
     { name: 'Finance', slug: 'finance', icon: DollarSign, component: AdminFinance },
     { name: 'Promo Codes', slug: 'promo-codes', icon: BadgePercent, component: AdminPromoCodes },
+    { name: 'Announcements', slug: 'announcements', icon: Megaphone, component: AdminAnnouncements },
+    { name: 'Feature Requests', slug: 'features', icon: Lightbulb, component: AdminFeatures },
     { name: 'Chats', slug: 'chats', icon: MessageSquare, component: AdminChats },
     { name: 'Calls', slug: 'calls', icon: PhoneCall, component: AdminCalls },
     { name: 'Live Streams', slug: 'streams', icon: Radio, component: AdminLiveStreams },

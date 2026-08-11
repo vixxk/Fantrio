@@ -6,11 +6,20 @@ import {
 } from 'lucide-react';
 import styles from './SettingsPage.module.css';
 
-export const ProfilePage = ({ setStatus, onBusyChange }) => {
+export const ProfilePage = ({ setStatus, onBusyChange, onDirtyChange }) => {
   const { user, updateUser, refreshProfile } = useApp();
   const fileInputRef = useRef(null);
 
   const [form, setForm] = useState({
+    displayName: user?.displayName || '',
+    username: user?.username || '',
+    bio: user?.bio || '',
+    avatarUrl: user?.avatarUrl || '',
+  });
+
+  // Snapshot of the profile as it was when the page opened, so we can tell
+  // whether the user has made any unsaved changes.
+  const initialFormRef = useRef({
     displayName: user?.displayName || '',
     username: user?.username || '',
     bio: user?.bio || '',
@@ -97,6 +106,19 @@ export const ProfilePage = ({ setStatus, onBusyChange }) => {
     return () => { if (onBusyChange) onBusyChange(false); };
   }, [saving, uploadingImage, onBusyChange]);
 
+  // Report whether the form has unsaved changes so the header Save button
+  // can be disabled until the user edits something. The baseline lives in a
+  // ref so it can be updated after a successful save without re-rendering.
+  useEffect(() => {
+    const hasChanges =
+      form.displayName !== initialFormRef.current.displayName ||
+      form.username !== initialFormRef.current.username ||
+      form.bio !== initialFormRef.current.bio ||
+      form.avatarUrl !== initialFormRef.current.avatarUrl;
+    if (onDirtyChange) onDirtyChange(hasChanges);
+    return () => { if (onDirtyChange) onDirtyChange(false); };
+  }, [form, onDirtyChange]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -110,12 +132,16 @@ export const ProfilePage = ({ setStatus, onBusyChange }) => {
           avatarUrl: res.user.avatarUrl,
           bio: res.user.bio,
         });
-        setForm({
+        const savedForm = {
           displayName: res.user.displayName || '',
           username: res.user.username || '',
           bio: res.user.bio || '',
           avatarUrl: res.user.avatarUrl || '',
-        });
+        };
+        setForm(savedForm);
+        // The saved values are now the new baseline, so the Save button
+        // returns to its disabled state.
+        initialFormRef.current = savedForm;
         if (setStatus) setStatus({ type: 'success', text: 'Profile updated successfully!' });
         // Refresh the user in context from the server so the header
         // (avatar, name, username) reflects the latest profile.
@@ -225,7 +251,7 @@ export const ProfilePage = ({ setStatus, onBusyChange }) => {
             <div className={styles.s3DropzoneContent}>
               {uploadingImage ? (
                 <>
-                  <Loader size={24} className={styles.spin} style={{ color: '#e10075' }} />
+                  <Loader size={24} className={styles.spin} style={{ color: '#0070f3' }} />
                   <div>
                     <span className={styles.s3DropzoneTitle}>Uploading...</span>
                     <p className={styles.s3DropzoneSub}>Please wait while your image is saved to secure cloud storage.</p>

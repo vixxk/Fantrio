@@ -48,7 +48,7 @@ const isRewardCompleted = async (type, userId) => {
       receiverId: userId,
       type: 'deposit',
       status: 'completed',
-      gateway: { $in: ['segpay', 'ccbill'] }
+      gateway: { $nin: ['referral_bonus', 'reward_bonus', 'promo'] }
     });
     return !!purchase;
   }
@@ -58,7 +58,7 @@ const isRewardCompleted = async (type, userId) => {
   }
   if (type === 'first_audio_call') {
     const call = await CallLog.findOne({
-      callerId: userId,
+      $or: [{ callerId: userId }, { receiverId: userId }],
       type: 'audio',
       status: { $in: ['active', 'completed'] }
     });
@@ -164,6 +164,58 @@ exports.createReport = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getMyReports = catchAsync(async (req, res, next) => {
+  const reports = await Report.find({ reporterId: req.user._id })
+    .sort({ createdAt: -1 });
+
+  res.status(200).json({
+    status: 'success',
+    reports
+  });
+});
+
+exports.getMyAllIssues = catchAsync(async (req, res, next) => {
+  const [tickets, reports] = await Promise.all([
+    SupportTicket.find({ userId: req.user._id }).sort({ createdAt: -1 }),
+    Report.find({ reporterId: req.user._id }).sort({ createdAt: -1 })
+  ]);
+
+  // Combine into a single normalized issue timeline if needed
+  const combined = [
+    ...tickets.map(t => ({
+      _id: t._id,
+      issueType: 'ticket',
+      subject: t.subject,
+      details: t.message,
+      category: t.category,
+      status: t.status, // open | in-progress | closed
+      reply: t.reply || '',
+      repliedAt: t.repliedAt || null,
+      createdAt: t.createdAt
+    })),
+    ...reports.map(r => ({
+      _id: r._id,
+      issueType: 'report',
+      subject: `Safety Report: ${r.reason}`,
+      details: r.description || `Reported ${r.targetType} (${r.targetId})`,
+      targetType: r.targetType,
+      targetId: r.targetId,
+      category: 'safety_report',
+      status: r.status, // pending | reviewed | resolved
+      reply: r.reply || '',
+      repliedAt: r.repliedAt || null,
+      createdAt: r.createdAt
+    }))
+  ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  res.status(200).json({
+    status: 'success',
+    tickets,
+    reports,
+    issues: combined
+  });
+});
+
 // ==========================================
 // FEATURE REQUESTS
 // ==========================================
@@ -174,10 +226,13 @@ exports.createFeatureRequest = catchAsync(async (req, res, next) => {
     return next(new ApiError(400, 'Title and description are required'));
   }
 
+  const isAdmin = req.user.role === 'admin';
+
   const feature = await FeatureRequest.create({
     userId: req.user._id,
     title,
     description,
+    isApproved: isAdmin, // auto-approve if submitted by admin, else requires approval
     votes: [req.user._id] // creator upvotes by default
   });
 
@@ -188,11 +243,22 @@ exports.createFeatureRequest = catchAsync(async (req, res, next) => {
 });
 
 exports.getFeatureRequests = catchAsync(async (req, res, next) => {
-  const features = await FeatureRequest.find()
+  const userIdStr = req.user._id.toString();
+  const isAdmin = req.user.role === 'admin';
+
+  // Approved features OR user's own feature OR all features for admin
+  const filter = isAdmin
+    ? {}
+    : {
+        $or: [
+          { isApproved: { $ne: false } },
+          { userId: req.user._id }
+        ]
+      };
+
+  const features = await FeatureRequest.find(filter)
     .populate('userId', 'username displayName avatarUrl')
     .sort({ createdAt: -1 });
-
-  const userIdStr = req.user._id.toString();
 
   const data = features.map((f) => ({
     ...f.toObject(),
@@ -251,10 +317,16 @@ exports.getAnnouncements = catchAsync(async (req, res, next) => {
 // ==========================================
 exports.getReferralStats = catchAsync(async (req, res, next) => {
   const referredCount = await Referral.countDocuments({ referrerId: req.user._id });
-  const referralCode = req.user.username ? req.user.username.toUpperCase() : req.user._id.toString().slice(-6).toUpperCase();
+
+  let user = await User.findById(req.user._id);
+  if (!user.referralCode || !/^[A-Z]{4}$/.test(user.referralCode)) {
+    user.referralCode = null;
+    await user.save({ validateBeforeSave: false });
+  }
+  const referralCode = user.referralCode;
 
   // Find if current user has been referred by someone else
-  const referredBy = await Referral.findOne({ referredId: req.user._id }).populate('referrerId', 'username displayName');
+  const referredBy = await Referral.findOne({ referredId: req.user._id }).populate('referrerId', 'username displayName referralCode');
 
   res.status(200).json({
     status: 'success',
@@ -272,17 +344,30 @@ exports.claimReferral = catchAsync(async (req, res, next) => {
     return next(new ApiError(400, 'Referral code is required'));
   }
 
-  const cleanCode = code.trim().toLowerCase();
+  const cleanCode = code.trim().toUpperCase();
+
+  let user = await User.findById(req.user._id);
+  if (!user.referralCode || !/^[A-Z]{4}$/.test(user.referralCode)) {
+    user.referralCode = null;
+    await user.save({ validateBeforeSave: false });
+  }
 
   // Prevent claiming own code
-  if (req.user.username && cleanCode === req.user.username.toLowerCase()) {
+  if (cleanCode === user.referralCode || (user.username && cleanCode === user.username.toUpperCase())) {
     return next(new ApiError(400, 'You cannot claim your own referral code'));
   }
 
-  // Find referrer
-  const referrer = await User.findOne({ username: cleanCode });
+  // Find referrer by referralCode (or fallback to username)
+  let referrer = await User.findOne({ referralCode: cleanCode });
+  if (!referrer) {
+    referrer = await User.findOne({ username: cleanCode.toLowerCase() });
+  }
   if (!referrer) {
     return next(new ApiError(404, 'Referral code not found'));
+  }
+
+  if (referrer._id.toString() === req.user._id.toString()) {
+    return next(new ApiError(400, 'You cannot claim your own referral code'));
   }
 
   // Check if current user has already claimed a referral

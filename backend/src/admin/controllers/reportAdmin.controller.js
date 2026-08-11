@@ -84,9 +84,9 @@ exports.getReports = catchAsync(async (req, res, next) => {
 // Update report moderation status
 exports.updateReportStatus = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const { status } = req.body;
+  const { status, reply } = req.body;
 
-  if (!['pending', 'reviewed', 'resolved'].includes(status)) {
+  if (status && !['pending', 'reviewed', 'resolved'].includes(status)) {
     return next(new ApiError(400, "Please provide a valid status: 'pending', 'reviewed' or 'resolved'"));
   }
 
@@ -95,7 +95,13 @@ exports.updateReportStatus = catchAsync(async (req, res, next) => {
     return next(new ApiError(404, 'Report not found'));
   }
 
-  report.status = status;
+  if (status) report.status = status;
+  if (reply !== undefined) {
+    report.reply = reply;
+    if (typeof reply === 'string' && reply.trim() !== '') {
+      report.repliedAt = new Date();
+    }
+  }
   await report.save();
 
   res.status(200).json({

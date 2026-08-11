@@ -2895,3 +2895,187 @@
   border-radius: 12px;
   margin-bottom: 0.4rem;
 }
+
+/* ================= SKELETON SHIMMER LOADING ================= */
+@keyframes skeletonShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeletonBlock {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.1) 37%,
+    rgba(255, 255, 255, 0.04) 63%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.4s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+:global(.light) .skeletonBlock {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.04) 25%,
+    rgba(0, 0, 0, 0.1) 37%,
+    rgba(0, 0, 0, 0.04) 63%
+  );
+  background-size: 200% 100%;
+}
+
+/* Skeleton Conversation Item */
+.convSkeletonItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  margin-bottom: 0.4rem;
+}
+
+:global(.light) .convSkeletonItem {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.04);
+}
+
+.convSkeletonAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.convSkeletonInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.convSkeletonTopRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.convSkeletonNameBar {
+  height: 14px;
+  width: 55%;
+  border-radius: 4px;
+}
+
+.convSkeletonTimeBar {
+  height: 11px;
+  width: 25%;
+  border-radius: 4px;
+}
+
+.convSkeletonMsgBar {
+  height: 12px;
+  width: 80%;
+  border-radius: 4px;
+}
+
+/* Skeleton Profile Sidebar */
+.profileSkeletonWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.profileSkeletonHeaderCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  background: #0a0a0a;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+:global(.light) .profileSkeletonHeaderCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.profileSkeletonAvatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  margin-bottom: 0.85rem;
+}
+
+.profileSkeletonNameBar {
+  height: 16px;
+  width: 55%;
+  margin-bottom: 0.4rem;
+  border-radius: 6px;
+}
+
+.profileSkeletonUserBar {
+  height: 12px;
+  width: 35%;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+}
+
+.profileSkeletonRatingBar {
+  height: 12px;
+  width: 28%;
+  border-radius: 4px;
+}
+
+.profileSkeletonCard {
+  background: #0a0a0a;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+:global(.light) .profileSkeletonCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.profileSkeletonCardTitle {
+  height: 15px;
+  width: 40%;
+  border-radius: 5px;
+  margin-bottom: 0.2rem;
+}
+
+.profileSkeletonRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.profileSkeletonLabel {
+  height: 12px;
+  width: 32%;
+  border-radius: 4px;
+}
+
+.profileSkeletonValue {
+  height: 12px;
+  width: 38%;
+  border-radius: 4px;
+}
+
+.profileSkeletonButton {
+  height: 38px;
+  width: 100%;
+  border-radius: 12px;
+  margin-top: 0.35rem;
+}

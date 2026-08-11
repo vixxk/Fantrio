@@ -21,6 +21,14 @@ const REPORT_STATUS_FILTERS = [
   { key: 'resolved', label: 'Resolved' }
 ];
 
+// Ticket categories match the SupportTicket schema enum and the fan-side form
+const CATEGORY_LABELS = {
+  general: 'General Inquiry',
+  billing: 'Billing & Purchases',
+  technical: 'Technical Issues',
+  other: 'Other Inquiries'
+};
+
 const statusBadge = (status) => {
   if (status === 'closed') return styles.badgeSuccess;
   if (status === 'open') return styles.badgeWarning;
@@ -342,9 +350,12 @@ export const AdminTickets = () => {
               <table className={styles.customTable}>
                 <thead>
                   <tr>
+                    <th>ID</th>
                     <th>Fan</th>
                     <th>Subject</th>
+                    <th>Category</th>
                     <th>Status</th>
+                    <th>Replied</th>
                     <th>Date</th>
                     <th>Actions</th>
                   </tr>
@@ -352,13 +363,19 @@ export const AdminTickets = () => {
                 <tbody>
                   {tickets.map((t) => (
                     <tr key={t._id}>
-                      <td className={styles.cellStrong}>{t.userId?.displayName || 'Unknown'}</td>
+                      <td><span className={styles.cellMono}>#TK-{(t._id || '').slice(-6).toUpperCase()}</span></td>
+                      <td>
+                        <div className={styles.cellStrong}>{t.userId?.displayName || 'Unknown'}</div>
+                        {t.userId?.email && <div className={styles.cellSub}>{t.userId.email}</div>}
+                      </td>
                       <td>{t.subject}</td>
+                      <td>{CATEGORY_LABELS[t.category] || t.category || 'General Inquiry'}</td>
                       <td>
                         <span className={`${styles.badge} ${statusBadge(t.status)}`}>
                           {t.status}
                         </span>
                       </td>
+                      <td>{t.repliedAt ? new Date(t.repliedAt).toLocaleString() : '—'}</td>
                       <td>{new Date(t.createdAt).toLocaleDateString()}</td>
                       <td>
                         <div className={styles.actionBtns}>
@@ -376,7 +393,7 @@ export const AdminTickets = () => {
                   ))}
                   {tickets.length === 0 && (
                     <tr>
-                      <td colSpan="5">
+                      <td colSpan="8">
                         <div className={styles.emptyState}>
                           {search || statusFilter !== 'all' || period.from
                             ? 'No tickets match the current filters'
@@ -400,8 +417,26 @@ export const AdminTickets = () => {
                     </span>
                   </div>
                   <div className={styles.mobileRow}>
+                    <span className={styles.mobileLabel}>ID:</span>
+                    <span className={`${styles.mobileVal} ${styles.cellMono}`}>#TK-{(t._id || '').slice(-6).toUpperCase()}</span>
+                  </div>
+                  {t.userId?.email && (
+                    <div className={styles.mobileRow}>
+                      <span className={styles.mobileLabel}>Email:</span>
+                      <span className={styles.mobileVal}>{t.userId.email}</span>
+                    </div>
+                  )}
+                  <div className={styles.mobileRow}>
                     <span className={styles.mobileLabel}>Subject:</span>
                     <span className={styles.mobileVal}>{t.subject}</span>
+                  </div>
+                  <div className={styles.mobileRow}>
+                    <span className={styles.mobileLabel}>Category:</span>
+                    <span className={styles.mobileVal}>{CATEGORY_LABELS[t.category] || t.category || 'General Inquiry'}</span>
+                  </div>
+                  <div className={styles.mobileRow}>
+                    <span className={styles.mobileLabel}>Replied:</span>
+                    <span className={styles.mobileVal}>{t.repliedAt ? new Date(t.repliedAt).toLocaleString() : '—'}</span>
                   </div>
                   <div className={styles.mobileRow}>
                     <span className={styles.mobileLabel}>Date:</span>
@@ -443,7 +478,14 @@ export const AdminTickets = () => {
             <div className={styles.formGrid}>
               <div className={styles.quoteBox}>
                 <div className={styles.strong} style={{ marginBottom: 4 }}>Subject: {activeTicket.subject}</div>
-                <div className={styles.muted}>{activeTicket.message || 'No description provided.'}</div>
+                <div className={styles.muted}>
+                  Category: {CATEGORY_LABELS[activeTicket.category] || activeTicket.category || 'General Inquiry'}
+                </div>
+                <div className={styles.muted}>
+                  From: {activeTicket.userId?.displayName || 'Unknown'}
+                  {activeTicket.userId?.email ? ` (${activeTicket.userId.email})` : ''}
+                </div>
+                <div className={styles.muted} style={{ marginTop: 6 }}>{activeTicket.message || 'No description provided.'}</div>
               </div>
 
               <div className={styles.formControlItem}>

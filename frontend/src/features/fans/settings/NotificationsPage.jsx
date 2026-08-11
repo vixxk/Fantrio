@@ -98,10 +98,9 @@ export const NotificationsPage = ({ setStatus }) => {
   return (
     <div className={styles.subPageBody}>
       <div className={styles.notifHeaderBanner}>
+        {/* Large faint bell watermark in the background (mobile only) */}
+        <Bell size={120} className={styles.notifBannerWatermark} aria-hidden="true" />
         <div className={styles.notifIntroText}>
-          <div className={styles.notifHeaderIconBox}>
-            <Bell size={22} />
-          </div>
           <div>
             <h3>Notification Preferences</h3>
             <p>Customize how and when Fantrio alerts you. All settings sync in real time.</p>

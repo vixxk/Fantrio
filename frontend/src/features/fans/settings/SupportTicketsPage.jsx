@@ -3,6 +3,21 @@ import { api } from '../../../services/api';
 import { Ticket, Plus, CheckCircle2, Clock, Headphones, FileText } from 'lucide-react';
 import styles from './SettingsPage.module.css';
 
+const CATEGORY_LABELS = {
+  general: 'General Inquiry',
+  billing: 'Billing & Purchases',
+  technical: 'Technical Issues',
+  other: 'Other Inquiries',
+};
+
+// Status values come from the SupportTicket schema enum (open | in-progress | closed)
+const STATUS_TABS = [
+  { key: 'all', label: 'All' },
+  { key: 'open', label: 'Open' },
+  { key: 'in-progress', label: 'In Progress' },
+  { key: 'closed', label: 'Closed' },
+];
+
 export const SupportTicketsPage = ({ setStatus, onContact }) => {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,8 +51,8 @@ export const SupportTicketsPage = ({ setStatus, onContact }) => {
 
   const getStatusBadge = (status) => {
     const s = (status || 'open').toLowerCase();
-    if (s === 'resolved') return <span className={`${styles.statusBadge} ${styles.resolved}`}><CheckCircle2 size={12} /> Resolved</span>;
-    if (s === 'in progress' || s === 'in_progress') return <span className={`${styles.statusBadge} ${styles.inProgress}`}><Clock size={12} /> In Progress</span>;
+    if (s === 'closed' || s === 'resolved') return <span className={`${styles.statusBadge} ${styles.closed}`}><CheckCircle2 size={12} /> Closed</span>;
+    if (s === 'in-progress' || s === 'in progress' || s === 'in_progress') return <span className={`${styles.statusBadge} ${styles.statusBadgeInProgress}`}><Clock size={12} /> In Progress</span>;
     return <span className={`${styles.statusBadge} ${styles.open}`}><span className={styles.greenPulse} /> Open</span>;
   };
 
@@ -59,14 +74,14 @@ export const SupportTicketsPage = ({ setStatus, onContact }) => {
 
       {/* Status Filter Tabs */}
       <div className={styles.ticketFilterTabs}>
-        {['all', 'open', 'in progress', 'resolved'].map(tab => (
+        {STATUS_TABS.map(tab => (
           <button
-            key={tab}
+            key={tab.key}
             type="button"
-            className={`${styles.ticketTabBtn} ${filterTab === tab ? styles.ticketTabActive : ''}`}
-            onClick={() => setFilterTab(tab)}
+            className={`${styles.ticketTabBtn} ${filterTab === tab.key ? styles.ticketTabActive : ''}`}
+            onClick={() => setFilterTab(tab.key)}
           >
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            {tab.label}
           </button>
         ))}
       </div>
@@ -74,7 +89,7 @@ export const SupportTicketsPage = ({ setStatus, onContact }) => {
       {filteredTickets.length === 0 ? (
         <div className={styles.emptyBox}>
           <Ticket size={44} className={styles.emptyBoxIcon} />
-          <p>No support tickets match the "{filterTab}" filter.</p>
+          <p>No support tickets match the "{STATUS_TABS.find(t => t.key === filterTab)?.label || filterTab}" filter.</p>
         </div>
       ) : (
         <div className={styles.ticketsList}>
@@ -96,11 +111,16 @@ export const SupportTicketsPage = ({ setStatus, onContact }) => {
                   <div className={styles.replyContentText}>
                     <strong>Fantrio Support Response:</strong>
                     <p>{t.reply}</p>
+                    {t.repliedAt && (
+                      <div className={styles.ticketDate} style={{ marginTop: 6 }}>
+                        <Clock size={12} /> Replied {new Date(t.repliedAt).toLocaleString()}
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : null}
               <div className={styles.ticketFooter}>
-                <span className={styles.ticketCategoryPill}><FileText size={12} /> {t.category || 'General'}</span>
+                <span className={styles.ticketCategoryPill}><FileText size={12} /> {CATEGORY_LABELS[t.category] || t.category || 'General Inquiry'}</span>
                 <span className={styles.ticketDate}><Clock size={12} /> {new Date(t.createdAt).toLocaleDateString()}</span>
               </div>
             </div>

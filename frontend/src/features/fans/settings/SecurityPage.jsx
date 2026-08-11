@@ -172,6 +172,13 @@ export const SecurityPage = ({ setStatus }) => {
               <p className={styles.securityCardDesc}>
                 Protect your account from unauthorized logins by requiring a one-time verification code sent to your email.
               </p>
+
+              {twoFaStep === 'idle' && (
+                <div className={styles.twoFaBenefits}>
+                  <span className={styles.benefitItem}><CheckCircle2 size={14} /> Instant email login notifications</span>
+                  <span className={styles.benefitItem}><CheckCircle2 size={14} /> Prevents unauthorized account access</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -182,7 +189,7 @@ export const SecurityPage = ({ setStatus }) => {
           )}
         </div>
 
-        {twoFaStep === 'enabled' ? (
+        {twoFaStep === 'enabled' && (
           <form onSubmit={handleDisable2FA} className={styles.twoFaForm}>
             <div className={styles.formGroup}>
               <label className={styles.formLabel}>Enter password to confirm 2FA deactivation</label>
@@ -199,7 +206,9 @@ export const SecurityPage = ({ setStatus }) => {
               {twoFaBusy ? 'Deactivating 2FA...' : 'Disable 2FA Security'}
             </button>
           </form>
-        ) : twoFaStep === 'sent' ? (
+        )}
+
+        {twoFaStep === 'sent' && (
           <form onSubmit={handleVerify2FA} className={styles.twoFaForm}>
             <div className={styles.otpCardBox}>
               <Zap size={24} className={styles.otpZapIcon} />
@@ -228,13 +237,6 @@ export const SecurityPage = ({ setStatus }) => {
               </button>
             </div>
           </form>
-        ) : (
-          <div className={styles.twoFaPromo}>
-            <div className={styles.twoFaBenefits}>
-              <span className={styles.benefitItem}><CheckCircle2 size={14} /> Instant email login notifications</span>
-              <span className={styles.benefitItem}><CheckCircle2 size={14} /> Prevents unauthorized account access</span>
-            </div>
-          </div>
         )}
       </div>
 
@@ -250,7 +252,7 @@ export const SecurityPage = ({ setStatus }) => {
               <p className={styles.securityCardDesc}>Ensure your account remains safe with a strong, unique password.</p>
             </div>
           </div>
-          <button type="submit" disabled={savingPwd} className={styles.submitBtn}>
+          <button type="submit" disabled={savingPwd} className={`${styles.submitBtn} ${styles.pwdSubmitBtn}`}>
             {savingPwd ? <><Loader size={16} className={styles.spin} /> Updating...</> : 'Update Password'}
           </button>
         </div>

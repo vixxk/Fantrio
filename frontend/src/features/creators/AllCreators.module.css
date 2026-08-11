@@ -132,7 +132,7 @@
 }
 
 .activePill {
-  background: linear-gradient(90deg, #ff007f, #7e00f3) !important;
+  background: linear-gradient(90deg, #e10075, #7e00f3) !important;
   border-color: transparent !important;
   color: #ffffff;
 }
@@ -268,6 +268,7 @@
 
 .creatorsGrid .creatorCard:hover {
   transform: translateY(-4px);
+  border-color: rgba(0, 112, 243, 0.4);
 }
 
 .cardHeaderStatus {

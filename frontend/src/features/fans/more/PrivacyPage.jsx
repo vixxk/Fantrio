@@ -5,11 +5,11 @@ export const PrivacyPage = () => {
   return (
     <div className={styles.subViewGrid}>
       <div className={styles.legalHeroCard}>
-        <div className={styles.legalHeroIconWrap}>
-          <Lock size={28} />
+        <Lock size={120} className={styles.legalBannerWatermark} aria-hidden="true" />
+        <div className={styles.legalHeroContent}>
+          <h3>Privacy Policy</h3>
+          <p>Last updated: August 2026. How Fantrio collects, uses, and safeguards your personal data.</p>
         </div>
-        <h3>Privacy Policy</h3>
-        <p>Last updated: August 2026. How Fantrio collects, uses, and safeguards your personal data.</p>
       </div>
 
       <div className={styles.legalDocCard}>

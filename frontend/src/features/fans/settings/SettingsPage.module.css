@@ -26,7 +26,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 2rem;
+  margin-bottom: 0.5rem;
 }
 
 .headerTitleBlock {
@@ -81,7 +81,7 @@
 
 .settingRow:hover {
   background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 0, 127, 0.2);
+  border-color: rgba(0, 112, 243, 0.2);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }
@@ -103,7 +103,7 @@
 }
 
 .settingIcon {
-  color: #e10075;
+  color: #0070f3;
 }
 
 .settingIconImg {
@@ -121,7 +121,7 @@
 
 .settingRow:hover .settingIconImg {
   transform: translate(-50%, -50%) scale(1.08);
-  filter: invert(19%) sepia(87%) saturate(6444%) hue-rotate(328deg) brightness(101%) contrast(107%);
+  filter: invert(27%) sepia(91%) saturate(3052%) hue-rotate(204deg) brightness(102%) contrast(105%);
 }
 
 .settingTextCol {
@@ -150,7 +150,7 @@
 }
 
 .settingRow:hover .chevron {
-  color: #ff007f;
+  color: #0070f3;
   transform: translateX(3px);
 }
 
@@ -193,7 +193,7 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: rgba(225, 0, 117, 0.1);
+  background: rgba(0, 112, 243, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -224,22 +224,32 @@
 }
 
 .supportBtn {
-  align-self: flex-start;
-  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
   border: none;
   color: #ffffff;
-  padding: 0.55rem 1.35rem;
-  border-radius: 10px;
+  padding: 0.52rem 1.1rem;
+  border-radius: 99px;
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.2s, transform 0.2s;
-  margin-top: 0.25rem;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(225, 0, 117, 0.35);
+}
+
+.supportBtn svg {
+  flex-shrink: 0;
+  display: block;
 }
 
 .supportBtn:hover {
-  opacity: 0.92;
+  opacity: 0.94;
   transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(225, 0, 117, 0.45);
 }
 
 /* ================= RIGHT SIDEBAR ================= */
@@ -273,7 +283,7 @@
 }
 
 .helpHeroIcon {
-  color: #e10075;
+  color: #0070f3;
 }
 
 .helpHeroIconImg {
@@ -373,7 +383,7 @@
 }
 
 .helpLinkRow:hover .helpLinkChevron {
-  color: #ff007f;
+  color: #0070f3;
   transform: translateX(3px);
 }
 
@@ -408,7 +418,7 @@
 }
 
 .light .settingRow:hover {
-  border-color: rgba(225, 0, 117, 0.3);
+  border-color: rgba(0, 112, 243, 0.3);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
 }
 
@@ -418,7 +428,7 @@
 }
 
 .light .supportCardIconWrap {
-  background: rgba(225, 0, 117, 0.08);
+  background: rgba(0, 112, 243, 0.08);
   border: none;
 }
 
@@ -465,32 +475,32 @@
   }
 
   .feedHeader {
-    margin-bottom: 1.25rem !important;
+    margin-bottom: 0.5rem !important;
   }
 
   .pageTitle {
-    font-size: 1.25rem !important;
+    font-size: 1.35rem !important;
   }
 
   .pageSubtitle {
-    font-size: 0.75rem !important;
+    font-size: 0.82rem !important;
   }
 
   .settingRow {
-    padding: 0.75rem 1rem !important;
+    padding: 0.6rem 0.9rem !important;
     border-radius: 12px !important;
   }
 
   .settingRowLeft {
-    gap: 0.75rem !important;
+    gap: 0.6rem !important;
   }
 
   .settingTitle {
-    font-size: 0.88rem !important;
+    font-size: 0.8rem !important;
   }
 
   .settingDesc {
-    font-size: 0.72rem !important;
+    font-size: 0.68rem !important;
   }
 
   .supportCardsRow {
@@ -518,13 +528,13 @@
   }
 
   .supportCardIconWrap {
-    width: 28px !important;
-    height: 28px !important;
-    background: rgba(255, 0, 127, 0.08) !important;
+    width: 26px !important;
+    height: 26px !important;
+    background: rgba(0, 112, 243, 0.08) !important;
   }
 
   .supportCardTitle {
-    font-size: 0.82rem !important;
+    font-size: 0.78rem !important;
     font-weight: 700 !important;
     margin: 0 !important;
   }
@@ -533,7 +543,7 @@
     display: none !important;
   }
 
-  .supportBtn {
+  .supportCard .supportBtn {
     display: none !important;
   }
 
@@ -552,15 +562,15 @@
   }
 
   .helpLinkRow {
-    padding: 0.75rem 1rem !important;
+    padding: 0.6rem 0.9rem !important;
   }
 
   .helpLinkTitle {
-    font-size: 0.85rem !important;
+    font-size: 0.78rem !important;
   }
 
   .helpLinkDesc {
-    font-size: 0.72rem !important;
+    font-size: 0.68rem !important;
   }
 }
 
@@ -572,9 +582,9 @@
 
 .subPageHeader {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 1rem;
-  margin-bottom: 1.75rem;
+  margin-bottom: 1rem;
 }
 
 .backBtn {
@@ -593,8 +603,8 @@
 }
 
 .backBtn:hover {
-  background: rgba(255, 0, 127, 0.1);
-  border-color: rgba(255, 0, 127, 0.35);
+  background: rgba(0, 112, 243, 0.1);
+  border-color: rgba(0, 112, 243, 0.35);
 }
 
 .subPageTitleBlock {
@@ -611,12 +621,21 @@
   background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%);
   border: none;
   color: #ffffff;
-  padding: 0.65rem 1.5rem;
+  padding: 0.65rem 1.4rem;
   border-radius: 12px;
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.saveProfileHeaderBtn svg {
+  flex-shrink: 0;
+  display: block;
 }
 
 .saveProfileHeaderBtn:hover:not(:disabled) {
@@ -635,6 +654,8 @@
     padding: 0.5rem 1.1rem;
     font-size: 0.78rem;
     margin-left: auto;
+    /* Keep the action button centred against the back button on mobile */
+    align-self: center;
   }
 }
 
@@ -650,6 +671,186 @@
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.5);
   margin: 0;
+}
+
+/* Creator Search Selector in Report Problem */
+.creatorSearchWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.creatorSearchInputBox {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.creatorSearchIcon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+}
+
+.creatorSearchInput {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.75rem 2.6rem 0.75rem 2.6rem;
+  color: #ffffff;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s, background-color 0.2s;
+  box-sizing: border-box;
+}
+
+.creatorSearchInput:focus {
+  border-color: rgba(126, 0, 243, 0.6);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.creatorSearchClearBtn {
+  position: absolute;
+  right: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border-radius: 50%;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.creatorSearchClearBtn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.creatorDropdownList {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  background: #121216;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  z-index: 50;
+  padding: 0.4rem;
+}
+
+.light .creatorDropdownList {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+}
+
+.creatorOptionItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.creatorOptionItem:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.light .creatorOptionItem:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.creatorOptionSelected {
+  background: rgba(126, 0, 243, 0.18) !important;
+  border: 1px solid rgba(126, 0, 243, 0.3);
+}
+
+.creatorOptionAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.creatorOptionInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.creatorOptionName {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.light .creatorOptionName {
+  color: #1a1625;
+}
+
+.creatorOptionUsername {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.light .creatorOptionUsername {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .creatorOptionEmpty {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+/* Creator search input needs a visible border/colors on the light theme
+   (base styles are white-tinted dark-theme colors) */
+.light .creatorSearchInput {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.15);
+  color: #1a1625;
+}
+
+.light .creatorSearchInput:focus {
+  border-color: rgba(126, 0, 243, 0.6);
+  background: #ffffff;
+}
+
+.light .creatorSearchInput::placeholder {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .creatorSearchIcon {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .creatorSearchClearBtn {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .creatorSearchClearBtn:hover {
+  color: #1a1625;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.creatorOptionEmpty {
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .subPageBody {
@@ -749,8 +950,8 @@
 .formSelect:focus,
 .formTextarea:focus {
   outline: none;
-  border-color: #e10075;
-  box-shadow: 0 0 0 3px rgba(225, 0, 117, 0.15);
+  border-color: #0070f3;
+  box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.15);
 }
 
 .formInput::placeholder,
@@ -796,7 +997,7 @@
 
 .submitBtn {
   align-self: flex-start;
-  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%);
+  background: linear-gradient(90deg, #0070f3 0%, #7e00f3 100%);
   border: none;
   color: #ffffff;
   padding: 0.7rem 1.6rem;
@@ -812,10 +1013,18 @@
   flex-shrink: 0;
 }
 
+.formActionsRight {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
 .submitBtn:hover:not(:disabled) {
   opacity: 0.92;
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(225, 0, 117, 0.3);
+  box-shadow: 0 6px 18px rgba(0, 112, 243, 0.3);
 }
 
 .submitBtn:disabled {
@@ -850,7 +1059,7 @@
   height: 64px;
   border-radius: 50%;
   overflow: hidden;
-  border: 2px solid rgba(255, 0, 127, 0.4);
+  border: 2px solid rgba(0, 112, 243, 0.4);
 }
 
 .profileAvatar {
@@ -900,7 +1109,7 @@
 
 .securityCardHeader {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
 }
@@ -916,8 +1125,8 @@
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background: rgba(225, 0, 117, 0.1);
-  color: #e10075;
+  background: rgba(0, 112, 243, 0.1);
+  color: #0070f3;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -934,7 +1143,10 @@
   font-size: 0.82rem;
   color: rgba(255, 255, 255, 0.5);
   margin: 0;
-  max-width: 520px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
   line-height: 1.5;
 }
 
@@ -1081,7 +1293,7 @@
 }
 
 .notifIntro svg {
-  color: #e10075;
+  color: #0070f3;
   flex-shrink: 0;
 }
 
@@ -1135,7 +1347,7 @@
 }
 
 .toggleOn {
-  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%);
+  background: linear-gradient(90deg, #0070f3 0%, #7e00f3 100%);
 }
 
 .toggleThumb {
@@ -1175,7 +1387,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%);
+  background: linear-gradient(90deg, #0070f3 0%, #7e00f3 100%);
   border: none;
   color: #ffffff;
   padding: 0.6rem 1.25rem;
@@ -1324,31 +1536,48 @@
 
 /* --- Help centre --- */
 .helpCentreHero {
+  position: relative;
+  overflow: hidden;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 1rem;
-  background: linear-gradient(120deg, rgba(225, 0, 117, 0.12), rgba(126, 0, 243, 0.12));
-  border: 1px solid rgba(225, 0, 117, 0.2);
-  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(0, 112, 243, 0.12) 0%, rgba(126, 0, 243, 0.12) 100%);
+  border: 1px solid rgba(0, 112, 243, 0.22);
+  border-radius: 18px;
   padding: 1.4rem 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
 }
 
-.helpCentreHero svg {
-  color: #e10075;
-  flex-shrink: 0;
+.heroWatermarkIcon {
+  position: absolute;
+  right: -0.5rem;
+  bottom: -0.8rem;
+  color: rgba(0, 112, 243, 0.12);
+  pointer-events: none;
+  transform: rotate(-10deg);
+  user-select: none;
 }
 
-.helpCentreHero h3 {
-  font-size: 1.1rem;
+.helpHeroContent {
+  position: relative;
+  z-index: 2;
+}
+
+.helpHeroContent h3 {
+  font-size: 1.25rem;
   font-weight: 800;
   color: #ffffff;
-  margin: 0 0 0.2rem 0;
+  margin: 0 0 0.25rem 0;
+  letter-spacing: -0.01em;
 }
 
-.helpCentreHero p {
-  font-size: 0.82rem;
-  color: rgba(255, 255, 255, 0.55);
+.helpHeroContent p {
+  font-size: 0.84rem;
+  color: rgba(255, 255, 255, 0.65);
   margin: 0;
+  line-height: 1.4;
+  max-width: 85%;
 }
 
 .accordionContainer {
@@ -1366,7 +1595,7 @@
 }
 
 .accordionItem:hover {
-  border-color: rgba(255, 0, 127, 0.25);
+  border-color: rgba(0, 112, 243, 0.25);
 }
 
 .accordionTrigger {
@@ -1394,7 +1623,7 @@
 
 .chevronRotated {
   transform: rotate(90deg);
-  color: #ff007f;
+  color: #0070f3;
 }
 
 .accordionPanel {
@@ -1424,7 +1653,7 @@
 }
 
 .helpCta svg {
-  color: #e10075;
+  color: #0070f3;
   flex-shrink: 0;
 }
 
@@ -1440,13 +1669,78 @@
 }
 
 .ticketCard {
-  background: #121212;
+  background: linear-gradient(145deg, #121216 0%, #0a0a0d 100%);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
-  padding: 1.2rem 1.35rem;
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.75rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+}
+
+.ticketCard:hover {
+  border-color: rgba(0, 112, 243, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+}
+
+.ticketCardBorder {
+  border-left: 3px solid #0070f3 !important;
+}
+
+.reportCardBorder {
+  border-left: 3px solid #ef4444 !important;
+}
+
+.ticketCardTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+  gap: 0.5rem;
+}
+
+.ticketIdChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.ticketChip {
+  background: rgba(0, 112, 243, 0.12);
+  color: #0070f3;
+  border: 1px solid rgba(0, 112, 243, 0.3);
+}
+
+.reportChip {
+  background: rgba(239, 68, 68, 0.12) !important;
+  color: #f87171 !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+}
+
+.ticketSubjectTitle {
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.35rem 0;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.ticketMessagePreview {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.78);
+  line-height: 1.45;
+  margin: 0 0 0.5rem 0;
 }
 
 .ticketHeader {
@@ -1457,7 +1751,7 @@
 }
 
 .ticketSubject {
-  font-size: 0.98rem;
+  font-size: 0.92rem;
   font-weight: 700;
   color: #ffffff;
 }
@@ -1466,26 +1760,37 @@
   flex-shrink: 0;
   font-size: 0.7rem;
   font-weight: 700;
-  text-transform: capitalize;
-  padding: 0.28rem 0.7rem;
+  padding: 0.2rem 0.55rem;
   border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 
 .statusBadge.open,
 .statusBadge.pending {
-  background: rgba(250, 204, 21, 0.15);
-  color: #facc15;
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 .statusBadge.in-progress {
-  background: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 .statusBadge.closed,
 .statusBadge.resolved {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
+  background: rgba(99, 102, 241, 0.12);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.statusBadgeInProgress {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 .ticketMessage {
@@ -1563,21 +1868,43 @@
   line-height: 1.5;
 }
 
-/* --- Guidelines --- */
 .guidelinesHero {
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   gap: 0.5rem;
-  background: linear-gradient(120deg, rgba(225, 0, 117, 0.12), rgba(126, 0, 243, 0.12));
-  border: 1px solid rgba(225, 0, 117, 0.2);
+  background: linear-gradient(120deg, rgba(0, 112, 243, 0.12), rgba(126, 0, 243, 0.12));
+  border: 1px solid rgba(0, 112, 243, 0.2);
   border-radius: 16px;
   padding: 1.75rem 1.5rem;
 }
 
-.guidelinesHero svg {
-  color: #e10075;
+.guidelinesWatermarkIcon {
+  position: absolute;
+  top: 50%;
+  right: -0.5rem;
+  transform: translateY(-50%);
+  color: #0070f3;
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.guidelinesHeroContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.guidelinesHeroContent svg {
+  color: #0070f3;
 }
 
 .guidelinesHero h3 {
@@ -1614,7 +1941,9 @@
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.1em;
-  color: #e10075;
+  color: #0070f3;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 .guidelineCard h4 {
@@ -1633,8 +1962,8 @@
 
 .guidelinesFooter {
   display: flex;
-  align-items: flex-start;
-  gap: 0.6rem;
+  align-items: center;
+  gap: 0.75rem;
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.25);
   border-radius: 12px;
@@ -1647,7 +1976,7 @@
 .guidelinesFooter svg {
   flex-shrink: 0;
   color: #f87171;
-  margin-top: 1px;
+  margin-top: 0;
 }
 
 /* --- Report segmented control --- */
@@ -1679,7 +2008,7 @@
 }
 
 .segmentActive {
-  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%);
+  background: linear-gradient(90deg, #0070f3 0%, #7e00f3 100%);
   color: #ffffff;
 }
 
@@ -1714,9 +2043,13 @@
 .light .notifTitle,
 .light .ticketSubject,
 .light .helpCentreHero h3,
+.light .helpHeroContent h3,
 .light .contactHero h3,
 .light .guidelinesHero h3,
-.light .guidelineCard h4 {
+.light .guidelineCard h4,
+.light .formLabel,
+.light .heroNameRow h3,
+.light .s3DropzoneTitle {
   color: #1a1625;
 }
 
@@ -1726,6 +2059,7 @@
 .light .notifDesc,
 .light .payIntro,
 .light .helpCentreHero p,
+.light .helpHeroContent p,
 .light .contactHero p,
 .light .guidelinesHero p,
 .light .guidelineCard p,
@@ -1733,20 +2067,50 @@
 .light .helpCta,
 .light .ticketMessage,
 .light .ticketFooter,
-.light .formLabel,
 .light .activityMeta,
-.light .activityTime {
-  color: rgba(26, 22, 37, 0.6);
+.light .activityTime,
+.light .settingDesc,
+.light .supportCardDesc,
+.light .helpHeroDesc,
+.light .helpLinkDesc,
+.light .heroUsername,
+.light .s3DropzoneSub {
+  color: #52525b;
+}
+
+.light .heroEmailBadge,
+.light .charCount {
+  color: #64748b;
+}
+
+.light .profileHeroCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.light .profileAvatarContainer,
+.light .onlineBadgeDot {
+  border-color: #ffffff;
+}
+
+.light .s3UploadDropzone {
+  background: #f8fafc;
+  border-color: rgba(0, 112, 243, 0.3);
+}
+
+.light .s3UploadDropzone:hover {
+  background: #f1f5f9;
 }
 
 .light .backBtn {
   background: #ffffff;
-  border-color: rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 0, 0, 0.12);
   color: #1a1625;
 }
 
 .light .backBtn:hover {
-  background: rgba(225, 0, 117, 0.06);
+  background: rgba(0, 112, 243, 0.06);
 }
 
 .light .profilePreview,
@@ -1766,24 +2130,39 @@
 }
 
 .light .securityIconBox {
-  background: rgba(225, 0, 117, 0.08);
+  background: rgba(0, 112, 243, 0.08);
 }
 
 .light .formInput,
 .light .formSelect,
 .light .formTextarea {
-  background: #f7f7f9;
-  border-color: rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.15);
   color: #1a1625;
+}
+
+.light .formInput:focus,
+.light .formSelect:focus,
+.light .formTextarea:focus {
+  border-color: #0070f3;
+  background-color: #ffffff;
+}
+
+.light .inputDisabled {
+  background-color: #f1f5f9 !important;
+  color: #64748b !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
 }
 
 .light .formInput::placeholder,
 .light .formTextarea::placeholder {
-  color: rgba(26, 22, 37, 0.3);
+  color: rgba(26, 22, 37, 0.4);
 }
 
 .light .formSelect {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231a1625' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
 }
 
 .light .statusAlert.success {
@@ -1815,6 +2194,10 @@
   background: rgba(0, 0, 0, 0.15);
 }
 
+.light .toggleOn {
+  background: linear-gradient(90deg, #0070f3 0%, #7e00f3 100%) !important;
+}
+
 .light .segmentedControl {
   background: #f2f2f5;
   border-color: rgba(0, 0, 0, 0.08);
@@ -1822,6 +2205,12 @@
 
 .light .segmentBtn {
   color: rgba(26, 22, 37, 0.55);
+}
+
+/* Selected segment keeps white text on the gradient in light theme too */
+.light .segmentActive {
+  color: #ffffff !important;
+  background: linear-gradient(90deg, #0070f3 0%, #7e00f3 100%) !important;
 }
 
 .light .accordionTrigger {
@@ -1905,7 +2294,7 @@
 
 .profileBannerBg {
   height: 90px;
-  background: linear-gradient(135deg, rgba(225, 0, 117, 0.4) 0%, rgba(139, 92, 246, 0.3) 50%, rgba(18, 18, 18, 0.9) 100%);
+  background: linear-gradient(135deg, rgba(0, 112, 243, 0.4) 0%, rgba(139, 92, 246, 0.3) 50%, rgba(18, 18, 18, 0.9) 100%);
   width: 100%;
 }
 
@@ -1991,9 +2380,9 @@
   gap: 0.3rem;
   padding: 0.25rem 0.65rem;
   border-radius: 12px;
-  background: rgba(225, 0, 117, 0.15);
-  border: 1px solid rgba(225, 0, 117, 0.3);
-  color: #ff007f;
+  background: rgba(0, 112, 243, 0.15);
+  border: 1px solid rgba(0, 112, 243, 0.3);
+  color: #0070f3;
   font-size: 0.75rem;
   font-weight: 700;
 }
@@ -2126,6 +2515,11 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  margin-bottom: 0.25rem;
+
+  .securityCardTitle {
+    margin: 0;
+  }
 }
 
 .securityStatusBadge.enabled {
@@ -2169,7 +2563,7 @@
 
 .otpCardBox {
   background: rgba(255, 255, 255, 0.03);
-  border: 1px dashed rgba(225, 0, 117, 0.4);
+  border: 1px dashed rgba(0, 112, 243, 0.4);
   border-radius: 16px;
   padding: 1.5rem;
   text-align: center;
@@ -2191,7 +2585,7 @@
 }
 
 .otpZapIcon {
-  color: #ff007f;
+  color: #0070f3;
   margin-bottom: 0.2rem;
 }
 
@@ -2202,7 +2596,7 @@
   text-align: center !important;
   max-width: 240px;
   background: #18181b !important;
-  border-color: rgba(225, 0, 117, 0.5) !important;
+  border-color: rgba(0, 112, 243, 0.5) !important;
   color: #ffffff !important;
   padding: 0.6rem !important;
 }
@@ -2217,11 +2611,14 @@
 .twoFaBenefits {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem 1.5rem;
-  padding: 0.85rem 1.1rem;
-  background: rgba(255, 255, 255, 0.025);
+  align-items: center;
+  gap: 0.6rem 1.5rem;
+  margin-top: 0.75rem;
+  padding: 0.55rem 0.95rem;
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
+  border-radius: 10px;
+  width: fit-content;
 }
 
 .benefitItem {
@@ -2233,14 +2630,16 @@
   gap: 0.5rem;
 
   svg {
-    color: #e10075;
+    color: #0070f3;
   }
 }
 
 /* Notifications Groups */
 .notifHeaderBanner {
-  background: linear-gradient(135deg, rgba(225, 0, 117, 0.15), rgba(139, 92, 246, 0.1));
-  border: 1px solid rgba(225, 0, 117, 0.2);
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(0, 112, 243, 0.15), rgba(139, 92, 246, 0.1));
+  border: 1px solid rgba(0, 112, 243, 0.2);
   border-radius: 16px;
   padding: 1.2rem 1.5rem;
   display: flex;
@@ -2249,7 +2648,22 @@
   margin-bottom: 1.5rem;
 }
 
+/* Large faint bell watermark in the banner background (shown on mobile only) */
+.notifBannerWatermark {
+  display: none;
+  position: absolute;
+  top: 50%;
+  right: -0.5rem;
+  transform: translateY(-50%);
+  color: #0070f3;
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: 0;
+}
+
 .notifIntroText {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -2271,8 +2685,8 @@
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: rgba(225, 0, 117, 0.2);
-  color: #ff007f;
+  background: rgba(0, 112, 243, 0.2);
+  color: #0070f3;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2287,7 +2701,7 @@
 .bulkPillBtn {
   padding: 0.4rem 0.85rem;
   border-radius: 20px;
-  background: #e10075;
+  background: #0070f3;
   border: none;
   color: #fff;
   font-size: 0.78rem;
@@ -2346,7 +2760,7 @@
   h4 {
     font-size: 0.95rem;
     font-weight: 700;
-    color: #ff007f;
+    color: #ffffff;
     margin: 0;
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -2354,7 +2768,7 @@
 }
 
 .groupIcon {
-  color: #ff007f;
+  color: #0070f3;
 }
 
 /* 3D Virtual Credit Cards Grid */
@@ -2527,8 +2941,8 @@
   transition: all 0.2s;
 
   &:hover {
-    background: #ff007f;
-    border-color: #ff007f;
+    background: #0070f3;
+    border-color: #0070f3;
   }
 }
 
@@ -2545,19 +2959,19 @@
 }
 
 /* Help Centre FAQ Enhancements */
-.helpHeroSearchOverlay {
+.helpHeroHeader {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.9rem;
 
   h3 {
-    font-size: 1.3rem;
+    font-size: 1.25rem;
     font-weight: 800;
     color: #fff;
-    margin: 0;
+    margin: 0 0 0.15rem 0;
   }
   p {
-    font-size: 0.85rem;
+    font-size: 0.84rem;
     color: rgba(255, 255, 255, 0.6);
     margin: 0;
   }
@@ -2567,8 +2981,8 @@
   width: 48px;
   height: 48px;
   border-radius: 14px;
-  background: rgba(225, 0, 117, 0.2);
-  color: #ff007f;
+  background: rgba(0, 112, 243, 0.2);
+  color: #0070f3;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2602,11 +3016,11 @@
 }
 
 .catPillActive {
-  background: #e10075 !important;
-  border-color: #e10075 !important;
+  background: #0070f3 !important;
+  border-color: #0070f3 !important;
   color: #ffffff !important;
   font-weight: 700;
-  box-shadow: 0 4px 12px rgba(225, 0, 117, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 112, 243, 0.3);
 }
 
 .searchClearBtn {
@@ -2624,63 +3038,93 @@
 }
 
 .accordionOpen {
-  border-color: rgba(225, 0, 117, 0.4) !important;
+  border-color: rgba(0, 112, 243, 0.4) !important;
   background: rgba(255, 255, 255, 0.03) !important;
 }
 
 /* FAQ search box */
 .faqSearchBox {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  background: #181818;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 0.7rem 1rem;
-  margin-bottom: 1rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.faqSearchBox:focus-within {
-  border-color: #e10075;
-  box-shadow: 0 0 0 3px rgba(225, 0, 117, 0.15);
+  width: 100%;
+  margin-bottom: 0;
 }
 
 .faqSearchIcon {
-  color: rgba(255, 255, 255, 0.4);
+  position: absolute;
+  left: 1rem;
+  color: rgba(255, 255, 255, 0.45);
+  pointer-events: none;
+  transition: color 0.2s ease;
   flex-shrink: 0;
 }
 
 .faqSearchInput {
-  flex: 1;
-  min-width: 0;
-  background: none;
-  border: none;
-  outline: none;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 0.72rem 2.8rem 0.72rem 2.7rem;
   color: #ffffff;
   font-size: 0.88rem;
-  font-family: inherit;
+  font-weight: 500;
+  outline: none;
+  transition: all 0.25s ease;
 }
 
 .faqSearchInput::placeholder {
-  color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.4);
 }
 
-.light .faqSearchBox {
-  background: #f7f7f9;
-  border-color: rgba(0, 0, 0, 0.1);
+.faqSearchInput:focus {
+  background: rgba(0, 0, 0, 0.5);
+  border-color: #0070f3;
+  box-shadow: 0 0 16px rgba(0, 112, 243, 0.25);
 }
 
-.light .faqSearchIcon {
-  color: rgba(26, 22, 37, 0.4);
+.faqSearchBox:focus-within .faqSearchIcon {
+  color: #0070f3;
+}
+
+.searchClearBtn {
+  position: absolute;
+  right: 0.85rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.searchClearBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
 }
 
 .light .faqSearchInput {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
   color: #1a1625;
 }
 
 .light .faqSearchInput::placeholder {
-  color: rgba(26, 22, 37, 0.3);
+  color: rgba(26, 22, 37, 0.45);
+}
+
+.light .faqSearchIcon {
+  color: rgba(26, 22, 37, 0.45);
+}
+
+.light .searchClearBtn {
+  background: rgba(0, 0, 0, 0.08);
+  color: rgba(26, 22, 37, 0.6);
 }
 
 .faqQuestionLeft {
@@ -2695,7 +3139,7 @@
   background: rgba(255, 255, 255, 0.08);
   font-size: 0.7rem;
   font-weight: 700;
-  color: #ff007f;
+  color: #0070f3;
   text-transform: uppercase;
 }
 
@@ -2754,8 +3198,8 @@
 }
 
 .helpCtaBanner {
-  background: linear-gradient(135deg, rgba(225, 0, 117, 0.15), rgba(30, 27, 75, 0.5));
-  border: 1px solid rgba(225, 0, 117, 0.3);
+  background: linear-gradient(135deg, rgba(0, 112, 243, 0.15), rgba(30, 27, 75, 0.5));
+  border: 1px solid rgba(0, 112, 243, 0.3);
   border-radius: 18px;
   padding: 1.25rem 1.5rem;
   display: flex;
@@ -2783,7 +3227,10 @@
 }
 
 .ctaHeadphoneIcon {
-  color: #ff007f;
+  color: #0070f3;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
 }
 
 /* Support Tickets Styling */
@@ -2794,26 +3241,28 @@
 }
 
 .ticketTabBtn {
-  padding: 0.35rem 0.85rem;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.78rem;
+  padding: 0.4rem 0.95rem;
+  border-radius: 9px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 
   &:hover {
-    color: #fff;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.06);
   }
 }
 
 .ticketTabActive {
-  background: rgba(225, 0, 117, 0.2) !important;
-  border-color: rgba(225, 0, 117, 0.4) !important;
-  color: #ff007f !important;
+  background: linear-gradient(135deg, #0070f3 0%, #7e00f3 100%) !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
   font-weight: 700;
+  box-shadow: 0 2px 10px rgba(0, 112, 243, 0.35);
 }
 
 .ticketTitleMeta {
@@ -2890,44 +3339,24 @@
 
 /* Contact Support */
 .contactHeroCard {
-  background: linear-gradient(135deg, rgba(225, 0, 117, 0.2), rgba(18, 18, 18, 0.9));
-  border: 1px solid rgba(225, 0, 117, 0.3);
+  background: linear-gradient(135deg, rgba(0, 112, 243, 0.2), rgba(18, 18, 18, 0.9));
+  border: 1px solid rgba(0, 112, 243, 0.3);
   border-radius: 20px;
-  padding: 1.5rem;
+  padding: 1.25rem 1.5rem;
   margin-bottom: 1.5rem;
 
   h3 {
     font-size: 1.3rem;
     font-weight: 800;
     color: #fff;
-    margin: 0.4rem 0 0.2rem 0;
+    margin: 0 0 0.25rem 0;
   }
   p {
     font-size: 0.85rem;
     color: rgba(255, 255, 255, 0.65);
     margin: 0;
+    line-height: 1.5;
   }
-}
-
-.liveSupportBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.25rem 0.65rem;
-  border-radius: 20px;
-  background: rgba(16, 185, 129, 0.15);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  color: #10b981;
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-
-.greenPulseDot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 8px #10b981;
 }
 
 .contactCatGrid {
@@ -2958,9 +3387,9 @@
 }
 
 .contactCatActive {
-  background: rgba(225, 0, 117, 0.2) !important;
-  border-color: #ff007f !important;
-  color: #ff007f !important;
+  background: rgba(0, 112, 243, 0.2) !important;
+  border-color: #0070f3 !important;
+  color: #0070f3 !important;
   font-weight: 700;
 }
 
@@ -2973,8 +3402,8 @@
   width: 52px;
   height: 52px;
   border-radius: 16px;
-  background: rgba(225, 0, 117, 0.2);
-  color: #ff007f;
+  background: rgba(0, 112, 243, 0.2);
+  color: #0070f3;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2983,8 +3412,8 @@
 
 .guidelineCardHeader {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 0.75rem;
   width: 100%;
   margin-bottom: 0.5rem;
 }
@@ -2993,8 +3422,8 @@
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: rgba(225, 0, 117, 0.15);
-  color: #ff007f;
+  background: rgba(0, 112, 243, 0.15);
+  color: #0070f3;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3007,8 +3436,8 @@
 
 /* Report Problem */
 .reportHeroCard {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(18, 18, 18, 0.9));
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: linear-gradient(135deg, rgba(0, 112, 243, 0.15), rgba(18, 18, 18, 0.9));
+  border: 1px solid rgba(0, 112, 243, 0.35);
   border-radius: 18px;
   padding: 1.25rem 1.5rem;
   display: flex;
@@ -3030,14 +3459,42 @@
 }
 
 .reportShieldIcon {
-  color: #ef4444;
+  color: #0070f3;
   flex-shrink: 0;
+}
+
+.light .reportHeroCard {
+  background: linear-gradient(135deg, rgba(0, 112, 243, 0.12) 0%, rgba(126, 0, 243, 0.12) 100%);
+  border-color: rgba(0, 112, 243, 0.22);
+}
+
+.light .reportHeroCard h3 {
+  color: #1a1625;
+}
+
+.light .reportHeroCard p {
+  color: rgba(26, 22, 37, 0.65);
 }
 
 .reasonPillGrid {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+}
+
+.reasonSelectMobile {
+  display: none;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .reasonPillGrid {
+    display: none !important;
+  }
+
+  .reasonSelectMobile {
+    display: block !important;
+  }
 }
 
 .reasonPill {
@@ -3050,24 +3507,43 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+}
 
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-  }
+.reasonPill:hover {
+  background: rgba(0, 112, 243, 0.15);
+  border-color: rgba(0, 112, 243, 0.4);
+  color: #0070f3;
 }
 
 .reasonPillActive {
-  background: rgba(239, 68, 68, 0.2) !important;
-  border-color: #ef4444 !important;
-  color: #ef4444 !important;
+  background: rgba(0, 112, 243, 0.18) !important;
+  border-color: #0070f3 !important;
+  color: #0070f3 !important;
   font-weight: 700;
+}
+
+.light .reasonPill {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+  color: #52525b;
+}
+
+.light .reasonPill:hover {
+  background: rgba(0, 112, 243, 0.08);
+  border-color: rgba(0, 112, 243, 0.3);
+  color: #0070f3;
+}
+
+.light .reasonPillActive {
+  background: rgba(0, 112, 243, 0.12) !important;
+  border-color: #0070f3 !important;
+  color: #0070f3 !important;
 }
 
 /* ================= IMAGE UPLOAD DROPZONE ================= */
 .s3UploadDropzone {
   background: rgba(255, 255, 255, 0.03);
-  border: 2px dashed rgba(225, 0, 117, 0.3);
+  border: 2px dashed rgba(0, 112, 243, 0.3);
   border-radius: 14px;
   padding: 1.25rem;
   cursor: pointer;
@@ -3075,8 +3551,8 @@
 }
 
 .s3UploadDropzone:hover {
-  background: rgba(225, 0, 117, 0.05);
-  border-color: #e10075;
+  background: rgba(0, 112, 243, 0.05);
+  border-color: #0070f3;
 }
 
 .s3DropzoneContent {
@@ -3089,8 +3565,8 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: rgba(225, 0, 117, 0.15);
-  color: #e10075;
+  background: rgba(0, 112, 243, 0.15);
+  color: #0070f3;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3112,9 +3588,9 @@
 
 .s3UploadBtn {
   margin-left: auto;
-  background: rgba(225, 0, 117, 0.15);
-  border: 1px solid rgba(225, 0, 117, 0.4);
-  color: #e10075;
+  background: rgba(0, 112, 243, 0.15);
+  border: 1px solid rgba(0, 112, 243, 0.4);
+  color: #0070f3;
   padding: 0.45rem 0.9rem;
   border-radius: 8px;
   font-size: 0.78rem;
@@ -3125,26 +3601,27 @@
 }
 
 .s3UploadBtn:hover {
-  background: #e10075;
+  background: #0070f3;
   color: #ffffff;
 }
 
 /* ================= SUB-PAGES MOBILE (Profile, Security, Notifications, Payments, Help, Tickets, Contact, Guidelines, Report) ================= */
 @media (max-width: 768px) {
   .subPageHeader {
-    gap: 0.65rem;
-    margin-bottom: 1rem;
-    align-items: flex-start;
+    gap: 0.6rem;
+    margin-bottom: 0.85rem;
+    /* Vertically centre the page title against the back button on mobile */
+    align-items: center;
   }
 
   .backBtn {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
   }
 
   .subPageTitle {
-    font-size: 1.05rem;
+    font-size: 1.28rem;
   }
 
   .subPageDesc {
@@ -3152,58 +3629,58 @@
   }
 
   .subPageBody {
-    gap: 1rem;
+    gap: 0.85rem;
   }
 
   .statusAlert {
-    padding: 0.7rem 0.85rem;
-    font-size: 0.8rem;
-    gap: 0.55rem;
-    margin-bottom: 0.9rem;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.75rem;
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
     border-radius: 10px;
   }
 
   /* --- Forms --- */
   .formGrid {
-    gap: 0.9rem;
+    gap: 0.75rem;
   }
 
   .formRow2Col,
   .formRow3Col,
   .formRow {
     grid-template-columns: 1fr;
-    gap: 0.85rem;
+    gap: 0.75rem;
   }
 
   .nameUserRow {
     display: grid;
     grid-template-columns: 1fr 1fr !important;
-    gap: 0.65rem !important;
+    gap: 0.55rem !important;
   }
 
   .formGroup {
-    gap: 0.35rem;
+    gap: 0.3rem;
   }
 
   .formLabel {
-    font-size: 0.76rem;
+    font-size: 0.72rem;
   }
 
   .formInput,
   .formSelect,
   .formTextarea {
-    padding: 0.65rem 0.85rem;
-    font-size: 0.85rem;
-    border-radius: 10px;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.8rem;
+    border-radius: 9px;
   }
 
   .formTextarea {
-    min-height: 90px;
+    min-height: 80px;
   }
 
   .charCount {
-    bottom: -1.05rem;
-    font-size: 0.66rem;
+    bottom: -0.95rem;
+    font-size: 0.62rem;
   }
 
   .formActionsRight {
@@ -3213,13 +3690,14 @@
   .submitBtn {
     width: 100%;
     justify-content: center;
-    padding: 0.65rem 1.2rem;
-    font-size: 0.85rem;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.76rem;
+    border-radius: 10px;
   }
 
   .actionBtn {
-    padding: 0.55rem 1rem;
-    font-size: 0.8rem;
+    padding: 0.48rem 0.9rem;
+    font-size: 0.76rem;
   }
 
   /* --- Profile --- */
@@ -3239,63 +3717,63 @@
   }
 
   .profileAvatarContainer {
-    width: 66px;
-    height: 66px;
+    width: 58px;
+    height: 58px;
     border-width: 3px;
   }
 
   .onlineBadgeDot {
-    width: 13px;
-    height: 13px;
+    width: 12px;
+    height: 12px;
     border-width: 2px;
   }
 
   .heroNameRow {
-    gap: 0.5rem;
+    gap: 0.45rem;
     flex-wrap: wrap;
   }
 
   .heroNameRow h3 {
-    font-size: 1.05rem;
+    font-size: 0.95rem;
   }
 
   .verifiedChip {
-    font-size: 0.68rem;
-    padding: 0.2rem 0.5rem;
-    gap: 0.2rem;
+    font-size: 0.64rem;
+    padding: 0.18rem 0.45rem;
+    gap: 0.18rem;
   }
 
   .heroUsername {
-    font-size: 0.78rem;
+    font-size: 0.74rem;
   }
 
   .heroEmailBadge {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
   }
 
   .s3UploadDropzone {
-    padding: 0.9rem;
-    border-radius: 12px;
+    padding: 0.8rem;
+    border-radius: 11px;
   }
 
   .s3DropzoneContent {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 0.6rem;
+    gap: 0.55rem;
   }
 
   .s3UploadIconCircle {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
   }
 
   .s3DropzoneTitle {
-    font-size: 0.82rem;
+    font-size: 0.78rem;
   }
 
   .s3DropzoneSub {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
   }
 
   .s3UploadBtn {
@@ -3308,37 +3786,68 @@
 
   /* --- Security --- */
   .securityCard {
-    padding: 1rem 1.05rem;
-    border-radius: 14px;
-    gap: 0.9rem;
+    padding: 0.9rem 0.95rem;
+    border-radius: 13px;
+    gap: 0.8rem;
   }
 
   .securityCardHeader {
     flex-direction: column;
-    gap: 0.7rem;
-  }
-
-  .securityCardTitleRow {
     gap: 0.6rem;
   }
 
+  /* Move the Update Password button to the end of the Change Password card on
+     mobile: unfold the header into the form's flex flow, then push the button
+     to the bottom via order (the form grid keeps its natural position). */
+  form.securityCard .securityCardHeader {
+    display: contents;
+  }
+
+  form.securityCard .pwdSubmitBtn {
+    order: 3;
+  }
+
+  .securityCardTitleRow {
+    /* Vertically centre the section icon against the header text on mobile */
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  /* Let the text column fill the row so the 2FA badge can sit top-right */
+  .securityCardTitleRow > div:last-child {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Pin the 2FA status badge to the top-right of the card on mobile */
+  .secTitleBadgeRow {
+    width: 100%;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .secTitleBadgeRow .securityCardTitle {
+    flex: 1;
+    min-width: 0;
+  }
+
   .securityIconBox {
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
     border-radius: 10px;
   }
 
   .securityCardTitle {
-    font-size: 0.92rem;
+    font-size: 0.88rem;
   }
 
   .securityCardDesc {
-    font-size: 0.78rem;
+    display: none !important;
   }
 
   .securityStatusBadge {
-    font-size: 0.68rem;
-    padding: 0.25rem 0.6rem;
+    font-size: 0.64rem;
+    padding: 0.22rem 0.55rem;
   }
 
   .twoFaActions {
@@ -3350,16 +3859,16 @@
   .cancelBtn {
     flex: 1;
     text-align: center;
-    padding: 0.6rem 1rem;
-    font-size: 0.82rem;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.78rem;
   }
 
   .strengthMeterBox {
-    padding: 0.7rem 0.85rem;
+    padding: 0.6rem 0.75rem;
   }
 
   .otpCardBox {
-    padding: 1.2rem 0.9rem;
+    padding: 1rem 0.8rem;
   }
 
   .otpInputRow {
@@ -3371,99 +3880,141 @@
   .notifHeaderBanner {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.75rem;
-    padding: 1rem;
-    margin-bottom: 1rem;
+    gap: 0.6rem;
+    padding: 0.8rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .notifBannerWatermark {
+    display: block;
+    right: 0.25rem;
+    width: 84px;
+    height: 84px;
+    opacity: 0.12;
   }
 
   .notifHeaderIconBox {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
   }
 
   .notifIntroText {
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.4rem;
   }
 
   .notifIntroText h3 {
-    font-size: 1rem;
+    font-size: 0.85rem;
   }
 
   .notifIntroText p {
-    font-size: 0.75rem;
+    font-size: 0.68rem;
   }
 
   .bulkActionsRow {
     width: 100%;
     flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .bulkPillBtn,
+  .bulkPillBtnSecondary {
+    padding: 0.3rem 0.7rem;
+    font-size: 0.72rem;
   }
 
   .notifIntro {
-    padding: 0.85rem 1rem;
-    font-size: 0.8rem;
+    padding: 0.7rem 0.85rem;
+    font-size: 0.74rem;
+  }
+
+  .notifGroupsContainer {
+    gap: 0.85rem;
+  }
+
+  .notifGroupTitleRow {
+    gap: 0.5rem;
+    margin-bottom: 0.7rem;
+    padding-bottom: 0.6rem;
+  }
+
+  .notifGroupTitleRow h4 {
+    font-size: 0.85rem;
   }
 
   .notifList {
-    border-radius: 14px;
+    border-radius: 12px;
   }
 
   .notifRow {
-    padding: 0.85rem 1rem;
-    gap: 0.75rem;
+    padding: 0.65rem 0.8rem;
+    gap: 0.6rem;
   }
 
   .notifTitle {
-    font-size: 0.88rem;
+    font-size: 0.78rem;
   }
 
   .notifDesc {
-    font-size: 0.76rem;
+    font-size: 0.68rem;
   }
 
   .toggle {
-    width: 40px;
-    height: 24px;
+    width: 34px;
+    height: 20px;
   }
 
   .toggleThumb {
-    width: 18px;
-    height: 18px;
+    width: 14px;
+    height: 14px;
   }
 
   .toggleOn .toggleThumb {
-    transform: translateX(16px);
+    transform: translateX(14px);
   }
 
   .notifGroupCard {
-    padding: 0.95rem 1rem;
-    border-radius: 14px;
+    padding: 0.75rem 0.85rem;
+    border-radius: 12px;
   }
 
   /* --- Payments --- */
   .payHeaderRow {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.7rem;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
   }
 
+  .payIntroGroup h3 {
+    font-size: 0.88rem;
+  }
+
+  /* Hide the descriptive subtitle on mobile */
   .payIntro {
-    font-size: 0.8rem;
+    display: none;
+  }
+
+  .payHeaderRow .actionBtn {
+    flex-shrink: 0;
+    padding: 0.5rem 0.95rem;
+    font-size: 0.76rem;
+    white-space: nowrap;
   }
 
   .payForm {
-    padding: 1.05rem;
-    border-radius: 14px;
+    padding: 0.9rem;
+    border-radius: 13px;
   }
 
   .cardItem {
-    padding: 1.05rem;
-    border-radius: 14px;
+    padding: 0.9rem;
+    border-radius: 13px;
   }
 
   .cardItemTop {
-    margin-bottom: 1.2rem;
+    margin-bottom: 1rem;
   }
 
   .cardActions {
@@ -3471,8 +4022,8 @@
   }
 
   .cardActionBtn {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.74rem;
+    padding: 0.36rem 0.7rem;
+    font-size: 0.7rem;
   }
 
   .virtualCardGrid {
@@ -3486,27 +4037,23 @@
 
   /* --- Help Centre --- */
   .helpCentreHero {
-    padding: 1.1rem;
+    padding: 1.1rem 1.15rem;
     border-radius: 14px;
-    gap: 0.75rem;
+    gap: 0.85rem;
   }
 
-  .helpCentreHero h3 {
-    font-size: 1rem;
-  }
-
-  .helpCentreHero p {
-    font-size: 0.78rem;
-  }
-
-  .helpHeroSearchOverlay {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.6rem;
-  }
-
-  .helpHeroSearchOverlay h3 {
+  .helpHeroContent h3 {
     font-size: 1.1rem;
+  }
+
+  .helpHeroContent p {
+    font-size: 0.78rem;
+    max-width: 90%;
+  }
+
+  .heroWatermarkIcon {
+    right: -0.6rem;
+    bottom: -0.9rem;
   }
 
   .accordionItem {
@@ -3514,26 +4061,50 @@
   }
 
   .accordionTrigger {
-    padding: 0.85rem 1rem;
-    font-size: 0.88rem;
+    padding: 0.62rem 0.75rem;
   }
 
-  .accordionPanel {
-    padding: 0.75rem 1rem 1rem 1rem;
-  }
-
-  .accordionPanel p {
-    font-size: 0.82rem;
-  }
-
-  .faqSearchBox {
-    padding: 0.6rem 0.85rem;
-    border-radius: 10px;
+  .faqQuestionLeft {
     gap: 0.5rem;
   }
 
+  .faqTag {
+    font-size: 0.62rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 5px;
+    letter-spacing: 0.03em;
+    flex-shrink: 0;
+  }
+
+  .faqQuestionText {
+    font-size: 0.78rem;
+    line-height: 1.35;
+    font-weight: 600;
+  }
+
+  .accordionPanel {
+    padding: 0.55rem 0.75rem 0.75rem 0.75rem;
+  }
+
+  .faqAnswerText,
+  .accordionPanel p {
+    font-size: 0.76rem;
+    line-height: 1.45;
+  }
+
+  .catPill {
+    padding: 0.32rem 0.7rem;
+    font-size: 0.74rem;
+  }
+
+  .faqSearchBox {
+    padding: 0.55rem 0.75rem;
+    border-radius: 9px;
+    gap: 0.45rem;
+  }
+
   .faqSearchInput {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
 
   .faqRatingRow {
@@ -3541,18 +4112,37 @@
   }
 
   .ticketReplyCallout {
-    padding: 0.65rem 0.8rem;
+    padding: 0.6rem 0.75rem;
   }
 
   .helpCtaBanner {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 0.8rem;
-    padding: 1.1rem;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 0.9rem 1rem;
+    border-radius: 14px;
+  }
+
+  .ctaHeadphoneIcon {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+  }
+
+  .helpCtaBanner .supportBtn {
+    display: inline-flex !important;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.48rem 0.85rem;
+    font-size: 0.78rem;
+    border-radius: 99px;
+    margin-top: 0.2rem;
   }
 
   .helpCta {
-    padding: 0.95rem 1.1rem;
+    padding: 0.85rem 1rem;
   }
 
   /* --- Tickets --- */
@@ -3566,12 +4156,12 @@
   }
 
   .ticketCard {
-    padding: 0.95rem 1.05rem;
+    padding: 0.85rem 0.95rem;
     border-radius: 12px;
   }
 
   .ticketSubject {
-    font-size: 0.9rem;
+    font-size: 0.86rem;
   }
 
   .ticketHeader {
@@ -3584,135 +4174,828 @@
 
   .ticketFooter {
     flex-wrap: wrap;
-    gap: 0.75rem;
+    gap: 0.6rem;
   }
 
   /* --- Contact --- */
   .contactHeroCard {
-    padding: 1.15rem;
-    border-radius: 16px;
-    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 15px;
+    margin-bottom: 0.9rem;
   }
 
   .contactHeroCard h3 {
-    font-size: 1.1rem;
-  }
-
-  .contactCatGrid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.6rem;
-  }
-
-  .contactCatCard {
-    padding: 0.7rem 0.4rem;
-    font-size: 0.74rem;
-  }
-
-  .contactHero {
-    padding: 1.25rem 1rem;
-    border-radius: 14px;
-  }
-
-  .contactHero h3 {
     font-size: 1.05rem;
   }
 
+  .contactCatGrid {
+    /* All four category cards in a single row on mobile */
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.4rem;
+  }
+
+  .contactCatCard {
+    padding: 0.45rem 0.25rem;
+    font-size: 0.6rem;
+    border-radius: 10px;
+    gap: 0.25rem;
+    line-height: 1.25;
+  }
+
+  .contactCatCard svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .contactHero {
+    padding: 1.1rem 0.9rem;
+    border-radius: 13px;
+  }
+
+  .contactHero h3 {
+    font-size: 1rem;
+  }
+
   .contactHero p {
-    font-size: 0.8rem;
+    font-size: 0.76rem;
   }
 
   /* --- Guidelines --- */
   .guidelinesHero {
-    padding: 1.25rem 1rem;
-    border-radius: 14px;
+    padding: 1.1rem 0.9rem;
+    border-radius: 13px;
+  }
+
+  .guidelinesWatermarkIcon {
+    right: 0.25rem;
+    width: 84px;
+    height: 84px;
+    opacity: 0.12;
   }
 
   .guidelinesHero h3 {
-    font-size: 1.05rem;
+    font-size: 1rem;
   }
 
   .guidelinesGrid {
     grid-template-columns: 1fr;
-    gap: 0.7rem;
+    gap: 0.65rem;
   }
 
   .guidelineCard {
-    padding: 1.05rem 1.1rem;
+    padding: 0.9rem 1rem;
     border-radius: 12px;
   }
 
   .guidelineCard h4 {
-    font-size: 0.92rem;
+    font-size: 0.88rem;
   }
 
   .guidelineCard p {
-    font-size: 0.8rem;
+    font-size: 0.76rem;
   }
 
   .guidelinesHeartBadge {
-    width: 42px;
-    height: 42px;
-    border-radius: 13px;
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
   }
 
   /* --- Report --- */
   .reportHeroCard {
-    padding: 1.05rem;
-    border-radius: 14px;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-  }
-
-  .reportHeroCard h3 {
-    font-size: 1.05rem;
+    display: none !important;
   }
 
   .segmentedControl {
-    padding: 0.3rem;
+    padding: 0.28rem;
   }
 
   .segmentBtn {
-    font-size: 0.8rem;
-    padding: 0.5rem 0.7rem;
+    font-size: 0.76rem;
+    padding: 0.45rem 0.6rem;
   }
 
   .emptyBox {
-    padding: 1.75rem 1rem;
-    border-radius: 14px;
+    padding: 1.5rem 0.9rem;
+    border-radius: 13px;
   }
 
   .emptyBox p {
-    font-size: 0.82rem;
+    font-size: 0.78rem;
   }
 }
 
 /* Extra-small screens: keep everything comfortably readable */
 @media (max-width: 420px) {
   .subPageTitle {
-    font-size: 0.98rem;
+    font-size: 1.12rem;
   }
 
   .saveProfileHeaderBtn {
-    padding: 0.45rem 0.85rem;
-    font-size: 0.72rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.68rem;
   }
 
   .heroNameRow h3 {
-    font-size: 0.98rem;
+    font-size: 0.9rem;
   }
 
   .profileHeroContent {
-    gap: 0.75rem;
+    gap: 0.65rem;
   }
 
   .profileAvatarContainer {
-    width: 58px;
-    height: 58px;
+    width: 52px;
+    height: 52px;
   }
 
   .notifHeaderBanner {
-    padding: 0.9rem;
+    padding: 0.8rem;
   }
 }
+
+/* ==========================================
+   MY ISSUES & TRACKER STYLES
+   ========================================== */
+.issuesFilterBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.6rem;
+  margin-bottom: 1.6rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  flex-wrap: wrap;
+}
+
+.ticketFilterTabs {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.035);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 0;
+}
+
+.statusFilterDropdownGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.filterLabel {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.selectWrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.issueStatusSelect {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  padding: 0.42rem 2.2rem 0.42rem 0.85rem;
+  border-radius: 9px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  min-width: 140px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.issueStatusSelect:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(0, 112, 243, 0.4);
+}
+
+.issueStatusSelect:focus {
+  border-color: #0070f3;
+  box-shadow: 0 0 12px rgba(0, 112, 243, 0.2);
+}
+
+.issueStatusSelect option {
+  background: #121216;
+  color: #ffffff;
+}
+
+.selectChevron {
+  position: absolute;
+  right: 0.65rem;
+  pointer-events: none;
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.2s ease;
+}
+
+.selectWrapper:hover .selectChevron {
+  color: #ffffff;
+}
+
+.ticketReplyCallout {
+  display: flex;
+  gap: 0.6rem;
+  background: linear-gradient(135deg, rgba(0, 112, 243, 0.08) 0%, rgba(126, 0, 243, 0.05) 100%);
+  border: 1px solid rgba(0, 112, 243, 0.25);
+  border-radius: 10px;
+  padding: 0.55rem 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.supportAvatarMini {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: linear-gradient(135deg, #0070f3 0%, #7e00f3 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.replyContentText {
+  flex: 1;
+  min-width: 0;
+}
+
+.replyHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.2rem;
+}
+
+.replyHeaderRow strong {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.replyTimeText {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.replyBodyText {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.pendingReplyBanner {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.65rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.ticketFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.45rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ticketCategoryPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.18rem 0.45rem;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.ticketDate {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.spinSlow {
+  animation: spinSlow 3s linear infinite;
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ==========================================
+   MY ISSUES LIGHT MODE OVERRIDES
+   ========================================== */
+.light .issuesFilterBar {
+  border-top-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .ticketFilterTabs {
+  background: #f3f3f6;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .ticketTabBtn {
+  color: rgba(26, 22, 37, 0.65);
+}
+
+.light .ticketTabBtn:hover {
+  color: #1a1625;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.light .ticketTabActive {
+  background: linear-gradient(135deg, #0070f3 0%, #7e00f3 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(0, 112, 243, 0.25);
+}
+
+.light .filterLabel {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .issueStatusSelect {
+  background: #f3f3f6;
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #1a1625;
+}
+
+.light .issueStatusSelect:hover {
+  background: #eaeaef;
+  border-color: rgba(0, 112, 243, 0.4);
+}
+
+.light .issueStatusSelect option {
+  background: #ffffff;
+  color: #1a1625;
+}
+
+.light .selectChevron {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .ticketCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+}
+
+.light .ticketIdChip {
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(26, 22, 37, 0.75);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .reportChip {
+  background: rgba(239, 68, 68, 0.08) !important;
+  color: #dc2626 !important;
+  border-color: rgba(239, 68, 68, 0.2) !important;
+}
+
+.light .ticketSubjectTitle {
+  color: #1a1625;
+}
+
+.light .ticketDetailsBox {
+  background: #f7f7f9;
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .ticketChip {
+  background: rgba(0, 112, 243, 0.08);
+  color: #0070f3;
+  border-color: rgba(0, 112, 243, 0.2);
+}
+
+.light .ticketMessagePreview {
+  color: rgba(26, 22, 37, 0.82);
+}
+
+.light .ticketReplyCallout {
+  background: rgba(0, 112, 243, 0.04);
+  border-color: rgba(0, 112, 243, 0.18);
+}
+
+.light .replyHeaderRow strong {
+  color: #1a1625;
+}
+
+.light .replyBodyText {
+  color: rgba(26, 22, 37, 0.9);
+}
+
+.light .pendingReplyBanner {
+  background: #f7f7f9;
+  border-color: rgba(0, 0, 0, 0.12);
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .ticketCategoryPill {
+  background: #f3f3f6;
+  border-color: rgba(0, 0, 0, 0.08);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .ticketDate {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .emptyBox {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  color: rgba(26, 22, 37, 0.6);
+}
+
+/* Security Light Overrides */
+.light .inputEyeBtn {
+  color: #64748b;
+}
+.light .inputEyeBtn:hover {
+  color: #1a1625;
+}
+.light .strengthMeterBox {
+  background: #f8fafc;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+.light .strengthMeterHeader {
+  color: #52525b;
+}
+.light .checkFail {
+  color: #9ca3af;
+}
+.light .otpCardBox {
+  background: #f8fafc;
+  border-color: rgba(0, 112, 243, 0.3);
+}
+.light .otpCardBox h4 {
+  color: #1a1625;
+}
+.light .otpCardBox p {
+  color: #52525b;
+}
+.light .otpInputBig {
+  background: #ffffff !important;
+  border-color: rgba(0, 112, 243, 0.4) !important;
+  color: #1a1625 !important;
+}
+.light .twoFaBenefits {
+  background: #f8fafc;
+  border-color: rgba(0, 0, 0, 0.06);
+}
+.light .benefitItem {
+  color: #52525b;
+}
+
+/* Notifications Light Overrides */
+.light .notifIntroText h3 {
+  color: #1a1625;
+}
+.light .notifIntroText p {
+  color: #52525b;
+}
+.light .notifHeaderBanner {
+  background: linear-gradient(135deg, rgba(0, 112, 243, 0.08), rgba(139, 92, 246, 0.05));
+  border-color: rgba(0, 112, 243, 0.2);
+}
+.light .notifGroupCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+.light .notifGroupTitleRow h4 {
+  color: #1a1625;
+}
+.light .bulkPillBtnSecondary {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: #52525b;
+}
+.light .bulkPillBtnSecondary:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Help Centre Light Overrides */
+.light .faqQuestionText {
+  color: #1a1625;
+}
+.light .faqAnswerText {
+  color: #52525b;
+}
+.light .faqRatingRow {
+  color: #64748b;
+  border-top-color: rgba(0, 0, 0, 0.08);
+}
+.light .rateBtn {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #52525b;
+}
+.light .rateBtn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: #1a1625;
+}
+.light .helpCtaLeft h4 {
+  color: #1a1625;
+}
+.light .helpCtaLeft p {
+  color: #52525b;
+}
+.light .faqTag {
+  background: rgba(0, 112, 243, 0.08);
+  color: #0070f3;
+}
+
+/* Category filter pills must stay visible on the light theme (base styles
+   are white-tinted dark-theme colors and would vanish on a light bg) */
+.light .catPill {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.12);
+  color: #52525b;
+}
+
+.light .catPill:hover {
+  background: rgba(0, 112, 243, 0.08);
+  border-color: rgba(0, 112, 243, 0.3);
+  color: #1a1625;
+}
+
+/* Match the "Still need assistance?" banner to the Knowledge Hub & FAQ hero
+   (blue -> purple tint) instead of the dark navy stop used in dark mode */
+.light .helpCtaBanner {
+  background: linear-gradient(135deg, rgba(0, 112, 243, 0.12) 0%, rgba(126, 0, 243, 0.12) 100%);
+  border-color: rgba(0, 112, 243, 0.22);
+}
+
+/* Contact Support Light Overrides */
+.light .contactCatCard {
+  background: #f8fafc;
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #52525b;
+}
+.light .contactCatCard:hover {
+  background: #f1f5f9;
+  color: #1a1625;
+}
+.light .contactCatActive {
+  background: rgba(0, 112, 243, 0.12) !important;
+  border-color: #0070f3 !important;
+  color: #0070f3 !important;
+}
+.light .contactHeroCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+.light .contactHeroCard h3 {
+  color: #1a1625;
+}
+.light .contactHeroCard p {
+  color: #52525b;
+}
+
+/* Community Guidelines Light Overrides */
+.light .guidelinesFooter {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: #dc2626;
+}
+.light .footerAlertIcon {
+  color: #dc2626;
+}
+.light .guidelineIconWrap {
+  background: rgba(0, 112, 243, 0.08);
+  color: #0070f3;
+}
+
+/* ==========================================
+   MY ISSUES MOBILE RESPONSIVENESS
+   ========================================== */
+.issueHeaderActions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-left: auto;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: 9px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(135deg, #0070f3 0%, #7e00f3 100%);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionBtn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.actionBtnOutline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: 9px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionBtnOutline:hover {
+  background: rgba(239, 68, 68, 0.18);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .subPageHeader {
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
+  }
+
+  .subPageTitleBlock {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  .subPageTitle {
+    font-size: 1.12rem !important;
+    line-height: 1.3 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .subPageDesc {
+    display: none !important;
+  }
+
+  .saveProfileHeaderBtn {
+    margin-left: auto !important;
+    flex-shrink: 0 !important;
+    padding: 0.45rem 0.75rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 10px !important;
+    white-space: nowrap !important;
+    align-self: center !important;
+  }
+
+  .issueHeaderActions {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-top: 0.4rem !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.5rem !important;
+  }
+
+  .issueHeaderActions button {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 0.52rem 0.6rem !important;
+    font-size: 0.78rem !important;
+    white-space: nowrap !important;
+  }
+
+  .issuesFilterBar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    margin-top: 1rem !important;
+    margin-bottom: 1.1rem !important;
+    padding-top: 0.85rem !important;
+  }
+
+  .ticketFilterTabs {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    overflow-x: auto;
+    padding: 3px;
+  }
+
+  .ticketTabBtn {
+    flex: 1;
+    text-align: center;
+    padding: 0.45rem 0.4rem !important;
+    font-size: 0.75rem !important;
+    white-space: nowrap;
+  }
+
+  .statusFilterDropdownGroup {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+  }
+
+  .selectWrapper {
+    flex: 1;
+    width: 100%;
+  }
+
+  .issueStatusSelect {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .ticketCard {
+    padding: 0.95rem !important;
+    border-radius: 14px !important;
+    margin-bottom: 0.85rem !important;
+  }
+
+  .ticketHeader {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
+    margin-bottom: 0.65rem !important;
+  }
+
+  .ticketTitleMeta {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.3rem !important;
+  }
+
+  .ticketSubject {
+    font-size: 0.92rem !important;
+    font-weight: 700 !important;
+  }
+
+  .ticketIdChip {
+    font-size: 0.68rem !important;
+    padding: 0.2rem 0.45rem !important;
+  }
+
+  .statusBadge {
+    padding: 0.25rem 0.55rem !important;
+    font-size: 0.72rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  .ticketMessagePreview {
+    font-size: 0.82rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .pendingReplyBanner {
+    padding: 0.55rem 0.75rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .ticketFooter {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-direction: row !important;
+    gap: 0.5rem !important;
+    margin-top: 0.75rem !important;
+    padding-top: 0.65rem !important;
+    font-size: 0.72rem !important;
+  }
+}
+
 
 

@@ -66,7 +66,7 @@ export const AdminUserDrawer = ({ user, activity, loading, onClose, onUnblock })
             <img src={user.avatarUrl || DEFAULT_AVATAR} alt={user.displayName} className={styles.drawerUserAvatar} />
             <div className={styles.drawerUserText}>
               <span className={styles.drawerUserName}>{user.displayName}</span>
-              <span className={styles.drawerUserSub}>@{user.username} · {user.email}</span>
+              <span className={styles.drawerUserSub}>@{user.username} · Ref: {user.referralCode || '—'} · {user.email}</span>
             </div>
           </div>
           <button className={styles.drawerCloseBtn} onClick={onClose} aria-label="Close details">

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { api } from '../../../services/api';
 import { getSocket, joinSocketRoom } from '../../../services/socket';
-import { 
+import {
   Search, BadgeCheck, Phone, Video, Gift, MoreVertical,
   Lock, Image as ImageIcon, Send, Plus, Star,
   X, Check, MessageSquare, User, ChevronLeft, SlidersHorizontal
@@ -35,9 +35,9 @@ const GradientBadgeCheck = ({ size = 15 }) => (
         <stop offset="100%" stopColor="#7e00f3" />
       </linearGradient>
     </defs>
-    <path 
-      d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76z" 
-      fill="url(#badgeGrad)" 
+    <path
+      d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76z"
+      fill="url(#badgeGrad)"
     />
     <path d="m9 12 2 2 4-4" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
@@ -142,7 +142,7 @@ export const MessagesPage = () => {
   const [loadingTargetCreator, setLoadingTargetCreator] = useState(false);
   const currentUserId = user?.id || null;
   const convIdsRef = useRef(new Set());
-  
+
   const { convId: selectedConvId, msgId: selectedMsgId } = parseMessagesPath(currentPath);
 
   const [filter, setFilter] = useState('all');
@@ -435,7 +435,7 @@ export const MessagesPage = () => {
   const filteredConversations = useMemo(() => {
     const base = conversationsToFilter.filter((c) => {
       const matchesSearch = c.user.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            c.lastMessage.toLowerCase().includes(searchQuery.toLowerCase());
+        c.lastMessage.toLowerCase().includes(searchQuery.toLowerCase());
       if (!matchesSearch) return false;
       if (chatFilters.type === 'subscribed') return true; // placeholder: subscription data not exposed in this view
       return matchesChatFilters(c, chatFilters, {});
@@ -622,497 +622,497 @@ export const MessagesPage = () => {
   if (isMobile) {
     return (
       <>
-      <div className={`${styles.mobileContainer} ${!darkMode ? styles.lightMobile : ''}`}>
-        
-        {/* ================= VIEW 1: CHATS LIST ================= */}
-        {mobileView === 'list' && (
-          <div className={styles.mobileListScreen}>
-            {/* Header */}
-            <div className={styles.mobileHeader}>
-              <div className={styles.headerTitleBlock} style={{ flex: 1, minWidth: 0 }}>
-                <div className={styles.titleRow} style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.2rem' }}>
-                  {showArchived ? (
-                    <button 
-                      type="button" 
-                      className={styles.mobileHeaderBack} 
-                      onClick={() => setShowArchived(false)}
-                      style={{ background: 'transparent', border: 'none', color: 'inherit', padding: '0.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                    >
-                      <ChevronLeft size={24} />
-                    </button>
-                  ) : (
-                    <MessageSquare size={24} style={{ stroke: 'url(#activeGradient)', filter: 'drop-shadow(0 2px 6px rgba(225,0,117,0.3))' }} />
-                  )}
-                  <h1 className={styles.pageTitle} style={{ fontSize: '1.15rem', fontWeight: 800, margin: 0, color: 'inherit' }}>
-                    {showArchived ? 'Archived' : 'Chats'}
-                  </h1>
-                </div>
-              </div>
-            </div>
+        <div className={`${styles.mobileContainer} ${!darkMode ? styles.lightMobile : ''}`}>
 
-            {/* Search */}
-            <div className={styles.mobileSearchWrapper}>
-              <Search size={16} className={styles.mobileSearchIcon} />
-              <input 
-                type="text"
-                placeholder="Search chats..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className={styles.mobileSearchInput}
-              />
-              <button
-                className={`${styles.mobileFilterBtn} ${activeFilterCount > 0 ? styles.mobileFilterBtnActive : ''}`}
-                onClick={() => setFilterSheetOpen(true)}
-                aria-label="Open filters"
-              >
-                <SlidersHorizontal size={16} />
-                {activeFilterCount > 0 && <span className={styles.filterBadge} />}
-              </button>
-            </div>
-
-            {/* Filter Pills */}
-            <div className={styles.mobileFilterPills}>
-              <button 
-                className={`${styles.mobileFilterPill} ${filter === 'all' ? styles.mobileFilterActive : ''}`}
-                onClick={() => setTypeFilter('all')}
-              >
-                All
-              </button>
-              <button 
-                className={`${styles.mobileFilterPill} ${filter === 'unread' ? styles.mobileFilterActive : ''}`}
-                onClick={() => setTypeFilter('unread')}
-              >
-                Unread
-              </button>
-              <button 
-                className={`${styles.mobileFilterPill} ${filter === 'subscribed' ? styles.mobileFilterActive : ''}`}
-                onClick={() => setTypeFilter('subscribed')}
-              >
-                Subscribed
-              </button>
-            </div>
-
-            {/* Chats List */}
-            <div className={styles.mobileConvList}>
-              {filteredConversations.length > 0 ? (
-                filteredConversations.map((conv) => {
-                  const isSelected = conv.id === selectedConvId;
-                  return (
-                    <div 
-                      key={conv.id}
-                      className={`${styles.mobileConvItem} ${isSelected ? styles.convSelected : ''}`}
-                      onClick={() => {
-                        navigateTo(`/messages/${conv.id}`);
-                        setMobileView('chat');
-                      }}
-                    >
-                      <div className={styles.convAvatarWrapper}>
-                        <img src={conv.user.avatarUrl} alt={conv.user.displayName} className={styles.convAvatar} />
-                        {conv.user.isOnline && <span className={styles.onlineDot} />}
-                      </div>
-
-                      <div className={styles.convInfo}>
-                        <div className={styles.convNameRow}>
-                          <span className={styles.convName}>
-                            {conv.user.displayName}
-                            {conv.user.isVerified && <GradientBadgeCheck size={14} />}
-                          </span>
-                          <span className={styles.convTime}>{conv.time}</span>
-                        </div>
-
-                        <div className={styles.convPreviewRow}>
-                          <span className={styles.convPreviewText}>{conv.lastMessage}</span>
-                          {conv.unreadCount > 0 && (
-                            <span className={styles.unreadBadge}>{conv.unreadCount}</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className={styles.mobileEmptyState}>
-                  <MessageSquare size={40} className={styles.emptyIcon} />
-                  <p>No conversations found</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* ================= VIEW 2: CHAT ROOM ================= */}
-        {mobileView === 'chat' && selectedConv && (
-          <div className={styles.mobileChatScreen}>
-            {/* Header */}
-            <div className={styles.mobileChatHeader}>
-              <button 
-                type="button" 
-                className={styles.mobileChatBackBtn} 
-                onClick={() => {
-                  setMobileView('list');
-                  navigateTo('/messages');
-                }}
-              >
-                <ChevronLeft size={24} />
-              </button>
-              
-              <div 
-                className={styles.mobileChatUserBlock}
-                onClick={() => setShowProfileSheet(true)}
-              >
-                <div className={styles.mobileChatAvatarWrapper}>
-                  <img src={selectedConv.user.avatarUrl} alt={selectedConv.user.displayName} className={styles.mobileChatAvatar} />
-                  {selectedConv.user.isOnline && <span className={styles.onlineDot} />}
-                </div>
-                <div className={styles.mobileChatNameBlock}>
-                  <div className={styles.mobileChatDisplayName}>
-                    {selectedConv.user.displayName}
-                    {selectedConv.user.isVerified && <GradientBadgeCheck size={14} />}
-                  </div>
-                  <div className={styles.mobileChatStatus}>
-                    {selectedConv.user.isOnline ? 'Online' : 'Offline'}
+          {/* ================= VIEW 1: CHATS LIST ================= */}
+          {mobileView === 'list' && (
+            <div className={styles.mobileListScreen}>
+              {/* Header */}
+              <div className={styles.mobileHeader}>
+                <div className={styles.headerTitleBlock} style={{ flex: 1, minWidth: 0 }}>
+                  <div className={styles.titleRow} style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.2rem' }}>
+                    {showArchived ? (
+                      <button
+                        type="button"
+                        className={styles.mobileHeaderBack}
+                        onClick={() => setShowArchived(false)}
+                        style={{ background: 'transparent', border: 'none', color: 'inherit', padding: '0.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <ChevronLeft size={24} />
+                      </button>
+                    ) : (
+                      <MessageSquare size={24} style={{ stroke: 'url(#activeGradient)', filter: 'drop-shadow(0 2px 6px rgba(225,0,117,0.3))' }} />
+                    )}
+                    <h1 className={styles.pageTitle} style={{ fontSize: '1.15rem', fontWeight: 800, margin: 0, color: 'inherit' }}>
+                      {showArchived ? 'Archived' : 'Chats'}
+                    </h1>
                   </div>
                 </div>
               </div>
 
-              {/* Header Actions */}
-              <div className={styles.mobileChatActions}>
-                <button 
-                  className={styles.mobileTipBtn}
-                  onClick={() => setShowTipModal(true)}
-                  type="button"
+              {/* Search */}
+              <div className={styles.mobileSearchWrapper}>
+                <Search size={16} className={styles.mobileSearchIcon} />
+                <input
+                  type="text"
+                  placeholder="Search chats..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className={styles.mobileSearchInput}
+                />
+                <button
+                  className={`${styles.mobileFilterBtn} ${activeFilterCount > 0 ? styles.mobileFilterBtnActive : ''}`}
+                  onClick={() => setFilterSheetOpen(true)}
+                  aria-label="Open filters"
                 >
-                  <Gift size={18} color="#fbbf24" />
+                  <SlidersHorizontal size={16} />
+                  {activeFilterCount > 0 && <span className={styles.filterBadge} />}
                 </button>
-
-                <div className={styles.menuWrapper} ref={menuRef}>
-                  <button 
-                    className={styles.mobileMoreBtn}
-                    onClick={() => setShowMenu(!showMenu)}
-                    type="button"
-                  >
-                    <MoreVertical size={20} />
-                  </button>
-                  
-                  {showMenu && (
-                    <div className={styles.dropdownMenu}>
-                      <button 
-                        className={styles.dropdownItem}
-                        onClick={() => {
-                          startAudioCall(buildCallCreator(selectedConv));
-                          setShowMenu(false);
-                        }}
-                        type="button"
-                        disabled={!selectedConv.user.isOnline || selectedConv.user.isBusy || !selectedConv.user.audioAvailable}
-                      >
-                        <Phone size={16} className={styles.dropdownIcon} />
-                        <div className={styles.dropdownItemText}>
-                          <span className={styles.dropdownItemLabel}>Audio Call</span>
-                          <span className={styles.dropdownItemSub}>
-                            {!selectedConv.user.isOnline ? 'Offline' : (selectedConv.user.isBusy ? 'Busy' : (!selectedConv.user.audioAvailable ? 'Unavailable' : `${selectedConv.user.audioRate} Coins/min`))}
-                          </span>
-                        </div>
-                      </button>
-                      
-                      <button 
-                        className={styles.dropdownItem}
-                        onClick={() => {
-                          startVideoCall(buildCallCreator(selectedConv));
-                          setShowMenu(false);
-                        }}
-                        type="button"
-                        disabled={!selectedConv.user.isOnline || selectedConv.user.isBusy || !selectedConv.user.videoAvailable}
-                      >
-                        <Video size={16} className={styles.dropdownIcon} />
-                        <div className={styles.dropdownItemText}>
-                          <span className={styles.dropdownItemLabel}>Video Call</span>
-                          <span className={styles.dropdownItemSub}>
-                            {!selectedConv.user.isOnline ? 'Offline' : (selectedConv.user.isBusy ? 'Busy' : (!selectedConv.user.videoAvailable ? 'Unavailable' : `${selectedConv.user.videoRate} Coins/min`))}
-                          </span>
-                        </div>
-                      </button>
-                    </div>
-                  )}
-                </div>
               </div>
-            </div>
 
-            {/* Chat Messages Body */}
-            <div className={styles.mobileChatBody}>
-              {loadingMessages && currentMessages.length === 0 ? (
-                <ChatThreadSkeleton light={!darkMode} />
-              ) : (
-                <>
-                  <div className={styles.dateSeparator}>
-                    <span>{chatDateLabel}</span>
-                  </div>
+              {/* Filter Pills */}
+              <div className={styles.mobileFilterPills}>
+                <button
+                  className={`${styles.mobileFilterPill} ${filter === 'all' ? styles.mobileFilterActive : ''}`}
+                  onClick={() => setTypeFilter('all')}
+                >
+                  All
+                </button>
+                <button
+                  className={`${styles.mobileFilterPill} ${filter === 'unread' ? styles.mobileFilterActive : ''}`}
+                  onClick={() => setTypeFilter('unread')}
+                >
+                  Unread
+                </button>
+                <button
+                  className={`${styles.mobileFilterPill} ${filter === 'subscribed' ? styles.mobileFilterActive : ''}`}
+                  onClick={() => setTypeFilter('subscribed')}
+                >
+                  Subscribed
+                </button>
+              </div>
 
-                  {currentMessages.map((msg) => {
-                    const isUser = msg.sender === 'user';
-
-                    if (msg.isPaywall) {
-                      return (
-                        <div 
-                          key={msg.id} 
-                          id={msg.id}
-                          className={`${styles.msgRow} ${styles.msgRowLeft}`}
-                          onClick={() => selectMessage(msg.id)}
-                        >
-                          <div className={`${styles.paywallWrapper} ${selectedMsgId === msg.id ? styles.paywallSelected : ''}`}>
-                            <span className={styles.paywallNoticeTitle}>{msg.title}</span>
-                            
-                            <div className={styles.paywallCard}>
-                              <div className={styles.paywallMediaFrame}>
-                                {msg.previewUrl ? <img src={msg.previewUrl} alt="Locked" className={`${styles.paywallImg} ${msg.isLocked ? styles.blurred : ''}`} /> : <div className={`${styles.paywallImg} ${msg.isLocked ? styles.blurred : ''}`} style={{ background: 'linear-gradient(135deg, #1a1a2e, #e10075)' }} />}
-                                {msg.isLocked && (
-                                  <div className={styles.lockOverlay}>
-                                    <Lock size={18} className={styles.lockIcon} />
-                                  </div>
-                                )}
-                              </div>
-
-                              <div className={styles.paywallContentBlock}>
-                                <h4 className={styles.paywallMediaTitle}>{msg.mediaType}</h4>
-                                <p className={styles.paywallSubtext}>{msg.textSub}</p>
-                              </div>
-                            </div>
-
-                            {/* Unlock Action Row */}
-                            {msg.isLocked ? (
-                              <div className={styles.paywallUnlockBar}>
-                                <div className={styles.coinPriceTag}>
-                                  <img src="/coin.png" alt="Coin" className={styles.coinIcon} />
-                                  <span>{msg.coinPrice} Coins</span>
-                                </div>
-                                <button 
-                                  className={styles.unlockBtn}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleUnlockMedia(msg.id, msg.coinPrice);
-                                  }}
-                                >
-                                  Unlock
-                                </button>
-                              </div>
-                            ) : (
-                              <div className={styles.unlockedNotice}>
-                                <Check size={14} /> Unlocked
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    }
-
+              {/* Chats List */}
+              <div className={styles.mobileConvList}>
+                {filteredConversations.length > 0 ? (
+                  filteredConversations.map((conv) => {
+                    const isSelected = conv.id === selectedConvId;
                     return (
-                      <div 
-                        key={msg.id} 
-                        id={msg.id}
-                        className={`${styles.msgRow} ${isUser ? styles.msgRowRight : styles.msgRowLeft}`}
-                        onClick={() => selectMessage(msg.id)}
+                      <div
+                        key={conv.id}
+                        className={`${styles.mobileConvItem} ${isSelected ? styles.convSelected : ''}`}
+                        onClick={() => {
+                          navigateTo(`/messages/${conv.id}`);
+                          setMobileView('chat');
+                        }}
                       >
-                        <div className={styles.msgContentWrapper}>
-                          <div className={`${styles.msgBubble} ${isUser ? styles.bubbleUser : styles.bubbleCreator} ${msg.isTip ? styles.bubbleTip : ''} ${selectedMsgId === msg.id ? styles.bubbleSelected : ''}`}>
-                            {msg.text && <p className={styles.msgText}>{msg.text}</p>}
+                        <div className={styles.convAvatarWrapper}>
+                          <img src={conv.user.avatarUrl} alt={conv.user.displayName} className={styles.convAvatar} />
+                          {conv.user.isOnline && <span className={styles.onlineDot} />}
+                        </div>
+
+                        <div className={styles.convInfo}>
+                          <div className={styles.convNameRow}>
+                            <span className={styles.convName}>
+                              {conv.user.displayName}
+                              {conv.user.isVerified && <GradientBadgeCheck size={14} />}
+                            </span>
+                            <span className={styles.convTime}>{conv.time}</span>
                           </div>
-                          <div className={`${styles.msgTimestampInline} ${isUser ? styles.timestampRight : styles.timestampLeft}`}>
-                            <span className={styles.msgTimestamp}>{msg.time}</span>
+
+                          <div className={styles.convPreviewRow}>
+                            <span className={styles.convPreviewText}>{conv.lastMessage}</span>
+                            {conv.unreadCount > 0 && (
+                              <span className={styles.unreadBadge}>{conv.unreadCount}</span>
+                            )}
                           </div>
                         </div>
                       </div>
                     );
-                  })}
-
-                  <div ref={messagesEndRef} />
-                </>
-              )}
-            </div>
-
-            {/* Chat Input Bar */}
-            <form className={styles.mobileChatInputBar} onSubmit={handleSendMessage}>
-              <button type="button" className={styles.inputAddBtn} title="Add Content">
-                <Plus size={20} />
-              </button>
-
-              <input 
-                ref={chatInputRef}
-                type="text"
-                placeholder="Enter your message..."
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                className={styles.chatInput}
-              />
-
-              <div className={styles.inputRightIcons}>
-                <ChatComposerExtras
-                  dark={darkMode}
-                  anchor="right"
-                  onPickEmoji={handlePickEmoji}
-                />
-                <button type="button" className={styles.inputIconButton} title="Attach Image">
-                  <ImageIcon size={19} />
-                </button>
-                <button type="submit" className={styles.sendSubmitBtn} title="Send Message">
-                  <Send size={16} />
-                </button>
-              </div>
-            </form>
-
-            {/* ================= PROFILE BOTTOM SHEET DRAWER ================= */}
-            {showProfileSheet && (
-              <>
-                <div 
-                  className={styles.profileSheetBackdrop} 
-                  onClick={() => setShowProfileSheet(false)}
-                />
-                <div className={styles.profileSheet}>
-                  <div className={styles.profileDragHandle} />
-                  
-                  <div className={styles.sheetHeader}>
-                    <h3 className={styles.sheetTitle}>Creator Info</h3>
-                    <button 
-                      type="button" 
-                      className={styles.sheetCloseBtn} 
-                      onClick={() => setShowProfileSheet(false)}
-                    >
-                      <X size={20} />
-                    </button>
+                  })
+                ) : (
+                  <div className={styles.mobileEmptyState}>
+                    <MessageSquare size={40} className={styles.emptyIcon} />
+                    <p>No conversations found</p>
                   </div>
+                )}
+              </div>
+            </div>
+          )}
 
-                  <div className={styles.sheetContent}>
-                    {/* Top Creator Info */}
-                    <div className={styles.creatorProfileCard}>
-                      <div className={styles.avatarRingWrapper}>
-                        <img src={selectedConv.user.avatarUrl} alt={selectedConv.user.displayName} className={styles.profileAvatar} />
-                        {selectedConv.user.isOnline && <span className={styles.profileOnlineDot} />}
-                      </div>
-                      
-                      <h3 className={styles.profileName}>
-                        {selectedConv.user.displayName}
-                        {selectedConv.user.isVerified && <BadgeCheck size={16} className={styles.feedVerifiedBadge} />}
-                      </h3>
-                      <span className={styles.profileUsername}>@{selectedConv.user.username}</span>
+          {/* ================= VIEW 2: CHAT ROOM ================= */}
+          {mobileView === 'chat' && selectedConv && (
+            <div className={styles.mobileChatScreen}>
+              {/* Header */}
+              <div className={styles.mobileChatHeader}>
+                <button
+                  type="button"
+                  className={styles.mobileChatBackBtn}
+                  onClick={() => {
+                    setMobileView('list');
+                    navigateTo('/messages');
+                  }}
+                >
+                  <ChevronLeft size={24} />
+                </button>
 
-                      <div className={styles.ratingRow}>
-                        <Star size={14} className={styles.starIcon} fill="#eab308" />
-                        <span>{selectedConv.user.rating} ({selectedConv.user.ratingCount})</span>
-                      </div>
+                <div
+                  className={styles.mobileChatUserBlock}
+                  onClick={() => setShowProfileSheet(true)}
+                >
+                  <div className={styles.mobileChatAvatarWrapper}>
+                    <img src={selectedConv.user.avatarUrl} alt={selectedConv.user.displayName} className={styles.mobileChatAvatar} />
+                    {selectedConv.user.isOnline && <span className={styles.onlineDot} />}
+                  </div>
+                  <div className={styles.mobileChatNameBlock}>
+                    <div className={styles.mobileChatDisplayName}>
+                      {selectedConv.user.displayName}
+                      {selectedConv.user.isVerified && <GradientBadgeCheck size={14} />}
                     </div>
-
-                    {/* Subscription Info Card */}
-                    <div className={styles.sidebarCard}>
-                    <div className={styles.cardHeaderRow}>
-                      <span className={styles.cardHeaderTitle}>Subscription</span>
-                      {selectedConv.user.hasSubscription && (
-                        <span className={styles.statusActiveTag}>Active</span>
-                      )}
-                    </div>
-
-                      <div className={styles.detailRow}>
-                        <span className={styles.detailLabel}>Plan</span>
-                        <span className={styles.detailValue}>{selectedConv.user.subscriptionPlan}</span>
-                      </div>
-
-                      <div className={styles.detailRow}>
-                        <span className={styles.detailLabel}>Renewal Date</span>
-                        <span className={styles.detailValue}>{selectedConv.user.renewalDate}</span>
-                      </div>
-
-                      <button className={styles.manageSubBtn}
-                        onClick={() => navigateTo(`/subscriptions?highlight=${selectedConvId}`)}
-                      >
-                        Manage Subscription
-                      </button>
-                    </div>
-
-                    {/* Rates Card */}
-                    <div className={styles.sidebarCard}>
-                      <h4 className={styles.cardTitle}>Rates</h4>
-
-                      <div className={styles.rateItem}>
-                        <div className={styles.rateLeft}>
-                          <Phone size={15} className={styles.rateIcon} />
-                          <span>1:1 Audio Call</span>
-                        </div>
-                        <span className={styles.rateVal}>{selectedConv.user.audioRate} Coins / Min</span>
-                      </div>
-
-                      <div className={styles.rateItem}>
-                        <div className={styles.rateLeft}>
-                          <Video size={15} className={styles.rateIcon} />
-                          <span>1:1 Video Call</span>
-                        </div>
-                        <span className={styles.rateVal}>{selectedConv.user.videoRate} Coins / Min</span>
-                      </div>
-                    </div>
-
-                    {/* About Card */}
-                    <div className={styles.sidebarCard}>
-                      <h4 className={styles.cardTitle}>About</h4>
-
-                      <div className={styles.detailRow}>
-                        <span className={styles.detailLabel}>Followers</span>
-                        <span className={styles.detailValue}>{selectedConv.user.followers}</span>
-                      </div>
-
-                      <div className={styles.detailRow}>
-                        <span className={styles.detailLabel}>Posts</span>
-                        <span className={styles.detailValue}>{selectedConv.user.posts}</span>
-                      </div>
-
-                      <div className={styles.detailRow}>
-                        <span className={styles.detailLabel}>Country</span>
-                        <span className={styles.detailValue}>{selectedConv.user.country}</span>
-                      </div>
-
-                      <div className={styles.detailRow}>
-                        <span className={styles.detailLabel}>Language</span>
-                        <span className={styles.detailValue}>{selectedConv.user.language}</span>
-                      </div>
-
-                      <button 
-                        className={styles.viewProfileBtn}
-                        onClick={() => {
-                          navigateTo(`/creator-profile/${selectedConv.user.username}`);
-                          setShowProfileSheet(false);
-                        }}
-                      >
-                        View Profile
-                      </button>
+                    <div className={styles.mobileChatStatus}>
+                      {selectedConv.user.isOnline ? 'Online' : 'Offline'}
                     </div>
                   </div>
                 </div>
-              </>
-            )}
-          </div>
-        )}
 
-        {/* ================= VIEW 2b: CHAT LOADING (direct URL) ================= */}
-        {mobileView === 'chat' && !selectedConv && (loadingConversations || loadingMessages) && (
-          <div className={styles.mobileChatScreen}>
-            <ChatScreenSkeleton light={!darkMode} />
-          </div>
-        )}
+                {/* Header Actions */}
+                <div className={styles.mobileChatActions}>
+                  <button
+                    className={styles.mobileTipBtn}
+                    onClick={() => setShowTipModal(true)}
+                    type="button"
+                  >
+                    <Gift size={18} color="#fbbf24" />
+                  </button>
 
-        {/* Send Gift Panel Modal */}
-        {showTipModal && selectedConv && (
-          <GiftPanel
-            receiverName={selectedConv.user.displayName}
-            balance={balance}
-            onSendGift={handleSendGiftInChat}
-            onRecharge={() => {
-              setShowTipModal(false);
-              setRechargeOpen(true);
-            }}
-            onClose={() => setShowTipModal(false)}
-          />
-        )}
-        {callOverlays}
+                  <div className={styles.menuWrapper} ref={menuRef}>
+                    <button
+                      className={styles.mobileMoreBtn}
+                      onClick={() => setShowMenu(!showMenu)}
+                      type="button"
+                    >
+                      <MoreVertical size={20} />
+                    </button>
 
-      </div>
+                    {showMenu && (
+                      <div className={styles.dropdownMenu}>
+                        <button
+                          className={styles.dropdownItem}
+                          onClick={() => {
+                            startAudioCall(buildCallCreator(selectedConv));
+                            setShowMenu(false);
+                          }}
+                          type="button"
+                          disabled={!selectedConv.user.isOnline || selectedConv.user.isBusy || !selectedConv.user.audioAvailable}
+                        >
+                          <Phone size={16} className={styles.dropdownIcon} />
+                          <div className={styles.dropdownItemText}>
+                            <span className={styles.dropdownItemLabel}>Audio Call</span>
+                            <span className={styles.dropdownItemSub}>
+                              {!selectedConv.user.isOnline ? 'Offline' : (selectedConv.user.isBusy ? 'Busy' : (!selectedConv.user.audioAvailable ? 'Unavailable' : `${selectedConv.user.audioRate} Coins/min`))}
+                            </span>
+                          </div>
+                        </button>
 
-      {/* Chat Filters Sheet */}
-      <ChatFiltersSheet {...filterSheetProps} />
+                        <button
+                          className={styles.dropdownItem}
+                          onClick={() => {
+                            startVideoCall(buildCallCreator(selectedConv));
+                            setShowMenu(false);
+                          }}
+                          type="button"
+                          disabled={!selectedConv.user.isOnline || selectedConv.user.isBusy || !selectedConv.user.videoAvailable}
+                        >
+                          <Video size={16} className={styles.dropdownIcon} />
+                          <div className={styles.dropdownItemText}>
+                            <span className={styles.dropdownItemLabel}>Video Call</span>
+                            <span className={styles.dropdownItemSub}>
+                              {!selectedConv.user.isOnline ? 'Offline' : (selectedConv.user.isBusy ? 'Busy' : (!selectedConv.user.videoAvailable ? 'Unavailable' : `${selectedConv.user.videoRate} Coins/min`))}
+                            </span>
+                          </div>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Chat Messages Body */}
+              <div className={styles.mobileChatBody}>
+                {loadingMessages && currentMessages.length === 0 ? (
+                  <ChatThreadSkeleton light={!darkMode} />
+                ) : (
+                  <>
+                    <div className={styles.dateSeparator}>
+                      <span>{chatDateLabel}</span>
+                    </div>
+
+                    {currentMessages.map((msg) => {
+                      const isUser = msg.sender === 'user';
+
+                      if (msg.isPaywall) {
+                        return (
+                          <div
+                            key={msg.id}
+                            id={msg.id}
+                            className={`${styles.msgRow} ${styles.msgRowLeft}`}
+                            onClick={() => selectMessage(msg.id)}
+                          >
+                            <div className={`${styles.paywallWrapper} ${selectedMsgId === msg.id ? styles.paywallSelected : ''}`}>
+                              <span className={styles.paywallNoticeTitle}>{msg.title}</span>
+
+                              <div className={styles.paywallCard}>
+                                <div className={styles.paywallMediaFrame}>
+                                  {msg.previewUrl ? <img src={msg.previewUrl} alt="Locked" className={`${styles.paywallImg} ${msg.isLocked ? styles.blurred : ''}`} /> : <div className={`${styles.paywallImg} ${msg.isLocked ? styles.blurred : ''}`} style={{ background: 'linear-gradient(135deg, #1a1a2e, #e10075)' }} />}
+                                  {msg.isLocked && (
+                                    <div className={styles.lockOverlay}>
+                                      <Lock size={18} className={styles.lockIcon} />
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div className={styles.paywallContentBlock}>
+                                  <h4 className={styles.paywallMediaTitle}>{msg.mediaType}</h4>
+                                  <p className={styles.paywallSubtext}>{msg.textSub}</p>
+                                </div>
+                              </div>
+
+                              {/* Unlock Action Row */}
+                              {msg.isLocked ? (
+                                <div className={styles.paywallUnlockBar}>
+                                  <div className={styles.coinPriceTag}>
+                                    <img src="/coin.png" alt="Coin" className={styles.coinIcon} />
+                                    <span>{msg.coinPrice} Coins</span>
+                                  </div>
+                                  <button
+                                    className={styles.unlockBtn}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleUnlockMedia(msg.id, msg.coinPrice);
+                                    }}
+                                  >
+                                    Unlock
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className={styles.unlockedNotice}>
+                                  <Check size={14} /> Unlocked
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div
+                          key={msg.id}
+                          id={msg.id}
+                          className={`${styles.msgRow} ${isUser ? styles.msgRowRight : styles.msgRowLeft}`}
+                          onClick={() => selectMessage(msg.id)}
+                        >
+                          <div className={styles.msgContentWrapper}>
+                            <div className={`${styles.msgBubble} ${isUser ? styles.bubbleUser : styles.bubbleCreator} ${msg.isTip ? styles.bubbleTip : ''} ${selectedMsgId === msg.id ? styles.bubbleSelected : ''}`}>
+                              {msg.text && <p className={styles.msgText}>{msg.text}</p>}
+                            </div>
+                            <div className={`${styles.msgTimestampInline} ${isUser ? styles.timestampRight : styles.timestampLeft}`}>
+                              <span className={styles.msgTimestamp}>{msg.time}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    <div ref={messagesEndRef} />
+                  </>
+                )}
+              </div>
+
+              {/* Chat Input Bar */}
+              <form className={styles.mobileChatInputBar} onSubmit={handleSendMessage}>
+                <button type="button" className={styles.inputAddBtn} title="Add Content">
+                  <Plus size={20} />
+                </button>
+
+                <input
+                  ref={chatInputRef}
+                  type="text"
+                  placeholder="Enter your message..."
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  className={styles.chatInput}
+                />
+
+                <div className={styles.inputRightIcons}>
+                  <ChatComposerExtras
+                    dark={darkMode}
+                    anchor="right"
+                    onPickEmoji={handlePickEmoji}
+                  />
+                  <button type="button" className={styles.inputIconButton} title="Attach Image">
+                    <ImageIcon size={19} />
+                  </button>
+                  <button type="submit" className={styles.sendSubmitBtn} title="Send Message">
+                    <Send size={16} />
+                  </button>
+                </div>
+              </form>
+
+              {/* ================= PROFILE BOTTOM SHEET DRAWER ================= */}
+              {showProfileSheet && (
+                <>
+                  <div
+                    className={styles.profileSheetBackdrop}
+                    onClick={() => setShowProfileSheet(false)}
+                  />
+                  <div className={styles.profileSheet}>
+                    <div className={styles.profileDragHandle} />
+
+                    <div className={styles.sheetHeader}>
+                      <h3 className={styles.sheetTitle}>Creator Info</h3>
+                      <button
+                        type="button"
+                        className={styles.sheetCloseBtn}
+                        onClick={() => setShowProfileSheet(false)}
+                      >
+                        <X size={20} />
+                      </button>
+                    </div>
+
+                    <div className={styles.sheetContent}>
+                      {/* Top Creator Info */}
+                      <div className={styles.creatorProfileCard}>
+                        <div className={styles.avatarRingWrapper}>
+                          <img src={selectedConv.user.avatarUrl} alt={selectedConv.user.displayName} className={styles.profileAvatar} />
+                          {selectedConv.user.isOnline && <span className={styles.profileOnlineDot} />}
+                        </div>
+
+                        <h3 className={styles.profileName}>
+                          {selectedConv.user.displayName}
+                          {selectedConv.user.isVerified && <BadgeCheck size={16} className={styles.feedVerifiedBadge} />}
+                        </h3>
+                        <span className={styles.profileUsername}>@{selectedConv.user.username}</span>
+
+                        <div className={styles.ratingRow}>
+                          <Star size={14} className={styles.starIcon} fill="#eab308" />
+                          <span>{selectedConv.user.rating} ({selectedConv.user.ratingCount})</span>
+                        </div>
+                      </div>
+
+                      {/* Subscription Info Card */}
+                      <div className={styles.sidebarCard}>
+                        <div className={styles.cardHeaderRow}>
+                          <span className={styles.cardHeaderTitle}>Subscription</span>
+                          {selectedConv.user.hasSubscription && (
+                            <span className={styles.statusActiveTag}>Active</span>
+                          )}
+                        </div>
+
+                        <div className={styles.detailRow}>
+                          <span className={styles.detailLabel}>Plan</span>
+                          <span className={styles.detailValue}>{selectedConv.user.subscriptionPlan}</span>
+                        </div>
+
+                        <div className={styles.detailRow}>
+                          <span className={styles.detailLabel}>Renewal Date</span>
+                          <span className={styles.detailValue}>{selectedConv.user.renewalDate}</span>
+                        </div>
+
+                        <button className={styles.manageSubBtn}
+                          onClick={() => navigateTo(`/subscriptions?highlight=${selectedConvId}`)}
+                        >
+                          Manage Subscription
+                        </button>
+                      </div>
+
+                      {/* Rates Card */}
+                      <div className={styles.sidebarCard}>
+                        <h4 className={styles.cardTitle}>Rates</h4>
+
+                        <div className={styles.rateItem}>
+                          <div className={styles.rateLeft}>
+                            <Phone size={15} className={styles.rateIcon} />
+                            <span>1:1 Audio Call</span>
+                          </div>
+                          <span className={styles.rateVal}>{selectedConv.user.audioRate} Coins / Min</span>
+                        </div>
+
+                        <div className={styles.rateItem}>
+                          <div className={styles.rateLeft}>
+                            <Video size={15} className={styles.rateIcon} />
+                            <span>1:1 Video Call</span>
+                          </div>
+                          <span className={styles.rateVal}>{selectedConv.user.videoRate} Coins / Min</span>
+                        </div>
+                      </div>
+
+                      {/* About Card */}
+                      <div className={styles.sidebarCard}>
+                        <h4 className={styles.cardTitle}>About</h4>
+
+                        <div className={styles.detailRow}>
+                          <span className={styles.detailLabel}>Followers</span>
+                          <span className={styles.detailValue}>{selectedConv.user.followers}</span>
+                        </div>
+
+                        <div className={styles.detailRow}>
+                          <span className={styles.detailLabel}>Posts</span>
+                          <span className={styles.detailValue}>{selectedConv.user.posts}</span>
+                        </div>
+
+                        <div className={styles.detailRow}>
+                          <span className={styles.detailLabel}>Country</span>
+                          <span className={styles.detailValue}>{selectedConv.user.country}</span>
+                        </div>
+
+                        <div className={styles.detailRow}>
+                          <span className={styles.detailLabel}>Language</span>
+                          <span className={styles.detailValue}>{selectedConv.user.language}</span>
+                        </div>
+
+                        <button
+                          className={styles.viewProfileBtn}
+                          onClick={() => {
+                            navigateTo(`/creator-profile/${selectedConv.user.username}`);
+                            setShowProfileSheet(false);
+                          }}
+                        >
+                          View Profile
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* ================= VIEW 2b: CHAT LOADING (direct URL) ================= */}
+          {mobileView === 'chat' && !selectedConv && (loadingConversations || loadingMessages) && (
+            <div className={styles.mobileChatScreen}>
+              <ChatScreenSkeleton light={!darkMode} />
+            </div>
+          )}
+
+          {/* Send Gift Panel Modal */}
+          {showTipModal && selectedConv && (
+            <GiftPanel
+              receiverName={selectedConv.user.displayName}
+              balance={balance}
+              onSendGift={handleSendGiftInChat}
+              onRecharge={() => {
+                setShowTipModal(false);
+                setRechargeOpen(true);
+              }}
+              onClose={() => setShowTipModal(false)}
+            />
+          )}
+          {callOverlays}
+
+        </div>
+
+        {/* Chat Filters Sheet */}
+        <ChatFiltersSheet {...filterSheetProps} />
       </>
     );
   }
@@ -1120,10 +1120,10 @@ export const MessagesPage = () => {
   return (
     <div className={`${styles.messagesContainer} ${!darkMode ? styles.light : ''}`}>
       <div className={styles.messagesShell}>
-        
+
         {/* ================= COLUMN 1: CHATS LIST SIDEBAR ================= */}
         <div className={`${styles.chatsSidebar} ${mobileView !== 'list' ? styles.hideMobile : ''}`}>
-          
+
           {/* Header */}
           <div className={styles.chatsHeader}>
             <h2 className={styles.chatsTitle}>
@@ -1134,7 +1134,7 @@ export const MessagesPage = () => {
           {/* Search Input */}
           <div className={styles.searchWrapper}>
             <Search size={16} className={styles.searchIcon} />
-            <input 
+            <input
               type="text"
               placeholder="Search chats..."
               value={searchQuery}
@@ -1153,19 +1153,19 @@ export const MessagesPage = () => {
 
           {/* Filter Tabs */}
           <div className={styles.filterPills}>
-            <button 
+            <button
               className={`${styles.filterPill} ${filter === 'all' ? styles.filterActive : ''}`}
               onClick={() => setTypeFilter('all')}
             >
               All
             </button>
-            <button 
+            <button
               className={`${styles.filterPill} ${filter === 'unread' ? styles.filterActive : ''}`}
               onClick={() => setTypeFilter('unread')}
             >
               Unread ({unreadConversationCount})
             </button>
-            <button 
+            <button
               className={`${styles.filterPill} ${filter === 'subscribed' ? styles.filterActive : ''}`}
               onClick={() => setTypeFilter('subscribed')}
             >
@@ -1175,45 +1175,59 @@ export const MessagesPage = () => {
 
           {/* Conversations List */}
           <div className={styles.conversationsList}>
-            {filteredConversations.map((conv) => {
-              const isSelected = conv.id === selectedConvId;
-              return (
-                <div 
-                  key={conv.id}
-                  className={`${styles.convItem} ${isSelected ? styles.convSelected : ''}`}
-                  onClick={() => {
-                    navigateTo(`/messages/${conv.id}`);
-                    setMobileView('chat');
-                  }}
-                >
-                  <div className={styles.convAvatarWrapper}>
-                    <img src={conv.user.avatarUrl} alt={conv.user.displayName} className={styles.convAvatar} />
-                    {conv.user.isOnline && <span className={styles.onlineDot} />}
-                  </div>
-
-                  <div className={styles.convInfo}>
-                    <div className={styles.convNameRow}>
-                      <span className={styles.convName}>
-                        {conv.user.displayName}
-                        {conv.user.isVerified && <GradientBadgeCheck size={14} />}
-                      </span>
-                      <span className={styles.convTime}>{conv.time}</span>
+            {loadingConversations ? (
+              Array.from({ length: 5 }).map((_, idx) => (
+                <div key={`conv-skel-${idx}`} className={styles.convSkeletonItem}>
+                  <div className={`${styles.skeletonBlock} ${styles.convSkeletonAvatar}`} />
+                  <div className={styles.convSkeletonInfo}>
+                    <div className={styles.convSkeletonTopRow}>
+                      <div className={`${styles.skeletonBlock} ${styles.convSkeletonNameBar}`} />
+                      <div className={`${styles.skeletonBlock} ${styles.convSkeletonTimeBar}`} />
                     </div>
-
-                    <div className={styles.convPreviewRow}>
-                      <span className={styles.convPreviewText}>{conv.lastMessage}</span>
-                      {conv.unreadCount > 0 && (
-                        <span className={styles.unreadBadge}>{conv.unreadCount}</span>
-                      )}
-                    </div>
+                    <div className={`${styles.skeletonBlock} ${styles.convSkeletonMsgBar}`} />
                   </div>
                 </div>
-              );
-            })}
-            {filteredConversations.length === 0 && (
+              ))
+            ) : filteredConversations.length > 0 ? (
+              filteredConversations.map((conv) => {
+                const isSelected = conv.id === selectedConvId;
+                return (
+                  <div
+                    key={conv.id}
+                    className={`${styles.convItem} ${isSelected ? styles.convSelected : ''}`}
+                    onClick={() => {
+                      navigateTo(`/messages/${conv.id}`);
+                      setMobileView('chat');
+                    }}
+                  >
+                    <div className={styles.convAvatarWrapper}>
+                      <img src={conv.user.avatarUrl} alt={conv.user.displayName} className={styles.convAvatar} />
+                      {conv.user.isOnline && <span className={styles.onlineDot} />}
+                    </div>
+
+                    <div className={styles.convInfo}>
+                      <div className={styles.convNameRow}>
+                        <span className={styles.convName}>
+                          {conv.user.displayName}
+                          {conv.user.isVerified && <GradientBadgeCheck size={14} />}
+                        </span>
+                        <span className={styles.convTime}>{conv.time}</span>
+                      </div>
+
+                      <div className={styles.convPreviewRow}>
+                        <span className={styles.convPreviewText}>{conv.lastMessage}</span>
+                        {conv.unreadCount > 0 && (
+                          <span className={styles.unreadBadge}>{conv.unreadCount}</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
               <div className={styles.mobileEmptyState}>
                 <MessageSquare size={40} className={styles.emptyIcon} />
-                <p>{loadingConversations ? 'Loading conversations...' : showArchived ? 'No archived conversations' : 'No conversations yet'}</p>
+                <p>{showArchived ? 'No archived conversations' : 'No conversations yet'}</p>
               </div>
             )}
           </div>
@@ -1224,15 +1238,15 @@ export const MessagesPage = () => {
 
         {/* ================= COLUMN 2: CENTER CHAT ROOM ================= */}
         <div className={`${styles.chatRoom} ${mobileView !== 'chat' ? styles.hideMobile : ''}`}>
-          
+
           {selectedConv ? (
             <>
               {/* Header Bar */}
               <div className={styles.roomHeader}>
                 <div className={styles.roomHeaderLeft}>
-                  <button 
-                    type="button" 
-                    className={styles.mobileBackBtn} 
+                  <button
+                    type="button"
+                    className={styles.mobileBackBtn}
                     onClick={() => {
                       setMobileView('list');
                       navigateTo('/messages');
@@ -1240,8 +1254,8 @@ export const MessagesPage = () => {
                   >
                     <ChevronLeft size={24} />
                   </button>
-                  
-                  <div 
+
+                  <div
                     className={styles.roomUserBlock}
                     onClick={() => {
                       if (window.innerWidth <= 768) {
@@ -1267,7 +1281,7 @@ export const MessagesPage = () => {
                 {/* Action Buttons */}
                 <div className={styles.roomActions}>
                   {/* Desktop-only: Audio & Video Call buttons (disabled when the creator is offline) */}
-                  <button 
+                  <button
                     className={styles.audioCallBtn}
                     onClick={() => startAudioCall(buildCallCreator(selectedConv))}
                     type="button"
@@ -1283,7 +1297,7 @@ export const MessagesPage = () => {
                     </div>
                   </button>
 
-                  <button 
+                  <button
                     className={styles.videoCallBtn}
                     onClick={() => startVideoCall(buildCallCreator(selectedConv))}
                     type="button"
@@ -1299,7 +1313,7 @@ export const MessagesPage = () => {
                     </div>
                   </button>
 
-                  <button 
+                  <button
                     className={styles.sendTipBtn}
                     onClick={() => setShowTipModal(true)}
                   >
@@ -1309,17 +1323,17 @@ export const MessagesPage = () => {
 
                   {/* Mobile-only: kebab menu with audio/video call options */}
                   <div className={styles.menuWrapper} ref={menuRef}>
-                    <button 
+                    <button
                       className={styles.moreOptionsBtn}
                       onClick={() => setShowMenu(!showMenu)}
                       type="button"
                     >
                       <MoreVertical size={18} />
                     </button>
-                    
+
                     {showMenu && (
                       <div className={styles.dropdownMenu}>
-                        <button 
+                        <button
                           className={styles.dropdownItem}
                           onClick={() => {
                             startAudioCall(buildCallCreator(selectedConv));
@@ -1336,8 +1350,8 @@ export const MessagesPage = () => {
                             </span>
                           </div>
                         </button>
-                        
-                        <button 
+
+                        <button
                           className={styles.dropdownItem}
                           onClick={() => {
                             startVideoCall(buildCallCreator(selectedConv));
@@ -1376,8 +1390,8 @@ export const MessagesPage = () => {
 
                       if (msg.isPaywall) {
                         return (
-                          <div 
-                            key={msg.id} 
+                          <div
+                            key={msg.id}
                             id={msg.id}
                             className={`${styles.msgRow} ${styles.msgRowLeft}`}
                             onClick={() => selectMessage(msg.id)}
@@ -1385,7 +1399,7 @@ export const MessagesPage = () => {
                           >
                             <div className={`${styles.paywallWrapper} ${selectedMsgId === msg.id ? styles.paywallSelected : ''}`}>
                               <span className={styles.paywallNoticeTitle}>{msg.title}</span>
-                              
+
                               <div className={styles.paywallCard}>
                                 <div className={styles.paywallMediaFrame}>
                                   {msg.previewUrl ? <img src={msg.previewUrl} alt="Locked" className={`${styles.paywallImg} ${msg.isLocked ? styles.blurred : ''}`} /> : <div className={`${styles.paywallImg} ${msg.isLocked ? styles.blurred : ''}`} style={{ background: 'linear-gradient(135deg, #1a1a2e, #e10075)' }} />}
@@ -1409,7 +1423,7 @@ export const MessagesPage = () => {
                                     <img src="/coin.png" alt="Coin" className={styles.coinIcon} />
                                     <span>{msg.coinPrice} Coins</span>
                                   </div>
-                                  <button 
+                                  <button
                                     className={styles.unlockBtn}
                                     onClick={(e) => {
                                       e.stopPropagation();
@@ -1430,8 +1444,8 @@ export const MessagesPage = () => {
                       }
 
                       return (
-                        <div 
-                          key={msg.id} 
+                        <div
+                          key={msg.id}
                           id={msg.id}
                           className={`${styles.msgRow} ${isUser ? styles.msgRowRight : styles.msgRowLeft}`}
                           onClick={() => selectMessage(msg.id)}
@@ -1460,7 +1474,7 @@ export const MessagesPage = () => {
                   <Plus size={20} />
                 </button>
 
-                <input 
+                <input
                   ref={chatInputRef}
                   type="text"
                   placeholder="Enter your message..."
@@ -1500,12 +1514,12 @@ export const MessagesPage = () => {
 
         {/* ================= COLUMN 3: RIGHT PROFILE DETAILS SIDEBAR ================= */}
         <div className={`${styles.profileSidebar} ${mobileView !== 'profile' ? styles.hideMobile : ''}`}>
-          
+
           {/* Mobile Profile Header */}
           <div className={styles.mobileProfileHeader}>
-            <button 
+            <button
               type="button"
-              className={styles.mobileBackBtn} 
+              className={styles.mobileBackBtn}
               onClick={() => setMobileView('chat')}
             >
               <ChevronLeft size={24} />
@@ -1513,7 +1527,41 @@ export const MessagesPage = () => {
             <span className={styles.mobileProfileTitle}>Creator Info</span>
           </div>
 
-          {selectedConv ? (
+          {loadingConversations ? (
+            <div className={styles.profileSkeletonWrapper}>
+              <div className={styles.profileSkeletonHeaderCard}>
+                <div className={`${styles.skeletonBlock} ${styles.profileSkeletonAvatar}`} />
+                <div className={`${styles.skeletonBlock} ${styles.profileSkeletonNameBar}`} />
+                <div className={`${styles.skeletonBlock} ${styles.profileSkeletonUserBar}`} />
+                <div className={`${styles.skeletonBlock} ${styles.profileSkeletonRatingBar}`} />
+              </div>
+
+              <div className={styles.profileSkeletonCard}>
+                <div className={`${styles.skeletonBlock} ${styles.profileSkeletonCardTitle}`} />
+                <div className={styles.profileSkeletonRow}>
+                  <div className={`${styles.skeletonBlock} ${styles.profileSkeletonLabel}`} />
+                  <div className={`${styles.skeletonBlock} ${styles.profileSkeletonValue}`} />
+                </div>
+                <div className={styles.profileSkeletonRow}>
+                  <div className={`${styles.skeletonBlock} ${styles.profileSkeletonLabel}`} />
+                  <div className={`${styles.skeletonBlock} ${styles.profileSkeletonValue}`} />
+                </div>
+                <div className={`${styles.skeletonBlock} ${styles.profileSkeletonButton}`} />
+              </div>
+
+              <div className={styles.profileSkeletonCard}>
+                <div className={`${styles.skeletonBlock} ${styles.profileSkeletonCardTitle}`} />
+                <div className={styles.profileSkeletonRow}>
+                  <div className={`${styles.skeletonBlock} ${styles.profileSkeletonLabel}`} />
+                  <div className={`${styles.skeletonBlock} ${styles.profileSkeletonValue}`} />
+                </div>
+                <div className={styles.profileSkeletonRow}>
+                  <div className={`${styles.skeletonBlock} ${styles.profileSkeletonLabel}`} />
+                  <div className={`${styles.skeletonBlock} ${styles.profileSkeletonValue}`} />
+                </div>
+              </div>
+            </div>
+          ) : selectedConv ? (
             <>
               {/* Top Creator Header */}
               <div className={styles.creatorProfileCard}>
@@ -1521,7 +1569,7 @@ export const MessagesPage = () => {
                   <img src={selectedConv.user.avatarUrl} alt={selectedConv.user.displayName} className={styles.profileAvatar} />
                   {selectedConv.user.isOnline && <span className={styles.profileOnlineDot} />}
                 </div>
-                
+
                 <h3 className={styles.profileName}>
                   {selectedConv.user.displayName}
                   {selectedConv.user.isVerified && <BadgeCheck size={16} className={styles.feedVerifiedBadge} />}
@@ -1605,7 +1653,7 @@ export const MessagesPage = () => {
                   <span className={styles.detailValue}>{selectedConv.user.language}</span>
                 </div>
 
-                <button 
+                <button
                   className={styles.viewProfileBtn}
                   onClick={() => navigateTo(`/creator-profile/${selectedConv.user.username}`)}
                 >

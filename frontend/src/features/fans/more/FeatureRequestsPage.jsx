@@ -37,7 +37,7 @@ export const FeatureRequestsPage = ({ setStatusMsg }) => {
     try {
       const res = await api.post('/more/features', form);
       if (res.status === 'success') {
-        if (setStatusMsg) setStatusMsg({ type: 'success', text: 'Feature suggestion submitted successfully!' });
+        if (setStatusMsg) setStatusMsg({ type: 'success', text: 'Feature suggestion submitted! It will appear publicly once approved by an admin.' });
         setForm({ title: '', description: '' });
         setShowForm(false);
         loadFeatures();
@@ -62,7 +62,10 @@ export const FeatureRequestsPage = ({ setStatusMsg }) => {
     }
   };
 
-  const getStatusBadge = (status) => {
+  const getStatusBadge = (status, isApproved) => {
+    if (isApproved === false) {
+      return <span className={`${styles.featureBadge} ${styles.pendingApproval}`}><Clock size={12} /> Pending Approval</span>;
+    }
     const s = (status || 'under_review').toLowerCase();
     if (s === 'planned') return <span className={`${styles.featureBadge} ${styles.planned}`}><Clock size={12} /> Planned</span>;
     if (s === 'completed') return <span className={`${styles.featureBadge} ${styles.completed}`}><CheckCircle2 size={12} /> Completed</span>;
@@ -76,11 +79,9 @@ export const FeatureRequestsPage = ({ setStatusMsg }) => {
   return (
     <div className={styles.subViewGrid}>
       <div className={styles.featureHero}>
+        <Lightbulb size={120} className={styles.legalBannerWatermark} aria-hidden="true" />
         <div className={styles.featureHeroLeft}>
-          <div className={styles.featureIconBadge}>
-            <Lightbulb size={26} />
-          </div>
-          <div>
+          <div className={styles.legalHeroContent}>
             <h3>Community Feature Request Board</h3>
             <p>Vote on new ideas or propose features you'd like to see implemented on Fantrio.</p>
           </div>
@@ -130,26 +131,34 @@ export const FeatureRequestsPage = ({ setStatusMsg }) => {
         <div className={styles.featureList}>
           {features.map((f) => (
             <div key={f._id} className={styles.featureCard}>
-              <button
-                type="button"
-                className={`${styles.voteBox} ${f.hasVoted ? styles.votedBox : ''}`}
-                onClick={() => handleVote(f._id)}
-              >
-                <ThumbsUp size={18} />
-                <span className={styles.voteCountNum}>{f.votesCount || 0}</span>
-                <span className={styles.voteTextLabel}>{f.hasVoted ? 'Voted' : 'Vote'}</span>
-              </button>
-
               <div className={styles.featureContentCol}>
                 <div className={styles.featureHeaderRow}>
                   <h4 className={styles.featureTitle}>{f.title}</h4>
-                  {getStatusBadge(f.status)}
+                  <div className={styles.desktopStatusBadge}>
+                    {getStatusBadge(f.status, f.isApproved)}
+                  </div>
                 </div>
                 <p className={styles.featureDesc}>{f.description}</p>
                 <div className={styles.featureMetaRow}>
                   <span>Suggested by @{f.userId?.username || 'user'}</span>
                   <span>•</span>
                   <span>{new Date(f.createdAt).toLocaleDateString()}</span>
+                </div>
+              </div>
+
+              <div className={styles.featureFooterRow}>
+                <button
+                  type="button"
+                  className={`${styles.voteBox} ${f.hasVoted ? styles.votedBox : ''}`}
+                  onClick={() => handleVote(f._id)}
+                >
+                  <ThumbsUp size={16} />
+                  <span className={styles.voteCountNum}>{f.votesCount || 0}</span>
+                  <span className={styles.voteTextLabel}>{f.hasVoted ? 'Voted' : 'Vote'}</span>
+                </button>
+
+                <div className={styles.mobileStatusBadge}>
+                  {getStatusBadge(f.status, f.isApproved)}
                 </div>
               </div>
             </div>

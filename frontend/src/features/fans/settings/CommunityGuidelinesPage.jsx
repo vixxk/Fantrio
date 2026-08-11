@@ -44,11 +44,11 @@ export const CommunityGuidelinesPage = () => {
   return (
     <div className={styles.subPageBody}>
       <div className={styles.guidelinesHero}>
-        <div className={styles.guidelinesHeartBadge}>
-          <Heart size={26} />
+        <Heart size={120} className={styles.guidelinesWatermarkIcon} aria-hidden="true" />
+        <div className={styles.guidelinesHeroContent}>
+          <h3>Fantrio Community Guidelines</h3>
+          <p>Creating a vibrant, safe, and empowering space for creators and fans worldwide.</p>
         </div>
-        <h3>Fantrio Community Guidelines</h3>
-        <p>Creating a vibrant, safe, and empowering space for creators and fans worldwide.</p>
       </div>
 
       <div className={styles.guidelinesGrid}>
@@ -60,9 +60,9 @@ export const CommunityGuidelinesPage = () => {
                 <div className={styles.guidelineIconWrap}>
                   <IconComponent size={20} />
                 </div>
+                <h4>{g.title}</h4>
                 <span className={styles.guidelineNumber}>{g.number}</span>
               </div>
-              <h4>{g.title}</h4>
               <p>{g.desc}</p>
             </div>
           );

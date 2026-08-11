@@ -52,6 +52,32 @@ const sendPasswordResetEmail = async (email, resetToken) => {
   await sendEmail(email, subject, text, html);
 };
 
+// Escape free-text content before interpolating it into HTML email templates.
+const escapeHtml = (str = '') =>
+  String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+const sendTicketReplyNotification = async (email, { ticketId, subject, reply, status }) => {
+  const ticketCode = `#TK-${String(ticketId).slice(-6).toUpperCase()}`;
+  const statusLabel = (status || 'open').replace('-', ' ');
+  const subjectLine = `Fantrio Support: ${ticketCode} has been updated`;
+  const text = `Your support ticket ${ticketCode} ("${subject}") has received a response from our team.\n\n${reply}\n\nTicket status: ${statusLabel}\n\nThanks,\nThe Fantrio Support Team`;
+  const html = `
+    <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 5px;">
+      <h2 style="color: #e10075; margin: 0 0 4px 0;">Your Ticket Has Been Answered</h2>
+      <p style="color: #666; margin: 0 0 16px 0;">${ticketCode} &middot; ${escapeHtml(subject)}</p>
+      <div style="border-left: 3px solid #e10075; background: #fafafa; padding: 12px 16px; border-radius: 4px; color: #333; margin-bottom: 16px; white-space: pre-wrap;">${escapeHtml(reply)}</div>
+      <p style="color: #888; margin: 0 0 16px 0;">Ticket status: <strong>${escapeHtml(statusLabel)}</strong></p>
+      <p style="color: #888; margin: 0;">You can track your ticket anytime in the Fantrio app under Settings &gt; My Support Tickets.</p>
+    </div>
+  `;
+  await sendEmail(email, subjectLine, text, html);
+};
+
 const send2FACode = async (email, code) => {
   const subject = 'Your Fantrio 2FA Verification Code';
   const text = `Your two-factor authentication code is: ${code}. It is valid for 10 minutes.`;
@@ -72,5 +98,6 @@ module.exports = {
   sendEmail,
   sendOTP,
   sendPasswordResetEmail,
-  send2FACode
+  send2FACode,
+  sendTicketReplyNotification
 };

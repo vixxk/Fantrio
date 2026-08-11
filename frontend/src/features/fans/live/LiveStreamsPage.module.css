@@ -256,7 +256,8 @@
 
 .streamCard:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(126, 0, 243, 0.15);
+  border-color: rgba(0, 112, 243, 0.4);
+  box-shadow: 0 10px 25px rgba(0, 112, 243, 0.15);
 }
 
 .cardBackground {
@@ -765,7 +766,7 @@
 
 .categoryCard:hover {
   background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(225, 0, 117, 0.3);
+  border-color: rgba(0, 112, 243, 0.4);
   transform: translateY(-3px);
 }
 
@@ -1072,7 +1073,7 @@
 
 .light .categoryCard:hover {
   background: rgba(0, 0, 0, 0.03);
-  border-color: rgba(225, 0, 117, 0.3);
+  border-color: rgba(0, 112, 243, 0.4);
 }
 
 .light .categoryCardLabel {

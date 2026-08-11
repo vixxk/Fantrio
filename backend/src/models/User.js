@@ -109,6 +109,15 @@ const userSchema = new mongoose.Schema(
     },
     passwordResetToken: { type: String },
     passwordResetExpires: { type: Date },
+    pendingReferralCode: { type: String },
+    referralCode: {
+      type: String,
+      unique: true,
+      sparse: true,
+      uppercase: true,
+      trim: true,
+      index: true
+    },
     following: {
       type: [mongoose.Schema.Types.ObjectId],
       ref: 'User',
@@ -125,8 +134,27 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Hash password before saving
+// Hash password before saving & auto-assign unique 4-letter referral code (A-Z only)
 userSchema.pre('save', async function (next) {
+  const isAlpha4 = this.referralCode && /^[A-Z]{4}$/.test(this.referralCode);
+
+  if (!isAlpha4) {
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let code;
+    let isUnique = false;
+    let attempts = 0;
+    const User = mongoose.model('User');
+    while (!isUnique && attempts < 200) {
+      attempts++;
+      code = Array.from({ length: 4 }, () => letters[Math.floor(Math.random() * letters.length)]).join('');
+      const existing = await User.findOne({ referralCode: code });
+      if (!existing || existing._id.toString() === this._id.toString()) {
+        isUnique = true;
+      }
+    }
+    this.referralCode = code;
+  }
+
   if (!this.isModified('password')) return next();
 
   this.password = await bcrypt.hash(this.password, 12);

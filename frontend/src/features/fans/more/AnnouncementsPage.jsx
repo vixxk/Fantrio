@@ -33,11 +33,11 @@ export const AnnouncementsPage = ({ setStatusMsg }) => {
   return (
     <div className={styles.subViewGrid}>
       <div className={styles.announcementsHero}>
-        <div className={styles.announcementIconBadge}>
-          <Megaphone size={26} />
+        <Megaphone size={120} className={styles.legalBannerWatermark} aria-hidden="true" />
+        <div className={styles.legalHeroContent}>
+          <h3>Official Announcements</h3>
+          <p>Stay informed with the latest updates, new features, and platform improvements from Fantrio.</p>
         </div>
-        <h3>Official Product Announcements</h3>
-        <p>Stay informed with the latest updates, new features, and platform improvements from Fantrio.</p>
       </div>
 
       {announcements.length === 0 ? (

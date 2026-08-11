@@ -4,9 +4,13 @@ import {
   ChevronRight, ArrowLeft, Ticket, Headphones, 
   HelpCircle, Gift, ShieldAlert, Megaphone, 
   Lightbulb, Info, CreditCard, Lock, Check, AlertTriangle,
-  Scale, LayoutGrid, User, UserPlus, Trophy
+  Scale, LayoutGrid, User, UserPlus, Trophy, Plus
 } from 'lucide-react';
 import styles from './MorePage.module.css';
+// The sub-view components (tickets/contact/faq/report) are styled by
+// SettingsPage.module.css, so their light-theme overrides need that module's
+// hashed `.light` class applied too — otherwise they keep dark styles on light mode.
+import settingsStyles from '../settings/SettingsPage.module.css';
 
 import { ReferralPage } from './ReferralPage';
 import { RewardsPage } from './RewardsPage';
@@ -15,10 +19,10 @@ import { FeatureRequestsPage } from './FeatureRequestsPage';
 import { AboutPage } from './AboutPage';
 import { TermsPage } from './TermsPage';
 import { PrivacyPage } from './PrivacyPage';
-import { SupportTicketsPage } from '../settings/SupportTicketsPage';
 import { ContactSupportPage } from '../settings/ContactSupportPage';
 import { HelpCentrePage } from '../settings/HelpCentrePage';
 import { ReportProblemPage } from '../settings/ReportProblemPage';
+import { MyIssuesPage } from '../settings/MyIssuesPage';
 
 export const MorePage = () => {
   const { darkMode, setActiveTab, currentPath, navigateTo } = useApp();
@@ -126,14 +130,16 @@ export const MorePage = () => {
       case 'features':
         return <FeatureRequestsPage setStatusMsg={setStatusMsg} />;
       case 'tickets':
-        return <SupportTicketsPage setStatus={setStatusMsg} onContact={() => handleNavigateSubView('contact')} />;
+      case 'my-issues':
+      case 'issues':
+        return <MyIssuesPage setStatus={setStatusMsg} onNavigate={(path) => navigateTo(`/settings/${path}`)} />;
       case 'contact':
         return <ContactSupportPage setStatus={setStatusMsg} />;
       case 'faq':
         return <HelpCentrePage setStatus={setStatusMsg} onContact={() => handleNavigateSubView('contact')} />;
       case 'report-creator':
       case 'report-content':
-        return <ReportProblemPage setStatus={setStatusMsg} />;
+        return <ReportProblemPage setStatus={setStatusMsg} initialTargetType={subView === 'report-content' ? 'content' : 'creator'} />;
       case 'about':
         return <AboutPage />;
       case 'terms':
@@ -164,7 +170,7 @@ export const MorePage = () => {
   };
 
   return (
-    <div className={`${styles.moreContainer} ${!darkMode ? styles.light : ''}`}>
+    <div className={`${styles.moreContainer} ${!darkMode ? `${styles.light} ${settingsStyles.light}` : ''}`}>
       {/* SVG Gradient Definition for Icons */}
       <svg width="0" height="0" style={{ position: 'absolute', pointerEvents: 'none' }}>
         <defs>
@@ -186,6 +192,16 @@ export const MorePage = () => {
                 <h2 className={styles.subPageTitle}>{getSubViewTitle(subView).title}</h2>
                 <p className={styles.subPageDesc}>{getSubViewTitle(subView).desc}</p>
               </div>
+              {(subView === 'my-issues' || subView === 'tickets' || subView === 'issues') && (
+                <div className={styles.issueHeaderActions}>
+                  <button className={styles.actionBtn} onClick={() => navigateTo('/settings/contact')}>
+                    <Plus size={15} /> New Ticket
+                  </button>
+                  <button className={styles.actionBtnOutline} onClick={() => navigateTo('/settings/report')}>
+                    <ShieldAlert size={15} /> Report Problem
+                  </button>
+                </div>
+              )}
             </div>
 
             {statusMsg.text && (
@@ -362,7 +378,7 @@ export const MorePage = () => {
                 <div className={styles.helpFooter}>
                   <span className={styles.footerLabel}>Average Response Time</span>
                   <span className={styles.footerStatus}>
-                    <span className={styles.greenDot}>•</span> Under 5 Minutes
+                    <span className={styles.greenDot}>•</span> Within 24 Hours
                   </span>
                 </div>
               </div>

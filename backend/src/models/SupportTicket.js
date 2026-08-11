@@ -32,6 +32,10 @@ const supportTicketSchema = new mongoose.Schema(
       type: String,
       trim: true,
       default: ''
+    },
+    repliedAt: {
+      type: Date,
+      default: null
     }
   },
   {

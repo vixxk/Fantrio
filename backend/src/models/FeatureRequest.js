@@ -27,6 +27,10 @@ const featureRequestSchema = new mongoose.Schema(
       type: String,
       enum: ['suggestion', 'under-review', 'planned', 'completed'],
       default: 'suggestion'
+    },
+    isApproved: {
+      type: Boolean,
+      default: true
     }
   },
   {

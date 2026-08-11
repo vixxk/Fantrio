@@ -1,15 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '../../../services/api';
-import { MessageSquare, CreditCard, Zap, SlidersHorizontal, Sparkles, Loader } from 'lucide-react';
+import { MessageSquare, CreditCard, Zap, SlidersHorizontal } from 'lucide-react';
 import styles from './SettingsPage.module.css';
 
-export const ContactSupportPage = ({ setStatus }) => {
+export const ContactSupportPage = ({ setStatus, onBusyChange, onDirtyChange }) => {
   const [form, setForm] = useState({ subject: '', category: 'general', message: '' });
   const [submitting, setSubmitting] = useState(false);
 
+  // Keep the header submit button in sync with this page's submitting state.
+  useEffect(() => {
+    if (onBusyChange) onBusyChange(submitting);
+    return () => { if (onBusyChange) onBusyChange(false); };
+  }, [submitting, onBusyChange]);
+
+  // The header submit button stays disabled until the required fields
+  // (subject and message) are filled in. Resets to disabled after submit.
+  useEffect(() => {
+    const canSubmit = form.subject.trim().length > 0 && form.message.trim().length > 0;
+    if (onDirtyChange) onDirtyChange(canSubmit);
+    return () => { if (onDirtyChange) onDirtyChange(false); };
+  }, [form, onDirtyChange]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.subject || !form.message) return;
+    if (!form.subject.trim() || !form.message.trim()) return;
     setSubmitting(true);
     if (setStatus) setStatus({ type: '', text: '' });
     try {
@@ -35,14 +49,11 @@ export const ContactSupportPage = ({ setStatus }) => {
   return (
     <div className={styles.subPageBody}>
       <div className={styles.contactHeroCard}>
-        <div className={styles.liveSupportBadge}>
-          <span className={styles.greenPulseDot} /> 24/7 Support Desk Online
-        </div>
         <h3>How can we assist you today?</h3>
-        <p>Fill out the details below to open a direct ticket with our specialized support desk. Average response time is under 5 minutes.</p>
+        <p>Fill out the details below to open a direct ticket with our specialized support desk. Average response time is within 24 hours.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className={styles.formGrid}>
+      <form id="contact-support-form" onSubmit={handleSubmit} className={styles.formGrid}>
         <div className={styles.formGroup}>
           <label className={styles.formLabel}>Select Category</label>
           <div className={styles.contactCatGrid}>
@@ -88,11 +99,6 @@ export const ContactSupportPage = ({ setStatus }) => {
           />
         </div>
 
-        <div className={styles.formActionsRight}>
-          <button type="submit" disabled={submitting} className={styles.submitBtn}>
-            {submitting ? <><Loader size={16} className={styles.spin} /> Submitting Ticket...</> : <><Sparkles size={16} /> Submit Support Ticket</>}
-          </button>
-        </div>
       </form>
     </div>
   );

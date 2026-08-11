@@ -361,13 +361,14 @@ try {
     setUser(prev => ({ ...prev, ...updates }));
   };
 
-  const register = async ({ email, password, role, username, displayName }) => {
+  const register = async ({ email, password, role, username, displayName, referralCode }) => {
     const res = await api.post('/auth/register', {
       email,
       password,
       role: (role === 'user' || !role) ? 'fan' : role,
       username,
-      displayName
+      displayName,
+      referralCode
     });
     // Auto-login when the backend (or mock) returns a token right away.
     // If only a verification message comes back (production OTP flow),

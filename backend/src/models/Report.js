@@ -30,6 +30,15 @@ const reportSchema = new mongoose.Schema(
       type: String,
       enum: ['pending', 'reviewed', 'resolved'],
       default: 'pending'
+    },
+    reply: {
+      type: String,
+      trim: true,
+      default: ''
+    },
+    repliedAt: {
+      type: Date,
+      default: null
     }
   },
   {

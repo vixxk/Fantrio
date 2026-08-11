@@ -13,6 +13,8 @@ router.get('/tickets', moreController.getMyTickets);
 
 // Reports routes
 router.post('/reports', moreController.createReport);
+router.get('/reports', moreController.getMyReports);
+router.get('/my-issues', moreController.getMyAllIssues);
 router.get('/creators', moreController.getReportCreators);
 
 // Rewards routes

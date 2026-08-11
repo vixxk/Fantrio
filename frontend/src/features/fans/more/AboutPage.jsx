@@ -5,11 +5,11 @@ export const AboutPage = () => {
   return (
     <div className={styles.subViewGrid}>
       <div className={styles.legalHeroCard}>
-        <div className={styles.legalHeroIconWrap}>
-          <Info size={28} />
+        <Info size={120} className={styles.legalBannerWatermark} aria-hidden="true" />
+        <div className={styles.legalHeroContent}>
+          <h3>About Fantrio</h3>
+          <p>Connecting creators and fans through real-time interactive streams, 1:1 calls, and exclusive media experiences.</p>
         </div>
-        <h3>About Fantrio</h3>
-        <p>Connecting creators and fans through real-time interactive streams, 1:1 calls, and exclusive media experiences.</p>
       </div>
 
       <div className={styles.aboutContentCard}>
@@ -38,7 +38,7 @@ export const AboutPage = () => {
 
         <div className={styles.versionMetaBanner}>
           <Award size={18} />
-          <span>Fantrio Web Application Version 2.4.0 • Built with High-Performance React Engine</span>
+          <span>Fantrio Web Application Version 1.0.0</span>
         </div>
       </div>
     </div>

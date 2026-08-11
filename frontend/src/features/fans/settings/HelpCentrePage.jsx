@@ -42,27 +42,32 @@ export const HelpCentrePage = ({ setStatus, onContact }) => {
   });
 
   const handleFeedback = (idx, type) => {
-    setFeedback(prev => ({ ...prev, [idx]: type }));
+    setFeedback(prev => {
+      if (prev[idx] === type) {
+        const next = { ...prev };
+        delete next[idx];
+        return next;
+      }
+      return { ...prev, [idx]: type };
+    });
   };
 
   return (
     <div className={styles.subPageBody}>
       <div className={styles.helpCentreHero}>
-        <div className={styles.helpHeroSearchOverlay}>
-          <div className={styles.helpHeroIconWrapBox}>
-            <BookOpen size={28} />
-          </div>
-          <div>
-            <h3>Knowledge Hub & FAQ</h3>
-            <p>Find instant answers to common questions about subscriptions, coins, and calls.</p>
-          </div>
+        <BookOpen size={100} className={styles.heroWatermarkIcon} />
+
+        <div className={styles.helpHeroContent}>
+          <h3>Knowledge Hub & FAQ</h3>
+          <p>Find instant answers to common questions about subscriptions, coins, and calls.</p>
         </div>
+
         <div className={styles.faqSearchBox}>
           <Search size={18} className={styles.faqSearchIcon} />
           <input
             type="text"
             className={styles.faqSearchInput}
-            placeholder="Type keywords (e.g. refund, password, call rate)..."
+            placeholder="Search help articles by keywords..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -140,14 +145,14 @@ export const HelpCentrePage = ({ setStatus, onContact }) => {
 
       <div className={styles.helpCtaBanner}>
         <div className={styles.helpCtaLeft}>
-          <Headphones size={22} className={styles.ctaHeadphoneIcon} />
+          <Headphones size={28} className={styles.ctaHeadphoneIcon} />
           <div>
             <h4>Still need assistance?</h4>
             <p>Our dedicated support team is available 24/7 to resolve your inquiries.</p>
           </div>
         </div>
         <button className={styles.supportBtn} onClick={onContact}>
-          <MessageSquare size={16} /> Contact Support Desk
+          <MessageSquare size={15} /> <span>Contact Support Desk</span>
         </button>
       </div>
     </div>

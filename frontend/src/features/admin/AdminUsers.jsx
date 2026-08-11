@@ -250,6 +250,7 @@ export const AdminUsers = () => {
                   <tr>
                     <th>Fan</th>
                     <th>Email</th>
+                    <th>Referral Code</th>
                     <th>Role</th>
                     <th>Wallet</th>
                     <th>Status</th>
@@ -276,6 +277,11 @@ export const AdminUsers = () => {
                         </div>
                       </td>
                       <td>{user.email}</td>
+                      <td>
+                        <span className={styles.cellStrong} style={{ fontFamily: 'monospace', letterSpacing: '0.05em' }}>
+                          {user.referralCode || '—'}
+                        </span>
+                      </td>
                       <td>
                         <span className={`${styles.badge} ${
                           user.role === 'admin' ? styles.badgeSuccess :
@@ -369,6 +375,12 @@ export const AdminUsers = () => {
                   <div className={styles.mobileRow}>
                     <span className={styles.mobileLabel}>Email:</span>
                     <span className={styles.mobileVal}>{user.email}</span>
+                  </div>
+                  <div className={styles.mobileRow}>
+                    <span className={styles.mobileLabel}>Referral Code:</span>
+                    <span className={styles.mobileVal} style={{ fontFamily: 'monospace', fontWeight: 700, letterSpacing: '0.05em' }}>
+                      {user.referralCode || '—'}
+                    </span>
                   </div>
                   <div className={styles.mobileRow}>
                     <span className={styles.mobileLabel}>Wallet:</span>
@@ -484,6 +496,17 @@ export const AdminUsers = () => {
                   className={styles.inputField}
                   value={editedForm.username}
                   onChange={(e) => setEditedForm({ ...editedForm, username: e.target.value })}
+                />
+              </div>
+
+              <div className={styles.formControlItem}>
+                <label className={styles.inputLabel}>Referral Code</label>
+                <input
+                  type="text"
+                  className={styles.inputField}
+                  value={editUser?.referralCode || '—'}
+                  disabled
+                  style={{ fontFamily: 'monospace', fontWeight: 700, letterSpacing: '0.05em', opacity: 0.8 }}
                 />
               </div>
 

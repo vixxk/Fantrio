@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../../../context/AppContext';
-import { 
-  ChevronRight, 
+import {
+  ChevronRight,
   Settings,
   ArrowLeft,
   BookOpen,
@@ -10,7 +10,9 @@ import {
   MessageSquare,
   Heart,
   Check,
-  AlertTriangle
+  AlertTriangle,
+  Plus,
+  ShieldAlert
 } from 'lucide-react';
 import styles from './SettingsPage.module.css';
 
@@ -23,6 +25,7 @@ import { SupportTicketsPage } from './SupportTicketsPage';
 import { ContactSupportPage } from './ContactSupportPage';
 import { CommunityGuidelinesPage } from './CommunityGuidelinesPage';
 import { ReportProblemPage } from './ReportProblemPage';
+import { MyIssuesPage } from './MyIssuesPage';
 
 export const SettingsPage = () => {
   const { darkMode, currentPath, navigateTo } = useApp();
@@ -31,15 +34,19 @@ export const SettingsPage = () => {
     if (!path) return null;
     const pathname = path.split('?')[0];
     if (pathname === '/help-centre' || pathname === '/faq' || pathname === '/settings/help-centre' || pathname === '/settings/faq') return 'help-centre';
-    if (pathname === '/support-tickets' || pathname === '/settings/support-tickets' || pathname === '/settings/tickets') return 'support-tickets';
+    if (pathname === '/support-tickets' || pathname === '/settings/support-tickets' || pathname === '/settings/tickets' || pathname === '/settings/my-issues' || pathname === '/my-issues') return 'my-issues';
     if (pathname === '/contact-support' || pathname === '/settings/contact-support' || pathname === '/settings/contact' || pathname === '/settings/contact-support-link') return 'contact-support-link';
     if (pathname === '/community-guidelines' || pathname === '/settings/community') return 'community';
-    if (pathname === '/settings/report') return 'report';
+    if (pathname === '/settings/report' || pathname === '/settings/report-creator' || pathname === '/settings/report-content') {
+      if (pathname.endsWith('-content')) return 'report-content';
+      if (pathname.endsWith('-creator')) return 'report-creator';
+      return 'report';
+    }
     if (pathname.startsWith('/settings/')) {
       const sub = pathname.replace('/settings/', '').split('/')[0];
       if (!sub) return null;
       if (sub === 'contact') return 'contact-support-link';
-      if (sub === 'tickets') return 'support-tickets';
+      if (sub === 'tickets' || sub === 'my-issues' || sub === 'issues') return 'my-issues';
       if (sub === 'faq' || sub === 'help') return 'help-centre';
       return sub;
     }
@@ -74,6 +81,12 @@ export const SettingsPage = () => {
       title: 'Payment Methods',
       desc: 'Add or manage your payment methods and billings.',
     },
+    {
+      id: 'my-issues',
+      iconUrl: '/report.png',
+      title: 'My Raised Issues & Tickets',
+      desc: 'Track safety reports, submitted issues and admin responses.',
+    },
   ];
 
   const helpLinks = [
@@ -84,10 +97,10 @@ export const SettingsPage = () => {
       desc: 'Browse articles and guides.',
     },
     {
-      id: 'support-tickets',
+      id: 'my-issues',
       Icon: Ticket,
-      title: 'My Support Tickets',
-      desc: 'View your existing tickets.',
+      title: 'My Support Tickets & Reports',
+      desc: 'View status of your existing issues & replies.',
     },
     {
       id: 'contact-support-link',
@@ -103,7 +116,7 @@ export const SettingsPage = () => {
     },
     {
       id: 'report',
-      iconUrl: '/report.png',
+      Icon: ShieldAlert,
       title: 'Report Problem',
       desc: 'Report content and behaviour',
     },
@@ -177,13 +190,13 @@ export const SettingsPage = () => {
 
           <div className={styles.supportCard} onClick={() => handleNavigate('help-centre')}>
             <div className={styles.supportCardIconWrap}>
-              <svg 
-                width="26" 
-                height="26" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                strokeWidth="2.2" 
-                strokeLinecap="round" 
+              <svg
+                width="26"
+                height="26"
+                viewBox="0 0 24 24"
+                fill="none"
+                strokeWidth="2.2"
+                strokeLinecap="round"
                 strokeLinejoin="round"
                 className={styles.supportCardIcon}
               >
@@ -293,13 +306,13 @@ export const SettingsPage = () => {
 
               <div className={styles.supportCard} onClick={() => handleNavigate('help-centre')}>
                 <div className={styles.supportCardIconWrap}>
-                  <svg 
-                    width="26" 
-                    height="26" 
-                    viewBox="0 0 24 24" 
-                    fill="none" 
-                    strokeWidth="2.2" 
-                    strokeLinecap="round" 
+                  <svg
+                    width="26"
+                    height="26"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
                     strokeLinejoin="round"
                     className={styles.supportCardIcon}
                   >
@@ -327,6 +340,10 @@ export const SettingsPage = () => {
 const SubPage = ({ section, onBack, onNavigate }) => {
   const [statusMsg, setStatusMsg] = useState({ type: '', text: '' });
   const [profileBusy, setProfileBusy] = useState(false);
+  const [profileDirty, setProfileDirty] = useState(false);
+  const [contactBusy, setContactBusy] = useState(false);
+  const [contactDirty, setContactDirty] = useState(false);
+  const [reportBusy, setReportBusy] = useState(false);
 
   const clearStatus = () => setStatusMsg({ type: '', text: '' });
 
@@ -335,17 +352,20 @@ const SubPage = ({ section, onBack, onNavigate }) => {
     security: { title: 'Security', desc: 'Manage your password, two-factor authentication and login activity.' },
     notifications: { title: 'Notifications', desc: 'Choose what notifications you want to receive.' },
     payment: { title: 'Payment Methods', desc: 'Add or manage your payment methods and billing.' },
+    'my-issues': { title: 'My Raised Issues & Tickets', desc: 'Track safety reports, submitted issues and official admin responses.' },
     'help-centre': { title: 'Help Centre', desc: 'Browse articles and guides to get the most out of Fantrio.' },
-    'support-tickets': { title: 'My Support Tickets', desc: 'View and track your support requests.' },
+    'support-tickets': { title: 'My Support Tickets & Reports', desc: 'View and track your support requests and safety reports.' },
     'contact-support-link': { title: 'Contact Support', desc: 'Get help from our support team.' },
     community: { title: 'Community Guidelines', desc: 'Stay safe and have fun.' },
     report: { title: 'Report Problem', desc: 'Report content and behaviour that violates our guidelines.' },
+    'report-creator': { title: 'Report Creator', desc: 'Report an inappropriate creator or profile.' },
+    'report-content': { title: 'Report Content', desc: 'Report inappropriate creator content or post.' },
   };
 
   const renderContent = () => {
     switch (section) {
       case 'profile':
-        return <ProfilePage setStatus={setStatusMsg} onBusyChange={setProfileBusy} />;
+        return <ProfilePage setStatus={setStatusMsg} onBusyChange={setProfileBusy} onDirtyChange={setProfileDirty} />;
       case 'security':
         return <SecurityPage setStatus={setStatusMsg} />;
       case 'notifications':
@@ -354,14 +374,23 @@ const SubPage = ({ section, onBack, onNavigate }) => {
         return <PaymentMethodsPage setStatus={setStatusMsg} />;
       case 'help-centre':
         return <HelpCentrePage setStatus={setStatusMsg} onContact={() => onNavigate('contact-support-link')} />;
+      case 'my-issues':
       case 'support-tickets':
-        return <SupportTicketsPage setStatus={setStatusMsg} onContact={() => onNavigate('contact-support-link')} />;
+        return <MyIssuesPage setStatus={setStatusMsg} onNavigate={onNavigate} />;
       case 'contact-support-link':
-        return <ContactSupportPage setStatus={setStatusMsg} />;
+        return <ContactSupportPage setStatus={setStatusMsg} onBusyChange={setContactBusy} onDirtyChange={setContactDirty} />;
       case 'community':
         return <CommunityGuidelinesPage />;
       case 'report':
-        return <ReportProblemPage setStatus={setStatusMsg} />;
+      case 'report-creator':
+      case 'report-content':
+        return (
+          <ReportProblemPage
+            setStatus={setStatusMsg}
+            onBusyChange={setReportBusy}
+            initialTargetType={section === 'report-content' ? 'content' : section === 'report-creator' ? 'creator' : undefined}
+          />
+        );
       default:
         return null;
     }
@@ -377,14 +406,34 @@ const SubPage = ({ section, onBack, onNavigate }) => {
           <h2 className={styles.subPageTitle}>{titles[section]?.title}</h2>
           <p className={styles.subPageDesc}>{titles[section]?.desc}</p>
         </div>
+        {(section === 'my-issues' || section === 'support-tickets') && (
+          <div className={styles.issueHeaderActions}>
+            <button className={styles.actionBtn} onClick={() => onNavigate('contact-support-link')}>
+              <Plus size={15} /> New Ticket
+            </button>
+            <button className={styles.actionBtnOutline} onClick={() => onNavigate('report')}>
+              <ShieldAlert size={15} /> Report Problem
+            </button>
+          </div>
+        )}
         {section === 'profile' && (
           <button
             type="submit"
             form="profile-save-form"
             className={styles.saveProfileHeaderBtn}
-            disabled={profileBusy}
+            disabled={profileBusy || !profileDirty}
           >
             {profileBusy ? 'Saving...' : 'Save Profile'}
+          </button>
+        )}
+        {section === 'contact-support-link' && (
+          <button
+            type="submit"
+            form="contact-support-form"
+            className={styles.saveProfileHeaderBtn}
+            disabled={contactBusy || !contactDirty}
+          >
+            {contactBusy ? 'Submitting...' : 'Submit Ticket'}
           </button>
         )}
       </div>

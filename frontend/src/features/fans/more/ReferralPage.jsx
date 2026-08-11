@@ -64,19 +64,19 @@ export const ReferralPage = ({ setStatusMsg }) => {
   return (
     <div className={styles.subViewGrid}>
       <div className={styles.referralHero}>
-        <div className={styles.refHeroBadge}>
-          <Share2 size={24} />
-        </div>
-        <h3>Invite Friends & Earn Free Coins</h3>
-        <p>Give your friends 50 bonus coins on signup, and get 100 coins for every friend who joins Fantrio.</p>
-        
-        <div className={styles.refCodeBox}>
-          <div className={styles.refCodeLabel}>YOUR EXCLUSIVE REFERRAL CODE</div>
-          <div className={styles.refCodeDisplay}>
-            <span>{stats.referralCode || '-------'}</span>
-            <button className={styles.copyCodeBtn} onClick={handleCopyCode}>
-              <Copy size={16} /> Copy Code
-            </button>
+        <Share2 size={120} className={styles.legalBannerWatermark} aria-hidden="true" />
+        <div className={styles.legalHeroContent}>
+          <h3>Invite Friends & Earn Free Coins</h3>
+          <p>Give your friends 50 bonus coins on signup, and get 100 coins for every friend who joins Fantrio.</p>
+          
+          <div className={styles.refCodeBox}>
+            <div className={styles.refCodeLabel}>YOUR EXCLUSIVE REFERRAL CODE</div>
+            <div className={styles.refCodeDisplay}>
+              <span>{stats.referralCode || '-------'}</span>
+              <button className={styles.copyCodeBtn} onClick={handleCopyCode}>
+                <Copy size={16} /> Copy Code
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -111,7 +111,7 @@ export const ReferralPage = ({ setStatusMsg }) => {
                 required
               />
               <button type="submit" disabled={claiming} className={styles.claimSubmitBtn}>
-                {claiming ? <Loader size={16} className={styles.spin} /> : <Sparkles size={16} />} Claim
+                {claiming && <Loader size={16} className={styles.spin} />} Claim
               </button>
             </form>
           )}

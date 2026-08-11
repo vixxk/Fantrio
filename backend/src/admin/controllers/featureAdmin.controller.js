@@ -17,7 +17,7 @@ exports.getFeatures = catchAsync(async (req, res, next) => {
 // Update feature status
 exports.updateFeature = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const { status } = req.body;
+  const { status, isApproved } = req.body;
 
   const feature = await FeatureRequest.findById(id);
   if (!feature) {
@@ -25,6 +25,7 @@ exports.updateFeature = catchAsync(async (req, res, next) => {
   }
 
   if (status) feature.status = status;
+  if (typeof isApproved === 'boolean') feature.isApproved = isApproved;
 
   await feature.save();
 

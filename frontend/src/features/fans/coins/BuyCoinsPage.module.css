@@ -175,8 +175,8 @@
 
 .coinCard:hover {
   transform: translateY(-4px);
-  border-color: rgba(126, 0, 243, 0.35);
-  box-shadow: 0 8px 25px rgba(126, 0, 243, 0.15);
+  border-color: rgba(0, 112, 243, 0.4);
+  box-shadow: 0 8px 25px rgba(0, 112, 243, 0.15);
 }
 
 .popularCard {
@@ -426,20 +426,22 @@
 
 .transHistoryBtn {
   width: 100%;
-  background: linear-gradient(90deg, #370da0 0%, #220b75 100%);
+  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%) !important;
   border: none;
-  color: #ffffff;
+  color: #ffffff !important;
   padding: 0.7rem 0;
   border-radius: 12px;
   font-size: 0.88rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: transform 0.2s, opacity 0.2s;
+  transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 15px rgba(225, 0, 117, 0.25);
 }
 
 .transHistoryBtn:hover {
   opacity: 0.92;
   transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(225, 0, 117, 0.35);
 }
 
 /* Why Buy Coins Widget */
@@ -752,7 +754,7 @@
 }
 
 .light .transHistoryBtn {
-  background: linear-gradient(90deg, #370da0 0%, #220b75 100%);
+  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%);
   color: #ffffff;
   border: none;
 }
@@ -834,7 +836,7 @@
   }
   
   .subtitle {
-    font-size: 0.75rem !important;
+    display: none !important;
   }
   
   .headerCoinIcon {

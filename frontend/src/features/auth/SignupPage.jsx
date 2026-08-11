@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import {
-  Mail, Lock, User, AtSign, Eye, EyeOff, Heart, Crown, Info
+  Mail, Lock, User, AtSign, Eye, EyeOff, Heart, Crown, Info, Gift
 } from 'lucide-react';
 import { AuthHeader } from './AuthHeader';
 import { AuthBackground } from './AuthBackground';
@@ -29,6 +29,7 @@ export const SignupPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
+  const [referralCode, setReferralCode] = useState('');
   const [showPwd, setShowPwd] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [agree, setAgree] = useState(false);
@@ -109,7 +110,8 @@ export const SignupPage = () => {
         password,
         role,
         username: username.trim(),
-        displayName: name.trim()
+        displayName: name.trim(),
+        referralCode: referralCode.trim()
       });
       if (res.token) {
         navigateTo(res.user && res.user.role === 'creator' ? '/creators/dashboard' : '/discover');
@@ -280,6 +282,22 @@ export const SignupPage = () => {
                     {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
+              </div>
+            </div>
+
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="signup-referral">Referral code (Optional)</label>
+              <div className={styles.inputWrap}>
+                <Gift size={18} className={styles.inputIcon} />
+                <input
+                  id="signup-referral"
+                  className={styles.input}
+                  type="text"
+                  placeholder="e.g. XJQP (earn 50 bonus coins)"
+                  value={referralCode}
+                  onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                  maxLength={10}
+                />
               </div>
             </div>
 

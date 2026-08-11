@@ -40,11 +40,11 @@ export const RewardsPage = ({ setStatusMsg }) => {
   return (
     <div className={styles.subViewGrid}>
       <div className={styles.rewardsHero}>
-        <div className={styles.rewardsHeroBadge}>
-          <Award size={26} />
+        <Award size={120} className={styles.legalBannerWatermark} aria-hidden="true" />
+        <div className={styles.legalHeroContent}>
+          <h3>Fantrio Fan Rewards & Milestones</h3>
+          <p>Complete simple community activities to unlock free bonus coins. Coins are credited automatically upon completion.</p>
         </div>
-        <h3>Fantrio Fan Rewards & Milestones</h3>
-        <p>Complete simple community activities to unlock free bonus coins. Coins are credited automatically upon completion.</p>
       </div>
 
       <div className={styles.rewardsList}>
@@ -56,13 +56,16 @@ export const RewardsPage = ({ setStatusMsg }) => {
             <div className={styles.rewardContentCol}>
               <div className={styles.rewardTitleRow}>
                 <h4>{r.title}</h4>
-                <span className={styles.rewardCoinsBadge}>
+                <span className={`${styles.rewardCoinsBadge} ${styles.desktopCoinsBadge}`}>
                   <Coins size={14} /> +{r.coins} Coins
                 </span>
               </div>
               <p>{r.description}</p>
             </div>
             <div className={styles.rewardStatusCol}>
+              <span className={`${styles.rewardCoinsBadge} ${styles.mobileCoinsBadge}`}>
+                <Coins size={14} /> +{r.coins} Coins
+              </span>
               {r.claimed ? (
                 <span className={styles.statusGranted}>
                   <CheckCircle2 size={16} /> Claimed
