@@ -64,7 +64,7 @@ exports.getStories = catchAsync(async (req, res, next) => {
   });
 });
 
-// Delete a story (admin only) — also removes the uploaded media from S3 so
+// Delete a story (admin only) — also removes the uploaded media from cloud storage so
 // moderated/expired stories don't leave orphaned files behind.
 exports.deleteStory = catchAsync(async (req, res, next) => {
   const { storyId } = req.params;

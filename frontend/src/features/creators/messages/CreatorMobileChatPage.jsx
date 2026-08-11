@@ -200,7 +200,7 @@ export const CreatorMobileChatPage = () => {
     navigateTo('/creators/messages');
   };
 
-  // Upload a picked image to S3 (via presigned URL) and send it as a media message
+  // Upload a picked image (via presigned URL) and send it as a media message
   const handleSendImage = async (file) => {
     if (!file || !fanId) return;
     const fileType = file.type || 'image/jpeg';

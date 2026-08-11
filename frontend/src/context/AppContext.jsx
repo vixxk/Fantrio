@@ -335,7 +335,10 @@ try {
   };
 
   const refreshProfile = async () => {
-    if (!token) return null;
+    // Gate on the authenticated user rather than the `token` state: auth is
+    // cookie-based, so `token` state can be empty even when the user is
+    // logged in (e.g. after a page refresh).
+    if (!user) return null;
     try {
       const meRes = await api.get('/auth/me');
       setUser({

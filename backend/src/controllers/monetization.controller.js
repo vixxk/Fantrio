@@ -266,7 +266,7 @@ exports.unlockPost = catchAsync(async (req, res, next) => {
         try {
           signedUrl = await awsService.getPresignedDownloadUrl(key);
         } catch (err) {
-          console.error(`[AWS S3] Error generating download URL for key ${key}:`, err);
+          console.error(`[Media Storage] Error generating download URL for key ${key}:`, err);
         }
         return {
           _id: item._id,

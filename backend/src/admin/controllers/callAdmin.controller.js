@@ -217,7 +217,7 @@ exports.deleteStream = catchAsync(async (req, res, next) => {
   }
 
   const wasLive = !!stream.isLive;
-  // Remove the uploaded cover thumbnail from S3 (seeded/external covers are skipped).
+  // Remove the uploaded cover thumbnail from cloud storage (seeded/external covers are skipped).
   await awsService.deleteS3Media([stream.coverUrl]);
   await LiveStream.findByIdAndDelete(id);
   // Remove the stream's chat history along with it.

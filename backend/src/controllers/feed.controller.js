@@ -65,7 +65,7 @@ const formatPostForUser = async (user, post, creatorDisplayMap, giftCounts) => {
           try {
             signedUrl = await awsService.getPresignedDownloadUrl(key);
           } catch (err) {
-            console.error(`[AWS S3] Error generating download URL for key ${key}:`, err);
+            console.error(`[Media Storage] Error generating download URL for key ${key}:`, err);
           }
         }
         return { _id: item._id, url: signedUrl, thumbnailUrl: item.thumbnailUrl || item.url, type: item.type, isLocked: false, isBlurred: item.isBlurred !== undefined ? item.isBlurred : true };

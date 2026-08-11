@@ -603,6 +603,41 @@
   gap: 0.2rem;
 }
 
+/* Save action button in the sub-page header (top right) */
+.saveProfileHeaderBtn {
+  margin-left: auto;
+  align-self: flex-start;
+  flex-shrink: 0;
+  background: linear-gradient(90deg, #e10075 0%, #7e00f3 100%);
+  border: none;
+  color: #ffffff;
+  padding: 0.65rem 1.5rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.saveProfileHeaderBtn:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(225, 0, 117, 0.3);
+}
+
+.saveProfileHeaderBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .saveProfileHeaderBtn {
+    padding: 0.5rem 1.1rem;
+    font-size: 0.78rem;
+    margin-left: auto;
+  }
+}
+
 .subPageTitle {
   font-size: 1.35rem;
   font-weight: 800;
@@ -773,6 +808,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .submitBtn:hover:not(:disabled) {
@@ -909,11 +946,17 @@
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.6);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .securityStatusBadge.enabled {
-  background: rgba(16, 185, 129, 0.15);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
   color: #34d399;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.15);
 }
 
 .twoFaForm {
@@ -1970,10 +2013,21 @@
 }
 
 /* Forms layout */
-.formRow2Col {
+.formRow2Col,
+.nameUserRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.2rem;
+}
+
+.formRow3Col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+}
+
+.formRow3Col .formInput {
+  padding: 0.7rem 0.85rem;
 }
 
 .labelWithCount {
@@ -2075,15 +2129,17 @@
 }
 
 .securityStatusBadge.enabled {
-  background: rgba(16, 185, 129, 0.15);
+  background: rgba(16, 185, 129, 0.12);
   border: 1px solid rgba(16, 185, 129, 0.3);
-  color: #10b981;
+  color: #34d399;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.15);
 }
 
 .securityStatusBadge.disabled {
-  background: rgba(245, 158, 11, 0.15);
+  background: rgba(245, 158, 11, 0.12);
   border: 1px solid rgba(245, 158, 11, 0.3);
-  color: #f59e0b;
+  color: #fbbf24;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.15);
 }
 
 .pulseDot {
@@ -2092,7 +2148,23 @@
   border-radius: 50%;
   background: currentColor;
   display: inline-block;
-  box-shadow: 0 0 8px currentColor;
+  box-shadow: 0 0 6px currentColor;
+  animation: pulseDotAnim 2s infinite ease-in-out;
+}
+
+@keyframes pulseDotAnim {
+  0% {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+  100% {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
 }
 
 .otpCardBox {
@@ -2144,19 +2216,24 @@
 
 .twoFaBenefits {
   display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  padding: 0.85rem 1.1rem;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
 }
 
 .benefitItem {
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
 
   svg {
-    color: #10b981;
+    color: #e10075;
   }
 }
 
@@ -2551,6 +2628,61 @@
   background: rgba(255, 255, 255, 0.03) !important;
 }
 
+/* FAQ search box */
+.faqSearchBox {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #181818;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.7rem 1rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.faqSearchBox:focus-within {
+  border-color: #e10075;
+  box-shadow: 0 0 0 3px rgba(225, 0, 117, 0.15);
+}
+
+.faqSearchIcon {
+  color: rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+}
+
+.faqSearchInput {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-family: inherit;
+}
+
+.faqSearchInput::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.light .faqSearchBox {
+  background: #f7f7f9;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.light .faqSearchIcon {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .faqSearchInput {
+  color: #1a1625;
+}
+
+.light .faqSearchInput::placeholder {
+  color: rgba(26, 22, 37, 0.3);
+}
+
 .faqQuestionLeft {
   display: flex;
   align-items: center;
@@ -2932,7 +3064,7 @@
   font-weight: 700;
 }
 
-/* ================= AWS S3 UPLOAD DROPZONE ================= */
+/* ================= IMAGE UPLOAD DROPZONE ================= */
 .s3UploadDropzone {
   background: rgba(255, 255, 255, 0.03);
   border: 2px dashed rgba(225, 0, 117, 0.3);
@@ -2995,6 +3127,592 @@
 .s3UploadBtn:hover {
   background: #e10075;
   color: #ffffff;
+}
+
+/* ================= SUB-PAGES MOBILE (Profile, Security, Notifications, Payments, Help, Tickets, Contact, Guidelines, Report) ================= */
+@media (max-width: 768px) {
+  .subPageHeader {
+    gap: 0.65rem;
+    margin-bottom: 1rem;
+    align-items: flex-start;
+  }
+
+  .backBtn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+  }
+
+  .subPageTitle {
+    font-size: 1.05rem;
+  }
+
+  .subPageDesc {
+    display: none;
+  }
+
+  .subPageBody {
+    gap: 1rem;
+  }
+
+  .statusAlert {
+    padding: 0.7rem 0.85rem;
+    font-size: 0.8rem;
+    gap: 0.55rem;
+    margin-bottom: 0.9rem;
+    border-radius: 10px;
+  }
+
+  /* --- Forms --- */
+  .formGrid {
+    gap: 0.9rem;
+  }
+
+  .formRow2Col,
+  .formRow3Col,
+  .formRow {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .nameUserRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.65rem !important;
+  }
+
+  .formGroup {
+    gap: 0.35rem;
+  }
+
+  .formLabel {
+    font-size: 0.76rem;
+  }
+
+  .formInput,
+  .formSelect,
+  .formTextarea {
+    padding: 0.65rem 0.85rem;
+    font-size: 0.85rem;
+    border-radius: 10px;
+  }
+
+  .formTextarea {
+    min-height: 90px;
+  }
+
+  .charCount {
+    bottom: -1.05rem;
+    font-size: 0.66rem;
+  }
+
+  .formActionsRight {
+    width: 100%;
+  }
+
+  .submitBtn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.65rem 1.2rem;
+    font-size: 0.85rem;
+  }
+
+  .actionBtn {
+    padding: 0.55rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  /* --- Profile --- */
+  .profileHeroCard {
+    border-radius: 16px;
+    margin-bottom: 1rem;
+  }
+
+  .profileBannerBg {
+    height: 62px;
+  }
+
+  .profileHeroContent {
+    gap: 1rem;
+    padding: 0 1rem 1rem 1rem;
+    margin-top: -34px;
+  }
+
+  .profileAvatarContainer {
+    width: 66px;
+    height: 66px;
+    border-width: 3px;
+  }
+
+  .onlineBadgeDot {
+    width: 13px;
+    height: 13px;
+    border-width: 2px;
+  }
+
+  .heroNameRow {
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .heroNameRow h3 {
+    font-size: 1.05rem;
+  }
+
+  .verifiedChip {
+    font-size: 0.68rem;
+    padding: 0.2rem 0.5rem;
+    gap: 0.2rem;
+  }
+
+  .heroUsername {
+    font-size: 0.78rem;
+  }
+
+  .heroEmailBadge {
+    font-size: 0.72rem;
+  }
+
+  .s3UploadDropzone {
+    padding: 0.9rem;
+    border-radius: 12px;
+  }
+
+  .s3DropzoneContent {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.6rem;
+  }
+
+  .s3UploadIconCircle {
+    width: 36px;
+    height: 36px;
+  }
+
+  .s3DropzoneTitle {
+    font-size: 0.82rem;
+  }
+
+  .s3DropzoneSub {
+    font-size: 0.7rem;
+  }
+
+  .s3UploadBtn {
+    margin-left: 0;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* --- Security --- */
+  .securityCard {
+    padding: 1rem 1.05rem;
+    border-radius: 14px;
+    gap: 0.9rem;
+  }
+
+  .securityCardHeader {
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .securityCardTitleRow {
+    gap: 0.6rem;
+  }
+
+  .securityIconBox {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+  }
+
+  .securityCardTitle {
+    font-size: 0.92rem;
+  }
+
+  .securityCardDesc {
+    font-size: 0.78rem;
+  }
+
+  .securityStatusBadge {
+    font-size: 0.68rem;
+    padding: 0.25rem 0.6rem;
+  }
+
+  .twoFaActions {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .dangerBtn,
+  .cancelBtn {
+    flex: 1;
+    text-align: center;
+    padding: 0.6rem 1rem;
+    font-size: 0.82rem;
+  }
+
+  .strengthMeterBox {
+    padding: 0.7rem 0.85rem;
+  }
+
+  .otpCardBox {
+    padding: 1.2rem 0.9rem;
+  }
+
+  .otpInputRow {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* --- Notifications --- */
+  .notifHeaderBanner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .notifHeaderIconBox {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  .notifIntroText {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .notifIntroText h3 {
+    font-size: 1rem;
+  }
+
+  .notifIntroText p {
+    font-size: 0.75rem;
+  }
+
+  .bulkActionsRow {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .notifIntro {
+    padding: 0.85rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  .notifList {
+    border-radius: 14px;
+  }
+
+  .notifRow {
+    padding: 0.85rem 1rem;
+    gap: 0.75rem;
+  }
+
+  .notifTitle {
+    font-size: 0.88rem;
+  }
+
+  .notifDesc {
+    font-size: 0.76rem;
+  }
+
+  .toggle {
+    width: 40px;
+    height: 24px;
+  }
+
+  .toggleThumb {
+    width: 18px;
+    height: 18px;
+  }
+
+  .toggleOn .toggleThumb {
+    transform: translateX(16px);
+  }
+
+  .notifGroupCard {
+    padding: 0.95rem 1rem;
+    border-radius: 14px;
+  }
+
+  /* --- Payments --- */
+  .payHeaderRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.7rem;
+  }
+
+  .payIntro {
+    font-size: 0.8rem;
+  }
+
+  .payForm {
+    padding: 1.05rem;
+    border-radius: 14px;
+  }
+
+  .cardItem {
+    padding: 1.05rem;
+    border-radius: 14px;
+  }
+
+  .cardItemTop {
+    margin-bottom: 1.2rem;
+  }
+
+  .cardActions {
+    flex-wrap: wrap;
+  }
+
+  .cardActionBtn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.74rem;
+  }
+
+  .virtualCardGrid {
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+  }
+
+  .virtualCardItem {
+    height: 152px;
+  }
+
+  /* --- Help Centre --- */
+  .helpCentreHero {
+    padding: 1.1rem;
+    border-radius: 14px;
+    gap: 0.75rem;
+  }
+
+  .helpCentreHero h3 {
+    font-size: 1rem;
+  }
+
+  .helpCentreHero p {
+    font-size: 0.78rem;
+  }
+
+  .helpHeroSearchOverlay {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+
+  .helpHeroSearchOverlay h3 {
+    font-size: 1.1rem;
+  }
+
+  .accordionItem {
+    border-radius: 12px;
+  }
+
+  .accordionTrigger {
+    padding: 0.85rem 1rem;
+    font-size: 0.88rem;
+  }
+
+  .accordionPanel {
+    padding: 0.75rem 1rem 1rem 1rem;
+  }
+
+  .accordionPanel p {
+    font-size: 0.82rem;
+  }
+
+  .faqSearchBox {
+    padding: 0.6rem 0.85rem;
+    border-radius: 10px;
+    gap: 0.5rem;
+  }
+
+  .faqSearchInput {
+    font-size: 0.85rem;
+  }
+
+  .faqRatingRow {
+    flex-wrap: wrap;
+  }
+
+  .ticketReplyCallout {
+    padding: 0.65rem 0.8rem;
+  }
+
+  .helpCtaBanner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+    padding: 1.1rem;
+  }
+
+  .helpCta {
+    padding: 0.95rem 1.1rem;
+  }
+
+  /* --- Tickets --- */
+  .ticketFilterTabs {
+    overflow-x: auto;
+    padding-bottom: 0.3rem;
+  }
+
+  .ticketTabBtn {
+    flex-shrink: 0;
+  }
+
+  .ticketCard {
+    padding: 0.95rem 1.05rem;
+    border-radius: 12px;
+  }
+
+  .ticketSubject {
+    font-size: 0.9rem;
+  }
+
+  .ticketHeader {
+    align-items: flex-start;
+  }
+
+  .ticketTitleMeta {
+    flex-wrap: wrap;
+  }
+
+  .ticketFooter {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  /* --- Contact --- */
+  .contactHeroCard {
+    padding: 1.15rem;
+    border-radius: 16px;
+    margin-bottom: 1rem;
+  }
+
+  .contactHeroCard h3 {
+    font-size: 1.1rem;
+  }
+
+  .contactCatGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+  }
+
+  .contactCatCard {
+    padding: 0.7rem 0.4rem;
+    font-size: 0.74rem;
+  }
+
+  .contactHero {
+    padding: 1.25rem 1rem;
+    border-radius: 14px;
+  }
+
+  .contactHero h3 {
+    font-size: 1.05rem;
+  }
+
+  .contactHero p {
+    font-size: 0.8rem;
+  }
+
+  /* --- Guidelines --- */
+  .guidelinesHero {
+    padding: 1.25rem 1rem;
+    border-radius: 14px;
+  }
+
+  .guidelinesHero h3 {
+    font-size: 1.05rem;
+  }
+
+  .guidelinesGrid {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+  }
+
+  .guidelineCard {
+    padding: 1.05rem 1.1rem;
+    border-radius: 12px;
+  }
+
+  .guidelineCard h4 {
+    font-size: 0.92rem;
+  }
+
+  .guidelineCard p {
+    font-size: 0.8rem;
+  }
+
+  .guidelinesHeartBadge {
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+  }
+
+  /* --- Report --- */
+  .reportHeroCard {
+    padding: 1.05rem;
+    border-radius: 14px;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .reportHeroCard h3 {
+    font-size: 1.05rem;
+  }
+
+  .segmentedControl {
+    padding: 0.3rem;
+  }
+
+  .segmentBtn {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.7rem;
+  }
+
+  .emptyBox {
+    padding: 1.75rem 1rem;
+    border-radius: 14px;
+  }
+
+  .emptyBox p {
+    font-size: 0.82rem;
+  }
+}
+
+/* Extra-small screens: keep everything comfortably readable */
+@media (max-width: 420px) {
+  .subPageTitle {
+    font-size: 0.98rem;
+  }
+
+  .saveProfileHeaderBtn {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.72rem;
+  }
+
+  .heroNameRow h3 {
+    font-size: 0.98rem;
+  }
+
+  .profileHeroContent {
+    gap: 0.75rem;
+  }
+
+  .profileAvatarContainer {
+    width: 58px;
+    height: 58px;
+  }
+
+  .notifHeaderBanner {
+    padding: 0.9rem;
+  }
 }
 
 

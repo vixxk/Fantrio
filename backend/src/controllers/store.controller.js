@@ -10,7 +10,7 @@ const ApiError = require('../utils/apiError');
 const catchAsync = require('../utils/catchAsync');
 
 // Collect every media URL a product references (gallery + thumbnail) so it can
-// be purged from S3 when the product is deleted.
+// be purged from cloud storage when the product is deleted.
 const collectProductMediaUrls = (product) => {
   const urls = [];
   (product.media || []).forEach((m) => {
@@ -131,7 +131,7 @@ exports.updateProduct = catchAsync(async (req, res, next) => {
   });
 });
 
-// Delete a product (owner only) — also removes its images from S3.
+// Delete a product (owner only) — also removes its images from cloud storage.
 exports.deleteProduct = catchAsync(async (req, res, next) => {
   const { productId } = req.params;
   const product = await Product.findOne({ _id: productId, creatorId: req.user._id });

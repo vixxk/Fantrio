@@ -531,7 +531,7 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   // Perform cleanups
   await CreatorProfile.findOneAndDelete({ userId });
 
-  // Remove uploaded media from S3 before deleting records (stream covers are kept)
+  // Remove uploaded media from cloud storage before deleting records (stream covers are kept)
   const awsService = require('../services/aws.service');
   const [userStories, userPosts, userMessages] = await Promise.all([
     Story.find({ creatorId: userId }).select('mediaUrl'),

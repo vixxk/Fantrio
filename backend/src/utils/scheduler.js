@@ -68,7 +68,7 @@ const initSubscriptionExpirationScheduler = () => {
   console.log('[Scheduler] Subscription expiration cron task initialized ⏰');
 };
 
-// Run daily to purge expired stories. Media uploaded to S3 must be deleted
+// Run daily to purge expired stories. Media uploaded to cloud storage must be deleted
 // along with the database record so expired stories don't leak storage.
 const initStoryExpirationScheduler = () => {
   cron.schedule('0 2 * * *', async () => {
@@ -76,12 +76,12 @@ const initStoryExpirationScheduler = () => {
       const expiredStories = await Story.find({ expiresAt: { $lte: new Date() } }).select('mediaUrl');
       if (expiredStories.length === 0) return;
 
-      // Best-effort removal from S3 (external/seeded URLs are skipped safely).
+      // Best-effort removal from cloud storage (external/seeded URLs are skipped safely).
       await awsService.deleteS3Media(expiredStories.map((s) => s.mediaUrl));
 
       const result = await Story.deleteMany({ _id: { $in: expiredStories.map((s) => s._id) } });
       if (result.deletedCount > 0) {
-        console.log(`[Story Expiry] Purged ${result.deletedCount} expired stories (S3 media cleaned).`);
+        console.log(`[Story Expiry] Purged ${result.deletedCount} expired stories (media cleaned).`);
       }
     } catch (err) {
       console.error('[Story Expiry] Error purging expired stories:', err);

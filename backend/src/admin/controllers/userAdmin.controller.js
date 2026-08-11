@@ -119,7 +119,7 @@ exports.toggleUserSuspension = catchAsync(async (req, res, next) => {
 });
 
 // Delete user and clean up all data — including removing any media the user
-// uploaded to S3 (stories, posts, chat attachments) so deleting an account
+// uploaded to cloud storage (stories, posts, chat attachments) so deleting an account
 // doesn't leave orphaned files behind.
 exports.deleteUser = catchAsync(async (req, res, next) => {
   const { userId } = req.params;
@@ -137,8 +137,8 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
   const CallLog = require('../../models/CallLog');
   const awsService = require('../../services/aws.service');
 
-  // Collect every S3 URL the user owns so we can purge the files after the
-  // database records are removed. deleteS3Media skips non-S3 (seeded) URLs.
+  // Collect every hosted media URL the user owns so we can purge the files after the
+  // database records are removed. deleteS3Media skips external (seeded) URLs.
   const [stories, posts, messages, streams] = await Promise.all([
     Story.find({ creatorId: userId }).select('mediaUrl').lean(),
     Post.find({ creatorId: userId }).select('media').lean(),
@@ -178,7 +178,7 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
     $or: [{ callerId: userId }, { receiverId: userId }]
   });
 
-  // Purge the user's media from S3 (best-effort; external URLs are skipped).
+  // Purge the user's media from cloud storage (best-effort; external URLs are skipped).
   await awsService.deleteS3Media(mediaUrls);
 
   await User.findByIdAndDelete(userId);

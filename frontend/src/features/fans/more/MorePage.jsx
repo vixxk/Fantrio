@@ -3,8 +3,8 @@ import { useApp } from '../../../context/AppContext';
 import { 
   ChevronRight, ArrowLeft, Ticket, Headphones, 
   HelpCircle, Gift, ShieldAlert, Megaphone, 
-  Lightbulb, Info, CreditCard, FileText, Lock, Check, AlertTriangle,
-  Scale, Share2, Award
+  Lightbulb, Info, CreditCard, Lock, Check, AlertTriangle,
+  Scale, LayoutGrid, User, UserPlus, Trophy
 } from 'lucide-react';
 import styles from './MorePage.module.css';
 
@@ -45,6 +45,8 @@ export const MorePage = () => {
   const handleNavigateSubView = (sub) => {
     if (sub === 'transactions') {
       setActiveTab('Transaction History');
+    } else if (sub === 'buy-coins') {
+      setActiveTab('Buy Coins');
     } else {
       navigateTo(`/more/${sub}`);
     }
@@ -58,58 +60,60 @@ export const MorePage = () => {
   const [statusMsg, setStatusMsg] = useState({ type: '', text: '' });
   const clearStatus = () => setStatusMsg({ type: '', text: '' });
 
-  const moreSections = [
+  const leftColumn = [
     {
-      group: 'Earning & Rewards',
+      group: 'Contact Support',
+      icon: Headphones,
       items: [
-        { id: 'referral', Icon: Share2, title: 'Referral Program', desc: 'Invite friends and earn free bonus coins.', badge: 'Popular' },
-        { id: 'rewards', Icon: Award, title: 'Rewards & Milestones', desc: 'Complete activities for instant coin rewards.', badge: 'Bonus' },
-        { id: 'transactions', Icon: CreditCard, title: 'Transaction History', desc: 'View billing history, receipts & coin logs.' },
+        { id: 'tickets', Icon: Ticket, title: 'Support Tickets', desc: 'View and track your support requests.' },
+        { id: 'contact', Icon: Headphones, title: 'Contact Support', desc: 'Get help from our support team.' },
+        { id: 'faq', Icon: HelpCircle, title: 'Help Centre / FAQ', desc: 'Browse articles and find answers.' },
       ]
     },
     {
-      group: 'Community & Feedback',
+      group: 'Safety & Reporting',
+      icon: ShieldAlert,
       items: [
-        { id: 'announcements', Icon: Megaphone, title: 'Official Announcements', desc: 'Latest updates and platform feature releases.' },
-        { id: 'features', Icon: Lightbulb, title: 'Feature Request Board', desc: 'Propose and vote on new platform ideas.' },
+        { id: 'report-creator', Icon: User, title: 'Report A Creator', desc: 'Report an inappropriate creator.' },
+        { id: 'report-content', Icon: AlertTriangle, title: 'Report Content', desc: 'Report inappropriate creator content.' },
       ]
     },
     {
-      group: 'Support & Safety',
+      group: 'Legal & Policies',
+      icon: Scale,
       items: [
-        { id: 'tickets', Icon: Ticket, title: 'Support Tickets', desc: 'Track your pending or resolved support requests.' },
-        { id: 'contact', Icon: Headphones, title: 'Contact Support', desc: 'Chat or send a direct ticket to our 24/7 team.' },
-        { id: 'faq', Icon: HelpCircle, title: 'Help Centre / FAQ', desc: 'Find instant answers to common questions.' },
-        { id: 'report-creator', Icon: ShieldAlert, title: 'Report Creator or Content', desc: 'Report policy violations to Trust & Safety.' },
-      ]
-    },
-    {
-      group: 'Legal & Info',
-      items: [
-        { id: 'about', Icon: Info, title: 'About Fantrio', desc: 'Learn more about our mission and vision.' },
-        { id: 'terms', Icon: Scale, title: 'Terms of Service', desc: 'Platform rules and legal guidelines.' },
-        { id: 'privacy', Icon: Lock, title: 'Privacy Policy', desc: 'How we manage and protect your personal data.' },
+        { id: 'terms', Icon: Scale, title: 'Terms of Service', desc: 'Read our terms and conditions.' },
+        { id: 'privacy', Icon: Lock, title: 'Privacy Policy', desc: 'Learn how we protect your data.' },
       ]
     }
   ];
 
-  const getSubViewTitle = (key) => {
-    switch (key) {
-      case 'referral': return { title: 'Referral Program', desc: 'Invite friends and earn bonus coins together.' };
-      case 'rewards': return { title: 'Rewards & Milestones', desc: 'Track your community activity rewards.' };
-      case 'announcements': return { title: 'Announcements', desc: 'Official platform news and updates.' };
-      case 'features': return { title: 'Feature Requests', desc: 'Vote and suggest platform enhancements.' };
-      case 'tickets': return { title: 'Support Tickets', desc: 'View your support ticket status.' };
-      case 'contact': return { title: 'Contact Support Desk', desc: 'Direct access to our 24/7 help desk.' };
-      case 'faq': return { title: 'Help Centre & FAQ', desc: 'Instant solutions to common inquiries.' };
-      case 'report-creator': return { title: 'Report Problem', desc: 'Report safety concerns or violations.' };
-      case 'report-content': return { title: 'Report Content', desc: 'Report specific media or posts.' };
-      case 'about': return { title: 'About Fantrio', desc: 'Empowering creator-fan connections.' };
-      case 'terms': return { title: 'Terms of Service', desc: 'Legal terms and usage policies.' };
-      case 'privacy': return { title: 'Privacy Policy', desc: 'Data privacy and security practices.' };
-      default: return { title: 'More Options', desc: 'Explore extra settings and resources.' };
+  const rightColumn = [
+    {
+      group: 'Community & Rewards',
+      icon: Trophy,
+      items: [
+        { id: 'referral', Icon: UserPlus, title: 'Referral Program', desc: 'Invite friends and earn rewards.' },
+        { id: 'rewards', Icon: Gift, title: 'Rewards Program', desc: 'Check your rewards and benefits.' },
+      ]
+    },
+    {
+      group: 'Billing & Transactions',
+      icon: CreditCard,
+      items: [
+        { id: 'transactions', Icon: CreditCard, title: 'Transaction History', desc: 'View your coin purchases and transactions.' },
+      ]
+    },
+    {
+      group: 'Platform',
+      icon: LayoutGrid,
+      items: [
+        { id: 'announcements', Icon: Megaphone, title: 'Announcements', desc: 'Latest updates and news.' },
+        { id: 'features', Icon: Lightbulb, title: 'Feature Requests', desc: 'Suggest new features.' },
+        { id: 'about', Icon: Info, title: 'About Fantrio', desc: 'Learn more about Fantrio.' },
+      ]
     }
-  };
+  ];
 
   const renderSubViewContent = () => {
     switch (subView) {
@@ -141,8 +145,36 @@ export const MorePage = () => {
     }
   };
 
+  const getSubViewTitle = (key) => {
+    switch (key) {
+      case 'referral': return { title: 'Referral Program', desc: 'Invite friends and earn bonus coins together.' };
+      case 'rewards': return { title: 'Rewards & Milestones', desc: 'Track your community activity rewards.' };
+      case 'announcements': return { title: 'Announcements', desc: 'Official platform news and updates.' };
+      case 'features': return { title: 'Feature Requests', desc: 'Vote and suggest platform enhancements.' };
+      case 'tickets': return { title: 'Support Tickets', desc: 'View your support ticket status.' };
+      case 'contact': return { title: 'Contact Support Desk', desc: 'Direct access to our 24/7 help desk.' };
+      case 'faq': return { title: 'Help Centre & FAQ', desc: 'Instant solutions to common inquiries.' };
+      case 'report-creator': return { title: 'Report Problem', desc: 'Report safety concerns or violations.' };
+      case 'report-content': return { title: 'Report Content', desc: 'Report specific media or posts.' };
+      case 'about': return { title: 'About Fantrio', desc: 'Empowering creator-fan connections.' };
+      case 'terms': return { title: 'Terms of Service', desc: 'Legal terms and usage policies.' };
+      case 'privacy': return { title: 'Privacy Policy', desc: 'Data privacy and security practices.' };
+      default: return { title: 'More Options', desc: 'Explore extra settings and resources.' };
+    }
+  };
+
   return (
     <div className={`${styles.moreContainer} ${!darkMode ? styles.light : ''}`}>
+      {/* SVG Gradient Definition for Icons */}
+      <svg width="0" height="0" style={{ position: 'absolute', pointerEvents: 'none' }}>
+        <defs>
+          <linearGradient id="more-page-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#e10075" />
+            <stop offset="100%" stopColor="#7e00f3" />
+          </linearGradient>
+        </defs>
+      </svg>
+
       <div className={styles.moreShell}>
         {subView ? (
           <div className={styles.subPageContainer}>
@@ -171,47 +203,169 @@ export const MorePage = () => {
             {renderSubViewContent()}
           </div>
         ) : (
-          <div className={styles.mainFeed}>
-            {/* Header */}
-            <div className={styles.feedHeader}>
-              <div className={styles.headerTitleBlock}>
-                <h1 className={styles.pageTitle}>More Resources & Features</h1>
-                <p className={styles.pageSubtitle}>Rewards, platform announcements, support, and legal information.</p>
+          <div className={styles.mainLayout}>
+            {/* Left & Center Main Feed */}
+            <div className={styles.centerFeed}>
+              {/* Header */}
+              <div className={styles.feedHeader}>
+                <div className={styles.headerTitleBlock}>
+                  <div className={styles.titleRow}>
+                    <LayoutGrid size={32} className={styles.headerIcon} style={{ stroke: 'url(#more-page-gradient)' }} />
+                    <h1 className={styles.pageTitle}>More</h1>
+                  </div>
+                  <p className={styles.pageSubtitle}>All the important links and Information in one place.</p>
+                </div>
+              </div>
+
+              {/* 2-Column Dashboard Grid */}
+              <div className={styles.dashboardGrid}>
+                {/* Column 1 */}
+                <div className={styles.dashboardColumn}>
+                  {leftColumn.map((sec, idx) => {
+                    const GroupIcon = sec.icon;
+                    return (
+                      <div key={idx} className={styles.categorySection}>
+                        <div className={styles.sectionHeader}>
+                          <GroupIcon size={22} className={styles.sectionIcon} style={{ stroke: 'url(#more-page-gradient)' }} />
+                          <h3>{sec.group}</h3>
+                        </div>
+                        <div className={styles.sectionCards}>
+                          {sec.items.map((item) => {
+                            const ItemIcon = item.Icon;
+                            return (
+                              <div
+                                key={item.id}
+                                className={styles.menuCard}
+                                onClick={() => handleNavigateSubView(item.id)}
+                              >
+                                <div className={styles.cardLeft}>
+                                  <ItemIcon size={20} className={styles.cardIcon} />
+                                  <div className={styles.cardText}>
+                                    <h4 className={styles.cardTitle}>{item.title}</h4>
+                                    <p className={styles.cardDesc}>{item.desc}</p>
+                                  </div>
+                                </div>
+                                <ChevronRight size={17} className={styles.chevron} />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Column 2 */}
+                <div className={styles.dashboardColumn}>
+                  {rightColumn.map((sec, idx) => {
+                    const GroupIcon = sec.icon;
+                    return (
+                      <div key={idx} className={styles.categorySection}>
+                        <div className={styles.sectionHeader}>
+                          <GroupIcon size={22} className={styles.sectionIcon} style={{ stroke: 'url(#more-page-gradient)' }} />
+                          <h3>{sec.group}</h3>
+                        </div>
+                        <div className={styles.sectionCards}>
+                          {sec.items.map((item) => {
+                            const ItemIcon = item.Icon;
+                            return (
+                              <div
+                                key={item.id}
+                                className={styles.menuCard}
+                                onClick={() => handleNavigateSubView(item.id)}
+                              >
+                                <div className={styles.cardLeft}>
+                                  <ItemIcon size={20} className={styles.cardIcon} />
+                                  <div className={styles.cardText}>
+                                    <h4 className={styles.cardTitle}>{item.title}</h4>
+                                    <p className={styles.cardDesc}>{item.desc}</p>
+                                  </div>
+                                </div>
+                                <ChevronRight size={17} className={styles.chevron} />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
-            {/* Main Sections */}
-            <div className={styles.sectionsContainer}>
-              {moreSections.map((sec, idx) => (
-                <div key={idx} className={styles.sectionGroup}>
-                  <h3 className={styles.groupTitle}>{sec.group}</h3>
-                  <div className={styles.gridRow}>
-                    {sec.items.map((item) => {
-                      const IconComp = item.Icon;
-                      return (
-                        <div
-                          key={item.id}
-                          className={styles.moreCard}
-                          onClick={() => handleNavigateSubView(item.id)}
-                        >
-                          <div className={styles.cardHeader}>
-                            <div className={styles.iconWrap}>
-                              <IconComp size={22} />
-                            </div>
-                            {item.badge && <span className={styles.badgePill}>{item.badge}</span>}
-                          </div>
-                          <h4 className={styles.cardTitle}>{item.title}</h4>
-                          <p className={styles.cardDesc}>{item.desc}</p>
-                          <div className={styles.cardFooter}>
-                            <span>Explore</span>
-                            <ChevronRight size={16} />
-                          </div>
-                        </div>
-                      );
-                    })}
+            {/* Right Sidebar */}
+            <div className={styles.rightSidebar}>
+              {/* Promo Card */}
+              <div className={styles.promoCard}>
+                <div className={styles.promoHeaderRow}>
+                  <div className={styles.promoTitleArea}>
+                    <span className={styles.promoLabel}>Get More With</span>
+                    <span className={styles.promoTitle}>Fantrio Coins</span>
+                  </div>
+                  <img src="/Gift & Coins.png" alt="Coins Offer" className={styles.promoImage} />
+                </div>
+                <p className={styles.promoDesc}>
+                  Unlock exclusive content, tip your favourite creator and enjoy premium features.
+                </p>
+                <button
+                  className={styles.buyCoinsBtn}
+                  onClick={() => handleNavigateSubView('buy-coins')}
+                >
+                  Buy Coins
+                </button>
+              </div>
+
+              {/* Need Help Card */}
+              <div className={styles.helpCard}>
+                <div className={styles.helpHeaderRow}>
+                  <h3 className={styles.helpTitle}>Need Help?</h3>
+                  <Headphones size={42} className={styles.helpHeaderIcon} style={{ stroke: 'url(#more-page-gradient)' }} />
+                </div>
+                <p className={styles.helpDesc}>
+                  Our support team is available 24/7 to assist you with any questions or issues.
+                </p>
+                <div className={styles.miniMenuList}>
+                  <div className={styles.miniMenuItem} onClick={() => handleNavigateSubView('contact')}>
+                    <div className={styles.miniItemLeft}>
+                      <Headphones size={17} className={styles.miniIconPink} style={{ stroke: 'url(#more-page-gradient)' }} />
+                      <span>Contact Support</span>
+                    </div>
+                    <div className={styles.miniItemRight}>
+                      <span>We're here to help</span>
+                      <ChevronRight size={15} />
+                    </div>
+                  </div>
+
+                  <div className={styles.miniMenuItem} onClick={() => handleNavigateSubView('faq')}>
+                    <div className={styles.miniItemLeft}>
+                      <HelpCircle size={17} className={styles.miniIconPink} style={{ stroke: 'url(#more-page-gradient)' }} />
+                      <span>Help Centre / FAQ</span>
+                    </div>
+                    <div className={styles.miniItemRight}>
+                      <span>Find Answer Fast</span>
+                      <ChevronRight size={15} />
+                    </div>
+                  </div>
+
+                  <div className={styles.miniMenuItem} onClick={() => handleNavigateSubView('tickets')}>
+                    <div className={styles.miniItemLeft}>
+                      <Ticket size={17} className={styles.miniIconPink} style={{ stroke: 'url(#more-page-gradient)' }} />
+                      <span>Support Tickets</span>
+                    </div>
+                    <div className={styles.miniItemRight}>
+                      <span>Track Your Requests.</span>
+                      <ChevronRight size={15} />
+                    </div>
                   </div>
                 </div>
-              ))}
+
+                <div className={styles.helpFooter}>
+                  <span className={styles.footerLabel}>Average Response Time</span>
+                  <span className={styles.footerStatus}>
+                    <span className={styles.greenDot}>•</span> Under 5 Minutes
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         )}

@@ -6,7 +6,7 @@ const catchAsync = require('../../utils/catchAsync');
 const { buildDateRangeQuery } = require('../../utils/dateRange');
 
 // Admins are allowed to view every attachment (including paywalled media), so
-// presign all media URLs. Non-S3 URLs (seeded external media) are already
+// presign all media URLs. External URLs (seeded media) are already
 // directly viewable and returned as-is (extractS3Key returns null for them).
 const presignMediaUrl = async (mediaUrl) => {
   if (!mediaUrl) return '';
@@ -15,7 +15,7 @@ const presignMediaUrl = async (mediaUrl) => {
   try {
     return await awsService.getPresignedDownloadUrl(key);
   } catch (err) {
-    console.error('[AWS S3] Error presigning message media:', err);
+    console.error('[Media Storage] Error presigning message media:', err);
     return mediaUrl;
   }
 };
@@ -94,7 +94,7 @@ exports.getMessages = catchAsync(async (req, res, next) => {
   });
 });
 
-// Delete message (also removes the attachment from S3)
+// Delete message (also removes the attachment from cloud storage)
 exports.deleteMessage = catchAsync(async (req, res, next) => {
   const { id } = req.params;
 

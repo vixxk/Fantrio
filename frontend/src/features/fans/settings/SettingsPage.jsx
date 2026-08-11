@@ -326,6 +326,7 @@ export const SettingsPage = () => {
 
 const SubPage = ({ section, onBack, onNavigate }) => {
   const [statusMsg, setStatusMsg] = useState({ type: '', text: '' });
+  const [profileBusy, setProfileBusy] = useState(false);
 
   const clearStatus = () => setStatusMsg({ type: '', text: '' });
 
@@ -344,7 +345,7 @@ const SubPage = ({ section, onBack, onNavigate }) => {
   const renderContent = () => {
     switch (section) {
       case 'profile':
-        return <ProfilePage setStatus={setStatusMsg} />;
+        return <ProfilePage setStatus={setStatusMsg} onBusyChange={setProfileBusy} />;
       case 'security':
         return <SecurityPage setStatus={setStatusMsg} />;
       case 'notifications':
@@ -376,6 +377,16 @@ const SubPage = ({ section, onBack, onNavigate }) => {
           <h2 className={styles.subPageTitle}>{titles[section]?.title}</h2>
           <p className={styles.subPageDesc}>{titles[section]?.desc}</p>
         </div>
+        {section === 'profile' && (
+          <button
+            type="submit"
+            form="profile-save-form"
+            className={styles.saveProfileHeaderBtn}
+            disabled={profileBusy}
+          >
+            {profileBusy ? 'Saving...' : 'Save Profile'}
+          </button>
+        )}
       </div>
 
       {statusMsg.text && (

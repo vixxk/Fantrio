@@ -174,6 +174,12 @@ export const SecurityPage = ({ setStatus }) => {
               </p>
             </div>
           </div>
+
+          {twoFaStep === 'idle' && (
+            <button onClick={handleEnable2FA} disabled={twoFaBusy} className={styles.submitBtn}>
+              {twoFaBusy ? <><Loader size={16} className={styles.spin} /> Sending Code...</> : <><ShieldCheck size={16} /> Setup 2FA Security</>}
+            </button>
+          )}
         </div>
 
         {twoFaStep === 'enabled' ? (
@@ -228,15 +234,12 @@ export const SecurityPage = ({ setStatus }) => {
               <span className={styles.benefitItem}><CheckCircle2 size={14} /> Instant email login notifications</span>
               <span className={styles.benefitItem}><CheckCircle2 size={14} /> Prevents unauthorized account access</span>
             </div>
-            <button onClick={handleEnable2FA} disabled={twoFaBusy} className={styles.submitBtn}>
-              {twoFaBusy ? <><Loader size={16} className={styles.spin} /> Sending Code...</> : <><ShieldCheck size={16} /> Setup 2FA Security</>}
-            </button>
           </div>
         )}
       </div>
 
       {/* Change password Card */}
-      <div className={styles.securityCard}>
+      <form onSubmit={handleChangePassword} className={styles.securityCard}>
         <div className={styles.securityCardHeader}>
           <div className={styles.securityCardTitleRow}>
             <div className={styles.securityIconBox}>
@@ -247,9 +250,12 @@ export const SecurityPage = ({ setStatus }) => {
               <p className={styles.securityCardDesc}>Ensure your account remains safe with a strong, unique password.</p>
             </div>
           </div>
+          <button type="submit" disabled={savingPwd} className={styles.submitBtn}>
+            {savingPwd ? <><Loader size={16} className={styles.spin} /> Updating...</> : 'Update Password'}
+          </button>
         </div>
 
-        <form onSubmit={handleChangePassword} className={styles.formGrid}>
+        <div className={styles.formGrid}>
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>Current Password</label>
             <div className={styles.inputWithIconWrap}>
@@ -342,14 +348,8 @@ export const SecurityPage = ({ setStatus }) => {
               </div>
             </div>
           )}
-
-          <div className={styles.formActionsRight}>
-            <button type="submit" disabled={savingPwd} className={styles.submitBtn}>
-              {savingPwd ? <><Loader size={16} className={styles.spin} /> Updating...</> : 'Update Password'}
-            </button>
-          </div>
-        </form>
-      </div>
+        </div>
+      </form>
 
       {/* Login activity */}
       <div className={styles.securityCard}>

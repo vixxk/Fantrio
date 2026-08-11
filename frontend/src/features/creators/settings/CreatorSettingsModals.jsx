@@ -456,7 +456,7 @@ export const AvatarModal = ({ darkMode, currentAvatar, onClose, onSaved }) => {
         });
         if (s3Response.ok || s3Response.status === 200) {
           setUrl(presignedRes.fileUrl);
-          setStatus({ type: 'success', text: 'Image uploaded to AWS S3! Click Update Picture to save.' });
+          setStatus({ type: 'success', text: 'Image uploaded! Click Update Picture to save.' });
         } else {
           const reader = new FileReader();
           reader.onload = (evt) => setUrl(evt.target.result);
@@ -496,14 +496,14 @@ export const AvatarModal = ({ darkMode, currentAvatar, onClose, onSaved }) => {
   };
 
   return (
-    <Modal darkMode={darkMode} title="Profile Picture" subtitle="Upload an image file directly to AWS S3 or provide an image URL." onClose={onClose}>
+    <Modal darkMode={darkMode} title="Profile Picture" subtitle="Upload an image file or provide an image URL." onClose={onClose}>
       <StatusMsg type={status.type} text={status.text} />
       <div className={styles.avatarModalPreview}>
         <img src={url.trim() || currentAvatar || ''} alt="Preview" className={styles.avatarModalImg} />
       </div>
       <form onSubmit={handleSubmit} className={styles.modalForm}>
         <div className={styles.formGroup}>
-          <label className={styles.formLabel}>Upload Image File (AWS S3)</label>
+          <label className={styles.formLabel}>Upload Image File</label>
           <input
             type="file"
             accept="image/*"
@@ -523,7 +523,7 @@ export const AvatarModal = ({ darkMode, currentAvatar, onClose, onSaved }) => {
           />
         </div>
         <button type="submit" disabled={saving || uploading} className={`${styles.modalBtn} ${styles.modalBtnPrimary}`}>
-          {saving ? 'Saving...' : uploading ? 'Uploading to S3...' : 'Update Picture'}
+          {saving ? 'Saving...' : uploading ? 'Uploading...' : 'Update Picture'}
         </button>
       </form>
     </Modal>

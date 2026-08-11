@@ -1,13 +1,13 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { api } from '../../../services/api';
 import { 
-  User, UploadCloud, BadgeCheck, Lock, Sparkles, Loader, Camera, Check, AlertCircle
+  User, UploadCloud, BadgeCheck, Lock, Loader, Camera
 } from 'lucide-react';
 import styles from './SettingsPage.module.css';
 
-export const ProfilePage = ({ setStatus }) => {
-  const { user, updateUser } = useApp();
+export const ProfilePage = ({ setStatus, onBusyChange }) => {
+  const { user, updateUser, refreshProfile } = useApp();
   const fileInputRef = useRef(null);
 
   const [form, setForm] = useState({
@@ -53,7 +53,7 @@ export const ProfilePage = ({ setStatus }) => {
       });
 
       if (presignedRes.status === 'success' && presignedRes.uploadUrl) {
-        // 2. Directly upload the image binary to AWS S3
+        // 2. Directly upload the image binary to cloud storage
         const s3Response = await fetch(presignedRes.uploadUrl, {
           method: 'PUT',
           headers: {
@@ -64,9 +64,9 @@ export const ProfilePage = ({ setStatus }) => {
 
         if (s3Response.ok || s3Response.status === 200) {
           setForm(prev => ({ ...prev, avatarUrl: presignedRes.fileUrl }));
-          if (setStatus) setStatus({ type: 'success', text: 'Profile picture uploaded to AWS S3 successfully!' });
+          if (setStatus) setStatus({ type: 'success', text: 'Profile picture uploaded successfully!' });
         } else {
-          // If AWS credentials in dev environment are mock/dummy, fallback to file data URL for preview
+          // If cloud storage credentials in dev environment are mock/dummy, fallback to file data URL for preview
           const reader = new FileReader();
           reader.onload = (evt) => {
             setForm(prev => ({ ...prev, avatarUrl: evt.target.result }));
@@ -76,7 +76,7 @@ export const ProfilePage = ({ setStatus }) => {
         }
       }
     } catch (err) {
-      console.warn('S3 upload fallback to local preview:', err);
+      console.warn('Upload fallback to local preview:', err);
       // Fallback: Read file locally as Data URL
       const reader = new FileReader();
       reader.onload = (evt) => {
@@ -90,6 +90,12 @@ export const ProfilePage = ({ setStatus }) => {
       if (e.target) e.target.value = '';
     }
   };
+
+  // Keep the header Save button in sync with this page's busy state
+  useEffect(() => {
+    if (onBusyChange) onBusyChange(saving || uploadingImage);
+    return () => { if (onBusyChange) onBusyChange(false); };
+  }, [saving, uploadingImage, onBusyChange]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -111,6 +117,9 @@ export const ProfilePage = ({ setStatus }) => {
           avatarUrl: res.user.avatarUrl || '',
         });
         if (setStatus) setStatus({ type: 'success', text: 'Profile updated successfully!' });
+        // Refresh the user in context from the server so the header
+        // (avatar, name, username) reflects the latest profile.
+        refreshProfile();
       }
     } catch (err) {
       if (setStatus) setStatus({ type: 'error', text: err.message || 'Failed to update profile.' });
@@ -121,7 +130,7 @@ export const ProfilePage = ({ setStatus }) => {
 
   return (
     <div className={styles.subPageBody}>
-      {/* Hidden file input for S3 upload */}
+      {/* Hidden file input for image upload */}
       <input
         type="file"
         ref={fileInputRef}
@@ -142,7 +151,7 @@ export const ProfilePage = ({ setStatus }) => {
               className={styles.avatarEditOverlay}
               onClick={triggerFileInput}
               disabled={uploadingImage}
-              title="Upload picture directly to AWS S3"
+              title="Upload picture"
             >
               {uploadingImage ? <Loader size={18} className={styles.spin} /> : <Camera size={18} />}
             </button>
@@ -163,8 +172,8 @@ export const ProfilePage = ({ setStatus }) => {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className={styles.formGrid}>
-        <div className={styles.formRow2Col}>
+      <form id="profile-save-form" onSubmit={handleSubmit} className={styles.formGrid}>
+        <div className={styles.nameUserRow}>
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>
               <User size={14} /> Display Name
@@ -192,10 +201,22 @@ export const ProfilePage = ({ setStatus }) => {
           </div>
         </div>
 
-        {/* Direct AWS S3 Upload Card */}
         <div className={styles.formGroup}>
           <label className={styles.formLabel}>
-            <UploadCloud size={14} /> Profile Picture (AWS S3 Upload)
+            <Lock size={14} /> Account Email
+          </label>
+          <input
+            type="email"
+            className={`${styles.formInput} ${styles.inputDisabled}`}
+            value={user?.email || ''}
+            disabled
+          />
+        </div>
+
+        {/* Direct image upload card */}
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel}>
+            <UploadCloud size={14} /> Profile Picture
           </label>
           <div
             className={styles.s3UploadDropzone}
@@ -206,8 +227,8 @@ export const ProfilePage = ({ setStatus }) => {
                 <>
                   <Loader size={24} className={styles.spin} style={{ color: '#e10075' }} />
                   <div>
-                    <span className={styles.s3DropzoneTitle}>Uploading to AWS S3...</span>
-                    <p className={styles.s3DropzoneSub}>Please wait while your image is saved directly to AWS S3 cloud storage.</p>
+                    <span className={styles.s3DropzoneTitle}>Uploading...</span>
+                    <p className={styles.s3DropzoneSub}>Please wait while your image is saved to secure cloud storage.</p>
                   </div>
                 </>
               ) : (
@@ -217,7 +238,7 @@ export const ProfilePage = ({ setStatus }) => {
                   </div>
                   <div>
                     <span className={styles.s3DropzoneTitle}>Click to choose an image file from your device</span>
-                    <p className={styles.s3DropzoneSub}>Image will be uploaded directly to AWS S3. PNG, JPG, WEBP up to 10MB.</p>
+                    <p className={styles.s3DropzoneSub}>PNG, JPG, WEBP up to 10MB.</p>
                   </div>
                   <button type="button" className={styles.s3UploadBtn} onClick={triggerFileInput}>
                     Browse File
@@ -225,29 +246,6 @@ export const ProfilePage = ({ setStatus }) => {
                 </>
               )}
             </div>
-          </div>
-        </div>
-
-        <div className={styles.formRow2Col}>
-          <div className={styles.formGroup}>
-            <label className={styles.formLabel}>
-              <Lock size={14} /> Account Email
-            </label>
-            <input
-              type="email"
-              className={`${styles.formInput} ${styles.inputDisabled}`}
-              value={user?.email || ''}
-              disabled
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label className={styles.formLabel}>Current Image Storage Location</label>
-            <input
-              type="text"
-              className={`${styles.formInput} ${styles.inputDisabled}`}
-              value={form.avatarUrl ? (form.avatarUrl.includes('.amazonaws.com/') ? 'AWS S3 Cloud Storage' : 'Configured Avatar') : 'Default'}
-              disabled
-            />
           </div>
         </div>
 
@@ -266,11 +264,6 @@ export const ProfilePage = ({ setStatus }) => {
           />
         </div>
 
-        <div className={styles.formActionsRight}>
-          <button type="submit" disabled={saving || uploadingImage} className={styles.submitBtn}>
-            {saving ? <><Loader size={16} className={styles.spin} /> Saving Changes...</> : <><Sparkles size={16} /> Save Profile</>}
-          </button>
-        </div>
       </form>
     </div>
   );

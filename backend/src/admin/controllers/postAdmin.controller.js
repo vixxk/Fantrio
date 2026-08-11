@@ -13,7 +13,7 @@ const collectPostMediaUrls = (post) => {
   return urls;
 };
 
-// Presign S3-hosted media so admins can preview every attachment. Non-S3 URLs
+// Presign hosted media so admins can preview every attachment. External URLs
 // (seeded external media) are already directly viewable and returned as-is.
 const presignMediaUrl = async (mediaUrl) => {
   if (!mediaUrl) return '';
@@ -22,7 +22,7 @@ const presignMediaUrl = async (mediaUrl) => {
   try {
     return await awsService.getPresignedDownloadUrl(key);
   } catch (err) {
-    console.error('[AWS S3] Error presigning post media:', err);
+    console.error('[Media Storage] Error presigning post media:', err);
     return mediaUrl;
   }
 };

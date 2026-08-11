@@ -27,7 +27,7 @@ const formatMessageForUser = async (user, msg) => {
       try {
         finalMediaUrl = await awsService.getPresignedDownloadUrl(key);
       } catch (err) {
-        console.error('[AWS S3] Error presigning message media:', err);
+        console.error('[Media Storage] Error presigning message media:', err);
       }
     } else {
       // Mask url
