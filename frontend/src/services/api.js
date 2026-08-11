@@ -1,4 +1,5 @@
-const BASE_URL = 'http://localhost:5000/api/v1';
+const BACKEND_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+const BASE_URL = `${BACKEND_URL}/api/v1`;
 
 class ApiService {
   constructor() {}

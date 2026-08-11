@@ -17,13 +17,21 @@ app.use(cors({
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
-// Base health check route
-app.get('/api/health', (req, res) => {
+// Health Check Routes (/health, /api/health, and /api/v1/health)
+const healthHandler = (req, res) => {
   res.status(200).json({
     status: 'success',
-    message: 'Fantrio API Server is healthy and running'
+    message: 'Fantrio API Server is healthy and running 🚀',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development'
   });
-});
+};
+
+app.get('/', healthHandler);
+app.get('/health', healthHandler);
+app.get('/api/health', healthHandler);
+app.get('/api/v1/health', healthHandler);
 
 // Dynamic Route Registrations (Phase-wise mount points)
 app.use('/api/v1/auth', require('./routes/auth.routes'));
