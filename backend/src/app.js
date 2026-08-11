@@ -5,12 +5,16 @@ const helmet = require('helmet');
 const app = express();
 
 // Set security HTTP headers
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: false
+}));
 
-// Enable CORS with dynamic client origin routing
+// Enable CORS - dynamically allow requesting origin with credentials
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
-  credentials: true
+  origin: (origin, callback) => callback(null, true),
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
 }));
 
 // Body parser, reading data from body into req.body
