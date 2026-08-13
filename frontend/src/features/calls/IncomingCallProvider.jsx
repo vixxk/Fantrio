@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
-import { Phone, PhoneOff, Mic, MicOff, Video, VideoOff, Gift, Coins, Bell, BellOff, X } from 'lucide-react';
+import { Phone, PhoneOff, Mic, MicOff, Video, VideoOff, Gift, Coins, Bell, BellOff, X, CameraOff } from 'lucide-react';
 import { isGiftChimeMuted, setGiftChimeMuted } from '../../utils/sound';
 import { useApp } from '../../context/AppContext';
 import { useToast } from '../../components/Toast/Toast';
@@ -244,6 +244,17 @@ export const IncomingCallProvider = ({ children }) => {
       setIsMuted(false);
       setIsCameraOff(false);
 
+      if (user?.role !== 'creator' && type === 'video') {
+        setTimeout(() => {
+          ag.toggleCamera();
+          setIsCameraOff(true);
+          setTimeout(() => {
+            ag.toggleCamera();
+            setIsCameraOff(false);
+          }, 150);
+        }, 100);
+      }
+
       // Duration timer
       durationTimer.current = setInterval(() => {
         setCallDuration((d) => d + 1);
@@ -393,7 +404,14 @@ export const IncomingCallProvider = ({ children }) => {
                   />
                   {isCameraOff && (
                     <div className={styles.localCameraOffFallback}>
-                      <span>Cam Off</span>
+                      <img
+                        src={user?.avatarUrl || '/profile.png'}
+                        alt={user?.displayName || 'Self'}
+                        className={styles.localAvatarImg}
+                      />
+                      <div className={styles.localCamOffBadge}>
+                        <CameraOff size={12} />
+                      </div>
                     </div>
                   )}
                 </div>

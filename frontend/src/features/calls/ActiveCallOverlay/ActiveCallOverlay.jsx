@@ -222,8 +222,14 @@ export const ActiveCallOverlay = ({
               />
               {isCameraOff && (
                 <div className={styles.localCameraOffFallback}>
-                  <CameraOff size={18} />
-                  <span>Cam Off</span>
+                  <img
+                    src={user?.avatarUrl || '/profile.png'}
+                    alt={user?.displayName || 'Self'}
+                    className={styles.localAvatarImg}
+                  />
+                  <div className={styles.localCamOffBadge}>
+                    <CameraOff size={12} />
+                  </div>
                 </div>
               )}
             </div>

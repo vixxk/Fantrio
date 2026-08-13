@@ -144,7 +144,6 @@
 }
 
 .localVideoContainer video,
-.localVideoContainer div,
 .localVideoContainer canvas,
 .localVideo {
   width: 100% !important;
@@ -154,21 +153,43 @@
 }
 
 .localVideoHidden {
-  display: none;
+  display: none !important;
 }
 
 .localCameraOffFallback {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
+  display: flex !important;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  background: #191226;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.75rem;
-  font-weight: 700;
+  background: #110d1a;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.localAvatarImg {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+.localCamOffBadge {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  color: #ef4444;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 2;
 }
 
 /* ========== Info Center Card (Overlays Video or Audio) ========== */

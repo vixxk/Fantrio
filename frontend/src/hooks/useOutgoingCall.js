@@ -232,6 +232,17 @@ export const useOutgoingCall = ({ type }) => {
         onRemoteStream: (stream) => setRemoteStream(stream),
         onRemoteLeave: () => endCall(),
         onCallEnded: () => endCall()
+      }).then(() => {
+        if (user?.role !== 'creator' && type === 'video') {
+          setTimeout(() => {
+            ag.toggleCamera();
+            setIsCameraOff(true);
+            setTimeout(() => {
+              ag.toggleCamera();
+              setIsCameraOff(false);
+            }, 150);
+          }, 100);
+        }
       }).catch((e) => console.error('join call failed', e));
 
       // Start duration + heartbeat
