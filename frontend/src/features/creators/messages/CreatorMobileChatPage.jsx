@@ -11,6 +11,7 @@ import { ConfirmDeleteDialog } from '../../../components/ConfirmDeleteDialog/Con
 import { useConfirmDelete } from '../../../hooks/useConfirmDelete';
 import { useToast } from '../../../components/Toast/Toast';
 import { useAppDialog } from '../../../components/AppDialog/AppDialog';
+import { GiftMessageCard, parseGiftMessage } from '../../gifts/GiftMessageCard';
 
 const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80';
 
@@ -33,6 +34,11 @@ const mapMessage = (m, currentUserId) => {
     sender: isCreator ? 'creator' : 'fan',
     text: m.content || '',
     time: formatTime(m.createdAt),
+    isGift: !!m.isGift,
+    giftName: m.giftName || '',
+    giftEmoji: m.giftEmoji || '',
+    giftCoins: m.giftCoins || 0,
+    giftTier: m.giftTier || 1,
     isPaywall: !!m.isPaywall,
     isLocked: !!m.isLocked,
     coinPrice: m.coinPrice || 0,
@@ -206,7 +212,7 @@ export const CreatorMobileChatPage = () => {
     const fileType = file.type || 'image/jpeg';
     const mediaType = fileType.startsWith('video/') ? 'video' : 'image';
     try {
-      const res = await api.post('/posts/upload-url', {
+      const res = await api.post('/settings/presigned-upload', {
         fileName: (file.name || `chat-image-${Date.now()}.jpg`).replace(/[^a-zA-Z0-9._-]/g, '_'),
         fileType
       });
@@ -413,13 +419,16 @@ export const CreatorMobileChatPage = () => {
         ) : (
           messages.map((msg) => {
             const isCreator = msg.sender === 'creator';
+            const parsedGift = parseGiftMessage(msg);
             return (
               <div key={msg.id} className={`${styles.msgRow} ${isCreator ? styles.msgRight : styles.msgLeft}`}>
                 {!isCreator && (
                   <img src={fan?.avatarUrl || DEFAULT_AVATAR} alt="" className={styles.msgAvatar} />
                 )}
                 <div className={styles.msgContent}>
-                  {msg.isPaywall ? (
+                  {parsedGift.isGift ? (
+                    <GiftMessageCard msg={msg} isCreator={isCreator} />
+                  ) : msg.isPaywall ? (
                     <div className={styles.paywall}>
                       <div className={styles.paywallPreview}>
                         {msg.previewUrl ? <img src={msg.previewUrl} alt="" className={styles.paywallImg} /> : <div className={styles.paywallImg} style={{ background: 'linear-gradient(135deg, #1a1a2e, #e10075)' }} />}

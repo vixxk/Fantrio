@@ -25,6 +25,26 @@ const messageSchema = new mongoose.Schema(
       enum: ['none', 'image', 'video', 'gif', 'media'],
       default: 'none'
     },
+    isGift: {
+      type: Boolean,
+      default: false
+    },
+    giftName: {
+      type: String,
+      default: ''
+    },
+    giftEmoji: {
+      type: String,
+      default: ''
+    },
+    giftCoins: {
+      type: Number,
+      default: 0
+    },
+    giftTier: {
+      type: Number,
+      default: 1
+    },
     isPaywall: {
       type: Boolean,
       default: false

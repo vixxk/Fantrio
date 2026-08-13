@@ -12,6 +12,7 @@ import { GiftOverlay } from '../../gifts/GiftOverlay';
 import { GiftPanel } from '../../gifts/GiftPanel';
 import { QuickRecharge } from '../../gifts/QuickRecharge';
 import { ChatScreenSkeleton } from '../../../components/ChatThreadSkeleton/ChatThreadSkeleton';
+import { GiftMessageCard, parseGiftMessage } from '../../gifts/GiftMessageCard';
 
 const formatTime = (iso) => {
   if (!iso) return '';
@@ -32,6 +33,11 @@ const mapMessage = (m, currentUserId) => {
     sender: isUser ? 'user' : 'creator',
     text: m.content || '',
     time: formatTime(m.createdAt),
+    isGift: !!m.isGift,
+    giftName: m.giftName || '',
+    giftEmoji: m.giftEmoji || '',
+    giftCoins: m.giftCoins || 0,
+    giftTier: m.giftTier || 1,
     isPaywall: !!m.isPaywall,
     isLocked: !!m.isLocked,
     coinPrice: m.coinPrice || 0,
@@ -354,13 +360,16 @@ export const MobileChatPage = () => {
 
         {messages.map((msg) => {
           const isMe = msg.sender === 'user';
+          const parsedGift = parseGiftMessage(msg);
           return (
             <div key={msg.id} className={`${styles.msgRow} ${isMe ? styles.msgRight : styles.msgLeft}`}>
               {!isMe && peer.avatarUrl && (
                 <img src={peer.avatarUrl} alt="" className={styles.msgAvatar} />
               )}
                 <div className={styles.msgContent}>
-                  {msg.isPaywall ? (
+                  {parsedGift.isGift ? (
+                    <GiftMessageCard msg={msg} isCreator={!isMe} />
+                  ) : msg.isPaywall ? (
                     <div className={styles.paywall}>
                       <div className={styles.paywallPreview}>
                         {msg.previewUrl ? <img src={msg.previewUrl} alt="" className={styles.paywallImg} /> : <div className={styles.paywallImg} style={{ background: 'linear-gradient(135deg, #1a1a2e, #e10075)' }} />}

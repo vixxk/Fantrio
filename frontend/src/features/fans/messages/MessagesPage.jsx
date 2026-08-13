@@ -25,6 +25,7 @@ import { QuickRecharge } from '../../../features/gifts/QuickRecharge';
 import { GiftOverlay } from '../../gifts/GiftOverlay';
 import { useOutgoingCall } from '../../../hooks/useOutgoingCall';
 import { useGiftEvents } from '../../../hooks/useGiftEvents';
+import { GiftMessageCard, parseGiftMessage } from '../../gifts/GiftMessageCard';
 
 // Custom Gradient Verification Badge
 const GradientBadgeCheck = ({ size = 15 }) => (
@@ -112,6 +113,11 @@ const mapMessage = (m, currentUserId) => {
     sender: isUser ? 'user' : 'creator',
     text: m.content || '',
     time: formatTime(m.createdAt),
+    isGift: !!m.isGift,
+    giftName: m.giftName || '',
+    giftEmoji: m.giftEmoji || '',
+    giftCoins: m.giftCoins || 0,
+    giftTier: m.giftTier || 1,
     isPaywall: !!m.isPaywall,
     isLocked: !!m.isLocked,
     coinPrice: m.coinPrice || 0,
@@ -340,6 +346,28 @@ export const MessagesPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedConvId]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const hlMsg = params.get('highlightMsg');
+    if (hlMsg && (messagesMap[selectedConvId] || []).length > 0) {
+      const timer = setTimeout(() => {
+        const el = document.getElementById(`msg-${hlMsg}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.style.transition = 'box-shadow 0.4s ease, transform 0.4s ease';
+          el.style.boxShadow = '0 0 25px #a78bfa, 0 0 12px #ff007f';
+          el.style.borderRadius = '16px';
+          el.style.transform = 'scale(1.02)';
+          setTimeout(() => {
+            el.style.boxShadow = '';
+            el.style.transform = '';
+          }, 3500);
+        }
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [selectedConvId, messagesMap]);
+
   // Handle case where user navigates directly to /messages/:creatorId for a creator without prior DM history
   useEffect(() => {
     if (!selectedConvId || loadingConversations) return;
@@ -491,6 +519,53 @@ export const MessagesPage = () => {
     }
   };
 
+  const chatMediaInputRef = useRef(null);
+
+  // Upload picked image/video via S3 presigned URL and send as media message
+  const handleSendImage = async (file) => {
+    if (!file || !selectedConvId) return;
+    const fileType = file.type || 'image/jpeg';
+    const mediaType = fileType.startsWith('video/') ? 'video' : 'image';
+    try {
+      const res = await api.post('/settings/presigned-upload', {
+        fileName: (file.name || `chat-image-${Date.now()}.jpg`).replace(/[^a-zA-Z0-9._-]/g, '_'),
+        fileType
+      });
+      if (res.status !== 'success') {
+        toast.error('Failed to get upload URL.');
+        return;
+      }
+      const putRes = await fetch(res.uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': fileType },
+        body: file
+      });
+      if (!putRes.ok) {
+        toast.error('Upload to storage failed.');
+        return;
+      }
+      const msgRes = await api.post('/chat/message', {
+        receiverId: selectedConvId,
+        content: '',
+        mediaUrl: res.fileUrl,
+        mediaType
+      });
+      if (msgRes.status === 'success' && msgRes.message) {
+        const uiMsg = mapMessage(msgRes.message, currentUserId);
+        setMessagesMap(prev => ({
+          ...prev,
+          [selectedConvId]: [...(prev[selectedConvId] || []), uiMsg]
+        }));
+        setConversations(prev => prev.map(c => (c.id === selectedConvId
+          ? { ...c, lastMessage: '📎 Media', time: 'Just now' }
+          : c)));
+      }
+    } catch (err) {
+      console.error('Failed to send image:', err);
+      toast.error('Failed to send image. Please try again.');
+    }
+  };
+
   // Insert a picked emoji at the caret position of the chat input
   const handlePickEmoji = (emoji) => {
     setInputText((prev) => insertEmojiAtCaret(prev, emoji, chatInputRef.current));
@@ -537,19 +612,30 @@ export const MessagesPage = () => {
         refreshBalance();
         setShowTipModal(false);
 
-        const giftMsg = {
-          id: res.eventId || `gift_${Date.now()}`,
-          sender: 'user',
-          text: `${gift.emoji} Sent ${gift.name} (${gift.coins.toLocaleString()} Coins) to ${selectedConv.user.displayName}!`,
-          time: 'Just now',
-          isTip: true,
-          gift: res.gift || gift
+        const rawMsg = res.message || {
+          _id: res.eventId || `gift_${Date.now()}`,
+          senderId: currentUserId,
+          receiverId: selectedConv.id,
+          content: `${gift.emoji} Sent ${gift.name} (${gift.coins.toLocaleString()} Coins)!`,
+          isGift: true,
+          giftName: gift.name,
+          giftEmoji: gift.emoji,
+          giftCoins: gift.coins,
+          giftTier: gift.tier || 1,
+          createdAt: new Date().toISOString()
         };
+        const giftMsg = mapMessage(rawMsg, currentUserId);
 
-        setMessagesMap(prev => ({
-          ...prev,
-          [selectedConvId]: [...(prev[selectedConvId] || []), giftMsg]
-        }));
+        setMessagesMap(prev => {
+          const list = prev[selectedConvId] || [];
+          if (list.some(m => String(m.id) === String(giftMsg.id))) {
+            return prev;
+          }
+          return {
+            ...prev,
+            [selectedConvId]: [...list, giftMsg]
+          };
+        });
         toast.success(`${gift.name} sent!`);
       }
     } catch (err) {
@@ -849,6 +935,7 @@ export const MessagesPage = () => {
 
                     {currentMessages.map((msg) => {
                       const isUser = msg.sender === 'user';
+                      const parsedGift = parseGiftMessage(msg);
 
                       if (msg.isPaywall) {
                         return (
@@ -857,6 +944,7 @@ export const MessagesPage = () => {
                             id={msg.id}
                             className={`${styles.msgRow} ${styles.msgRowLeft}`}
                             onClick={() => selectMessage(msg.id)}
+                            style={{ cursor: 'pointer' }}
                           >
                             <div className={`${styles.paywallWrapper} ${selectedMsgId === msg.id ? styles.paywallSelected : ''}`}>
                               <span className={styles.paywallNoticeTitle}>{msg.title}</span>
@@ -910,11 +998,21 @@ export const MessagesPage = () => {
                           id={msg.id}
                           className={`${styles.msgRow} ${isUser ? styles.msgRowRight : styles.msgRowLeft}`}
                           onClick={() => selectMessage(msg.id)}
+                          style={{ cursor: 'pointer' }}
                         >
                           <div className={styles.msgContentWrapper}>
-                            <div className={`${styles.msgBubble} ${isUser ? styles.bubbleUser : styles.bubbleCreator} ${msg.isTip ? styles.bubbleTip : ''} ${selectedMsgId === msg.id ? styles.bubbleSelected : ''}`}>
-                              {msg.text && <p className={styles.msgText}>{msg.text}</p>}
-                            </div>
+                            {parsedGift.isGift ? (
+                              <GiftMessageCard msg={msg} isCreator={!isUser} />
+                            ) : (
+                              <div className={`${styles.msgBubble} ${isUser ? styles.bubbleUser : styles.bubbleCreator} ${msg.isTip ? styles.bubbleTip : ''} ${selectedMsgId === msg.id ? styles.bubbleSelected : ''}`}>
+                                {msg.mediaUrl && msg.mediaType === 'video' ? (
+                                  <video src={msg.mediaUrl} controls className={styles.msgMedia} />
+                                ) : msg.mediaUrl ? (
+                                  <img src={msg.mediaUrl} alt="Media" className={styles.msgMedia} />
+                                ) : null}
+                                {msg.text && <p className={styles.msgText}>{msg.text}</p>}
+                              </div>
+                            )}
                             <div className={`${styles.msgTimestampInline} ${isUser ? styles.timestampRight : styles.timestampLeft}`}>
                               <span className={styles.msgTimestamp}>{msg.time}</span>
                             </div>
@@ -1443,18 +1541,23 @@ export const MessagesPage = () => {
                         );
                       }
 
+                      const parsedGift = parseGiftMessage(msg);
                       return (
                         <div
                           key={msg.id}
-                          id={msg.id}
+                          id={`msg-${msg.id}`}
                           className={`${styles.msgRow} ${isUser ? styles.msgRowRight : styles.msgRowLeft}`}
                           onClick={() => selectMessage(msg.id)}
                           style={{ cursor: 'pointer' }}
                         >
                           <div className={styles.msgContentWrapper}>
-                            <div className={`${styles.msgBubble} ${isUser ? styles.bubbleUser : styles.bubbleCreator} ${msg.isTip ? styles.bubbleTip : ''} ${selectedMsgId === msg.id ? styles.bubbleSelected : ''}`}>
-                              {msg.text && <p className={styles.msgText}>{msg.text}</p>}
-                            </div>
+                            {parsedGift.isGift ? (
+                              <GiftMessageCard msg={msg} isCreator={!isUser} />
+                            ) : (
+                              <div className={`${styles.msgBubble} ${isUser ? styles.bubbleUser : styles.bubbleCreator} ${msg.isTip ? styles.bubbleTip : ''} ${selectedMsgId === msg.id ? styles.bubbleSelected : ''}`}>
+                                {msg.text && <p className={styles.msgText}>{msg.text}</p>}
+                              </div>
+                            )}
                             <div className={`${styles.msgTimestampInline} ${isUser ? styles.timestampRight : styles.timestampLeft}`}>
                               <span className={styles.msgTimestamp}>{msg.time}</span>
                             </div>

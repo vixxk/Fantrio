@@ -86,9 +86,17 @@ export const IncomingCallProvider = ({ children }) => {
       }, 30000);
     };
 
+    const handleGift = (evt) => {
+      if (evt && evt.giftId) {
+        setGiftEvents((prev) => [...prev, evt]);
+      }
+    };
+
     socket.on('incoming_call', handleIncoming);
+    socket.on('gift_received', handleGift);
     return () => {
       socket.off('incoming_call', handleIncoming);
+      socket.off('gift_received', handleGift);
       if (ringTimeoutRef.current) clearTimeout(ringTimeoutRef.current);
     };
   }, [user, incoming]);

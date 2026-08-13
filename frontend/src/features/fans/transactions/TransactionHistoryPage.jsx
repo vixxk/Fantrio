@@ -67,19 +67,33 @@ const getDirection = (t, userId) => {
 };
 
 const getDescription = (t, userId) => {
+  const dir = getDirection(t, userId);
+  const counterpart = dir === 'out' ? t.receiverId : t.senderId;
+  const name = counterpart && (counterpart.displayName || counterpart.username) ? (counterpart.displayName || counterpart.username) : null;
+
   if (t.type === 'deposit') {
     if (t.metadata && t.metadata.promoCode) return `Promo code · ${t.metadata.promoCode}`;
-    if (t.metadata && t.metadata.packageCoins) return `Coin package · ${t.metadata.packageCoins} coins`;
+    if (t.metadata && t.metadata.packageCoins) return `Coin package · ${t.metadata.packageCoins.toLocaleString()} coins`;
     return 'Coin purchase';
   }
   if (t.type === 'withdrawal') return 'Withdrawal request';
-  if (t.type === 'live_entry') return 'Live stream entry';
-  if (t.type === 'store_purchase') return 'Store purchase';
+  if (t.type === 'live_entry') return name ? `Live stream entry (${name})` : 'Live stream entry';
+  if (t.type === 'store_purchase') return name ? `Store purchase from ${name}` : 'Store purchase';
+  if (t.type === 'call_billing') return name ? `1:1 Call session with ${name}` : '1:1 Call billing';
+  if (t.type === 'ppv_unlock') return name ? `Unlocked content from ${name}` : 'PPV content unlock';
+  if (t.type === 'subscription') return name ? (dir === 'out' ? `Subscribed to ${name}` : `Subscription from ${name}`) : 'Subscription';
+  
+  if (t.type === 'gift') {
+    const giftLabel = t.metadata?.giftName ? `${t.metadata.giftEmoji || '🎁'} ${t.metadata.giftName}` : 'Gift';
+    if (!name) return giftLabel;
+    return dir === 'out' ? `${giftLabel} to ${name}` : `${giftLabel} from ${name}`;
+  }
 
-  // Sent to a creator / received from a fan
-  const dir = getDirection(t, userId);
-  const counterpart = dir === 'out' ? t.receiverId : t.senderId;
-  const name = counterpart && counterpart.displayName ? counterpart.displayName : null;
+  if (t.type === 'tip') {
+    if (!name) return 'Tip';
+    return dir === 'out' ? `Tip to ${name}` : `Tip from ${name}`;
+  }
+
   const base = (TYPE_META[t.type] || {}).label || t.type.replace(/_/g, ' ');
   if (!name) return base;
   return dir === 'out' ? `${base} to ${name}` : `${base} from ${name}`;
@@ -121,7 +135,7 @@ const SkeletonRows = () => (
 );
 
 export const TransactionHistoryPage = () => {
-  const { balance, darkMode, setActiveTab, user } = useApp();
+  const { balance, darkMode, setActiveTab, user, navigateTo } = useApp();
 
   const [filter, setFilter] = useState('all');
   const [transactions, setTransactions] = useState([]);
@@ -323,8 +337,28 @@ export const TransactionHistoryPage = () => {
                     const Icon = meta.Icon;
                     const dir = getDirection(t, user?.id);
                     const status = STATUS_META[t.status] || { label: t.status, cls: 'pending' };
+                    const isClickable = true;
+                    
+                    const handleRowClick = () => {
+                      if (t.metadata?.postId) {
+                        navigateTo(`/post/${t.metadata.postId}${t.metadata?.commentId ? `?highlight=${t.metadata.commentId}` : ''}`);
+                      } else if (t.type === 'gift' || t.type === 'tip' || t.type === 'subscription' || t.type === 'call_billing') {
+                        const recId = t.receiverId?._id || t.receiverId;
+                        if (recId) {
+                          navigateTo(`/messages/${recId}${t.metadata?.messageId ? `?highlightMsg=${t.metadata.messageId}` : ''}`);
+                        }
+                      } else if (t.type === 'deposit') {
+                        setActiveTab('Buy Coins');
+                      }
+                    };
+
                     return (
-                      <div key={t._id} className={styles.txRow}>
+                      <div
+                        key={t._id}
+                        className={`${styles.txRow} ${isClickable ? styles.txRowClickable : ''}`}
+                        onClick={handleRowClick}
+                        style={{ cursor: isClickable ? 'pointer' : 'default' }}
+                      >
                         <div
                           className={styles.txIconBox}
                           style={{ color: meta.color, borderColor: `${meta.color}33`, background: `${meta.color}14` }}

@@ -25,6 +25,7 @@ import { insertEmojiAtCaret } from '../../../components/ChatComposerExtras/chatC
 import { ConfirmDeleteDialog } from '../../../components/ConfirmDeleteDialog/ConfirmDeleteDialog';
 import { useConfirmDelete } from '../../../hooks/useConfirmDelete';
 import { useToast } from '../../../components/Toast/Toast';
+import { GiftMessageCard, parseGiftMessage } from '../../gifts/GiftMessageCard';
 
 // Custom Gradient Verification Badge
 const GradientBadgeCheck = ({ size = 15 }) => (
@@ -100,6 +101,11 @@ const mapCreatorMessage = (m, currentUserId) => {
     sender: isCreator ? 'creator' : 'fan',
     text: m.content || '',
     time: formatTime(m.createdAt),
+    isGift: !!m.isGift,
+    giftName: m.giftName || '',
+    giftEmoji: m.giftEmoji || '',
+    giftCoins: m.giftCoins || 0,
+    giftTier: m.giftTier || 1,
     isPaywall: !!m.isPaywall,
     isLocked: !!m.isLocked,
     coinPrice: m.coinPrice || 0,
@@ -416,7 +422,7 @@ export const CreatorMessagesPage = () => {
     const fileType = file.type || 'image/jpeg';
     const mediaType = fileType.startsWith('video/') ? 'video' : 'image';
     try {
-      const res = await api.post('/posts/upload-url', {
+      const res = await api.post('/settings/presigned-upload', {
         fileName: (file.name || `chat-image-${Date.now()}.jpg`).replace(/[^a-zA-Z0-9._-]/g, '_'),
         fileType
       });
@@ -649,6 +655,7 @@ export const CreatorMessagesPage = () => {
 
                   {currentMessages.map((msg) => {
                     const isCreator = msg.sender === 'creator';
+                    const parsedGift = parseGiftMessage(msg);
                     return (
                       <div
                         key={msg.id}
@@ -659,14 +666,18 @@ export const CreatorMessagesPage = () => {
                           <img src={selectedConv.user.avatarUrl} alt="" className={styles.msgAvatar} />
                         )}
                         <div className={styles.msgContentWrapper}>
-                          <div className={`${styles.msgBubble} ${isCreator ? styles.bubbleCreator : styles.bubbleFan}`}>
-                            {msg.mediaUrl && msg.mediaType === 'video' ? (
-                              <video src={msg.mediaUrl} controls className={styles.msgMedia} />
-                            ) : msg.mediaUrl ? (
-                              <img src={msg.mediaUrl} alt="Media" className={styles.msgMedia} />
-                            ) : null}
-                            {msg.text && <p className={styles.msgText}>{msg.text}</p>}
-                          </div>
+                          {parsedGift.isGift ? (
+                            <GiftMessageCard msg={msg} isCreator={isCreator} />
+                          ) : (
+                            <div className={`${styles.msgBubble} ${isCreator ? styles.bubbleCreator : styles.bubbleFan}`}>
+                              {msg.mediaUrl && msg.mediaType === 'video' ? (
+                                <video src={msg.mediaUrl} controls className={styles.msgMedia} />
+                              ) : msg.mediaUrl ? (
+                                <img src={msg.mediaUrl} alt="Media" className={styles.msgMedia} />
+                              ) : null}
+                              {msg.text && <p className={styles.msgText}>{msg.text}</p>}
+                            </div>
+                          )}
                           <div className={`${styles.msgTimestampInline} ${isCreator ? styles.timestampRight : styles.timestampLeft}`}>
                             <span className={styles.msgTimestamp}>{msg.time}</span>
                           </div>
@@ -1051,6 +1062,7 @@ export const CreatorMessagesPage = () => {
 
                     {currentMessages.map((msg) => {
                       const isCreator = msg.sender === 'creator';
+                      const parsedGift = parseGiftMessage(msg);
                       return (
                         <div
                           key={msg.id}
@@ -1060,14 +1072,18 @@ export const CreatorMessagesPage = () => {
                             <img src={selectedConv.user.avatarUrl} alt="" className={styles.msgAvatar} />
                           )}
                           <div className={styles.msgContentWrapper}>
-                            <div className={`${styles.msgBubble} ${isCreator ? styles.bubbleCreator : styles.bubbleFan}`}>
-                              {msg.mediaUrl && msg.mediaType === 'video' ? (
-                                <video src={msg.mediaUrl} controls className={styles.msgMedia} />
-                              ) : msg.mediaUrl ? (
-                                <img src={msg.mediaUrl} alt="Media" className={styles.msgMedia} />
-                              ) : null}
-                              {msg.text && <p className={styles.msgText}>{msg.text}</p>}
-                            </div>
+                            {parsedGift.isGift ? (
+                              <GiftMessageCard msg={msg} isCreator={isCreator} />
+                            ) : (
+                              <div className={`${styles.msgBubble} ${isCreator ? styles.bubbleCreator : styles.bubbleFan}`}>
+                                {msg.mediaUrl && msg.mediaType === 'video' ? (
+                                  <video src={msg.mediaUrl} controls className={styles.msgMedia} />
+                                ) : msg.mediaUrl ? (
+                                  <img src={msg.mediaUrl} alt="Media" className={styles.msgMedia} />
+                                ) : null}
+                                {msg.text && <p className={styles.msgText}>{msg.text}</p>}
+                              </div>
+                            )}
                             <div className={`${styles.msgTimestampInline} ${isCreator ? styles.timestampRight : styles.timestampLeft}`}>
                               <span className={styles.msgTimestamp}>{msg.time}</span>
                             </div>

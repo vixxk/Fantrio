@@ -107,6 +107,13 @@ export const PostDetailPage = () => {
   const [showQuickRecharge, setShowQuickRecharge] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+  const [highlightCommentId, setHighlightCommentId] = useState(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const hl = params.get('highlight');
+    if (hl) setHighlightCommentId(hl);
+  }, []);
 
   const commentsEndRef = useRef(null);
 
@@ -197,6 +204,27 @@ export const PostDetailPage = () => {
 
     fetchPost();
   }, [postId]);
+
+  useEffect(() => {
+    if (highlightCommentId && comments.length > 0) {
+      const timer = setTimeout(() => {
+        const el = document.getElementById(`comment-${highlightCommentId}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.style.transition = 'box-shadow 0.4s ease, border-color 0.4s ease, transform 0.4s ease';
+          el.style.boxShadow = '0 0 25px #a78bfa, 0 0 10px #ff007f';
+          el.style.borderColor = '#a78bfa';
+          el.style.transform = 'scale(1.02)';
+          setTimeout(() => {
+            el.style.boxShadow = '';
+            el.style.borderColor = '';
+            el.style.transform = '';
+          }, 3500);
+        }
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [highlightCommentId, comments]);
 
   const handleBack = () => {
     if (window.history.length > 1) {
@@ -590,14 +618,14 @@ export const PostDetailPage = () => {
                         const giftTier = comment.giftTier || 1;
                         const tierClass = styles[`giftTier${giftTier}`] || styles.giftTier1;
                         const badgeClass = styles[`badgeTier${giftTier}`] || styles.badgeTier1;
-                        const tierLabels = { 1: 'Classic Gift', 2: 'Premium Gift', 3: 'Luxury Gift', 4: 'Royal Gift 👑' };
+                        const tierLabels = { 2: 'Premium Gift', 3: 'Luxury Gift', 4: 'Royal Gift 👑' };
                         // Podium rank (1st/2nd/3rd most expensive gift) gets its own distinct card UI
                         const giftRank = giftRanks[comment._id] || 0;
                         const rankClass = giftRank ? styles[`giftRank${giftRank}`] || '' : '';
                         const medalClass = giftRank ? styles[`giftMedal${giftRank}`] || '' : '';
 
                         return (
-                          <div key={comment._id} className={`${styles.giftCommentCard} ${tierClass} ${rankClass}`}>
+                          <div key={comment._id} id={`comment-${comment._id}`} className={`${styles.giftCommentCard} ${tierClass} ${rankClass}`}>
                             <span className={styles.giftBgEmoji} aria-hidden="true">{comment.giftEmoji || '🎁'}</span>
                             <div className={styles.giftAvatarWrap}>
                               <img 
@@ -627,11 +655,11 @@ export const PostDetailPage = () => {
                                   <span className={`${styles.giftBadge} ${styles[`badgeRank${giftRank}`] || ''}`}>
                                     {giftRank === 1 ? 'Top Gift 🥇' : giftRank === 2 ? '2nd Gift' : '3rd Gift'}
                                   </span>
-                                ) : (
+                                ) : tierLabels[giftTier] ? (
                                   <span className={`${styles.giftBadge} ${badgeClass}`}>
-                                    {tierLabels[giftTier] || 'Gift'}
+                                    {tierLabels[giftTier]}
                                   </span>
-                                )}
+                                ) : null}
                               </div>
                               <div className={styles.giftBodyRow}>
                                 <span className={styles.giftEmojiLarge}>{comment.giftEmoji || '🎁'}</span>

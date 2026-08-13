@@ -135,6 +135,7 @@ export const Feed = () => {
   const [newComment, setNewComment] = useState('');
 
   const [activeTipCreator, setActiveTipCreator] = useState(null);
+  const [activeTipPostId, setActiveTipPostId] = useState(null);
   const [giftOpen, setGiftOpen] = useState(false);
   const [rechargeOpen, setRechargeOpen] = useState(false);
   const [activeKebabPostId, setActiveKebabPostId] = useState(null);
@@ -314,11 +315,25 @@ export const Feed = () => {
       return;
     }
     try {
-      await api.post(`/monetization/gift/${activeTipCreator}`, { giftId: gift.id });
+      const res = await api.post(`/monetization/gift/${activeTipCreator}`, { giftId: gift.id, postId: activeTipPostId });
       toast.success(`${gift.name} sent!`);
       setGiftOpen(false);
       setActiveTipCreator(null);
       await refreshBalance();
+      if (activeTipPostId && res.post) {
+        setPosts((current) => current.map((p) =>
+          p._id === activeTipPostId
+            ? {
+                ...p,
+                giftCount: res.post.giftCount,
+                commentsCount: res.post.commentsCount,
+                comments: res.post.comments
+              }
+            : p
+        ));
+        setActiveCommentPost(activeTipPostId);
+      }
+      setActiveTipPostId(null);
     } catch (err) {
       toast.error('Failed to send gift: ' + (err.message || 'Please try again'));
       throw err;
@@ -681,7 +696,7 @@ export const Feed = () => {
 
                   <button 
                     className={`${styles.footerActionBtn} ${styles.giftBtn}`}
-                    onClick={() => { setActiveTipCreator(creatorId); setGiftOpen(true); }}
+                    onClick={() => { setActiveTipCreator(creatorId); setActiveTipPostId(post._id); setGiftOpen(true); }}
                   >
                     <Gift size={20} />
                     <span>{post.giftCount || 0}</span>

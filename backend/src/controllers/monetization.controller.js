@@ -412,6 +412,15 @@ exports.sendGift = catchAsync(async (req, res, next) => {
     { callRoomId: callRoomId || null }
   );
 
+  const meta = {
+    callRoomId: callRoomId || null,
+    giftId: gift.id,
+    giftName: gift.name,
+    giftEmoji: gift.emoji,
+    giftCoins: gift.coins,
+    giftTier: gift.tier || 1
+  };
+
   // If gift was sent for a post, attach a gift comment card to the post
   if (postId && mongoose.Types.ObjectId.isValid(postId)) {
     try {
@@ -427,11 +436,41 @@ exports.sendGift = catchAsync(async (req, res, next) => {
           giftCoins: gift.coins || 0,
           createdAt: new Date()
         });
+        postObj.giftCount = (postObj.giftCount || 0) + 1;
+        postObj.commentsCount = postObj.comments.length;
         await postObj.save();
+        const addedComment = postObj.comments[postObj.comments.length - 1];
+        meta.postId = postId;
+        if (addedComment) meta.commentId = addedComment._id;
+        updatedPost = await Post.findById(postId).populate('comments.userId', 'displayName username avatarUrl isVerifiedBadge');
       }
     } catch (e) {
       console.error('Failed to attach gift comment to post:', e);
     }
+  }
+
+  // Create persistent Message record for chat threads so it renders as a Gift Card
+  let chatMessage = null;
+  try {
+    const Message = require('../models/Message');
+    chatMessage = await Message.create({
+      senderId: req.user._id,
+      receiverId,
+      content: `${gift.emoji} Sent ${gift.name} (${gift.coins.toLocaleString()} Coins)!`,
+      isGift: true,
+      giftName: gift.name,
+      giftEmoji: gift.emoji,
+      giftCoins: gift.coins,
+      giftTier: gift.tier || 1
+    });
+    if (chatMessage) meta.messageId = chatMessage._id;
+  } catch (err) {
+    console.error('Failed to create gift chat message:', err);
+  }
+
+  if (transaction) {
+    transaction.metadata = { ...(transaction.metadata || {}), ...meta };
+    await transaction.save();
   }
 
   // Broadcast the animation payload to everyone who should see it:
@@ -466,6 +505,10 @@ exports.sendGift = catchAsync(async (req, res, next) => {
     if (streamId) {
       io.to(`live_stream_${streamId}`).emit('gift_received', senderPayload);
     }
+    if (chatMessage) {
+      io.to(req.user._id.toString()).emit('new_message', chatMessage);
+      io.to(receiverId.toString()).emit('new_message', chatMessage);
+    }
   }
 
   const updatedWallet = await Wallet.findOne({ userId: req.user._id });
@@ -482,6 +525,7 @@ exports.sendGift = catchAsync(async (req, res, next) => {
       coins: gift.coins,
       tier: gift.tier
     },
+    post: updatedPost,
     balanceCoins: updatedWallet ? updatedWallet.balanceCoins : 0,
     transaction
   });

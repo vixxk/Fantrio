@@ -61,16 +61,8 @@ export const GiftPanel = ({ receiverName = 'this creator', balance = 0, onSendGi
     if (!confirmGift) return;
     const targetGift = confirmGift;
     setConfirmGift(null);
-    setSendingId(targetGift.id);
-    try {
-      await onSendGift(targetGift);
-      setSentId(targetGift.id);
-      setTimeout(() => setSentId(null), 900);
-    } catch (err) {
-      toast.error(err.message || 'Failed to send gift');
-    } finally {
-      setSendingId(null);
-    }
+    onSendGift(targetGift);
+    onClose();
   };
 
   return (
