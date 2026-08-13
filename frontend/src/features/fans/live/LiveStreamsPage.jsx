@@ -18,7 +18,8 @@ import {
   Send,
   MessageSquare,
   Search,
-  Radio
+  Radio,
+  LogOut
 } from 'lucide-react';
 import { useGiftEvents } from '../../../hooks/useGiftEvents';
 import { GiftOverlay } from '../../gifts/GiftOverlay';
@@ -38,6 +39,7 @@ export const LiveStreamsPage = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [tab, setTab] = useState('all'); // all, upcoming, liveNow, topRated, new
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [sortBy, setSortBy] = useState('Viewers High To Low');
   const [availability, setAvailability] = useState('all'); // all, live, upcoming
   const [category, setCategory] = useState('All Categories');
@@ -858,7 +860,7 @@ export const LiveStreamsPage = () => {
           chatMessages={chatMessages}
           sendChatMessage={sendChatMessage}
           chatSending={chatSending}
-          onLeaveStream={handleLeaveStream}
+          onLeaveStream={() => setShowLeaveConfirm(true)}
           balance={balance}
         />
       )}
@@ -931,6 +933,52 @@ export const LiveStreamsPage = () => {
         </div>
       )}
 
+      {/* Leave Stream Confirmation Modal */}
+      {showLeaveConfirm && (
+        <div className={styles.joinModalBackdrop} onClick={() => setShowLeaveConfirm(false)}>
+          <div className={styles.joinModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.joinModalHeader}>
+              <h3 className={styles.joinModalTitle}>Leave Live Stream</h3>
+              <button className={styles.joinModalClose} onClick={() => setShowLeaveConfirm(false)}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className={styles.joinModalBody}>
+              <div className={styles.endedStreamBox}>
+                <div className={styles.endedAvatarContainer}>
+                  <LogOut size={26} className={styles.endedRadioIcon} />
+                </div>
+                <h4 className={styles.endedTitle}>Leave Stream?</h4>
+                <p className={styles.endedDescription}>
+                  Are you sure you want to leave <strong>{joinStream?.displayName || 'this live stream'}</strong>? You can rejoin anytime.
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.joinModalFooter}>
+              <div className={styles.joinModalFooterRow}>
+                <button
+                  className={styles.modalCancelBtn}
+                  onClick={() => setShowLeaveConfirm(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className={styles.joinConfirmBtn}
+                  onClick={() => {
+                    setShowLeaveConfirm(false);
+                    handleLeaveStream();
+                  }}
+                >
+                  Leave Stream
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Gift animation layer + gift picker + recharge (watching live only) */}
       {joinResult && joinResult.status === 'success' && <GiftOverlay events={giftEvents} />}
       {giftOpen && (
@@ -962,7 +1010,7 @@ export const LiveStreamsPage = () => {
                 </div>
                 <h4 className={styles.endedTitle}>Live Stream Has Ended</h4>
                 <p className={styles.endedDescription}>
-                  <strong>{streamEndedInfo.creatorName}</strong> has ended the live stream <em>"{streamEndedInfo.streamTitle}"</em>. Thank you for watching!
+                  <strong>{streamEndedInfo.creatorName}</strong> has ended the live stream <em>"{streamEndedInfo.streamTitle}"</em>.<br />Thank you for watching!
                 </p>
               </div>
             </div>

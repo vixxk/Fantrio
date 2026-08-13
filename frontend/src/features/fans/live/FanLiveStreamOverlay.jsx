@@ -90,7 +90,7 @@ export const FanLiveStreamOverlay = ({
         <div className={styles.topVignette} />
         <div className={styles.bottomVignette} />
 
-        {/* Instagram Header Bar */}
+        {/* Top Header Bar */}
         <div className={styles.headerBar}>
           <div className={styles.creatorInfo}>
             <img
@@ -101,43 +101,22 @@ export const FanLiveStreamOverlay = ({
             <div className={styles.nameBlock}>
               <span className={styles.displayName}>
                 {stream.displayName || stream.username || 'Creator'}
-                {stream.isVerified && <BadgeCheck size={13} color="#e10075" />}
+                {stream.isVerified && <BadgeCheck size={14} color="#e10075" />}
               </span>
-              <span className={styles.streamTitle}>{stream.streamTitle}</span>
+              {stream.streamTitle && <span className={styles.streamTitle}>{stream.streamTitle}</span>}
             </div>
             <div className={styles.headerMetaRow}>
               <span className={styles.liveTag}>
                 <span className={styles.liveDot} /> LIVE
               </span>
               <span className={styles.viewerChip}>
-                <Eye size={12} /> {stream.viewerCount || 0}
+                <Eye size={13} /> {stream.viewerCount || 0}
               </span>
             </div>
           </div>
 
-          {/* Top Right Controls & Coin Balance under close button */}
-          <div className={styles.topRightControlsColumn}>
-            <div className={styles.headerRightControls}>
-              <button
-                className={styles.leaderboardBtn}
-                onClick={() => setShowLeaderboard(true)}
-                title="Top Gifters Leaderboard"
-              >
-                <Trophy size={13} />
-                <span>Top Gifters</span>
-              </button>
-
-              <button
-                className={styles.closeBtn}
-                onClick={onLeaveStream}
-                title="Leave Stream"
-                aria-label="Leave Stream"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            {/* Balance chip positioned directly under cross button */}
+          {/* Top Right Controls (Single Row) */}
+          <div className={styles.headerRightControls}>
             <div className={styles.topBalanceChip}>
               <img src="/coin.png" alt="Coin" className={styles.coinImg} />
               <span>{(balance || 0).toLocaleString()}</span>
@@ -149,6 +128,24 @@ export const FanLiveStreamOverlay = ({
                 +
               </button>
             </div>
+
+            <button
+              className={styles.leaderboardBtn}
+              onClick={() => setShowLeaderboard(true)}
+              title="Top Gifters Leaderboard"
+            >
+              <Trophy size={15} />
+              <span>Top Gifters</span>
+            </button>
+
+            <button
+              className={styles.closeBtn}
+              onClick={onLeaveStream}
+              title="Leave Stream"
+              aria-label="Leave Stream"
+            >
+              <X size={18} />
+            </button>
           </div>
         </div>
 

@@ -190,3 +190,69 @@
   height: 14px;
   object-fit: contain;
 }
+
+/* Light Theme Overrides */
+.light.backdrop {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.light .modal {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+}
+
+.light .header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.light .title {
+  color: #1a1625;
+}
+
+.light .closeBtn {
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .closeBtn:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: #1a1625;
+}
+
+.light .emptyState {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .row {
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.light .row:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.light .rankBadge:not(.rank1):not(.rank2):not(.rank3) {
+  background: rgba(0, 0, 0, 0.06);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .avatar {
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .name {
+  color: #1a1625;
+}
+
+.light .subtext {
+  color: rgba(26, 22, 37, 0.55);
+}
+
+.light .coinsBadge {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: #d97706;
+}

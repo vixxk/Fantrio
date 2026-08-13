@@ -181,7 +181,7 @@ export const CreatorLiveStreamOverlay = ({ liveStream, onEndStream }) => {
 
           <div className={styles.headerRightControls}>
             <div className={styles.timerChip}>
-              <Clock size={12} />
+              <Clock size={14} />
               <span>{formatTimer(durationSeconds)}</span>
             </div>
 
@@ -190,15 +190,16 @@ export const CreatorLiveStreamOverlay = ({ liveStream, onEndStream }) => {
               onClick={() => setShowLeaderboard(true)}
               title="Top Gifters Leaderboard"
             >
-              <Trophy size={13} />
+              <Trophy size={14} />
               <span>Top Gifters</span>
             </button>
 
             <button
-              className={styles.endBtn}
+              className={styles.endPowerBtn}
               onClick={() => setShowConfirmEnd(true)}
+              title="End Live Stream"
             >
-              End
+              <Power size={18} />
             </button>
           </div>
         </div>
@@ -242,7 +243,7 @@ export const CreatorLiveStreamOverlay = ({ liveStream, onEndStream }) => {
               className={styles.composerSendBtn}
               disabled={!chatDraft.trim() || chatSending}
             >
-              <Send size={13} />
+              <Send size={15} />
             </button>
           </form>
 
@@ -261,7 +262,7 @@ export const CreatorLiveStreamOverlay = ({ liveStream, onEndStream }) => {
               onClick={toggleCamera}
               title={isCameraOn ? 'Turn Camera Off' : 'Turn Camera On'}
             >
-              {isCameraOn ? <Camera size={18} /> : <CameraOff size={18} />}
+              {isCameraOn ? <Camera size={20} /> : <CameraOff size={20} />}
             </button>
 
             <button
@@ -269,15 +270,7 @@ export const CreatorLiveStreamOverlay = ({ liveStream, onEndStream }) => {
               onClick={toggleMute}
               title={isMuted ? 'Unmute Microphone' : 'Mute Microphone'}
             >
-              {isMuted ? <MicOff size={18} /> : <Mic size={18} />}
-            </button>
-
-            <button
-              className={`${styles.controlCircleBtn} ${styles.btnOff}`}
-              onClick={() => setShowConfirmEnd(true)}
-              title="End Stream"
-            >
-              <Power size={18} />
+              {isMuted ? <MicOff size={20} /> : <Mic size={20} />}
             </button>
           </div>
         </div>

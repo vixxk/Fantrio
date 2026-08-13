@@ -1081,12 +1081,6 @@ export const CreatorLiveStreamsPage = () => {
                 </div>
               ))}
             </div>
-            <button
-              className={styles.viewAnalyticsBtn}
-              onClick={() => navigateTo('/creators/analytics')}
-            >
-              View Analytics
-            </button>
           </div>
 
           {/* Stream Categories */}

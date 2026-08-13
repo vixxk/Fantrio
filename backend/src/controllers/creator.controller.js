@@ -773,6 +773,7 @@ exports.getCreatorDashboard = catchAsync(async (req, res, next) => {
     creatorId: req.user._id,
     isLive: false,
     cancelledAt: null,
+    endedAt: null,
     scheduledAt: { $gt: new Date() }
   }).sort({ scheduledAt: 1 }).limit(4);
 
@@ -954,6 +955,7 @@ exports.getLiveStreams = catchAsync(async (req, res, next) => {
   // Ended/cancelled streams are never listed here.
   const streamQuery = {
     cancelledAt: null,
+    endedAt: null,
     $or: [{ isLive: true }, { scheduledAt: { $gt: new Date() } }]
   };
   if (hiddenIds.length > 0) {
@@ -1300,9 +1302,9 @@ exports.getMyLiveStreams = catchAsync(async (req, res, next) => {
   const fallbackThumb = profile.coverBannerUrl || profile.avatarUrl || '/Girl.png';
   const now = new Date();
 
-  // Upcoming (scheduled, future, not cancelled)
+  // Upcoming (scheduled, future, not cancelled, not ended)
   const upcoming = allStreams
-    .filter((s) => !s.isLive && !s.cancelledAt && s.scheduledAt && new Date(s.scheduledAt) > now)
+    .filter((s) => !s.isLive && !s.cancelledAt && !s.endedAt && s.scheduledAt && new Date(s.scheduledAt) > now)
     .sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt))
     .map((s) => ({
       _id: s._id,

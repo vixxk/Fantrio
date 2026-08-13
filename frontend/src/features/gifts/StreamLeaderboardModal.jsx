@@ -1,9 +1,13 @@
 import { Trophy, X } from 'lucide-react';
+import { useApp } from '../../context/AppContext';
 import styles from './StreamLeaderboardModal.module.css';
 
-export const StreamLeaderboardModal = ({ leaderboard = [], onClose }) => {
+export const StreamLeaderboardModal = ({ leaderboard = [], onClose, darkMode: propDarkMode }) => {
+  const { darkMode: appDarkMode } = useApp();
+  const darkMode = propDarkMode !== undefined ? propDarkMode : appDarkMode;
+
   return (
-    <div className={styles.backdrop} onClick={onClose}>
+    <div className={`${styles.backdrop} ${!darkMode ? styles.light : ''}`} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <div className={styles.titleRow}>

@@ -1758,7 +1758,43 @@
   padding: 1rem 1.4rem 1.4rem;
 }
 
+.joinModalFooterRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.modalCancelBtn {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 0.85rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modalCancelBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.light .modalCancelBtn {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.light .modalCancelBtn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
 .joinConfirmBtn {
+  flex: 1;
   width: 100%;
   background: linear-gradient(90deg, #e10075, #7e00f3);
   color: #ffffff;

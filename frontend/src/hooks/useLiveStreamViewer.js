@@ -97,6 +97,7 @@ export const useLiveStreamViewer = () => {
   }, [cleanup]);
 
   const leave = useCallback(() => {
+    onStreamEndedRef.current = null;
     cleanup();
   }, [cleanup]);
 
