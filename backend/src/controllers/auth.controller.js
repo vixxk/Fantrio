@@ -150,6 +150,32 @@ exports.register = catchAsync(async (req, res, next) => {
     return next(new ApiError(400, 'Email already in use'));
   }
 
+  // Check username uniqueness if provided
+  if (username) {
+    const cleanUsername = String(username).trim().toLowerCase();
+    const existingUsername = await User.findOne({ username: cleanUsername });
+    if (existingUsername) {
+      return next(new ApiError(400, 'Username is already taken'));
+    }
+  }
+
+  // If referral code is provided, verify that it belongs to an existing user account
+  let validatedReferralCode = null;
+  if (referralCode && String(referralCode).trim() !== '') {
+    const cleanCode = String(referralCode).trim().toUpperCase();
+    if (username && cleanCode === String(username).trim().toUpperCase()) {
+      return next(new ApiError(400, 'You cannot use your own username as a referral code.'));
+    }
+    let referrer = await User.findOne({ referralCode: cleanCode });
+    if (!referrer) {
+      referrer = await User.findOne({ username: cleanCode.toLowerCase() });
+    }
+    if (!referrer) {
+      return next(new ApiError(400, 'Invalid referral code. No account found with this referral code.'));
+    }
+    validatedReferralCode = cleanCode;
+  }
+
   // In development, skip email verification for a frictionless signup flow.
   // Production keeps the OTP email verification flow below.
   if (process.env.NODE_ENV === 'development') {
@@ -164,8 +190,8 @@ exports.register = catchAsync(async (req, res, next) => {
     });
 
     // Apply referral bonus if code provided
-    if (referralCode) {
-      await applyReferralCode(newUser, referralCode);
+    if (validatedReferralCode) {
+      await applyReferralCode(newUser, validatedReferralCode);
     }
 
     // Initialize wallet if not created by referral
@@ -200,7 +226,7 @@ exports.register = catchAsync(async (req, res, next) => {
     password,
     role: (role === 'user' || !role) ? 'fan' : role,
     isVerified: false,
-    pendingReferralCode: referralCode ? String(referralCode).trim().toUpperCase() : undefined,
+    pendingReferralCode: validatedReferralCode || undefined,
     otp: {
       code: otpCode,
       expiresAt: otpExpires

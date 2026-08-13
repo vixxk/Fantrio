@@ -38,6 +38,7 @@ export const AppProvider = ({ children }) => {
     'Creator Earnings': '/creators/earnings',
     'Creator Store': '/creators/store',
     'Creator Settings': '/creators/settings',
+    'Creator Announcements': '/creators/announcements',
     'Live Streams': '/live',
     '1:1 Audio Calls': '/audio-calls',
     '1:1 Video Calls': '/video-calls',
@@ -69,6 +70,7 @@ export const AppProvider = ({ children }) => {
     '/creators/earnings': 'Creator Earnings',
     '/creators/store': 'Creator Store',
     '/creators/settings': 'Creator Settings',
+    '/creators/announcements': 'Creator Announcements',
     '/live': 'Live Streams',
     '/audio-calls': '1:1 Audio Calls',
     '/video-calls': '1:1 Video Calls',
@@ -88,6 +90,7 @@ export const AppProvider = ({ children }) => {
     if (pathname.startsWith('/listener-profile') || pathname.startsWith('/creator-profile')) return 'Public Creator Profile';
     if (pathname.startsWith('/messages')) return 'Messages';
     if (pathname.startsWith('/creators/profile')) return 'Creator Profile';
+    if (pathname.startsWith('/creators/announcements')) return 'Creator Announcements';
     if (pathname.startsWith('/creators/live-calls')) return 'Creator Live Calls';
     if (pathname.startsWith('/creators/audio-calls')) return 'Creator Audio Calls';
     if (pathname.startsWith('/creators/video-calls')) return 'Creator Video Calls';
@@ -111,8 +114,8 @@ export const AppProvider = ({ children }) => {
     if (pathname.startsWith('/settings')) return 'Settings';
     if (pathname.startsWith('/more')) return 'More';
     if (pathname.startsWith('/help-centre') || pathname.startsWith('/faq')) return 'Settings';
-    if (pathname.startsWith('/support-tickets') || pathname.startsWith('/tickets')) return 'More';
-    if (pathname.startsWith('/contact-support') || pathname.startsWith('/contact')) return 'More';
+    if (pathname.startsWith('/support-tickets') || pathname.startsWith('/tickets')) return 'Settings';
+    if (pathname.startsWith('/contact-support') || pathname.startsWith('/contact')) return 'Settings';
     if (pathname.startsWith('/community-guidelines')) return 'Settings';
     if (pathname.startsWith('/creators')) return 'All Creators';
     if (pathname === '/' || pathname.startsWith('/discover')) return 'Discover Feed';
@@ -130,11 +133,10 @@ export const AppProvider = ({ children }) => {
   // ---- Role-based access control ----
   const isCreatorTab = (tab) => typeof tab === 'string' && tab.startsWith('Creator');
 
-  // Maps a requested tab to one the current user is allowed to see. Creators
-  // are confined to creator tabs, regular users to user tabs, and admins are
-  // confined to the admin panel. `role` lets callers pass an explicit role
-  // (e.g. right after session restore) instead of relying on the possibly-
-  // stale `user` state.
+  // Maps a requested tab to one the current user is allowed to see.
+  // Creators can ONLY access Creator tabs (and shared public routes).
+  // Fans can ONLY access Fan tabs.
+  // Admins can ONLY access Admin Panel.
   const resolveAccessibleTab = (tab, role) => {
     const currentRole = role || user?.role;
     if (!currentRole) return tab;
@@ -142,11 +144,17 @@ export const AppProvider = ({ children }) => {
     // Admins only get the admin panel — user and creator routes are off-limits.
     if (currentRole === 'admin') return 'Admin Panel';
 
-    const wantCreator = isCreatorTab(tab);
     const isCreator = currentRole === 'creator';
-    if (wantCreator && !isCreator) return 'Discover Feed';
-    if (!wantCreator && isCreator) return 'Creator Dashboard';
-    return tab;
+    const wantCreator = isCreatorTab(tab);
+    const isPublicRoute = ['Public Creator Profile', 'Post Detail'].includes(tab);
+
+    if (isCreator) {
+      if (wantCreator || isPublicRoute) return tab;
+      return 'Creator Dashboard';
+    } else {
+      if (wantCreator) return 'Discover Feed';
+      return tab;
+    }
   };
 
   // Wrapper function to update state and push history
@@ -249,7 +257,7 @@ export const AppProvider = ({ children }) => {
             username: meRes.user.username,
             displayName: meRes.user.displayName,
             email: meRes.user.email,
-            avatarUrl: meRes.user.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
+            avatarUrl: meRes.user.avatarUrl || '',
             role: meRes.user.role
           });
           {
@@ -349,7 +357,7 @@ export const AppProvider = ({ children }) => {
         username: meRes.user.username,
         displayName: meRes.user.displayName,
         email: meRes.user.email,
-        avatarUrl: meRes.user.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80',
+        avatarUrl: meRes.user.avatarUrl || '',
         role: meRes.user.role,
         bio: meRes.user.bio || ''
       });

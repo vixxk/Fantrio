@@ -375,21 +375,11 @@ export const BuyCoinsPage = () => {
                 {availablePromos.map((p) => (
                   <div
                     key={p.code}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      background: 'rgba(126, 0, 243, 0.12)',
-                      border: '1px solid rgba(126, 0, 243, 0.25)',
-                      borderRadius: '10px',
-                      padding: '0.45rem 0.7rem',
-                      fontSize: '0.8rem',
-                      cursor: 'pointer'
-                    }}
+                    className={styles.availablePromoCard}
                     onClick={() => setPromoCode(p.code)}
                   >
-                    <span style={{ fontWeight: 700, color: '#e10075' }}>{p.code}</span>
-                    <span style={{ color: 'rgba(255,255,255,0.7)' }}>+{p.bonusCoins} coins</span>
+                    <span className={styles.promoCodeBadge}>{p.code}</span>
+                    <span className={styles.promoBonusCoins}>+{p.bonusCoins} coins</span>
                   </div>
                 ))}
               </div>

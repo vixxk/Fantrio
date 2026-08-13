@@ -51,7 +51,7 @@ const DEFAULT_PREFERENCES = [
 ];
 
 export const CreatorSettingsPage = () => {
-  const { darkMode } = useApp();
+  const { darkMode, refreshProfile } = useApp();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -185,6 +185,7 @@ export const CreatorSettingsPage = () => {
         }
       });
       setSavedMsg('Profile updated successfully!');
+      if (refreshProfile) refreshProfile();
       setTimeout(() => setSavedMsg(''), 3000);
     } catch (err) {
       setError(err.message || 'Could not save profile settings.');
@@ -359,7 +360,10 @@ export const CreatorSettingsPage = () => {
           darkMode={darkMode}
           currentAvatar={profileData?.avatar}
           onClose={() => setActiveModal(null)}
-          onSaved={loadSettings}
+          onSaved={() => {
+            loadSettings();
+            if (refreshProfile) refreshProfile();
+          }}
         />
       )}
       {activeModal === 'help' && (

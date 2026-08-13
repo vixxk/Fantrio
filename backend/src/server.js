@@ -60,6 +60,10 @@ const CreatorProfile = require('./models/CreatorProfile');
 const socketUserMap = new Map();
 const userSocketCount = new Map();
 const onlineUsers = new Set();
+// Map to track pending 5-minute disconnect timers for creators
+const pendingOfflineTimers = new Map();
+const CREATOR_OFFLINE_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
+
 // Serializes presence writes per user so a rapid connect→disconnect can never
 // resolve out of order and leave a stale flag (the call guard trusts this).
 const presenceQueue = new Map();
@@ -80,6 +84,8 @@ const updatePresence = (userId, online) => {
         // availability guard, discover filters and profile pages agree.
         CreatorProfile.updateOne({ userId }, { $set: { isOnline: online } })
       ]);
+      // Broadcast real-time presence change to all connected socket clients
+      io.emit('user_presence_change', { userId: String(userId), isOnline: online });
     })
     .catch((err) => console.error(`[Presence] Failed to set presence for ${userId} -> ${online}:`, err));
   presenceQueue.set(userId, next);
@@ -101,13 +107,49 @@ const resetPresenceOnBoot = async () => {
   }
 };
 
-const markUserOfflineIfNoSockets = (userId) => {
+const markUserOfflineIfNoSockets = async (userId) => {
   const count = userSocketCount.get(userId) || 0;
   if (count > 0) return; // still connected from another tab
-  userSocketCount.delete(userId);
-  if (onlineUsers.has(userId)) {
-    onlineUsers.delete(userId);
-    updatePresence(userId, false);
+
+  try {
+    const user = await User.findById(userId).select('role').lean();
+    const isCreator = user && user.role === 'creator';
+
+    if (isCreator) {
+      // Creator disconnect: keep isOnline: true for 5 minutes before setting offline
+      if (!pendingOfflineTimers.has(userId)) {
+        console.log(`[Presence] Creator ${userId} disconnected. 5-minute offline grace period initiated.`);
+        const timer = setTimeout(async () => {
+          pendingOfflineTimers.delete(userId);
+          const currentCount = userSocketCount.get(userId) || 0;
+          if (currentCount === 0 && onlineUsers.has(userId)) {
+            userSocketCount.delete(userId);
+            onlineUsers.delete(userId);
+            await updatePresence(userId, false);
+            console.log(`[Presence] Creator ${userId} 5-minute grace period expired. Marked offline.`);
+          }
+        }, CREATOR_OFFLINE_TIMEOUT_MS);
+        pendingOfflineTimers.set(userId, timer);
+      }
+    } else {
+      // Non-creator (fan): mark offline immediately
+      if (pendingOfflineTimers.has(userId)) {
+        clearTimeout(pendingOfflineTimers.get(userId));
+        pendingOfflineTimers.delete(userId);
+      }
+      userSocketCount.delete(userId);
+      if (onlineUsers.has(userId)) {
+        onlineUsers.delete(userId);
+        await updatePresence(userId, false);
+      }
+    }
+  } catch (err) {
+    console.error(`[Presence] Error in markUserOfflineIfNoSockets for ${userId}:`, err);
+    userSocketCount.delete(userId);
+    if (onlineUsers.has(userId)) {
+      onlineUsers.delete(userId);
+      await updatePresence(userId, false);
+    }
   }
 };
 
@@ -133,6 +175,14 @@ io.on('connection', (socket) => {
 
     socketUserMap.set(socket.id, uid);
     userSocketCount.set(uid, (userSocketCount.get(uid) || 0) + 1);
+
+    // Cancel any pending 5-minute offline timer if creator reconnected
+    if (pendingOfflineTimers.has(uid)) {
+      clearTimeout(pendingOfflineTimers.get(uid));
+      pendingOfflineTimers.delete(uid);
+      console.log(`[Presence] User/Creator ${uid} reconnected. Cancelled 5-minute offline timer.`);
+    }
+
     if (!onlineUsers.has(uid)) {
       onlineUsers.add(uid);
       updatePresence(uid, true);

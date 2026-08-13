@@ -7,6 +7,7 @@ import {
   User, Shield, CreditCard, Landmark, BookOpen, Headphones, Heart, AlertOctagon, FileText, PhoneCall, Loader
 } from 'lucide-react';
 import { ProfileDropdown } from './ProfileDropdown';
+import { NotificationDropdown } from './NotificationDropdown';
 import styles from './Header.module.css';
 
 const ALL_SETTINGS_ITEMS = [
@@ -111,6 +112,8 @@ const renderSettingIcon = (iconName) => {
 export const Header = ({ onMenuToggle }) => {
   const { user, balance, darkMode, activeTab, setActiveTab, navigateTo } = useApp();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [notificationUnreadCount, setNotificationUnreadCount] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -370,7 +373,7 @@ export const Header = ({ onMenuToggle }) => {
   };
 
   const { title, subtitle } = getHeaderMeta();
-  const avatarUrl = user?.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80';
+  const avatarUrl = user?.avatarUrl && !user.avatarUrl.includes('unsplash.com') ? user.avatarUrl : '/profile.png';
   const displayName = user?.displayName || user?.username || 'User';
 
   return (
@@ -444,7 +447,7 @@ export const Header = ({ onMenuToggle }) => {
                           }}
                         >
                           <img
-                            src={creator.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80'}
+                            src={creator.avatarUrl && !creator.avatarUrl.includes('unsplash.com') ? creator.avatarUrl : '/profile.png'}
                             alt={creator.displayName}
                             className={styles.searchResultAvatar}
                           />
@@ -534,18 +537,33 @@ export const Header = ({ onMenuToggle }) => {
           </div>
         )}
 
-        {/* Notification bell button */}
-        <button className={`${styles.iconButton} ${styles.bellButton}`} onClick={() => {
-          if (activeTab.startsWith('Creator')) navigateTo('/creators/messages');
-          else navigateTo('/messages');
-        }}>
-          <div className={styles.iconWrapper}>
-            <Bell size={20} />
-            {unreadCount > 0 && (
-              <span className={styles.badge}>{unreadCount > 99 ? '99+' : unreadCount}</span>
-            )}
-          </div>
-        </button>
+        {/* Notification bell button with Popover */}
+        <div style={{ position: 'relative' }}>
+          <button 
+            className={`${styles.iconButton} ${styles.bellButton}`} 
+            onClick={() => {
+              setNotificationOpen(!notificationOpen);
+              setDropdownOpen(false);
+            }}
+            aria-label="Notifications"
+          >
+            <div className={styles.iconWrapper}>
+              <Bell size={20} />
+              {(unreadCount > 0 || notificationUnreadCount > 0) && (
+                <span className={styles.badge}>
+                  {Math.max(unreadCount, notificationUnreadCount) > 99 ? '99+' : Math.max(unreadCount, notificationUnreadCount)}
+                </span>
+              )}
+            </div>
+          </button>
+
+          <NotificationDropdown
+            isOpen={notificationOpen}
+            onClose={() => setNotificationOpen(false)}
+            onUnreadCountChange={(cnt) => setNotificationUnreadCount(cnt)}
+            isCreatorPage={isCreatorPage}
+          />
+        </div>
 
         {/* User Profile dropdown */}
         <div 

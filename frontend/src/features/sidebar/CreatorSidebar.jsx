@@ -24,6 +24,7 @@ import styles from './CreatorSidebar.module.css';
 
 export const CreatorSidebar = ({ onClose }) => {
   const { 
+    user,
     activeTab, 
     setActiveTab, 
     darkMode,
@@ -31,6 +32,11 @@ export const CreatorSidebar = ({ onClose }) => {
     logout,
     navigateTo
   } = useApp();
+
+  const displayName = user?.displayName || user?.username || 'Creator';
+  const username = user?.username || 'creator';
+  const hasAvatar = user?.avatarUrl && user.avatarUrl.trim() !== '' && !user.avatarUrl.includes('unsplash.com');
+  const avatarUrl = hasAvatar ? user.avatarUrl : '/profile.png';
 
   const [liveCallsExpanded, setLiveCallsExpanded] = useState(true);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -220,16 +226,16 @@ export const CreatorSidebar = ({ onClose }) => {
         </div>
         <div className={styles.creatorProfile}>
           <img
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
-            alt="Bella Rose"
+            src={avatarUrl}
+            alt={displayName}
             className={styles.creatorAvatar}
           />
           <div className={styles.creatorInfo}>
             <div className={styles.creatorNameRow}>
-              <span className={styles.creatorName}>Bella Rose</span>
+              <span className={styles.creatorName}>{displayName}</span>
               <BadgeCheck size={16} className={styles.verifiedBadge} />
             </div>
-            <span className={styles.creatorHandle}>@bellarose_official</span>
+            <span className={styles.creatorHandle}>@{username}</span>
             <div className={styles.onlineStatus}>
               <span className={styles.onlineDot} />
               <span>Online</span>

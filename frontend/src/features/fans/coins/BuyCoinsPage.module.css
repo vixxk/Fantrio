@@ -526,6 +526,29 @@
   opacity: 0.85;
 }
 
+.availablePromoCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(126, 0, 243, 0.12);
+  border: 1px solid rgba(126, 0, 243, 0.25);
+  border-radius: 10px;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.promoCodeBadge {
+  font-weight: 700;
+  color: #e10075;
+}
+
+.promoBonusCoins {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+}
+
 .whyIconImg {
   width: 20px;
   height: 20px;
@@ -796,6 +819,15 @@
   color: #d30071;
   background: rgba(225, 0, 117, 0.08);
   border-color: rgba(225, 0, 117, 0.25);
+}
+
+.light .availablePromoCard {
+  background: rgba(126, 0, 243, 0.06);
+  border-color: rgba(126, 0, 243, 0.18);
+}
+
+.light .promoBonusCoins {
+  color: #4b5563;
 }
 
 .light .modalCard {

@@ -21,7 +21,6 @@ import { SecurityPage } from './SecurityPage';
 import { NotificationsPage } from './NotificationsPage';
 import { PaymentMethodsPage } from './PaymentMethodsPage';
 import { HelpCentrePage } from './HelpCentrePage';
-import { SupportTicketsPage } from './SupportTicketsPage';
 import { ContactSupportPage } from './ContactSupportPage';
 import { CommunityGuidelinesPage } from './CommunityGuidelinesPage';
 import { ReportProblemPage } from './ReportProblemPage';

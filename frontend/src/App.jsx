@@ -26,6 +26,7 @@ import { CreatorLiveStreamsPage } from './features/creators/live-streams/Creator
 import { EarningsPage } from './features/creators/earnings/EarningsPage';
 import { StorePage } from './features/creators/store/StorePage';
 import { CreatorSettingsPage } from './features/creators/settings/CreatorSettingsPage';
+import { AnnouncementsPage } from './features/fans/more/AnnouncementsPage';
 import { AudioCallsPage } from './features/fans/audio/AudioCallsPage';
 import { VideoCallsPage } from './features/fans/video/VideoCallsPage';
 import { SubscriptionsPage } from './features/fans/subscriptions/SubscriptionsPage';
@@ -268,6 +269,12 @@ const AppContent = () => {
         return (
           <div className="tabAnalytics">
             <CreatorSettingsPage />
+          </div>
+        );
+      case 'Creator Announcements':
+        return (
+          <div className="tabAnalytics">
+            <AnnouncementsPage />
           </div>
         );
       case '1:1 Audio Calls':

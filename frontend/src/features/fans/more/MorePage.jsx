@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { 
   ChevronRight, ArrowLeft, Ticket, Headphones, 
@@ -7,9 +7,6 @@ import {
   Scale, LayoutGrid, User, UserPlus, Trophy, Plus
 } from 'lucide-react';
 import styles from './MorePage.module.css';
-// The sub-view components (tickets/contact/faq/report) are styled by
-// SettingsPage.module.css, so their light-theme overrides need that module's
-// hashed `.light` class applied too — otherwise they keep dark styles on light mode.
 import settingsStyles from '../settings/SettingsPage.module.css';
 
 import { ReferralPage } from './ReferralPage';
@@ -19,10 +16,6 @@ import { FeatureRequestsPage } from './FeatureRequestsPage';
 import { AboutPage } from './AboutPage';
 import { TermsPage } from './TermsPage';
 import { PrivacyPage } from './PrivacyPage';
-import { ContactSupportPage } from '../settings/ContactSupportPage';
-import { HelpCentrePage } from '../settings/HelpCentrePage';
-import { ReportProblemPage } from '../settings/ReportProblemPage';
-import { MyIssuesPage } from '../settings/MyIssuesPage';
 
 export const MorePage = () => {
   const { darkMode, setActiveTab, currentPath, navigateTo } = useApp();
@@ -36,9 +29,6 @@ export const MorePage = () => {
     if (pathname.startsWith('/more/')) {
       const sub = pathname.replace('/more/', '').split('/')[0];
       if (!sub) return null;
-      if (sub === 'support-tickets') return 'tickets';
-      if (sub === 'contact-support') return 'contact';
-      if (sub === 'help-centre') return 'faq';
       return sub;
     }
     return null;
@@ -46,11 +36,40 @@ export const MorePage = () => {
 
   const subView = getSubViewFromPath(currentPath);
 
+  // If a subview matches a Settings page subpage, redirect to the Settings version
+  useEffect(() => {
+    if (subView === 'tickets' || subView === 'my-issues' || subView === 'issues' || subView === 'support-tickets') {
+      navigateTo('/settings/my-issues');
+    } else if (subView === 'contact' || subView === 'contact-support') {
+      navigateTo('/settings/contact');
+    } else if (subView === 'faq' || subView === 'help-centre') {
+      navigateTo('/settings/help-centre');
+    } else if (subView === 'report-creator') {
+      navigateTo('/settings/report-creator');
+    } else if (subView === 'report-content') {
+      navigateTo('/settings/report-content');
+    } else if (subView === 'report') {
+      navigateTo('/settings/report');
+    }
+  }, [subView, navigateTo]);
+
   const handleNavigateSubView = (sub) => {
     if (sub === 'transactions') {
       setActiveTab('Transaction History');
     } else if (sub === 'buy-coins') {
       setActiveTab('Buy Coins');
+    } else if (sub === 'tickets' || sub === 'support-tickets' || sub === 'my-issues' || sub === 'issues') {
+      navigateTo('/settings/my-issues');
+    } else if (sub === 'contact' || sub === 'contact-support') {
+      navigateTo('/settings/contact');
+    } else if (sub === 'faq' || sub === 'help-centre') {
+      navigateTo('/settings/help-centre');
+    } else if (sub === 'report-creator') {
+      navigateTo('/settings/report-creator');
+    } else if (sub === 'report-content') {
+      navigateTo('/settings/report-content');
+    } else if (sub === 'report') {
+      navigateTo('/settings/report');
     } else {
       navigateTo(`/more/${sub}`);
     }
@@ -129,17 +148,6 @@ export const MorePage = () => {
         return <AnnouncementsPage setStatusMsg={setStatusMsg} />;
       case 'features':
         return <FeatureRequestsPage setStatusMsg={setStatusMsg} />;
-      case 'tickets':
-      case 'my-issues':
-      case 'issues':
-        return <MyIssuesPage setStatus={setStatusMsg} onNavigate={(path) => navigateTo(`/settings/${path}`)} />;
-      case 'contact':
-        return <ContactSupportPage setStatus={setStatusMsg} />;
-      case 'faq':
-        return <HelpCentrePage setStatus={setStatusMsg} onContact={() => handleNavigateSubView('contact')} />;
-      case 'report-creator':
-      case 'report-content':
-        return <ReportProblemPage setStatus={setStatusMsg} initialTargetType={subView === 'report-content' ? 'content' : 'creator'} />;
       case 'about':
         return <AboutPage />;
       case 'terms':

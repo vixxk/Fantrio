@@ -57,7 +57,7 @@ export const ProfileDropdown = ({ isOpen, onClose }) => {
       <div className={styles.profileHeader} onClick={() => handleItemClick('Settings')}>
         <div className={styles.avatarWrapper}>
           <img 
-            src={user?.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'} 
+            src={user?.avatarUrl && !user.avatarUrl.includes('unsplash.com') ? user.avatarUrl : '/profile.png'} 
             alt="User avatar" 
             className={styles.avatar}
           />

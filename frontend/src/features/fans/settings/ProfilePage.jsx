@@ -170,7 +170,7 @@ export const ProfilePage = ({ setStatus, onBusyChange, onDirtyChange }) => {
         <div className={styles.profileBannerBg} />
         <div className={styles.profileHeroContent}>
           <div className={styles.profileAvatarContainer}>
-            <img src={form.avatarUrl || '/profile.png'} alt="Profile" className={styles.profileAvatarImg} />
+            <img src={form.avatarUrl && !form.avatarUrl.includes('unsplash.com') ? form.avatarUrl : '/profile.png'} alt="Profile" className={styles.profileAvatarImg} />
             <div className={styles.onlineBadgeDot} />
             <button
               type="button"
