@@ -742,23 +742,70 @@ export const Feed = () => {
 
                   <div className={styles.commentsList}>
                     {post.comments && post.comments.length > 0 ? (
-                      post.comments.slice(-5).reverse().map((c, i) => (
-                        <div key={c._id || i} className={styles.commentItem}>
-                          <img 
-                            src={c.userId?.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=50&q=80'} 
-                            alt={`${c.userId?.displayName || 'User'}'s avatar`} 
-                            className={styles.commentAvatar} 
-                          />
-                          <div className={styles.commentBubble}>
-                            <div className={styles.commentMeta}>
-                              <span className={styles.commenterName}>{c.userId?.displayName || 'User'}</span>
-                              {c.userId?.isVerifiedBadge && <BadgeCheck size={12} className={styles.commentVerifiedIcon} />}
-                              <span className={styles.commentTime}>{formatTimeAgo(c.createdAt)}</span>
+                      post.comments.slice(-5).reverse().map((c, i) => {
+                        if (c.isGift) {
+                          const coins = c.giftCoins || 0;
+                          let giftTier = c.giftTier || 1;
+                          if (coins >= 5000) giftTier = 4;
+                          else if (coins >= 1000) giftTier = 3;
+                          else if (coins >= 100) giftTier = 2;
+
+                          const tierClass = styles[`giftTier${giftTier}`] || styles.giftTier1;
+                          const badgeClass = styles[`badgeTier${giftTier}`] || styles.badgeTier1;
+                          const tierLabels = {
+                            1: 'CLASSIC GIFT',
+                            2: 'PREMIUM GIFT ✦',
+                            3: 'LUXURY ROYALTY 💎',
+                            4: 'ROYAL JACKPOT 👑✨'
+                          };
+
+                          return (
+                            <div key={c._id || i} className={`${styles.giftCommentCard} ${tierClass}`}>
+                              <span className={styles.giftBgEmoji} aria-hidden="true">{c.giftEmoji || '🎁'}</span>
+                              <img 
+                                src={c.userId?.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'} 
+                                alt={c.userId?.displayName || 'User'} 
+                                className={styles.giftAvatar} 
+                              />
+                              <div className={styles.giftCommentContent}>
+                                <div className={styles.giftHeaderRow}>
+                                  <span className={styles.giftCommenterName}>{c.userId?.displayName || c.userId?.username || 'Fan'}</span>
+                                  <span className={`${styles.giftBadge} ${badgeClass}`}>
+                                    {tierLabels[giftTier]}
+                                  </span>
+                                </div>
+                                <div className={styles.giftBodyRow}>
+                                  <span className={styles.giftEmojiLarge}>{c.giftEmoji || '🎁'}</span>
+                                  <div className={styles.giftDetails}>
+                                    <span className={styles.giftMessage}>{c.text || `Sent ${c.giftName || 'Gift'}`}</span>
+                                  </div>
+                                  <div className={styles.giftCoinPill}>
+                                    <span>🪙 {coins.toLocaleString()}</span>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-                            <p className={styles.commentText}>{c.text}</p>
+                          );
+                        }
+
+                        return (
+                          <div key={c._id || i} className={styles.commentItem}>
+                            <img 
+                              src={c.userId?.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=50&q=80'} 
+                              alt={`${c.userId?.displayName || 'User'}'s avatar`} 
+                              className={styles.commentAvatar} 
+                            />
+                            <div className={styles.commentBubble}>
+                              <div className={styles.commentMeta}>
+                                <span className={styles.commenterName}>{c.userId?.displayName || 'User'}</span>
+                                {c.userId?.isVerifiedBadge && <BadgeCheck size={12} className={styles.commentVerifiedIcon} />}
+                                <span className={styles.commentTime}>{formatTimeAgo(c.createdAt)}</span>
+                              </div>
+                              <p className={styles.commentText}>{c.text}</p>
+                            </div>
                           </div>
-                        </div>
-                      ))
+                        );
+                      })
                     ) : (
                       <p className={styles.commentsEmpty}>No comments yet — be the first to join the conversation.</p>
                     )}
@@ -825,6 +872,7 @@ export const Feed = () => {
       {/* Gift Panel */}
       {giftOpen && activeTipCreator && (
         <GiftPanel
+          type="comment"
           receiverName={receiverName}
           balance={balance}
           onSendGift={handleSendGift}

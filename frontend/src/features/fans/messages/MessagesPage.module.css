@@ -831,6 +831,16 @@
   margin: 0;
 }
 
+.msgMedia {
+  max-width: 260px;
+  max-height: 260px;
+  border-radius: 12px;
+  object-fit: cover;
+  margin-top: 0.35rem;
+  cursor: pointer;
+  display: block;
+}
+
 .msgContentWrapper {
   display: flex;
   flex-direction: column;

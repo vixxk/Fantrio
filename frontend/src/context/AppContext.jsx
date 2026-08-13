@@ -87,7 +87,7 @@ export const AppProvider = ({ children }) => {
     // Strip query string for tab resolution (e.g. /subscriptions?highlight=xyz)
     const pathname = path.split('?')[0];
     if (pathname.startsWith('/admin')) return 'Admin Panel';
-    if (pathname.startsWith('/listener-profile') || pathname.startsWith('/creator-profile')) return 'Public Creator Profile';
+    if (pathname.startsWith('/listener-profile') || pathname.startsWith('/creator-profile') || pathname.startsWith('/creator/')) return 'Public Creator Profile';
     if (pathname.startsWith('/messages')) return 'Messages';
     if (pathname.startsWith('/creators/profile')) return 'Creator Profile';
     if (pathname.startsWith('/creators/announcements')) return 'Creator Announcements';
@@ -171,7 +171,8 @@ export const AppProvider = ({ children }) => {
   const navigateTo = (path) => {
     const requestedTab = getTabFromPath(path);
     const resolvedTab = resolveAccessibleTab(requestedTab);
-    if (window.location.pathname !== path) {
+    const currentFull = window.location.pathname + window.location.search;
+    if (currentFull !== path) {
       // When the requested path is off-limits for the current role, land on
       // that role's allowed home instead of leaving the forbidden URL live.
       if (resolvedTab !== requestedTab) {

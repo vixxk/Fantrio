@@ -13,12 +13,11 @@ const formatFollowers = (n) => {
 };
 
 export const SuggestionsSidebar = () => {
-  const { darkMode, setActiveTab, refreshBalance } = useApp();
+  const { darkMode, setActiveTab, refreshBalance, navigateTo } = useApp();
   const { toast } = useToast();
   const [topCreators, setTopCreators] = useState([]);
   const [suggestedCreators, setSuggestedCreators] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [subscribingId, setSubscribingId] = useState(null);
 
   // Countdown timer state (computed, never hardcoded)
   const [timeLeft, setTimeLeft] = useState({
@@ -105,26 +104,15 @@ export const SuggestionsSidebar = () => {
     fetchData().finally(() => setLoading(false));
   }, []);
 
-  const handleSubscribe = async (creatorId) => {
-    if (subscribingId) return;
-    setSubscribingId(creatorId);
-    try {
-      const res = await api.post(`/monetization/subscribe/${creatorId}`);
-      if (res.status === 'success') {
-        if (res.alreadySubscribed) {
-          toast.info(res.message || 'You are already subscribed to this creator.');
-        } else {
-          toast.success(res.message || 'Subscribed successfully!');
-        }
-        refreshBalance();
-        // The creator is now subscribed — drop them from the suggestions
-        setSuggestedCreators((prev) => prev.filter((c) => c._id !== creatorId));
-      }
-    } catch (err) {
-      toast.error(err.message || 'Subscription failed.');
-    } finally {
-      setSubscribingId(null);
+  const handleCreatorClick = (rawUsername) => {
+    const cleanUsername = rawUsername ? rawUsername.replace(/^@/, '') : '';
+    if (cleanUsername) {
+      navigateTo(`/creator/${cleanUsername}`);
     }
+  };
+
+  const handleSubscribe = (creator) => {
+    handleCreatorClick(creator.username);
   };
 
   const handleBuyPromo = () => {
@@ -221,7 +209,12 @@ export const SuggestionsSidebar = () => {
               ))}
             </div>
           ) : topCreators.length > 0 ? topCreators.map((creator, i) => (
-            <div key={creator._id} className={styles.creatorRow}>
+            <div
+              key={creator._id}
+              className={styles.creatorRow}
+              onClick={() => handleCreatorClick(creator.username)}
+              style={{ cursor: 'pointer' }}
+            >
               <div className={styles.creatorDetails}>
                 <span className={styles.rankNum}>{i + 1}</span>
                 <img src={creator.avatarUrl} alt={creator.displayName} className={styles.avatar} />
@@ -258,34 +251,34 @@ export const SuggestionsSidebar = () => {
                 </div>
               ))}
             </div>
-          ) : suggestedCreators.length > 0 ? suggestedCreators.map((c) => {
-            const isSubscribing = subscribingId === c._id;
-            return (
-              <div key={c._id} className={styles.suggestedRow}>
-                <div className={styles.suggestedCreator}>
-                  <img src={c.avatarUrl} alt={c.displayName} className={styles.avatar} />
-                  <div className={styles.nameBlock}>
-                    <div className={styles.nameLock}>
-                      <span className={styles.displayName}>{c.displayName}</span>
-                      {c.isVerified && <BadgeCheck size={14} className={styles.verifiedIcon} />}
-                    </div>
-                    <span className={styles.username}>{c.username}</span>
+          ) : suggestedCreators.length > 0 ? suggestedCreators.map((c) => (
+            <div
+              key={c._id}
+              className={styles.suggestedRow}
+              onClick={() => handleCreatorClick(c.username)}
+              style={{ cursor: 'pointer' }}
+            >
+              <div className={styles.suggestedCreator}>
+                <img src={c.avatarUrl} alt={c.displayName} className={styles.avatar} />
+                <div className={styles.nameBlock}>
+                  <div className={styles.nameLock}>
+                    <span className={styles.displayName}>{c.displayName}</span>
+                    {c.isVerified && <BadgeCheck size={14} className={styles.verifiedIcon} />}
                   </div>
+                  <span className={styles.username}>{c.username}</span>
                 </div>
-                <button
-                  className={`${styles.subscribeBtn} ${isSubscribing ? styles.subscribeBtnBusy : ''}`}
-                  onClick={() => handleSubscribe(c._id)}
-                  disabled={isSubscribing}
-                >
-                  {isSubscribing ? (
-                    <span className={styles.subscribeSpinner} />
-                  ) : (
-                    <span className={styles.subscribeBtnText}>Subscribe</span>
-                  )}
-                </button>
               </div>
-            );
-          }) : (
+              <button
+                className={styles.subscribeBtn}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleSubscribe(c);
+                }}
+              >
+                <span className={styles.subscribeBtnText}>Subscribe</span>
+              </button>
+            </div>
+          )) : (
             <p className={styles.emptyList}>No suggestions right now.</p>
           )}
         </div>

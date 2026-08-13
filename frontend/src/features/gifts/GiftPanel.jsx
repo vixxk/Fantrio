@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Check, Zap } from 'lucide-react';
 import { api } from '../../services/api';
-import { GIFTS as LOCAL_GIFTS, GIFT_TIERS } from './giftCatalog';
+import { COMMENT_GIFTS, CHAT_GIFTS, GIFT_TIERS } from './giftCatalog';
 import { useToast } from '../../components/Toast/Toast';
 import { useApp } from '../../context/AppContext';
 import styles from './GiftPanel.module.css';
@@ -14,19 +14,19 @@ const TIER_STYLES = {
 };
 
 /**
- * Bottom-sheet gift picker used on 1:1 call overlays and live stream watch
- * screens. The catalog is fetched from the backend (/monetization/gifts) so
- * the UI always reflects the authoritative server list; the bundled mirror is
- * only a fallback for instant first paint or offline render.
+ * Bottom-sheet gift picker used on 1:1 call overlays, live stream watch
+ * screens, post comments, and direct chat messages.
  */
-export const GiftPanel = ({ receiverName = 'this creator', balance = 0, onSendGift, onRecharge, onClose }) => {
+export const GiftPanel = ({ type = 'chat', receiverName = 'this creator', balance = 0, onSendGift, onRecharge, onClose }) => {
   const { toast } = useToast();
   const app = useApp?.() || {};
   const darkMode = app.darkMode !== undefined ? app.darkMode : true;
 
+  const initialGifts = type === 'comment' ? COMMENT_GIFTS : CHAT_GIFTS;
+
   const [sendingId, setSendingId] = useState(null);
   const [sentId, setSentId] = useState(null);
-  const [gifts, setGifts] = useState(LOCAL_GIFTS);
+  const [gifts, setGifts] = useState(initialGifts);
   const [confirmGift, setConfirmGift] = useState(null);
 
   const safeBalance = typeof balance === 'number' ? balance : Number(balance) || 0;
@@ -36,7 +36,7 @@ export const GiftPanel = ({ receiverName = 'this creator', balance = 0, onSendGi
     let mounted = true;
     const loadCatalog = async () => {
       try {
-        const res = await api.get('/monetization/gifts');
+        const res = await api.get(`/monetization/gifts?type=${type}`);
         if (mounted && res.status === 'success' && Array.isArray(res.gifts) && res.gifts.length > 0) {
           setGifts(res.gifts);
         }
@@ -46,7 +46,7 @@ export const GiftPanel = ({ receiverName = 'this creator', balance = 0, onSendGi
     };
     Promise.resolve().then(loadCatalog);
     return () => { mounted = false; };
-  }, []);
+  }, [type]);
 
   const handleGiftClick = (gift) => {
     const coinPrice = typeof gift.coins === 'number' ? gift.coins : Number(gift.coins) || 0;

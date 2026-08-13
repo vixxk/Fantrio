@@ -359,9 +359,10 @@ exports.tipCreator = catchAsync(async (req, res, next) => {
 // Gift catalog (authoritative from the shared constant)
 exports.getGiftCatalog = catchAsync(async (req, res, next) => {
   const { getPublicGifts, TIER_NAMES } = require('../utils/gifts');
+  const type = req.query.type || (req.query.postId ? 'comment' : 'chat');
   res.status(200).json({
     status: 'success',
-    gifts: getPublicGifts(),
+    gifts: getPublicGifts(type),
     tierNames: TIER_NAMES
   });
 });
@@ -525,7 +526,11 @@ exports.sendGift = catchAsync(async (req, res, next) => {
       coins: gift.coins,
       tier: gift.tier
     },
-    post: updatedPost,
+    post: updatedPost ? {
+      ...updatedPost.toObject(),
+      commentsCount: updatedPost.comments ? updatedPost.comments.length : 0,
+      giftCount: updatedPost.comments ? updatedPost.comments.filter(c => c.isGift).length : 0
+    } : null,
     balanceCoins: updatedWallet ? updatedWallet.balanceCoins : 0,
     transaction
   });

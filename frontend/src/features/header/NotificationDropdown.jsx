@@ -31,21 +31,35 @@ export const NotificationDropdown = ({ isOpen, onClose, onUnreadCountChange, isC
       try {
         const chatRes = await api.get('/chat/conversations');
         const conversations = chatRes.conversations || [];
-        conversations.forEach((c) => {
+        conversations.forEach((c, idx) => {
           if (c.unreadCount > 0 || c.lastMessage) {
             const isUnread = c.unreadCount > 0;
-            const otherName = c.displayName || c.username || 'User';
+            const peer = (c._id && typeof c._id === 'object') ? c._id : (c.user && typeof c.user === 'object') ? c.user : null;
+            const otherName = peer?.displayName || peer?.username || c.displayName || c.username || 'User';
+            const convId = peer?._id || peer?.id || (typeof c._id === 'string' ? c._id : idx);
+
+            let snippetText = 'Sent you a message';
+            if (typeof c.lastMessage === 'string') {
+              snippetText = c.lastMessage;
+            } else if (c.lastMessage && typeof c.lastMessage === 'object') {
+              snippetText = c.lastMessage.content || c.lastMessage.text || (c.lastMessage.isGift ? `${c.lastMessage.giftEmoji || '🎁'} Sent ${c.lastMessage.giftName || 'a gift'} (${(c.lastMessage.giftCoins || 0).toLocaleString()} Coins)!` : 'Sent you a message');
+            }
+
+            const lastMsgDate = c.lastMessage?.createdAt || c.lastMessageAt;
+            const timestamp = lastMsgDate ? new Date(lastMsgDate).getTime() : Date.now();
+            const itemId = `msg_${convId}_${timestamp}`;
+
             items.push({
-              id: `msg_${c._id}_${c.lastMessageAt || Date.now()}`,
+              id: itemId,
               type: 'message',
               title: `Message from ${otherName}`,
-              snippet: c.lastMessage || 'Sent you a message',
-              time: c.lastMessageAt ? new Date(c.lastMessageAt) : new Date(),
-              avatarUrl: c.avatarUrl && !c.avatarUrl.includes('unsplash.com') ? c.avatarUrl : '/profile.png',
-              conversationId: c._id,
-              username: c.username,
-              isUnread: isUnread && !readIds.includes(`msg_${c._id}_${c.lastMessageAt || Date.now()}`),
-              targetRoute: user.role === 'creator' ? '/creators/messages' : '/messages'
+              snippet: String(snippetText || 'Sent you a message'),
+              time: lastMsgDate ? new Date(lastMsgDate) : new Date(),
+              avatarUrl: peer?.avatarUrl || c.avatarUrl || '/profile.png',
+              conversationId: convId,
+              username: peer?.username || c.username,
+              isUnread: isUnread && !readIds.includes(itemId),
+              targetRoute: user?.role === 'creator' ? '/creators/messages' : '/messages'
             });
           }
         });
@@ -255,7 +269,9 @@ export const NotificationDropdown = ({ isOpen, onClose, onUnreadCountChange, isC
                   </div>
                   <span className={styles.itemTime}>{formatTimeAgo(item.time)}</span>
                 </div>
-                <p className={styles.itemSnippet}>{item.snippet}</p>
+                <p className={styles.itemSnippet}>
+                  {typeof item.snippet === 'object' ? (item.snippet.content || item.snippet.text || 'New message') : String(item.snippet || '')}
+                </p>
               </div>
             </div>
           ))

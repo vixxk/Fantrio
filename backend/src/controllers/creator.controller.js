@@ -458,12 +458,12 @@ exports.discoverCreators = catchAsync(async (req, res, next) => {
 
 // Get trending creators
 exports.getTrending = catchAsync(async (req, res, next) => {
-  const limit = parseInt(req.query.limit || '5', 10);
+  const limit = parseInt(req.query.limit || '6', 10);
 
   const hiddenIds = req.user ? await getHiddenUserIds(req.user._id) : [];
   const query = {
-    // Private profiles are not discoverable through public rankings
-    profileVisibility: { $ne: 'Private' }
+    profileVisibility: { $ne: 'Private' },
+    username: { $nin: ['creator', 'creator1', 'test_creator', 'admin'] }
   };
   if (hiddenIds.length > 0) {
     query.userId = { $nin: hiddenIds };
@@ -1111,15 +1111,30 @@ exports.getLiveStreams = catchAsync(async (req, res, next) => {
 
 // Fetch Suggested Creators
 exports.getSuggested = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.user._id);
-  const followingIds = user ? user.following : [];
-  const hiddenIds = await getHiddenUserIds(req.user._id);
+  const user = req.user ? await User.findById(req.user._id) : null;
+  const followingIds = user ? user.following || [] : [];
+  const hiddenIds = req.user ? await getHiddenUserIds(req.user._id) : [];
+
+  let subscribedCreatorUserIds = [];
+  if (req.user) {
+    const activeSubs = await Subscription.find({ userId: req.user._id, status: 'active' }).select('creatorId');
+    subscribedCreatorUserIds = activeSubs.map(s => s.creatorId);
+  }
+
+  const excludeUserIds = [
+    ...(req.user ? [req.user._id] : []),
+    ...followingIds,
+    ...subscribedCreatorUserIds,
+    ...hiddenIds
+  ].filter(Boolean);
 
   const creators = await CreatorProfile.find({
-    userId: { $nin: [...followingIds, req.user._id, ...hiddenIds] },
-    // Private profiles are not recommended to other users
-    profileVisibility: { $ne: 'Private' }
-  }).limit(5);
+    userId: { $nin: excludeUserIds },
+    profileVisibility: { $ne: 'Private' },
+    username: { $nin: ['creator', 'creator1', 'test_creator', 'admin'] }
+  })
+  .sort({ followerCount: -1, createdAt: -1 })
+  .limit(6);
 
   res.status(200).json({
     status: 'success',

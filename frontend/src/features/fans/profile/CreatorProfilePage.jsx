@@ -52,7 +52,15 @@ export const CreatorProfilePage = () => {
   const { toast } = useToast();
   const mountedRef = useRef(true);
 
-  const username = (currentPath.split('/').filter(Boolean)[1] || '').toLowerCase();
+  const pathParts = currentPath.split('?')[0].split('/').filter(Boolean);
+  let username = (pathParts.length > 1 ? pathParts[pathParts.length - 1] : '').toLowerCase();
+  if (username === 'creator' || username === 'creator-profile' || username === 'listener-profile') {
+    username = '';
+  }
+  if (!username) {
+    const params = new URLSearchParams(window.location.search);
+    username = (params.get('username') || '').toLowerCase();
+  }
 
   const [creator, setCreator] = useState(null);
   const [loading, setLoading] = useState(true);

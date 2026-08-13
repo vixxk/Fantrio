@@ -45,10 +45,11 @@ const GradientBadgeCheck = ({ size = 15 }) => (
 );
 
 const parseMessagesPath = (pathname) => {
-  if (!pathname.startsWith('/messages')) {
+  if (!pathname || !pathname.startsWith('/messages')) {
     return { convId: null, msgId: null };
   }
-  const parts = pathname.split('/').filter(Boolean);
+  const cleanPath = pathname.split('?')[0].split('#')[0];
+  const parts = cleanPath.split('/').filter(Boolean);
   const convId = parts[1] || null;
   const msgId = parts[2] || null;
   return { convId, msgId };
@@ -347,26 +348,36 @@ export const MessagesPage = () => {
   }, [selectedConvId]);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const hlMsg = params.get('highlightMsg');
-    if (hlMsg && (messagesMap[selectedConvId] || []).length > 0) {
+    let hlMsg = null;
+    if (currentPath && currentPath.includes('highlightMsg=')) {
+      const search = currentPath.split('?')[1];
+      if (search) {
+        hlMsg = new URLSearchParams(search).get('highlightMsg');
+      }
+    }
+    if (!hlMsg) {
+      const params = new URLSearchParams(window.location.search);
+      hlMsg = params.get('highlightMsg');
+    }
+
+    if (hlMsg && selectedConvId && (messagesMap[selectedConvId] || []).length > 0) {
       const timer = setTimeout(() => {
         const el = document.getElementById(`msg-${hlMsg}`);
         if (el) {
           el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          el.style.transition = 'box-shadow 0.4s ease, transform 0.4s ease';
-          el.style.boxShadow = '0 0 25px #a78bfa, 0 0 12px #ff007f';
-          el.style.borderRadius = '16px';
-          el.style.transform = 'scale(1.02)';
+          el.style.transition = 'box-shadow 0.4s ease, transform 0.4s ease, border-color 0.4s ease';
+          el.style.boxShadow = '0 0 30px #a78bfa, 0 0 15px #e10075';
+          el.style.borderRadius = '18px';
+          el.style.transform = 'scale(1.03)';
           setTimeout(() => {
             el.style.boxShadow = '';
             el.style.transform = '';
           }, 3500);
         }
-      }, 400);
+      }, 350);
       return () => clearTimeout(timer);
     }
-  }, [selectedConvId, messagesMap]);
+  }, [selectedConvId, messagesMap, currentPath]);
 
   // Handle case where user navigates directly to /messages/:creatorId for a creator without prior DM history
   useEffect(() => {
@@ -694,6 +705,7 @@ export const MessagesPage = () => {
       {activeCallForGifts && activeCallForGifts.status === 'active' && <GiftOverlay events={callGiftEvents} />}
       {giftOpen && (
         <GiftPanel
+          type="chat"
           receiverName={activeCallForGifts?.creator?.displayName || 'this creator'}
           balance={balance}
           onSendGift={(gift) => sendCallGift(gift)}
@@ -1195,6 +1207,7 @@ export const MessagesPage = () => {
           {/* Send Gift Panel Modal */}
           {showTipModal && selectedConv && (
             <GiftPanel
+              type="chat"
               receiverName={selectedConv.user.displayName}
               balance={balance}
               onSendGift={handleSendGiftInChat}
@@ -1556,6 +1569,21 @@ export const MessagesPage = () => {
                             ) : (
                               <div className={`${styles.msgBubble} ${isUser ? styles.bubbleUser : styles.bubbleCreator} ${msg.isTip ? styles.bubbleTip : ''} ${selectedMsgId === msg.id ? styles.bubbleSelected : ''}`}>
                                 {msg.text && <p className={styles.msgText}>{msg.text}</p>}
+                                {msg.mediaUrl && (
+                                  msg.mediaType === 'video' ? (
+                                    <video src={msg.mediaUrl} controls className={styles.msgMedia} />
+                                  ) : (
+                                    <img
+                                      src={msg.mediaUrl}
+                                      alt="Attached media"
+                                      className={styles.msgMedia}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        window.open(msg.mediaUrl, '_blank');
+                                      }}
+                                    />
+                                  )
+                                )}
                               </div>
                             )}
                             <div className={`${styles.msgTimestampInline} ${isUser ? styles.timestampRight : styles.timestampLeft}`}>
@@ -1573,9 +1601,18 @@ export const MessagesPage = () => {
 
               {/* Input Bar */}
               <form className={styles.chatInputBar} onSubmit={handleSendMessage}>
-                <button type="button" className={styles.inputAddBtn} title="Add Content">
-                  <Plus size={20} />
-                </button>
+                <input
+                  type="file"
+                  ref={chatMediaInputRef}
+                  accept="image/*,video/*"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      handleSendImage(e.target.files[0]);
+                      e.target.value = '';
+                    }
+                  }}
+                />
 
                 <input
                   ref={chatInputRef}
@@ -1592,7 +1629,12 @@ export const MessagesPage = () => {
                     anchor="right"
                     onPickEmoji={handlePickEmoji}
                   />
-                  <button type="button" className={styles.inputIconButton} title="Attach Image">
+                  <button
+                    type="button"
+                    className={styles.inputIconButton}
+                    title="Attach Image"
+                    onClick={() => chatMediaInputRef.current?.click()}
+                  >
                     <ImageIcon size={19} />
                   </button>
                   <button type="submit" className={styles.sendSubmitBtn} title="Send Message">

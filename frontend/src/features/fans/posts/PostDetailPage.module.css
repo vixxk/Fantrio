@@ -1053,9 +1053,13 @@
 }
 
 .light .shareIconCopy {
-  background: rgba(0, 0, 0, 0.04);
-  border-color: rgba(0, 0, 0, 0.08);
-  color: #1a1625;
+  background: rgba(26, 22, 37, 0.08);
+  border: 1px solid rgba(26, 22, 37, 0.15);
+  color: #1a1625 !important;
+}
+
+.light .shareIconCopy svg {
+  color: #1a1625 !important;
 }
 
 .light .shareCancel {
@@ -1080,6 +1084,69 @@
 }
 
 /* ============================================================
+   Luxurious Keyframe Animations for Tiered Gift Cards
+   ============================================================ */
+@keyframes giftShimmer {
+  0% { transform: translateX(-150%) rotate(25deg); }
+  35% { transform: translateX(250%) rotate(25deg); }
+  100% { transform: translateX(250%) rotate(25deg); }
+}
+
+@keyframes emojiFloat {
+  0%, 100% { transform: translateY(0) scale(1) rotate(0deg); }
+  50% { transform: translateY(-4px) scale(1.15) rotate(6deg); filter: drop-shadow(0 4px 10px rgba(255, 215, 0, 0.4)); }
+}
+
+@keyframes spinWatermark {
+  0% { transform: translateY(-50%) rotate(0deg) scale(1); }
+  50% { transform: translateY(-50%) rotate(180deg) scale(1.15); }
+  100% { transform: translateY(-50%) rotate(360deg) scale(1); }
+}
+
+@keyframes goldAuraBreathing {
+  0%, 100% {
+    box-shadow: 0 0 24px rgba(255, 215, 0, 0.75), inset 0 0 14px rgba(255, 215, 0, 0.3);
+    border-color: #ffd700;
+  }
+  50% {
+    box-shadow: 0 0 42px rgba(255, 215, 0, 0.95), 0 0 50px rgba(255, 180, 0, 0.5), inset 0 0 22px rgba(255, 215, 0, 0.45);
+    border-color: #ffe259;
+  }
+}
+
+@keyframes royalPurpleBreathing {
+  0%, 100% {
+    box-shadow: 0 0 14px rgba(167, 139, 250, 0.3), inset 0 0 10px rgba(167, 139, 250, 0.15);
+    border-color: rgba(167, 139, 250, 0.55);
+  }
+  50% {
+    box-shadow: 0 0 28px rgba(167, 139, 250, 0.65), inset 0 0 18px rgba(167, 139, 250, 0.3);
+    border-color: #c4b5fd;
+  }
+}
+
+@keyframes badgeGlowPulse {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.05); filter: brightness(1.3); }
+}
+
+@keyframes cardFloat3D {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes animatedGradientBg {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes coinPulseGlow {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 6px rgba(255, 215, 0, 0.4); }
+  50% { transform: scale(1.05); box-shadow: 0 0 16px rgba(255, 215, 0, 0.85); }
+}
+
+/* ============================================================
    Special Gift Comment Cards — Luxurious Tier-Based Design
    ============================================================ */
 .giftCommentCard {
@@ -1094,6 +1161,7 @@
   overflow: hidden;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
   box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .giftCommentCard::before {
@@ -1161,100 +1229,110 @@
   transform: translateY(-2px);
 }
 
-/* ---- TIER 1 — Classic (warm pink, subtle) ---- */
+/* ---- TIER 1 — Classic Rose Gold (1 - 99 Coins) ---- */
 .giftTier1 {
-  background: linear-gradient(135deg, rgba(255, 0, 127, 0.1) 0%, rgba(255, 80, 160, 0.04) 100%);
-  border: 1px solid rgba(255, 0, 127, 0.25);
-  box-shadow: 0 2px 12px rgba(255, 0, 127, 0.08);
+  background: linear-gradient(135deg, rgba(255, 0, 127, 0.14) 0%, rgba(255, 80, 160, 0.06) 100%);
+  border: 1px solid rgba(255, 0, 127, 0.35);
+  box-shadow: 0 4px 14px rgba(255, 0, 127, 0.1);
 }
 
-.giftTier1:hover {
-  box-shadow: 0 6px 24px rgba(255, 0, 127, 0.18);
+.giftTier1 .giftEmojiLarge {
+  animation: emojiFloat 3s infinite ease-in-out;
 }
 
-/* ---- TIER 2 — Premium (electric cyan, metallic feel) ---- */
+/* ---- TIER 2 — Sapphire Cyan Premium (100 - 999 Coins) ---- */
 .giftTier2 {
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.14) 0%, rgba(6, 182, 212, 0.06) 50%, rgba(56, 189, 248, 0.1) 100%);
-  border: 1px solid rgba(56, 189, 248, 0.4);
-  box-shadow: 0 4px 20px rgba(56, 189, 248, 0.15), inset 0 1px 0 rgba(56, 189, 248, 0.12);
+  background: linear-gradient(135deg, rgba(0, 198, 255, 0.18) 0%, rgba(0, 114, 255, 0.1) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.55);
+  box-shadow: 0 6px 20px rgba(56, 189, 248, 0.22);
 }
 
 .giftTier2::before {
-  background: linear-gradient(90deg, transparent 0%, rgba(56, 189, 248, 0.06) 50%, transparent 100%);
-  opacity: 1;
-  animation: shimmer2 4s ease-in-out infinite;
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 60px;
+  height: 200%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.35) 50%, rgba(255, 255, 255, 0) 100%);
+  transform: rotate(25deg);
+  pointer-events: none;
+  z-index: 1;
+  animation: giftShimmer 4.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.giftTier2:hover {
-  box-shadow: 0 8px 32px rgba(56, 189, 248, 0.28), inset 0 1px 0 rgba(56, 189, 248, 0.15);
+.giftTier2 .giftEmojiLarge {
+  animation: emojiFloat 2.5s infinite ease-in-out;
 }
 
-@keyframes shimmer2 {
-  0%, 100% { transform: translateX(-100%); }
-  50% { transform: translateX(100%); }
-}
-
-/* ---- TIER 3 — Luxury (purple/violet, rich depth + shine) ---- */
+/* ---- TIER 3 — Amethyst Purple Royalty (1000 - 4999 Coins) — ANIMATED LUXURY ---- */
 .giftTier3 {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.18) 0%, rgba(167, 139, 250, 0.1) 40%, rgba(124, 58, 237, 0.14) 100%);
-  border: 1px solid rgba(167, 139, 250, 0.5);
-  box-shadow:
-    0 6px 28px rgba(139, 92, 246, 0.2),
-    inset 0 1px 0 rgba(167, 139, 250, 0.15),
-    inset 0 -1px 0 rgba(124, 58, 237, 0.1);
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.28) 0%, rgba(79, 70, 229, 0.2) 50%, rgba(236, 72, 153, 0.24) 100%);
+  background-size: 200% 200%;
+  border: 1.5px solid rgba(167, 139, 250, 0.75);
+  animation: animatedGradientBg 8s ease infinite, royalPurpleBreathing 3.5s infinite ease-in-out, cardFloat3D 4s infinite ease-in-out;
 }
 
 .giftTier3::before {
-  background: linear-gradient(120deg, transparent 30%, rgba(167, 139, 250, 0.12) 50%, transparent 70%);
-  opacity: 1;
-  animation: shimmer3 3s ease-in-out infinite;
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 80px;
+  height: 200%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0) 100%);
+  transform: rotate(25deg);
+  pointer-events: none;
+  z-index: 1;
+  animation: giftShimmer 3.2s infinite cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.giftTier3:hover {
-  box-shadow:
-    0 10px 40px rgba(139, 92, 246, 0.35),
-    inset 0 1px 0 rgba(167, 139, 250, 0.2);
-  border-color: rgba(167, 139, 250, 0.7);
+.giftTier3 .giftBgEmoji {
+  font-size: 4.5rem;
+  opacity: 0.18;
 }
 
-@keyframes shimmer3 {
-  0% { transform: translateX(-150%); }
-  100% { transform: translateX(150%); }
+.giftTier3 .giftEmojiLarge {
+  animation: emojiFloat 2s infinite ease-in-out;
 }
 
-/* ---- TIER 4 — Royal (gold, animated glow + sparkle shimmer) ---- */
+.giftTier3 .giftCoinPill {
+  animation: coinPulseGlow 3s infinite ease-in-out;
+}
+
+/* ---- TIER 4 — 24K Royal Jackpot Grand Legend (5000+ Coins) — ULTRA ANIMATED ROYAL LEGEND ---- */
 .giftTier4 {
-  background: linear-gradient(135deg, rgba(255, 209, 102, 0.2) 0%, rgba(251, 191, 36, 0.12) 30%, rgba(245, 158, 11, 0.16) 60%, rgba(251, 146, 60, 0.1) 100%);
-  border: 1px solid rgba(255, 209, 102, 0.65);
-  box-shadow:
-    0 8px 32px rgba(255, 209, 102, 0.25),
-    0 0 0 1px rgba(255, 209, 102, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  animation: royalGlow 3s ease-in-out infinite alternate;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.32) 0%, rgba(217, 119, 6, 0.26) 40%, rgba(239, 68, 68, 0.22) 80%, rgba(255, 215, 0, 0.36) 100%);
+  background-size: 200% 200%;
+  border: 2px solid #ffd700;
+  animation: animatedGradientBg 5s ease infinite, goldAuraBreathing 2.5s infinite ease-in-out, cardFloat3D 3s infinite ease-in-out;
 }
 
 .giftTier4::before {
-  background: linear-gradient(110deg, transparent 20%, rgba(255, 209, 102, 0.18) 40%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 209, 102, 0.18) 60%, transparent 80%);
-  opacity: 1;
-  animation: royalShimmer 2.5s ease-in-out infinite;
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 100px;
+  height: 200%;
+  background: linear-gradient(90deg, rgba(255, 215, 0, 0) 0%, rgba(255, 255, 255, 0.9) 50%, rgba(255, 215, 0, 0) 100%);
+  transform: rotate(25deg);
+  pointer-events: none;
+  z-index: 1;
+  animation: giftShimmer 2.2s infinite cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.giftTier4:hover {
-  box-shadow:
-    0 12px 48px rgba(255, 209, 102, 0.45),
-    0 0 0 1px rgba(255, 209, 102, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 209, 102, 0.9);
+.giftTier4 .giftBgEmoji {
+  font-size: 5rem;
+  opacity: 0.22;
 }
 
-@keyframes royalGlow {
-  0% { box-shadow: 0 6px 24px rgba(255, 209, 102, 0.2), 0 0 0 1px rgba(255, 209, 102, 0.08); }
-  100% { box-shadow: 0 10px 40px rgba(255, 209, 102, 0.4), 0 0 0 1px rgba(255, 209, 102, 0.15); }
+.giftTier4 .giftEmojiLarge {
+  animation: emojiFloat 1.6s infinite ease-in-out;
 }
 
-@keyframes royalShimmer {
-  0% { transform: translateX(-200%); }
-  100% { transform: translateX(200%); }
+.giftTier4 .giftCoinPill {
+  animation: coinPulseGlow 2s infinite ease-in-out;
 }
 
 /* ---- Avatar ---- */
@@ -1264,16 +1342,13 @@
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
-  border: 2px solid rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
-.giftTier1 .giftAvatar { border-color: rgba(255, 0, 127, 0.4); }
-.giftTier2 .giftAvatar { border-color: rgba(56, 189, 248, 0.5); }
-.giftTier3 .giftAvatar { border-color: rgba(167, 139, 250, 0.5); }
-.giftTier4 .giftAvatar {
-  border-color: rgba(255, 209, 102, 0.7);
-  box-shadow: 0 0 12px rgba(255, 209, 102, 0.25);
-}
+.giftTier1 .giftAvatar { border-color: rgba(255, 0, 127, 0.5); }
+.giftTier2 .giftAvatar { border-color: rgba(56, 189, 248, 0.6); box-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
+.giftTier3 .giftAvatar { border-color: rgba(167, 139, 250, 0.7); box-shadow: 0 0 12px rgba(167, 139, 250, 0.4); }
+.giftTier4 .giftAvatar { border-color: #ffd700; box-shadow: 0 0 16px rgba(255, 215, 0, 0.6); }
 
 /* ---- Content Layout ---- */
 .giftCommentContent {
@@ -1291,7 +1366,7 @@
 
 .giftCommenterName {
   font-size: 0.9rem;
-  font-weight: 700;
+  font-weight: 800;
   color: #ffffff;
 }
 
@@ -1301,7 +1376,7 @@
   align-items: center;
   gap: 4px;
   font-size: 0.65rem;
-  font-weight: 800;
+  font-weight: 900;
   padding: 3px 10px;
   border-radius: 999px;
   text-transform: uppercase;
@@ -1309,29 +1384,34 @@
 }
 
 .badgeTier1 {
-  background: rgba(255, 0, 127, 0.15);
+  background: rgba(255, 0, 127, 0.18);
   color: #ff4a9e;
-  border: 1px solid rgba(255, 0, 127, 0.3);
+  border: 1px solid rgba(255, 0, 127, 0.4);
 }
 
 .badgeTier2 {
-  background: rgba(56, 189, 248, 0.15);
+  background: rgba(56, 189, 248, 0.2);
   color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.3);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.25);
+  animation: badgeGlowPulse 3s infinite ease-in-out;
 }
 
 .badgeTier3 {
-  background: rgba(167, 139, 250, 0.18);
-  color: #c4b5fd;
-  border: 1px solid rgba(167, 139, 250, 0.35);
-  box-shadow: 0 0 8px rgba(139, 92, 246, 0.15);
+  background: linear-gradient(135deg, rgba(167, 139, 250, 0.3), rgba(139, 92, 246, 0.25));
+  color: #e9d5ff;
+  border: 1px solid rgba(167, 139, 250, 0.6);
+  box-shadow: 0 0 12px rgba(167, 139, 250, 0.35);
+  animation: badgeGlowPulse 2.5s infinite ease-in-out;
 }
 
 .badgeTier4 {
-  background: linear-gradient(135deg, rgba(255, 209, 102, 0.3), rgba(251, 146, 60, 0.25));
-  color: #ffd166;
-  border: 1px solid rgba(255, 209, 102, 0.5);
-  box-shadow: 0 0 10px rgba(255, 209, 102, 0.2);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.4), rgba(251, 146, 60, 0.35));
+  color: #fffbeb;
+  border: 1px solid #ffd700;
+  box-shadow: 0 0 16px rgba(255, 215, 0, 0.5);
+  animation: badgeGlowPulse 2s infinite ease-in-out;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 /* ---- Body (emoji + message + coin pill) ---- */
@@ -1377,6 +1457,49 @@
   border-radius: 999px;
   background: rgba(255, 209, 102, 0.08);
   border: 1px solid rgba(255, 209, 102, 0.15);
+}
+
+/* Light Mode overrides for luxury gift comment cards */
+.light .giftCommenterName {
+  color: #1a1625 !important;
+}
+
+.light .giftMessage {
+  color: rgba(26, 22, 37, 0.9) !important;
+}
+
+.light .giftBgEmoji {
+  opacity: 0.12;
+}
+
+.light .giftTier1 {
+  background: linear-gradient(135deg, rgba(255, 0, 127, 0.08) 0%, rgba(255, 80, 160, 0.04) 100%);
+  border: 1px solid rgba(255, 0, 127, 0.3);
+  box-shadow: 0 2px 10px rgba(255, 0, 127, 0.08);
+}
+
+.light .giftTier2 {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.12) 0%, rgba(6, 182, 212, 0.05) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  box-shadow: 0 4px 16px rgba(56, 189, 248, 0.12);
+}
+
+.light .giftTier3 {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.14) 0%, rgba(167, 139, 250, 0.06) 100%);
+  border: 1px solid rgba(167, 139, 250, 0.45);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.15);
+}
+
+.light .giftTier4 {
+  background: linear-gradient(135deg, rgba(255, 209, 102, 0.22) 0%, rgba(251, 191, 36, 0.12) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.55);
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.2);
+}
+
+.light .giftCoinPill {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #b45309;
 }
 
 /* ---- Top 3 Gift Cards — Gold / Silver / Bronze podium ---- */
@@ -1456,13 +1579,37 @@
 
 /* 1st place — Gold Champion */
 .giftRank1 {
-  background: linear-gradient(135deg, rgba(255, 209, 102, 0.3) 0%, rgba(251, 191, 36, 0.16) 40%, rgba(245, 158, 11, 0.22) 100%);
-  border: 1px solid rgba(255, 209, 102, 0.85);
-  box-shadow:
-    0 8px 32px rgba(255, 209, 102, 0.3),
-    0 0 0 1px rgba(255, 209, 102, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16);
-  animation: none;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.35) 0%, rgba(217, 119, 6, 0.28) 40%, rgba(239, 68, 68, 0.22) 80%, rgba(255, 215, 0, 0.35) 100%);
+  background-size: 200% 200%;
+  border: 2px solid #ffd700;
+  animation: animatedGradientBg 5s ease infinite, goldAuraBreathing 2.5s infinite ease-in-out, cardFloat3D 3s infinite ease-in-out;
+}
+
+.giftRank1::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 100px;
+  height: 200%;
+  background: linear-gradient(90deg, rgba(255, 215, 0, 0) 0%, rgba(255, 255, 255, 0.85) 50%, rgba(255, 215, 0, 0) 100%);
+  transform: rotate(25deg);
+  pointer-events: none;
+  z-index: 1;
+  animation: giftShimmer 2.2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.giftRank1 .giftBgEmoji {
+  font-size: 5rem;
+  opacity: 0.22;
+}
+
+.giftRank1 .giftEmojiLarge {
+  animation: emojiFloat 1.6s infinite ease-in-out;
+}
+
+.giftRank1 .giftCoinPill {
+  animation: coinPulseGlow 2s infinite ease-in-out;
 }
 
 .giftRank1:hover {
@@ -1473,8 +1620,8 @@
 }
 
 .giftRank1 .giftAvatar {
-  border-color: rgba(255, 209, 102, 0.85);
-  box-shadow: 0 0 12px rgba(255, 209, 102, 0.3);
+  border-color: #ffd700;
+  box-shadow: 0 0 16px rgba(255, 215, 0, 0.6);
 }
 
 .giftRank1 .giftCommenterName {
@@ -1483,12 +1630,28 @@
 
 /* 2nd place — Silver Runner-Up */
 .giftRank2 {
-  background: linear-gradient(135deg, rgba(226, 232, 240, 0.26) 0%, rgba(148, 163, 184, 0.12) 50%, rgba(100, 116, 139, 0.18) 100%);
-  border: 1px solid rgba(148, 163, 184, 0.75);
-  box-shadow:
-    0 6px 24px rgba(148, 163, 184, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  animation: none;
+  background: linear-gradient(135deg, rgba(226, 232, 240, 0.28) 0%, rgba(148, 163, 184, 0.18) 50%, rgba(100, 116, 139, 0.22) 100%);
+  background-size: 200% 200%;
+  border: 1.5px solid rgba(203, 213, 225, 0.85);
+  animation: animatedGradientBg 7s ease infinite, cardFloat3D 3.5s infinite ease-in-out;
+}
+
+.giftRank2::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 80px;
+  height: 200%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.7) 50%, rgba(255, 255, 255, 0) 100%);
+  transform: rotate(25deg);
+  pointer-events: none;
+  z-index: 1;
+  animation: giftShimmer 3.2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.giftRank2 .giftEmojiLarge {
+  animation: emojiFloat 2.2s infinite ease-in-out;
 }
 
 .giftRank2:hover {
@@ -1499,7 +1662,7 @@
 
 .giftRank2 .giftAvatar {
   border-color: rgba(203, 213, 225, 0.85);
-  box-shadow: 0 0 10px rgba(203, 213, 225, 0.25);
+  box-shadow: 0 0 10px rgba(203, 213, 225, 0.3);
 }
 
 .giftRank2 .giftCommenterName {
@@ -1508,12 +1671,28 @@
 
 /* 3rd place — Bronze */
 .giftRank3 {
-  background: linear-gradient(135deg, rgba(217, 160, 107, 0.28) 0%, rgba(180, 120, 60, 0.14) 50%, rgba(146, 90, 40, 0.2) 100%);
-  border: 1px solid rgba(217, 160, 107, 0.75);
-  box-shadow:
-    0 6px 24px rgba(180, 120, 60, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
-  animation: none;
+  background: linear-gradient(135deg, rgba(217, 160, 107, 0.3) 0%, rgba(180, 120, 60, 0.18) 50%, rgba(146, 90, 40, 0.24) 100%);
+  background-size: 200% 200%;
+  border: 1.5px solid rgba(217, 160, 107, 0.85);
+  animation: animatedGradientBg 9s ease infinite, cardFloat3D 4s infinite ease-in-out;
+}
+
+.giftRank3::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 80px;
+  height: 200%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0) 100%);
+  transform: rotate(25deg);
+  pointer-events: none;
+  z-index: 1;
+  animation: giftShimmer 3.8s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.giftRank3 .giftEmojiLarge {
+  animation: emojiFloat 2.6s infinite ease-in-out;
 }
 
 .giftRank3:hover {
@@ -1524,7 +1703,7 @@
 
 .giftRank3 .giftAvatar {
   border-color: rgba(217, 160, 107, 0.85);
-  box-shadow: 0 0 10px rgba(217, 160, 107, 0.25);
+  box-shadow: 0 0 10px rgba(217, 160, 107, 0.3);
 }
 
 .giftRank3 .giftCommenterName {
@@ -1551,14 +1730,6 @@
   color: #e9c8a2;
   border: 1px solid rgba(217, 160, 107, 0.55);
   box-shadow: 0 0 10px rgba(180, 120, 60, 0.2);
-}
-
-/* Neutralize tier shimmers on podium cards so each medal keeps its own look */
-.giftRank1::before,
-.giftRank2::before,
-.giftRank3::before {
-  animation: none;
-  opacity: 0;
 }
 
 /* Delete Comment Confirmation Modal */

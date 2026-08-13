@@ -232,6 +232,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0.35rem 0.4rem;
+  border-radius: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.creatorRow:hover {
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .creatorDetails {
@@ -301,6 +308,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0.35rem 0.4rem;
+  border-radius: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.suggestedRow:hover {
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .suggestedCreator {
@@ -414,6 +428,11 @@
 
 .light .displayName {
   color: #1a1625;
+}
+
+.light .creatorRow:hover,
+.light .suggestedRow:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .light .username, .light .rankNum, .light .statVal {

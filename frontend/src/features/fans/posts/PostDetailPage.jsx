@@ -212,14 +212,9 @@ export const PostDetailPage = () => {
         if (el) {
           el.scrollIntoView({ behavior: 'smooth', block: 'center' });
           el.style.transition = 'box-shadow 0.4s ease, border-color 0.4s ease, transform 0.4s ease';
-          el.style.boxShadow = '0 0 25px #a78bfa, 0 0 10px #ff007f';
-          el.style.borderColor = '#a78bfa';
-          el.style.transform = 'scale(1.02)';
-          setTimeout(() => {
-            el.style.boxShadow = '';
-            el.style.borderColor = '';
-            el.style.transform = '';
-          }, 3500);
+          el.style.boxShadow = '0 0 28px rgba(255, 215, 0, 0.85), 0 0 12px rgba(255, 180, 0, 0.6)';
+          el.style.borderColor = '#ffd700';
+          el.style.transform = 'scale(1.01)';
         }
       }, 400);
       return () => clearTimeout(timer);
@@ -615,10 +610,20 @@ export const PostDetailPage = () => {
                       const canDelete = user && (String(commenter._id || commenter) === String(user.id || user._id) || isPostOwner);
 
                       if (comment.isGift) {
-                        const giftTier = comment.giftTier || 1;
+                        const coins = comment.giftCoins || 0;
+                        let giftTier = comment.giftTier || 1;
+                        if (coins >= 5000) giftTier = 4;
+                        else if (coins >= 1000) giftTier = 3;
+                        else if (coins >= 100) giftTier = 2;
+
                         const tierClass = styles[`giftTier${giftTier}`] || styles.giftTier1;
                         const badgeClass = styles[`badgeTier${giftTier}`] || styles.badgeTier1;
-                        const tierLabels = { 2: 'Premium Gift', 3: 'Luxury Gift', 4: 'Royal Gift 👑' };
+                        const tierLabels = {
+                          1: 'CLASSIC GIFT',
+                          2: 'PREMIUM GIFT ✦',
+                          3: 'LUXURY ROYALTY 💎',
+                          4: 'ROYAL JACKPOT 👑✨'
+                        };
                         // Podium rank (1st/2nd/3rd most expensive gift) gets its own distinct card UI
                         const giftRank = giftRanks[comment._id] || 0;
                         const rankClass = giftRank ? styles[`giftRank${giftRank}`] || '' : '';
@@ -732,6 +737,7 @@ export const PostDetailPage = () => {
       {/* Gift Panel Modal */}
       {showGiftPanel && post && (
         <GiftPanel
+          type="comment"
           receiverName={post.creatorId?.displayName || 'Creator'}
           balance={balance}
           onSendGift={handleSendGift}
