@@ -59,6 +59,15 @@ export const LiveCallsPage = () => {
 
   const toggleMenu = (id) => setOpenMenuId((prev) => (prev === id ? null : id));
 
+  const getStatusClass = (status) => {
+    if (!status) return styles.statusCompleted;
+    const s = status.toLowerCase();
+    if (s.includes('completed')) return styles.statusCompleted;
+    if (s.includes('missed') || s.includes('rejected')) return styles.statusMissed;
+    if (s.includes('pending')) return styles.statusPending;
+    return styles.statusCompleted;
+  };
+
   const isAvailable = (type) =>
     type === 'audio' ? !!(merged && merged.audioAvailable) : !!(merged && merged.videoAvailable);
 
@@ -735,6 +744,7 @@ export const LiveCallsPage = () => {
                     <th>Type</th>
                     <th>Date &amp; Time</th>
                     <th>Duration</th>
+                    <th>Gifts</th>
                     <th>Earned</th>
                     <th>Status</th>
                     <th />
@@ -763,9 +773,10 @@ export const LiveCallsPage = () => {
                           <span className={styles.dateTime}>{`${date}\n${time || ''}`}</span>
                         </td>
                         <td>{row.duration}</td>
+                        <td className={styles.giftsCell}>{row.gifts || '0 coins'}</td>
                         <td className={styles.earnedCell}>{row.earned}</td>
                         <td>
-                          <span className={`${styles.statusBadge} ${row.status === 'Completed' ? styles.statusCompleted : styles.statusMissed}`}>
+                          <span className={`${styles.statusBadge} ${getStatusClass(row.status)}`}>
                             {row.status}
                           </span>
                         </td>
@@ -788,7 +799,7 @@ export const LiveCallsPage = () => {
                   })}
                   {recentCalls.length === 0 && (
                     <tr>
-                      <td colSpan={7} style={{ textAlign: 'center', padding: '32px 0', opacity: 0.6 }}>
+                      <td colSpan={8} style={{ textAlign: 'center', padding: '32px 0', opacity: 0.6 }}>
                         No {activeTab === 'All Calls' ? '' : activeTab.toLowerCase() + ' '}calls yet.
                       </td>
                     </tr>
@@ -835,8 +846,11 @@ export const LiveCallsPage = () => {
                   </div>
 
                   <div className={styles.mobileActivityFooter}>
-                    <span className={styles.earnedCell}>{row.earned}</span>
-                    <span className={`${styles.statusBadge} ${row.status === 'Completed' ? styles.statusCompleted : styles.statusMissed}`}>
+                    <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                      <span className={styles.giftsCell}>{row.gifts || '0 coins'}</span>
+                      <span className={styles.earnedCell}>{row.earned}</span>
+                    </div>
+                    <span className={`${styles.statusBadge} ${getStatusClass(row.status)}`}>
                       {row.status}
                     </span>
                   </div>
@@ -1025,13 +1039,17 @@ export const LiveCallsPage = () => {
                       <span className={styles.detailValue}>{detailsRow.duration}</span>
                     </div>
                     <div className={styles.detailRow}>
+                      <span className={styles.detailLabel}>Gifts</span>
+                      <span className={styles.detailValue}>{detailsRow.gifts || '0 coins'}</span>
+                    </div>
+                    <div className={styles.detailRow}>
                       <span className={styles.detailLabel}>Earned</span>
                       <span className={styles.detailValue}>{detailsRow.earned}</span>
                     </div>
                     <div className={styles.detailRow}>
                       <span className={styles.detailLabel}>Status</span>
                       <span className={styles.detailValue}>
-                        <span className={`${styles.statusBadge} ${detailsRow.status === 'Completed' ? styles.statusCompleted : styles.statusMissed}`}>
+                        <span className={`${styles.statusBadge} ${getStatusClass(detailsRow.status)}`}>
                           {detailsRow.status}
                         </span>
                       </span>

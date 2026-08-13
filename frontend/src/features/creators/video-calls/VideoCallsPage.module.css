@@ -516,6 +516,7 @@
   color: #10b981;
 }
 
+.statusRejected,
 .statusMissed {
   background: rgba(239, 68, 68, 0.15);
   color: #ef4444;
@@ -524,6 +525,11 @@
 .statusPending {
   background: rgba(245, 158, 11, 0.15);
   color: #f59e0b;
+}
+
+.giftsCell {
+  color: #10b981;
+  font-weight: 600;
 }
 
 .moreBtn {
@@ -1428,6 +1434,7 @@
   color: #059669;
 }
 
+.light .statusRejected,
 .light .statusMissed {
   background: rgba(220, 38, 38, 0.12);
   color: #dc2626;
@@ -1436,6 +1443,10 @@
 .light .statusPending {
   background: rgba(217, 119, 6, 0.12);
   color: #d97706;
+}
+
+.light .giftsCell {
+  color: #059669;
 }
 
 .light .earned {

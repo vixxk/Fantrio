@@ -524,9 +524,15 @@
   color: #10b981;
 }
 
+.statusRejected,
 .statusMissed {
   background: rgba(239, 68, 68, 0.15);
   color: #ef4444;
+}
+
+.giftsCell {
+  color: #10b981;
+  font-weight: 600;
 }
 
 .moreBtn {
@@ -1350,9 +1356,14 @@
   color: #059669;
 }
 
+.light .statusRejected,
 .light .statusMissed {
   background: rgba(220, 38, 38, 0.12);
   color: #dc2626;
+}
+
+.light .giftsCell {
+  color: #059669;
 }
 
 .light .moreBtn {

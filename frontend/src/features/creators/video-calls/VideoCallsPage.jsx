@@ -142,12 +142,12 @@ export const VideoCallsPage = () => {
   });
 
   const getStatusClass = (status) => {
-    switch (status) {
-      case 'Completed': return styles.statusCompleted;
-      case 'Missed': return styles.statusMissed;
-      case 'Pending': return styles.statusPending;
-      default: return '';
-    }
+    if (!status) return styles.statusCompleted;
+    const s = status.toLowerCase();
+    if (s.includes('completed')) return styles.statusCompleted;
+    if (s.includes('missed') || s.includes('rejected')) return styles.statusMissed;
+    if (s.includes('pending')) return styles.statusPending;
+    return styles.statusCompleted;
   };
 
   if (loading) {
@@ -422,7 +422,7 @@ export const VideoCallsPage = () => {
                         <span className={styles.dateTime}>{call.dateTime}</span>
                       </td>
                       <td className={styles.td}>{call.duration}</td>
-                      <td className={`${styles.td} ${styles.earned}`}>{call.gifts || '0 coins'}</td>
+                      <td className={`${styles.td} ${styles.giftsCell}`}>{call.gifts || '0 coins'}</td>
                       <td className={`${styles.td} ${styles.earned}`}>{call.earned}</td>
                       <td className={`${styles.td} ${styles.hideMobile}`}>
                         <span className={`${styles.statusBadge} ${getStatusClass(call.status)}`}>

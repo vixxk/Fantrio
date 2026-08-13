@@ -215,7 +215,9 @@ exports.acceptCall = catchAsync(async (req, res, next) => {
     callLog.receiverId,
     rate,
     'call_billing',
-    callLog._id
+    callLog._id,
+    0.20,
+    { callType: callLog.type, callRoomId: callLog.roomId }
   );
 
   const now = new Date();
@@ -353,7 +355,9 @@ exports.endCall = catchAsync(async (req, res, next) => {
             callLog.receiverId,
             coinsToDeduct,
             'call_billing',
-            callLog._id
+            callLog._id,
+            0.20,
+            { callType: callLog.type, callRoomId: callLog.roomId }
           );
         } catch (e) {
           console.warn('Final call billing transfer warning:', e?.message || e);
@@ -486,7 +490,9 @@ exports.heartbeat = catchAsync(async (req, res, next) => {
     callLog.receiverId,
     rate,
     'call_billing',
-    callLog._id
+    callLog._id,
+    0.20,
+    { callType: callLog.type, callRoomId: callLog.roomId }
   );
 
   // Update call metadata logs

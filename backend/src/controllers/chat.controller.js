@@ -3,6 +3,7 @@ const Subscription = require('../models/Subscription');
 const User = require('../models/User');
 const CreatorProfile = require('../models/CreatorProfile');
 const CallLog = require('../models/CallLog');
+const Transaction = require('../models/Transaction');
 const walletService = require('../services/wallet.service');
 const awsService = require('../services/aws.service');
 const ApiError = require('../utils/apiError');
@@ -52,7 +53,7 @@ const formatMessageForUser = async (user, msg) => {
 
 // Retrieve chat threads
 // Each conversation carries the peer user, their creator profile (rates/status),
-// the last message, and an unread count so the UI can render the sidebar directly.
+// the last message, unread count, and fan stats so the UI can render the sidebar directly.
 exports.getConversations = catchAsync(async (req, res, next) => {
   const conversations = await Message.aggregate([
     {
@@ -79,7 +80,7 @@ exports.getConversations = catchAsync(async (req, res, next) => {
 
   const populated = await Message.populate(conversations, {
     path: '_id',
-    select: 'username displayName avatarUrl role',
+    select: 'username displayName avatarUrl role createdAt',
     model: 'User'
   });
 
@@ -95,34 +96,166 @@ exports.getConversations = catchAsync(async (req, res, next) => {
   const peerIds = populated
     .map((c) => (c._id && c._id._id ? c._id._id : c._id))
     .filter(Boolean);
+
   const profiles = await CreatorProfile.find({ userId: { $in: peerIds } }).lean();
   const profileMap = {};
   profiles.forEach((p) => { profileMap[String(p.userId)] = p; });
 
-  // Fans don't have a CreatorProfile — their presence lives on the User record
-  // (kept in sync by the Socket.io presence layer), so the creator's messages
-  // page can show whether each fan is online.
+  // User presence & registration dates
   const users = await User.find({ _id: { $in: peerIds } })
-    .select('isOnline lastSeenAt')
+    .select('isOnline lastSeenAt createdAt')
     .lean();
   const userPresenceMap = {};
   users.forEach((u) => { userPresenceMap[String(u._id)] = u; });
 
-  // The viewer's active subscription with each peer (so the UI can show the
-  // real plan + renewal date instead of placeholder data).
-  const activeSubs = await Subscription.find({
-    userId: req.user._id,
-    creatorId: { $in: peerIds },
-    // 'active' and 'expiring' both count as a live subscription the viewer
-    // still benefits from.
-    status: { $in: ['active', 'expiring'] },
-    expiryDate: { $gt: new Date() }
-  }).lean();
-  const subMap = {};
-  activeSubs.forEach((s) => { subMap[String(s.creatorId)] = s; });
+  // 1. Message counts & earliest message dates per peer
+  const messageStats = peerIds.length
+    ? await Message.aggregate([
+        {
+          $match: {
+            $or: [
+              { senderId: req.user._id, receiverId: { $in: peerIds } },
+              { senderId: { $in: peerIds }, receiverId: req.user._id }
+            ]
+          }
+        },
+        {
+          $project: {
+            peerId: {
+              $cond: [{ $eq: ['$senderId', req.user._id] }, '$receiverId', '$senderId']
+            },
+            createdAt: 1
+          }
+        },
+        {
+          $group: {
+            _id: '$peerId',
+            count: { $sum: 1 },
+            earliestDate: { $min: '$createdAt' }
+          }
+        }
+      ])
+    : [];
+  const msgStatMap = {};
+  messageStats.forEach((m) => {
+    msgStatMap[String(m._id)] = { count: m.count, earliestDate: m.earliestDate };
+  });
 
-  // Which peers are currently on an active call, so the chat UI can surface a
-  // "busy" state and disable the call buttons while they're on another call.
+  // 2. Subscriptions (active sub info + earliest sub interaction date per peer)
+  const allSubs = peerIds.length
+    ? await Subscription.find({
+        $or: [
+          { userId: req.user._id, creatorId: { $in: peerIds } },
+          { userId: { $in: peerIds }, creatorId: req.user._id }
+        ]
+      }).sort({ createdAt: 1 }).lean()
+    : [];
+
+  const subMap = {};
+  const subDateMap = {};
+  allSubs.forEach((s) => {
+    const peerKey = String(s.userId.toString() === req.user._id.toString() ? s.creatorId : s.userId);
+    if (!subDateMap[peerKey]) {
+      subDateMap[peerKey] = s.createdAt;
+    }
+    if ((s.status === 'active' || s.status === 'expiring') && new Date(s.expiryDate) > new Date()) {
+      subMap[peerKey] = s;
+    }
+  });
+
+  // 3. CallLogs earliest date per peer
+  const callStats = peerIds.length
+    ? await CallLog.aggregate([
+        {
+          $match: {
+            $or: [
+              { callerId: req.user._id, receiverId: { $in: peerIds } },
+              { callerId: { $in: peerIds }, receiverId: req.user._id }
+            ]
+          }
+        },
+        {
+          $project: {
+            peerId: {
+              $cond: [{ $eq: ['$callerId', req.user._id] }, '$receiverId', '$callerId']
+            },
+            createdAt: 1
+          }
+        },
+        {
+          $group: {
+            _id: '$peerId',
+            earliestDate: { $min: '$createdAt' }
+          }
+        }
+      ])
+    : [];
+  const callDateMap = {};
+  callStats.forEach((c) => {
+    callDateMap[String(c._id)] = c.earliestDate;
+  });
+
+  // 4. Transactions (Total spent, total gifts/tips, earliest transaction date per peer)
+  const txStats = peerIds.length
+    ? await Transaction.aggregate([
+        {
+          $match: {
+            status: 'completed',
+            $or: [
+              { senderId: req.user._id, receiverId: { $in: peerIds } },
+              { senderId: { $in: peerIds }, receiverId: req.user._id }
+            ]
+          }
+        },
+        {
+          $project: {
+            senderId: 1,
+            receiverId: 1,
+            type: 1,
+            amountCoins: 1,
+            createdAt: 1,
+            peerId: {
+              $cond: [{ $eq: ['$senderId', req.user._id] }, '$receiverId', '$senderId']
+            }
+          }
+        },
+        {
+          $group: {
+            _id: '$peerId',
+            earliestDate: { $min: '$createdAt' },
+            totalSpentCoins: {
+              $sum: {
+                $cond: [{ $ne: ['$senderId', req.user._id] }, '$amountCoins', 0]
+              }
+            },
+            totalTipsCoins: {
+              $sum: {
+                $cond: [
+                  {
+                    $and: [
+                      { $ne: ['$senderId', req.user._id] },
+                      { $in: ['$type', ['tip', 'gift']] }
+                    ]
+                  },
+                  '$amountCoins',
+                  0
+                ]
+              }
+            }
+          }
+        }
+      ])
+    : [];
+  const txStatMap = {};
+  txStats.forEach((t) => {
+    txStatMap[String(t._id)] = {
+      earliestDate: t.earliestDate,
+      totalSpentCoins: t.totalSpentCoins || 0,
+      totalTipsCoins: t.totalTipsCoins || 0
+    };
+  });
+
+  // Active call status
   const activeCalls = peerIds.length
     ? await CallLog.find({
         status: 'active',
@@ -139,14 +272,13 @@ exports.getConversations = catchAsync(async (req, res, next) => {
     const peerId = String(c._id && c._id._id ? c._id._id : c._id);
     c.unreadCount = unreadMap[peerId] || 0;
     const profile = profileMap[peerId] || null;
-    // Respect the creator's "Show Online Status" preference for presence dots
+    const u = userPresenceMap[peerId] || null;
+
     if (profile) {
       profile.isOnline = profile.showOnlineStatus !== false && !!profile.isOnline;
       profile.isBusy = busyIds.has(peerId);
       c.profile = profile;
     } else {
-      // Fan peer: derive presence from the live User record.
-      const u = userPresenceMap[peerId] || null;
       c.profile = u
         ? {
             isOnline: !!u.isOnline,
@@ -155,9 +287,44 @@ exports.getConversations = catchAsync(async (req, res, next) => {
           }
         : null;
     }
-    c.subscription = subMap[peerId]
-      ? { status: 'active', plan: subMap[peerId].plan || 'Premium', renewalDate: subMap[peerId].expiryDate || null }
-      : null;
+
+    const liveSub = subMap[peerId];
+    c.subscription = liveSub
+      ? {
+          status: 'ACTIVE',
+          plan: liveSub.plan || 'Premium',
+          since: liveSub.createdAt ? new Date(liveSub.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '—',
+          renewalDate: liveSub.expiryDate || null
+        }
+      : {
+          status: 'INACTIVE',
+          plan: 'Free',
+          since: '—',
+          renewalDate: null
+        };
+
+    const mStat = msgStatMap[peerId] || {};
+    const tStat = txStatMap[peerId] || {};
+
+    const rawDates = [
+      mStat.earliestDate,
+      subDateMap[peerId],
+      callDateMap[peerId],
+      tStat.earliestDate
+    ].filter(Boolean).map((d) => new Date(d).getTime());
+
+    const firstInteractionTimestamp = rawDates.length ? Math.min(...rawDates) : null;
+    const firstInteractionDate = firstInteractionTimestamp ? new Date(firstInteractionTimestamp) : null;
+
+    c.fanStats = {
+      fanSince: firstInteractionDate
+        ? firstInteractionDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
+        : (u && u.createdAt ? new Date(u.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '—'),
+      firstInteractionAt: firstInteractionDate,
+      totalSpentCoins: tStat.totalSpentCoins || 0,
+      totalTipsCoins: tStat.totalTipsCoins || 0,
+      messagesCount: mStat.count || 0
+    };
   });
 
   res.status(200).json({

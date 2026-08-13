@@ -68,6 +68,11 @@ const mapConversation = (conv) => {
   const peer = conv._id || {};
   const profile = conv.profile || {};
   const lastMsg = conv.lastMessage || {};
+  const stats = conv.fanStats || {};
+  const sub = conv.subscription || {};
+  const totalSpentCoins = stats.totalSpentCoins || 0;
+  const totalTipsCoins = stats.totalTipsCoins || 0;
+
   return {
     id: String(peer._id || conv._id),
     user: {
@@ -77,16 +82,21 @@ const mapConversation = (conv) => {
       avatarUrl: peer.avatarUrl || DEFAULT_AVATAR,
       isVerified: !!profile.isVerifiedBadge,
       isOnline: !!profile.isOnline,
-      isTopFan: false,
-      isHighSpender: false,
-      fanSince: '—',
-      totalSpent: 0,
-      totalTips: 0,
-      messages: 0,
-      subscription: { tier: 'Free', status: 'INACTIVE', since: '—', renewsOn: '—' },
+      isTopFan: totalSpentCoins >= 1000,
+      isHighSpender: totalSpentCoins >= 500,
+      fanSince: stats.fanSince || '—',
+      totalSpent: totalSpentCoins,
+      totalTips: totalTipsCoins,
+      messages: stats.messagesCount || 0,
+      subscription: {
+        tier: sub.plan || 'Free',
+        status: sub.status || 'INACTIVE',
+        since: sub.since || '—',
+        renewsOn: sub.renewalDate ? new Date(sub.renewalDate).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) : '—'
+      },
       labels: []
     },
-    lastMessage: lastMsg.content || (lastMsg.isPaywall ? '🔒 ' + (lastMsg.mediaType || 'Media') : '📎 Media'),
+    lastMessage: lastMsg.content || (lastMsg.isPaywall ? '🔒 ' + (lastMsg.mediaType || 'Media') : (lastMsg.mediaUrl ? '📎 Media' : '')),
     time: formatTime(lastMsg.createdAt),
     lastMessageAt: lastMsg.createdAt ? new Date(lastMsg.createdAt).getTime() : 0,
     unreadCount: conv.unreadCount || 0,
@@ -1201,11 +1211,11 @@ export const CreatorMessagesPage = () => {
                 </div>
                 <div className={styles.statRow}>
                   <span className={styles.statLabel}>Total Spent</span>
-                  <span className={styles.statValue}>${selectedConv.user.totalSpent.toLocaleString()}</span>
+                  <span className={styles.statValue}>{selectedConv.user.totalSpent.toLocaleString()} Coins</span>
                 </div>
                 <div className={styles.statRow}>
-                  <span className={styles.statLabel}>Total Tips</span>
-                  <span className={styles.statValue}>${selectedConv.user.totalTips.toLocaleString()}</span>
+                  <span className={styles.statLabel}>Total Gifts</span>
+                  <span className={styles.statValue}>{selectedConv.user.totalTips.toLocaleString()} Coins</span>
                 </div>
                 <div className={styles.statRow}>
                   <span className={styles.statLabel}>Messages</span>
@@ -1238,25 +1248,47 @@ export const CreatorMessagesPage = () => {
               {/* Quick Actions */}
               <div className={styles.actionsCard}>
                 <h4 className={styles.actionsTitle}>Quick Actions</h4>
-                <button className={`${styles.actionBtn} ${styles.actionViewProfile}`}>
+                <button
+                  type="button"
+                  className={`${styles.actionBtn} ${styles.actionViewProfile}`}
+                  onClick={() => {
+                    if (selectedConv?.user?.id) {
+                      navigateTo(`/creators/subscribers?search=${encodeURIComponent(selectedConv.user.displayName)}`);
+                    } else {
+                      handleShowProfile();
+                    }
+                  }}
+                >
                   <div className={`${styles.actionIcon} ${styles.iconPink}`}>
                     <User size={22} />
                   </div>
                   <span>View Profile</span>
                 </button>
-                <button className={`${styles.actionBtn} ${styles.actionSendTip}`}>
+                <button
+                  type="button"
+                  className={`${styles.actionBtn} ${styles.actionSendTip}`}
+                  onClick={() => chatInputRef.current?.focus()}
+                >
                   <div className={`${styles.actionIcon} ${styles.iconWhite}`}>  
                     <DollarSign size={22} />
                   </div>
-                  <span>Send Tip</span>
+                  <span>Send Gift</span>
                 </button>
-                <button className={`${styles.actionBtn} ${styles.actionCreatePPV}`}>
+                <button
+                  type="button"
+                  className={`${styles.actionBtn} ${styles.actionCreatePPV}`}
+                  onClick={() => chatMediaInputRef.current?.click()}
+                >
                   <div className={`${styles.actionIcon} ${styles.iconPurple}`}>
                     <Gift size={22} />
                   </div>
                   <span>Create PPV Offer</span>
                 </button>
-                <button className={`${styles.actionBtn} ${styles.actionBlockUser}`}>
+                <button
+                  type="button"
+                  className={`${styles.actionBtn} ${styles.actionBlockUser}`}
+                  onClick={handleBlockUser}
+                >
                   <div className={`${styles.actionIcon} ${styles.iconRed}`}>
                     <Ban size={22} />
                   </div>

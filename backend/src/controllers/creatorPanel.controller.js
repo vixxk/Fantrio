@@ -420,23 +420,14 @@ exports.getEarnings = catchAsync(async (req, res, next) => {
   // Revenue breakdown by source, with a real % change vs the previous period
   const sourceDefs = [
     { key: 'subscription', source: 'Subscriptions', icon: 'users', color: '#e10075' },
-    { key: 'tip', source: 'Tips & Gifts', icon: 'gift', color: '#f59e0b' },
+    { key: 'gift', source: 'Tips & Gifts', icon: 'gift', color: '#f59e0b' },
     { key: 'ppv_unlock', source: 'PPV Content', icon: 'lock', color: '#3b82f6' },
-    { key: 'call_billing', source: 'Video Calls', icon: 'video', color: '#10b981' },
+    { key: 'video_calls', source: 'Video Calls', icon: 'video', color: '#10b981' },
+    { key: 'audio_calls', source: 'Audio Calls', icon: 'phone', color: '#34d399' },
     { key: 'live_entry', source: 'Live Streams', icon: 'radio', color: '#ef4444' },
     { key: 'store_purchase', source: 'Store', icon: 'shopping', color: '#8b5cf6' }
   ];
-  const splitCalls = (txs) => ({
-    video: txs.filter((t) => t.type === 'call_billing' && (!t.metadata || t.metadata.callType !== 'audio')),
-    audio: txs.filter((t) => t.type === 'call_billing' && t.metadata && t.metadata.callType === 'audio')
-  });
-  const sourceAmount = (txs, def) => {
-    if (def.key === 'call_billing') {
-      const split = splitCalls(txs);
-      return sumTx(def.source === 'Video Calls' ? split.video : split.audio);
-    }
-    return sumTx(txs.filter((t) => t.type === def.key));
-  };
+
   // Previous period window (same length as the selected period, right before it)
   const prevWindowStart = periodStart
     ? new Date(periodStart.getTime() - (Date.now() - periodStart.getTime()))
@@ -444,6 +435,36 @@ exports.getEarnings = catchAsync(async (req, res, next) => {
   const prevIncome = prevWindowStart
     ? await Transaction.find({ ...incomeMatch, createdAt: { $gte: prevWindowStart, $lt: periodStart } })
     : [];
+
+  // Map call room IDs for gift transactions to attribute call gifts to Video or Audio calls
+  const allCallRoomIds = [...new Set(
+    [...income, ...prevIncome]
+      .filter((t) => (t.type === 'gift' || t.type === 'tip') && t.metadata && t.metadata.callRoomId)
+      .map((t) => t.metadata.callRoomId)
+  )];
+  let callRoomTypeMap = {};
+  if (allCallRoomIds.length) {
+    const logs = await CallLog.find({ roomId: { $in: allCallRoomIds } }).select('roomId type').lean();
+    logs.forEach((l) => { callRoomTypeMap[l.roomId] = l.type; });
+  }
+
+  const sourceAmount = (txs, def) => {
+    if (def.key === 'video_calls') {
+      const billing = sumTx(txs.filter((t) => t.type === 'call_billing' && (!t.metadata || t.metadata.callType !== 'audio')));
+      const gifts = sumTx(txs.filter((t) => (t.type === 'gift' || t.type === 'tip') && t.metadata?.callRoomId && callRoomTypeMap[t.metadata.callRoomId] === 'video'));
+      return billing + gifts;
+    }
+    if (def.key === 'audio_calls') {
+      const billing = sumTx(txs.filter((t) => t.type === 'call_billing' && t.metadata && t.metadata.callType === 'audio'));
+      const gifts = sumTx(txs.filter((t) => (t.type === 'gift' || t.type === 'tip') && t.metadata?.callRoomId && callRoomTypeMap[t.metadata.callRoomId] === 'audio'));
+      return billing + gifts;
+    }
+    if (def.key === 'gift') {
+      return sumTx(txs.filter((t) => (t.type === 'gift' || t.type === 'tip') && (!t.metadata || !t.metadata.callRoomId || !callRoomTypeMap[t.metadata.callRoomId])));
+    }
+    return sumTx(txs.filter((t) => t.type === def.key));
+  };
+
   const revenueBreakdown = sourceDefs.map((def) => {
     const amount = sourceAmount(income, def);
     const prevAmount = sourceAmount(prevIncome, def);
@@ -461,12 +482,27 @@ exports.getEarnings = catchAsync(async (req, res, next) => {
     };
   });
 
-  const earningsTabs = ['All Transactions', 'Subscriptions', 'Tips', 'PPV Unlocks', 'Video Calls', 'Audio Calls', 'Live Streams', 'Store'];
+  const earningsTabs = ['All Transactions', 'Subscriptions', 'Gifts', 'PPV Unlocks', 'Video Calls', 'Audio Calls', 'Live Streams', 'Store'];
+
+  // Pre-lookup CallLog call types for all call_billing transactions to ensure accurate Audio vs Video filtering
+  const unmappedCallBillingTxs = allTx.filter((t) => t.type === 'call_billing' && (!t.metadata || !t.metadata.callType));
+  const callLogIds = [...new Set(unmappedCallBillingTxs.map((t) => t.referenceId).filter(Boolean))];
+  const callLogs = callLogIds.length
+    ? await CallLog.find({ _id: { $in: callLogIds } }).select('type')
+    : [];
+  const callTypeMap = {};
+  callLogs.forEach((cl) => { callTypeMap[cl._id.toString()] = cl.type; });
+
+  const getTxCallType = (t) => {
+    if (t.metadata && t.metadata.callType) return t.metadata.callType;
+    if (t.referenceId && callTypeMap[t.referenceId.toString()]) return callTypeMap[t.referenceId.toString()];
+    return 'video';
+  };
 
   // Transaction history filtered by tab
   const tabTypeMap = {
     'Subscriptions': 'subscription',
-    'Tips': 'tip',
+    'Gifts': 'gift',
     'PPV Unlocks': 'ppv_unlock',
     'Video Calls': 'call_billing',
     'Audio Calls': 'call_billing',
@@ -475,29 +511,41 @@ exports.getEarnings = catchAsync(async (req, res, next) => {
   };
   let historyTxs = allTx;
   if (tabTypeMap[tab]) {
-    historyTxs = allTx.filter((t) => t.type === tabTypeMap[tab]);
-    if (tab === 'Audio Calls') {
-      historyTxs = historyTxs.filter((t) => t.metadata && t.metadata.callType === 'audio');
-    } else if (tab === 'Video Calls') {
-      historyTxs = historyTxs.filter((t) => !t.metadata || t.metadata.callType !== 'audio');
+    if (tab === 'Gifts') {
+      historyTxs = allTx.filter((t) => t.type === 'gift' || t.type === 'tip');
+    } else {
+      historyTxs = allTx.filter((t) => t.type === tabTypeMap[tab]);
+      if (tab === 'Audio Calls') {
+        historyTxs = historyTxs.filter((t) => getTxCallType(t) === 'audio');
+      } else if (tab === 'Video Calls') {
+        historyTxs = historyTxs.filter((t) => getTxCallType(t) !== 'audio');
+      }
     }
   }
 
+  const sliceTxs = historyTxs.slice(0, 100);
+
   // Resolve sender (fan) display info for the transaction table
-  const senderIds = [...new Set(historyTxs.map((t) => t.senderId).filter(Boolean))];
+  const senderIds = [...new Set(sliceTxs.map((t) => t.senderId).filter(Boolean))];
   const senders = senderIds.length
     ? await User.find({ _id: { $in: senderIds } }).select('username displayName avatarUrl')
     : [];
   const senderMap = {};
   senders.forEach((s) => { senderMap[s._id.toString()] = s; });
 
-  const transactionHistory = historyTxs.slice(0, 100).map((t, idx) => {
+  const transactionHistory = sliceTxs.map((t, idx) => {
     const sender = t.senderId ? senderMap[t.senderId.toString()] : null;
+    const callType = t.type === 'call_billing' ? getTxCallType(t) : undefined;
+    const resolvedSource = t.type === 'call_billing'
+      ? (callType === 'audio' ? 'Audio Calls' : 'Video Calls')
+      : t.type === 'withdrawal' ? 'Withdrawal' : 'Creator earnings';
+
     return {
       id: idx + 1,
       type: t.type,
+      callType: callType || (t.type === 'call_billing' ? 'video' : undefined),
       description: t.type.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
-      source: t.type === 'withdrawal' ? 'Withdrawal' : 'Creator earnings',
+      source: resolvedSource,
       user: sender ? (sender.displayName || sender.username) : 'Platform',
       avatar: sender ? (sender.avatarUrl || '') : '',
       date: t.createdAt.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }),
@@ -838,22 +886,54 @@ exports.getCallStats = catchAsync(async (req, res, next) => {
     prevCalls = await CallLog.find({ receiverId: creatorId, type, createdAt: { $gte: prevStart, $lt: prevEnd } });
   }
 
+  // Gifts per call room ID
+  const roomIds = calls.map((c) => c.roomId).filter(Boolean);
+  let giftsByRoom = {};
+  if (roomIds.length) {
+    const giftTxs = await Transaction.find({
+      type: 'gift',
+      status: 'completed',
+      'metadata.callRoomId': { $in: roomIds }
+    }).select('amountCoins metadata').lean();
+    giftsByRoom = giftTxs.reduce((acc, g) => {
+      const room = g.metadata && g.metadata.callRoomId;
+      if (!room) return acc;
+      acc[room] = (acc[room] || 0) + (Number(g.amountCoins) || 0);
+      return acc;
+    }, {});
+  }
+
+  // Previous window gifts per call room ID
+  const prevRoomIds = prevCalls.map((c) => c.roomId).filter(Boolean);
+  let prevGiftsByRoom = {};
+  if (prevRoomIds.length) {
+    const prevGiftTxs = await Transaction.find({
+      type: 'gift',
+      status: 'completed',
+      'metadata.callRoomId': { $in: prevRoomIds }
+    }).select('amountCoins metadata').lean();
+    prevGiftsByRoom = prevGiftTxs.reduce((acc, g) => {
+      const room = g.metadata && g.metadata.callRoomId;
+      if (!room) return acc;
+      acc[room] = (acc[room] || 0) + (Number(g.amountCoins) || 0);
+      return acc;
+    }, {});
+  }
+
   const completedCalls = calls.filter((c) => c.status === 'completed');
   const missedCalls = calls.filter((c) => c.status === 'missed' || c.status === 'rejected');
   const pendingCalls = calls.filter((c) => c.status === 'initiated' || c.status === 'active');
 
   const totalMinutes = completedCalls.reduce((s, c) => s + (c.totalMinutesBilling || 0), 0);
-  const totalEarned = completedCalls.reduce((s, c) => s + (c.totalCoinsBilled || 0), 0);
+  const totalEarned = completedCalls.reduce((s, c) => s + (c.totalCoinsBilled || 0) + (giftsByRoom[c.roomId] || 0), 0);
 
   // Change for the stat cards: same-length previous window vs the selected one
   const prevCompleted = prevCalls.filter((c) => c.status === 'completed');
-  const prevEarned = prevCompleted.reduce((s, c) => s + (c.totalCoinsBilled || 0), 0);
+  const prevEarned = prevCompleted.reduce((s, c) => s + (c.totalCoinsBilled || 0) + (prevGiftsByRoom[c.roomId] || 0), 0);
   const prevMinutes = prevCompleted.reduce((s, c) => s + (c.totalMinutesBilling || 0), 0);
   const prevMissed = prevCalls.filter((c) => c.status === 'missed' || c.status === 'rejected').length;
   const fmtPct = (cur, prev) => `${prev > 0 ? (cur >= prev ? '+' : '-') : cur > 0 ? '+' : ''}${prev > 0 ? Math.abs(Math.round(((cur - prev) / prev) * 100)) : cur > 0 ? 100 : 0}%`;
   const changeOf = (cur, prev) => (showChange ? fmtPct(cur, prev) : '');
-
-
 
   // Peak hours (calls grouped by hour, all time) — 24 data points for the chart
   const hourCounts = Array(24).fill(0);
@@ -898,22 +978,11 @@ exports.getCallStats = catchAsync(async (req, res, next) => {
     { id: 'missedCalls', label: 'Missed Calls', value: String(missedCalls.length), change: missedChange, changeType: missedChange.startsWith('-') ? 'positive' : 'negative', period: prevLabel, icon: 'phoneMissed', color: '#ef4444' }
   ];
 
-  // Gifts per call room ID
-  const roomIds = calls.map((c) => c.roomId).filter(Boolean);
-  let giftsByRoom = {};
-  if (roomIds.length) {
-    const giftTxs = await Transaction.find({
-      type: 'gift',
-      status: 'completed',
-      'metadata.callRoomId': { $in: roomIds }
-    }).select('amountCoins metadata').lean();
-    giftsByRoom = giftTxs.reduce((acc, g) => {
-      const room = g.metadata && g.metadata.callRoomId;
-      if (!room) return acc;
-      acc[room] = (acc[room] || 0) + (Number(g.amountCoins) || 0);
-      return acc;
-    }, {});
-  }
+  // Recent calls
+  const fanIds = [...new Set(calls.map((c) => c.callerId ? c.callerId.toString() : '').filter(Boolean))];
+  const fans = fanIds.length ? await User.find({ _id: { $in: fanIds } }).select('username displayName avatarUrl') : [];
+  const fanMap = {};
+  fans.forEach((f) => { fanMap[f._id.toString()] = f; });
 
   const recentCalls = calls.slice(0, 30).map((c, idx) => {
     const fan = c.callerId ? fanMap[c.callerId.toString()] : null;
@@ -933,6 +1002,7 @@ exports.getCallStats = catchAsync(async (req, res, next) => {
     const exactDurationStr = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 
     const giftsEarned = giftsByRoom[c.roomId] || 0;
+    const totalCallEarned = (c.totalCoinsBilled || 0) + giftsEarned;
 
     return {
       id: idx + 1,
@@ -947,11 +1017,11 @@ exports.getCallStats = catchAsync(async (req, res, next) => {
       time,
       duration: exactDurationStr,
       gifts: giftsEarned > 0 ? `${giftsEarned} coins` : '0 coins',
-      earned: `${c.totalCoinsBilled || 0} coins`,
+      earned: `${totalCallEarned} coins`,
       status: c.status.charAt(0).toUpperCase() + c.status.slice(1),
       type: c.type === 'video' ? 'Video Call' : 'Audio Call',
       typeIcon: c.type === 'video' ? 'video' : 'phone',
-      coins: c.totalCoinsBilled || 0
+      coins: totalCallEarned
     };
   });
 

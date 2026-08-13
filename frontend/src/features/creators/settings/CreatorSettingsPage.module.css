@@ -2446,6 +2446,26 @@
   color: #e10075;
 }
 
+/* Light theme overrides for rateCard */
+.light .rateCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.light .rateCard:hover {
+  background: #fafafa;
+  border-color: rgba(225, 0, 117, 0.3);
+}
+
+.light .rateCardHeader h4 {
+  color: #1a1625;
+}
+
+.light .rateCardHeader p {
+  color: rgba(26, 22, 37, 0.55);
+}
+
 @media (max-width: 768px) {
   .ratesGrid3Col {
     grid-template-columns: 1fr;

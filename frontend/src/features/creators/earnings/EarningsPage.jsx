@@ -44,6 +44,20 @@ const typeLabelMap = {
   withdrawal: 'Withdrawal'
 };
 
+const getTxSourceMeta = (tx) => {
+  if (tx.type === 'call_billing') {
+    const isAudio = tx.callType === 'audio' || (tx.source && tx.source.toLowerCase().includes('audio'));
+    return {
+      label: isAudio ? 'Audio Calls' : 'Video Calls',
+      Icon: isAudio ? Phone : Video
+    };
+  }
+  return {
+    label: typeLabelMap[tx.type] || tx.source || tx.type,
+    Icon: typeIconMap[tx.type] || Users
+  };
+};
+
 // Map a raw status to the matching badge class (pending = yellow, completed = green, failed/refunded = red)
 const statusBadgeClass = (status) => {
   const s = String(status || '').toLowerCase();
@@ -426,7 +440,7 @@ export const EarningsPage = () => {
                       <tr><td colSpan={5} className={styles.td} style={{ textAlign: 'center', color: darkMode ? 'rgba(255,255,255,0.45)' : '#4b5563', fontWeight: 500 }}>No transactions in this category yet.</td></tr>
                     )}
                     {currentTransactions.map((tx) => {
-                      const TypeIcon = typeIconMap[tx.type] || Users;
+                      const { label: sourceLabel, Icon: TypeIcon } = getTxSourceMeta(tx);
                       return (
                         <tr key={tx.id} className={styles.tableRow}>
                           <td className={styles.td}>
@@ -438,7 +452,7 @@ export const EarningsPage = () => {
                           <td className={styles.td}>
                             <div className={styles.sourceBadge}>
                               <TypeIcon size={12} />
-                              <span>{typeLabelMap[tx.type] || tx.source}</span>
+                              <span>{sourceLabel}</span>
                             </div>
                           </td>
                           <td className={styles.td}>

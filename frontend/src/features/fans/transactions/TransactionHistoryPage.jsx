@@ -12,6 +12,7 @@ import {
   Gift,
   LockOpen,
   Phone,
+  Video,
   Radio,
   ShoppingBag,
   Banknote,
@@ -28,12 +29,24 @@ const TYPE_META = {
   deposit: { label: 'Coin Purchase', Icon: Coins, color: '#10b981' },
   withdrawal: { label: 'Withdrawal', Icon: Banknote, color: '#eab308' },
   subscription: { label: 'Subscription', Icon: Star, color: '#ff007f' },
-  tip: { label: 'Tip', Icon: Heart, color: '#ff007f' },
+  tip: { label: 'Gift', Icon: Gift, color: '#a78bfa' },
   gift: { label: 'Gift', Icon: Gift, color: '#a78bfa' },
   ppv_unlock: { label: 'PPV Unlock', Icon: LockOpen, color: '#eab308' },
-  call_billing: { label: 'Call Billing', Icon: Phone, color: '#eab308' },
+  call_billing: { label: 'Call Billing', Icon: Video, color: '#eab308' },
   live_entry: { label: 'Live Stream Entry', Icon: Radio, color: '#06b6d4' },
   store_purchase: { label: 'Store Purchase', Icon: ShoppingBag, color: '#f97316' }
+};
+
+const getTxTypeMeta = (t) => {
+  if (t.type === 'call_billing') {
+    const isAudio = t.metadata?.callType === 'audio';
+    return {
+      label: isAudio ? 'Audio Call' : 'Video Call',
+      Icon: isAudio ? Phone : Video,
+      color: '#eab308'
+    };
+  }
+  return TYPE_META[t.type] || { label: t.type.replace(/_/g, ' '), Icon: Coins, color: '#ffffff' };
 };
 
 const FILTERS = [
@@ -42,7 +55,6 @@ const FILTERS = [
   { key: 'out', label: 'Money Out' },
   { key: 'deposit', label: 'Purchases' },
   { key: 'subscription', label: 'Subscriptions' },
-  { key: 'tip', label: 'Tips' },
   { key: 'gift', label: 'Gifts' },
   { key: 'call_billing', label: 'Calls' },
   { key: 'ppv_unlock', label: 'PPV' },
@@ -79,19 +91,17 @@ const getDescription = (t, userId) => {
   if (t.type === 'withdrawal') return 'Withdrawal request';
   if (t.type === 'live_entry') return name ? `Live stream entry (${name})` : 'Live stream entry';
   if (t.type === 'store_purchase') return name ? `Store purchase from ${name}` : 'Store purchase';
-  if (t.type === 'call_billing') return name ? `1:1 Call session with ${name}` : '1:1 Call billing';
+  if (t.type === 'call_billing') {
+    const callTypeStr = t.metadata?.callType === 'audio' ? '1:1 Audio Call' : '1:1 Video Call';
+    return name ? `${callTypeStr} session with ${name}` : `${callTypeStr} billing`;
+  }
   if (t.type === 'ppv_unlock') return name ? `Unlocked content from ${name}` : 'PPV content unlock';
   if (t.type === 'subscription') return name ? (dir === 'out' ? `Subscribed to ${name}` : `Subscription from ${name}`) : 'Subscription';
   
-  if (t.type === 'gift') {
+  if (t.type === 'gift' || t.type === 'tip') {
     const giftLabel = t.metadata?.giftName ? `${t.metadata.giftEmoji || '🎁'} ${t.metadata.giftName}` : 'Gift';
     if (!name) return giftLabel;
     return dir === 'out' ? `${giftLabel} to ${name}` : `${giftLabel} from ${name}`;
-  }
-
-  if (t.type === 'tip') {
-    if (!name) return 'Tip';
-    return dir === 'out' ? `Tip to ${name}` : `Tip from ${name}`;
   }
 
   const base = (TYPE_META[t.type] || {}).label || t.type.replace(/_/g, ' ');
@@ -333,7 +343,7 @@ export const TransactionHistoryPage = () => {
               <>
                 <div className={styles.txList}>
                   {transactions.map((t) => {
-                    const meta = TYPE_META[t.type] || { label: t.type.replace(/_/g, ' '), Icon: Coins, color: '#ffffff' };
+                    const meta = getTxTypeMeta(t);
                     const Icon = meta.Icon;
                     const dir = getDirection(t, user?.id);
                     const status = STATUS_META[t.status] || { label: t.status, cls: 'pending' };

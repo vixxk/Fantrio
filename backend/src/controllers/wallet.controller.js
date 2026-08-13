@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Wallet = require('../models/Wallet');
 const Transaction = require('../models/Transaction');
 const SystemSetting = require('../models/SystemSetting');
+const CallLog = require('../models/CallLog');
 const walletService = require('../services/wallet.service');
 const ApiError = require('../utils/apiError');
 const catchAsync = require('../utils/catchAsync');
@@ -43,9 +44,12 @@ exports.getTransactions = catchAsync(async (req, res, next) => {
   }
 
   // Optional type filter (single transaction type)
-  const validTypes = ['deposit', 'withdrawal', 'subscription', 'tip', 'gift', 'ppv_unlock', 'call_billing', 'live_entry', 'store_purchase'];
   if (validTypes.includes(type)) {
-    query.type = type;
+    if (type === 'gift' || type === 'tip') {
+      query.type = { $in: ['gift', 'tip'] };
+    } else {
+      query.type = type;
+    }
   }
 
   const [transactions, total, summary, spendingByType] = await Promise.all([
@@ -96,6 +100,23 @@ exports.getTransactions = catchAsync(async (req, res, next) => {
       { $sort: { coins: -1 } }
     ])
   ]);
+
+  // Batch resolve missing callType metadata for call_billing transactions from CallLog
+  const callBillingTxs = transactions.filter((t) => t.type === 'call_billing' && (!t.metadata || !t.metadata.callType));
+  if (callBillingTxs.length > 0) {
+    const callLogIds = [...new Set(callBillingTxs.map((t) => t.referenceId).filter(Boolean))];
+    if (callLogIds.length > 0) {
+      const callLogs = await CallLog.find({ _id: { $in: callLogIds } }).select('type');
+      const callTypeMap = {};
+      callLogs.forEach((cl) => { callTypeMap[cl._id.toString()] = cl.type; });
+      callBillingTxs.forEach((t) => {
+        if (t.referenceId && callTypeMap[t.referenceId.toString()]) {
+          if (!t.metadata) t.metadata = {};
+          t.metadata.callType = callTypeMap[t.referenceId.toString()];
+        }
+      });
+    }
+  }
 
   res.status(200).json({
     status: 'success',
