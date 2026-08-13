@@ -223,6 +223,17 @@
   animation: pulse 2s infinite;
 }
 
+.offlineStatus {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.offlineDot {
+  width: 8px;
+  height: 8px;
+  background: #6b7280;
+  border-radius: 50%;
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }

@@ -31,6 +31,8 @@ export const IncomingCallProvider = ({ children }) => {
   const [rechargeOpen, setRechargeOpen] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
 
+  const isFan = user?.role === 'fan';
+
   // The gift summary pill can be dismissed so it doesn't crowd small screens.
   // It stays hidden for the rest of the call (per-call state — fresh each call).
   const [giftSummaryDismissed, setGiftSummaryDismissed] = useState(false);
@@ -485,16 +487,18 @@ export const IncomingCallProvider = ({ children }) => {
                       >
                         {balance.toLocaleString()}
                       </span>
-                      <button
-                        className={styles.callRechargeBtn}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setRechargeOpen(true);
-                        }}
-                        title="Recharge coins"
-                      >
-                        <Coins size={11} /> Recharge
-                      </button>
+                      {isFan && (
+                        <button
+                          className={styles.callRechargeBtn}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setRechargeOpen(true);
+                          }}
+                          title="Recharge coins"
+                        >
+                          <Coins size={11} /> Recharge
+                        </button>
+                      )}
                     </span>
                   </span>
 

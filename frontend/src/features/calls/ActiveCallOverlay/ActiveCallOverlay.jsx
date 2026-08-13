@@ -100,16 +100,18 @@ export const ActiveCallOverlay = ({
                 {balance.toLocaleString()} Coins
               </span>
             </div>
-            <button
-              className={styles.callRechargeBtn}
-              onClick={(e) => {
-                e.stopPropagation();
-                onRecharge();
-              }}
-              title="Recharge coins"
-            >
-              <Coins size={12} /> Recharge
-            </button>
+            {isFan && (
+              <button
+                className={styles.callRechargeBtn}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRecharge();
+                }}
+                title="Recharge coins"
+              >
+                <Coins size={12} /> Recharge
+              </button>
+            )}
           </div>
         </div>
 

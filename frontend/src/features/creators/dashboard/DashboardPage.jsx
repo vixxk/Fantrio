@@ -81,10 +81,13 @@ export const DashboardPage = () => {
             if (!prev || !prev.quickActions) return prev;
             const updatedActions = prev.quickActions.map((action) => {
               if (action.id === 'audio') {
-                return { ...action, isOnline: payload.isOnline && payload.audioAvailable !== false };
+                return { ...action, isOnline: !!(payload.isOnline && payload.showOnlineStatus !== false && payload.audioAvailable !== false) };
               }
               if (action.id === 'video') {
-                return { ...action, isOnline: payload.isOnline && payload.videoAvailable !== false };
+                return { ...action, isOnline: !!(payload.isOnline && payload.showOnlineStatus !== false && payload.videoAvailable !== false) };
+              }
+              if (action.id === 'messages') {
+                return { ...action, isOnline: !!(payload.isOnline && payload.showOnlineStatus !== false) };
               }
               return action;
             });
@@ -557,9 +560,13 @@ export const DashboardPage = () => {
                         <div className={styles.quickActionInfo}>
                           <div className={styles.quickActionHeaderRow}>
                             <h3 className={styles.quickActionTitle}>{action.title}</h3>
-                            {action.isOnline && (
+                            {action.isOnline ? (
                               <div className={styles.onlineStatus}>
                                 <span className={styles.onlineDot} /> {action.id === 'stream' ? (action.goLiveBtnLabel === 'Streaming Now' ? 'LIVE' : 'Online') : 'Online'}
+                              </div>
+                            ) : (
+                              <div className={`${styles.onlineStatus} ${styles.offlineStatus}`}>
+                                <span className={styles.offlineDot} /> Offline
                               </div>
                             )}
                           </div>

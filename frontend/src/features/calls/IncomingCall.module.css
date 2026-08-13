@@ -107,21 +107,28 @@
   position: absolute;
   top: 110px;
   right: 20px;
-  width: 140px;
-  height: 190px;
+  width: 135px;
+  aspect-ratio: 3 / 4;
+  height: auto;
   border-radius: 16px;
   overflow: hidden;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.35);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
   z-index: 10;
   background: #110d1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.localVideoContainer video,
+.localVideoContainer div,
+.localVideoContainer canvas,
 .localVideo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
 }
 
 .localVideoHidden {
@@ -734,7 +741,8 @@
     top: 175px;
     right: 14px;
     width: 105px;
-    height: 145px;
+    height: auto;
+    aspect-ratio: 3 / 4;
     border-radius: 14px;
     z-index: 10;
   }

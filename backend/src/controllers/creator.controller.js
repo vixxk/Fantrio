@@ -661,7 +661,7 @@ exports.getCreatorDashboard = catchAsync(async (req, res, next) => {
     {
       id: 'audio',
       title: 'Audio Calls',
-      isOnline: profile.audioAvailable !== false,
+      isOnline: !!(profile.isOnline && profile.showOnlineStatus !== false && profile.audioAvailable !== false),
       rate: `${profile.rates.audioCallPerMin || 0}`,
       rateUnit: 'coins/min',
       color: '#10b981',
@@ -671,7 +671,7 @@ exports.getCreatorDashboard = catchAsync(async (req, res, next) => {
     {
       id: 'video',
       title: 'Video Calls',
-      isOnline: profile.videoAvailable !== false,
+      isOnline: !!(profile.isOnline && profile.showOnlineStatus !== false && profile.videoAvailable !== false),
       rate: `${profile.rates.videoCallPerMin || 0}`,
       rateUnit: 'coins/min',
       color: '#3b82f6',
@@ -682,7 +682,7 @@ exports.getCreatorDashboard = catchAsync(async (req, res, next) => {
       id: 'messages',
       title: 'Messages',
       description: 'Reply to Messages',
-      isOnline: true,
+      isOnline: !!(profile.isOnline && profile.showOnlineStatus !== false),
       unreadCount: unreadMessages,
       color: '#8b5cf6',
       actionLabel: 'Open Messages'
