@@ -111,9 +111,15 @@
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-.closeBtn:hover {
+.closeBtn:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.14);
   color: #fff;
+}
+
+.closeBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .grid {

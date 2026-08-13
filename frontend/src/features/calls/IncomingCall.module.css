@@ -826,24 +826,35 @@
   background: radial-gradient(circle at center, #f5f3ff 0%, #e2e8f0 100%);
 }
 
+.light .callName,
 .light .name {
-  color: #0f172a;
+  color: #0f172a !important;
 }
 
-.light .username {
-  color: rgba(15, 23, 42, 0.65);
+.light .callUsername,
+.light .username,
+.light .handle {
+  color: #475569 !important;
 }
 
-.light .blink {
-  color: #334155;
+.light .statusBlink,
+.light .blink,
+.light .connectingText {
+  color: #e10075 !important;
+  font-weight: 700;
 }
 
-.light .duration {
-  color: #0f172a;
+.light .duration,
+.light .durationText {
+  color: #0f172a !important;
+  font-weight: 800;
 }
 
-.light .rate {
-  color: #d97706;
+.light .billingRate,
+.light .rate,
+.light .rateText {
+  color: #d97706 !important;
+  font-weight: 700;
 }
 
 .light .localVideoContainer {
@@ -927,32 +938,54 @@
 }
 
 /* Call End Confirmation Modal Light Mode */
+.light.confirmModalBackdrop,
 .light .confirmModalBackdrop {
-  background: rgba(15, 23, 42, 0.5);
-  backdrop-filter: blur(8px);
+  background: rgba(15, 23, 42, 0.45) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
 }
 
-.light .confirmModalBox {
-  background: #ffffff;
-  border-color: rgba(0, 0, 0, 0.1);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+.light .confirmModalBox,
+.light.confirmModalBox {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18) !important;
+}
+
+.light .confirmModalIcon {
+  background: rgba(239, 68, 68, 0.12) !important;
+  border: 1px solid rgba(239, 68, 68, 0.25) !important;
+}
+
+.light .confirmPhoneIcon {
+  color: #ef4444 !important;
 }
 
 .light .confirmModalTitle {
-  color: #0f172a;
+  color: #0f172a !important;
 }
 
 .light .confirmModalText {
-  color: #475569;
+  color: #475569 !important;
+}
+
+.light .confirmModalText strong {
+  color: #0f172a !important;
 }
 
 .light .confirmModalCancelBtn {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
-  color: #334155;
+  background: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #334155 !important;
 }
 
 .light .confirmModalCancelBtn:hover {
-  background: #e2e8f0;
-  color: #0f172a;
+  background: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+.light .confirmModalEndBtn {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3) !important;
 }

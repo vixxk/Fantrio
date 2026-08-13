@@ -91,7 +91,7 @@ export const GiftPanel = ({ type = 'chat', receiverName = 'this creator', balanc
   };
 
   return (
-    <div className={`${styles.backdrop} ${!darkMode ? styles.light : styles.dark}`} onClick={onClose}>
+    <div className={`${styles.backdrop} ${!darkMode ? styles.light : styles.dark}`} onClick={() => !sendingId && onClose()}>
       <div className={styles.sheet} onClick={(e) => e.stopPropagation()}>
         <div className={styles.handle} />
 
@@ -105,7 +105,12 @@ export const GiftPanel = ({ type = 'chat', receiverName = 'this creator', balanc
               <img src="/coin.png" alt="Coin" className={styles.coinImg} />
               {safeBalance.toLocaleString()}
             </span>
-            <button className={styles.closeBtn} onClick={onClose} aria-label="Close">
+            <button
+              className={styles.closeBtn}
+              onClick={onClose}
+              disabled={!!sendingId}
+              aria-label="Close"
+            >
               <X size={18} />
             </button>
           </div>
@@ -157,7 +162,7 @@ export const GiftPanel = ({ type = 'chat', receiverName = 'this creator', balanc
 
         {/* Gift Confirmation Modal */}
         {confirmGift && (
-          <div className={styles.confirmBackdrop} onClick={() => setConfirmGift(null)}>
+          <div className={styles.confirmBackdrop} onClick={() => !sendingId && setConfirmGift(null)}>
             <div className={styles.confirmBox} onClick={(e) => e.stopPropagation()}>
               <div className={styles.confirmEmoji}>{confirmGift.emoji}</div>
               <h4 className={styles.confirmTitle}>Send {confirmGift.name}?</h4>
@@ -173,6 +178,7 @@ export const GiftPanel = ({ type = 'chat', receiverName = 'this creator', balanc
                   type="button"
                   className={styles.confirmCancelBtn}
                   onClick={() => setConfirmGift(null)}
+                  disabled={!!sendingId}
                 >
                   Cancel
                 </button>
@@ -180,8 +186,9 @@ export const GiftPanel = ({ type = 'chat', receiverName = 'this creator', balanc
                   type="button"
                   className={styles.confirmSendBtn}
                   onClick={handleConfirmSend}
+                  disabled={!!sendingId}
                 >
-                  Confirm & Send
+                  {sendingId ? 'Sending...' : 'Confirm & Send'}
                 </button>
               </div>
             </div>

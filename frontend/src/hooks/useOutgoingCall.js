@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
 import { getSocket } from '../services/socket';
 import { useToast } from '../components/Toast/Toast';
+import { useAppDialog } from '../components/AppDialog/AppDialog';
 import { pickAlternatePlaybackDevice } from '../services/agora';
 import { useAgoraCall } from './useAgoraCall';
 import { playRingtone, stopRingtone } from '../utils/ringtone';
@@ -10,6 +11,7 @@ import { playRingtone, stopRingtone } from '../utils/ringtone';
 export const useOutgoingCall = ({ type }) => {
   const { user, balance, refreshBalance } = useApp();
   const { toast } = useToast();
+  const { info } = useAppDialog();
   const [activeCall, setActiveCall] = useState(null); // { creator, status, roomId, callLogId, rate, token }
   const [callDuration, setCallDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
@@ -64,13 +66,9 @@ export const useOutgoingCall = ({ type }) => {
   }, [cleanupTimers, removeSocketListeners, ag]);
 
   const endCall = useCallback(async () => {
-    // Guard against double-end: remote leave (user-left) and the connection
-    // dropping (DISCONNECTED) can fire back-to-back and both reach here.
     if (endingRef.current) return;
     endingRef.current = true;
     const cur = activeCallRef.current;
-    // Release local camera/mic FIRST so the browser's in-use indicator turns
-    // off immediately, then notify the backend (which may be slow or offline).
     clearCall();
     if (cur && cur.roomId) {
       try {
@@ -79,13 +77,11 @@ export const useOutgoingCall = ({ type }) => {
     }
     refreshBalance();
     endingRef.current = false;
-    // Refresh page for caller after call ends or cuts
     setTimeout(() => {
       window.location.reload();
     }, 100);
   }, [clearCall, refreshBalance]);
 
-  // Lock navigation to the ongoing call view while a call is connecting or active
   useEffect(() => {
     const handlePopState = (e) => {
       if (activeCallRef.current) {
@@ -119,9 +115,6 @@ export const useOutgoingCall = ({ type }) => {
 
   const checkMediaPermissions = async (callType) => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return true;
-    // Video calls need BOTH mic and camera — the backend only has one
-    // media permission path, so falling back to audio-only here would leave
-    // the caller in a video call with no video (and no way to fix it).
     const constraints = callType === 'video'
       ? { audio: true, video: true }
       : { audio: true };
@@ -140,17 +133,22 @@ export const useOutgoingCall = ({ type }) => {
       toast.warning('You are already in an active call. End it before starting a new one.');
       return;
     }
-    // A previous call may have left the guard set (e.g. a no-answer timeout
-    // path that ends without going through endCall). Make sure a fresh call
-    // is never blocked by stale state from the previous one.
     endingRef.current = false;
     const rate = creator.rate || creator[videoCall ? 'videoCallPerMin' : 'audioCallPerMin'] || 0;
+
+    // Special themed popup for fans if creator is busy
     if (creator.isBusy) {
-      toast.warning(`${creator.displayName} is currently busy on another call.`);
+      info({
+        title: 'Creator is Busy',
+        message: `${creator.displayName || 'The creator'} is currently in another active call. Please try again in a few minutes.`
+      });
       return;
     }
     if (creator.isOnline === false) {
-      toast.warning(`${creator.displayName} is currently offline and cannot take calls.`);
+      info({
+        title: 'Creator Offline',
+        message: `${creator.displayName || 'The creator'} is currently offline and cannot take call requests right now.`
+      });
       return;
     }
     if (balance < rate) {
@@ -158,7 +156,6 @@ export const useOutgoingCall = ({ type }) => {
       return;
     }
 
-    // Explicitly prompt for Camera / Microphone permissions before starting call trial
     const hasPermission = await checkMediaPermissions(type);
     if (!hasPermission) {
       toast.error(`Microphone ${videoCall ? 'and Camera ' : ''}permission is required for ${type} calls. Please allow permission in your browser settings.`);
@@ -172,7 +169,14 @@ export const useOutgoingCall = ({ type }) => {
         type
       });
     } catch (err) {
-      toast.error(err.message || 'Failed to initiate call');
+      if (err.message && err.message.toLowerCase().includes('busy')) {
+        info({
+          title: 'Creator is Busy',
+          message: `${creator.displayName || 'The creator'} is currently in another active call. Please try again in a few minutes.`
+        });
+      } else {
+        toast.error(err.message || 'Failed to initiate call');
+      }
       return;
     }
 
@@ -193,13 +197,16 @@ export const useOutgoingCall = ({ type }) => {
       setActiveCall((prev) => {
         if (prev && prev.status === 'connecting' && prev.roomId === roomId) {
           callEnded = true;
-          // Drop this call's socket listeners BEFORE clearing so a late
-          // call_accepted/call_rejected for this room can't fire on the
-          // next call the user starts.
           removeSocketListeners();
           try { api.post('/calls/end', { roomId }); } catch { /* noop */ }
           clearCall();
-          toast.info('No answer. Creator did not accept call request.');
+          sessionStorage.setItem('fantrio_call_notice', JSON.stringify({
+            title: 'Call Unanswered',
+            message: `No answer. ${creator.displayName || 'The creator'} did not pick up the call request.`
+          }));
+          setTimeout(() => {
+            window.location.reload();
+          }, 150);
           return null;
         }
         return prev;
@@ -214,16 +221,10 @@ export const useOutgoingCall = ({ type }) => {
       clearTimeout(ringTimeout);
       setActiveCall((prev) => (prev ? { ...prev, status: 'active' } : prev));
       setCallDuration(0);
-      // The call starts with both parties' mic & camera ON (fresh tracks are
-      // created enabled by joinCall). Reset the UI flags so the buttons always
-      // reflect the true state at connect.
       setIsMuted(false);
       setIsCameraOff(false);
       refreshBalance();
 
-      // Join Agora room as the caller. NOTE: the hook expects `channel`, not
-      // `roomId`, and `uid`, not `userId` — a mismatch here silently breaks
-      // the Agora connection even with valid credentials.
       ag.joinCall({
         channel: roomId,
         token: payload?.token || token,
@@ -232,22 +233,21 @@ export const useOutgoingCall = ({ type }) => {
         onRemoteStream: (stream) => setRemoteStream(stream),
         onRemoteLeave: () => endCall(),
         onCallEnded: () => endCall()
-      }).then(() => {
-        if (user?.role !== 'creator' && type === 'video') {
-          setTimeout(() => {
+      }).catch((e) => console.error('join call failed', e));
+
+      durationTimer.current = setInterval(() => {
+        setCallDuration((d) => {
+          const next = d + 1;
+          if (next === 1 && user?.role !== 'creator' && type === 'video') {
             ag.toggleCamera();
             setIsCameraOff(true);
             setTimeout(() => {
               ag.toggleCamera();
               setIsCameraOff(false);
             }, 150);
-          }, 100);
-        }
-      }).catch((e) => console.error('join call failed', e));
-
-      // Start duration + heartbeat
-      durationTimer.current = setInterval(() => {
-        setCallDuration((d) => d + 1);
+          }
+          return next;
+        });
       }, 1000);
       heartbeatTimer.current = setInterval(async () => {
         try {
@@ -266,14 +266,20 @@ export const useOutgoingCall = ({ type }) => {
       if (payload.roomId && payload.roomId !== roomId) return;
       clearTimeout(ringTimeout);
       clearCall();
+      let title = 'Call Declined';
+      let message = `${creator.displayName || 'The creator'} declined your call request.`;
       if (payload?.reason === 'receiver_busy') {
-        toast.info(`${creator.displayName} is busy on another call right now.`);
+        title = 'Creator Busy';
+        message = `${creator.displayName || 'The creator'} is currently busy on another call.`;
       } else if (payload?.reason === 'insufficient_funds') {
-        toast.error('The call could not start — your coin balance is too low.');
-      } else {
-        toast.info('The call was declined.');
+        title = 'Call Failed';
+        message = 'The call could not start — your coin balance is too low.';
       }
+      sessionStorage.setItem('fantrio_call_notice', JSON.stringify({ title, message }));
       refreshBalance();
+      setTimeout(() => {
+        window.location.reload();
+      }, 150);
     };
 
     const handleEnded = (payload) => {

@@ -78,18 +78,20 @@ export const ActiveCallOverlay = ({
       {/* Top Bar for Coin Balance + Quick Recharge + per-call gift summary */}
       <div className={`${styles.callTopBar} ${!controlsVisible ? styles.controlsHidden : ''}`}>
         <div className={styles.topBarRow}>
-          <button
-            type="button"
-            className={`${styles.chimeMuteBtn} ${chimeMuted ? styles.chimeMuteBtnActive : ''}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleChimeMuted();
-            }}
-            title={chimeMuted ? 'Unmute gift chimes' : 'Mute gift chimes'}
-            aria-label={chimeMuted ? 'Unmute gift chimes' : 'Mute gift chimes'}
-          >
-            {chimeMuted ? <BellOff size={14} /> : <Bell size={14} />}
-          </button>
+          {!isFan && (
+            <button
+              type="button"
+              className={`${styles.chimeMuteBtn} ${chimeMuted ? styles.chimeMuteBtnActive : ''}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleChimeMuted();
+              }}
+              title={chimeMuted ? 'Unmute gift chimes' : 'Mute gift chimes'}
+              aria-label={chimeMuted ? 'Unmute gift chimes' : 'Mute gift chimes'}
+            >
+              {chimeMuted ? <BellOff size={14} /> : <Bell size={14} />}
+            </button>
+          )}
           <div className={styles.callBalanceChip}>
             <div className={styles.callCoinInfo}>
               <img src="/coin.png" alt="Coin" className={styles.callCoinImg} />
@@ -355,7 +357,7 @@ export const ActiveCallOverlay = ({
 
       {/* Modern Theme-matched Call End Confirmation Modal */}
       {showEndConfirm && (
-        <div className={styles.confirmModalBackdrop} onClick={() => setShowEndConfirm(false)}>
+        <div className={`${styles.confirmModalBackdrop} ${!darkMode ? styles.light : ''}`} onClick={() => setShowEndConfirm(false)}>
           <div className={styles.confirmModalBox} onClick={(e) => e.stopPropagation()}>
             <div className={styles.confirmModalIcon}>
               <Phone size={24} className={styles.confirmPhoneIcon} />

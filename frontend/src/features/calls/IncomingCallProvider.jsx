@@ -11,6 +11,7 @@ import { GiftOverlay } from '../gifts/GiftOverlay';
 import { GiftPanel } from '../gifts/GiftPanel';
 import { QuickRecharge } from '../gifts/QuickRecharge';
 import { playRingtone, stopRingtone } from '../../utils/ringtone';
+import { useAppDialog } from '../../components/AppDialog/AppDialog';
 import styles from './IncomingCall.module.css';
 
 const IncomingCallContext = createContext(null);
@@ -21,6 +22,7 @@ export const useIncomingCall = () => useContext(IncomingCallContext);
 export const IncomingCallProvider = ({ children }) => {
   const { user, refreshBalance, balance, darkMode } = useApp();
   const { toast } = useToast();
+  const { info } = useAppDialog();
   const [incoming, setIncoming] = useState(null);
   const [active, setActive] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
@@ -32,6 +34,25 @@ export const IncomingCallProvider = ({ children }) => {
   const [controlsVisible, setControlsVisible] = useState(true);
 
   const isFan = user?.role === 'fan';
+
+  // Check for post-reload call notice (e.g. Call Declined / No Answer)
+  useEffect(() => {
+    const rawNotice = sessionStorage.getItem('fantrio_call_notice');
+    if (rawNotice) {
+      try {
+        const notice = JSON.parse(rawNotice);
+        sessionStorage.removeItem('fantrio_call_notice');
+        setTimeout(() => {
+          info({
+            title: notice.title || 'Call Update',
+            message: notice.message || 'The call request was updated.'
+          });
+        }, 350);
+      } catch {
+        sessionStorage.removeItem('fantrio_call_notice');
+      }
+    }
+  }, [info]);
 
   // The gift summary pill can be dismissed so it doesn't crowd small screens.
   // It stays hidden for the rest of the call (per-call state — fresh each call).
@@ -77,11 +98,16 @@ export const IncomingCallProvider = ({ children }) => {
   const durationTimer = useRef(null);
   const heartbeatTimer = useRef(null);
   const activeRef = useRef(null);
+  const incomingRef = useRef(null);
   const endingRef = useRef(false);
 
   useEffect(() => {
     activeRef.current = active;
   }, [active]);
+
+  useEffect(() => {
+    incomingRef.current = incoming;
+  }, [incoming]);
 
   // Connect socket when user logs in and register to their room
   useEffect(() => {
@@ -93,12 +119,13 @@ export const IncomingCallProvider = ({ children }) => {
 
   const ringTimeoutRef = useRef(null);
 
-  // Listen for incoming calls
+  // Listen for incoming calls & call cancellation/ended events in real time
   useEffect(() => {
     if (!user?.id) return;
     const socket = getSocket();
+
     const handleIncoming = (payload) => {
-      if (activeRef.current || incoming) {
+      if (activeRef.current || incomingRef.current) {
         // Receiver busy: auto reject
         try {
           api.post(`/calls/reject/${payload.callLogId}`);
@@ -124,12 +151,52 @@ export const IncomingCallProvider = ({ children }) => {
       }, 30000);
     };
 
+    const handleCallEnded = (payload) => {
+      const curInc = incomingRef.current;
+      const curAct = activeRef.current;
+      if (!payload?.roomId || payload.roomId === curInc?.roomId || payload.roomId === curAct?.roomId || payload.callLogId === curInc?.callLogId) {
+        stopRingtone();
+        ag.endCall();
+        if (ringTimeoutRef.current) clearTimeout(ringTimeoutRef.current);
+        setIncoming(null);
+        if (curAct) {
+          endActiveCallRef.current(false);
+        }
+      }
+    };
+
     socket.on('incoming_call', handleIncoming);
+    socket.on('call_ended', handleCallEnded);
+    socket.on('call_cancelled', handleCallEnded);
+    socket.on('call_rejected', handleCallEnded);
+
     return () => {
       socket.off('incoming_call', handleIncoming);
+      socket.off('call_ended', handleCallEnded);
+      socket.off('call_cancelled', handleCallEnded);
+      socket.off('call_rejected', handleCallEnded);
       if (ringTimeoutRef.current) clearTimeout(ringTimeoutRef.current);
     };
-  }, [user, incoming, ag]);
+  }, [user, ag]);
+
+  // Lock navigation to call overlay during active or incoming calls
+  useEffect(() => {
+    const handlePopState = (e) => {
+      if (activeRef.current || incomingRef.current) {
+        e?.preventDefault?.();
+        window.history.pushState(null, '', window.location.href);
+      }
+    };
+
+    if (active || incoming) {
+      window.history.pushState(null, '', window.location.href);
+      window.addEventListener('popstate', handlePopState);
+    }
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [active, incoming]);
 
   const cleanupTimers = useCallback(() => {
     stopRingtone();
@@ -244,20 +311,20 @@ export const IncomingCallProvider = ({ children }) => {
       setIsMuted(false);
       setIsCameraOff(false);
 
-      if (user?.role !== 'creator' && type === 'video') {
-        setTimeout(() => {
-          ag.toggleCamera();
-          setIsCameraOff(true);
-          setTimeout(() => {
-            ag.toggleCamera();
-            setIsCameraOff(false);
-          }, 150);
-        }, 100);
-      }
-
       // Duration timer
       durationTimer.current = setInterval(() => {
-        setCallDuration((d) => d + 1);
+        setCallDuration((d) => {
+          const next = d + 1;
+          if (next === 1 && user?.role !== 'creator' && type === 'video') {
+            ag.toggleCamera();
+            setIsCameraOff(true);
+            setTimeout(() => {
+              ag.toggleCamera();
+              setIsCameraOff(false);
+            }, 150);
+          }
+          return next;
+        });
       }, 1000);
     } catch (err) {
       console.error('accept call failed', err);
@@ -485,18 +552,20 @@ export const IncomingCallProvider = ({ children }) => {
               <>
                 <div className={`${styles.callTopBar} ${!controlsVisible ? styles.controlsHidden : ''}`}>
                   <span className={styles.topBarRow}>
-                    <button
-                      type="button"
-                      className={`${styles.chimeMuteBtn} ${chimeMuted ? styles.chimeMuteBtnActive : ''}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleChimeMuted();
-                      }}
-                      title={chimeMuted ? 'Unmute gift chimes' : 'Mute gift chimes'}
-                      aria-label={chimeMuted ? 'Unmute gift chimes' : 'Mute gift chimes'}
-                    >
-                      {chimeMuted ? <BellOff size={14} /> : <Bell size={14} />}
-                    </button>
+                    {!isFan && (
+                      <button
+                        type="button"
+                        className={`${styles.chimeMuteBtn} ${chimeMuted ? styles.chimeMuteBtnActive : ''}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleChimeMuted();
+                        }}
+                        title={chimeMuted ? 'Unmute gift chimes' : 'Mute gift chimes'}
+                        aria-label={chimeMuted ? 'Unmute gift chimes' : 'Mute gift chimes'}
+                      >
+                        {chimeMuted ? <BellOff size={14} /> : <Bell size={14} />}
+                      </button>
+                    )}
                     <span className={styles.callBalanceChip}>
                       <img src="/coin.png" alt="Coin" className={styles.callCoinImg} />
                       <span
@@ -606,7 +675,7 @@ export const IncomingCallProvider = ({ children }) => {
 
       {/* Theme End Call Confirmation Modal */}
       {showEndConfirm && (
-        <div className={styles.confirmModalBackdrop} onClick={() => setShowEndConfirm(false)}>
+        <div className={`${styles.confirmModalBackdrop} ${!darkMode ? styles.light : ''}`} onClick={() => setShowEndConfirm(false)}>
           <div className={styles.confirmModalBox} onClick={(e) => e.stopPropagation()}>
             <div className={styles.confirmModalIcon}>
               <Phone size={24} className={styles.confirmPhoneIcon} />
