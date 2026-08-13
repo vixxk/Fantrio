@@ -60,12 +60,10 @@ export const FanLiveStreamOverlay = ({
     <div className={`${styles.overlayContainer} ${!darkMode ? styles.light : ''}`}>
       {/* Main Video View Area */}
       <div className={styles.videoArea}>
-        {/* Agora Remote Video Element */}
-        <video
+        {/* Agora Remote Video Container */}
+        <div
           ref={(el) => el && viewer?.attachVideo && viewer.attachVideo(el)}
           className={styles.videoElement}
-          playsInline
-          autoPlay
           style={{ display: viewer?.isPlaying ? 'block' : 'none' }}
         />
 

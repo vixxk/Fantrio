@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { api } from '../../../services/api';
 import { useApp } from '../../../context/AppContext';
 import { useLiveStreamHost } from '../../../hooks/useLiveStreamHost';
 import { useGiftEvents } from '../../../hooks/useGiftEvents';
@@ -59,15 +60,20 @@ export const CreatorLiveStreamOverlay = ({ liveStream, onEndStream }) => {
   const [chatDraft, setChatDraft] = useState('');
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showConfirmEnd, setShowConfirmEnd] = useState(false);
+  const [endingStream, setEndingStream] = useState(false);
   const chatListRef = useRef(null);
 
   // Initialize Host session
+  const roomId = liveStream?.roomId;
+  const agoraToken = liveStream?.agoraToken;
+  const userId = user?.id || user?._id;
+
   useEffect(() => {
-    if (liveStream && liveStream.roomId && liveStream.agoraToken) {
+    if (roomId && agoraToken && userId) {
       startHost({
-        channel: liveStream.roomId,
-        token: liveStream.agoraToken,
-        uid: user?.id || user?._id
+        channel: roomId,
+        token: agoraToken,
+        uid: userId
       }).catch((err) => {
         console.warn('Host streaming auto-start error:', err);
       });
@@ -75,7 +81,7 @@ export const CreatorLiveStreamOverlay = ({ liveStream, onEndStream }) => {
     return () => {
       stopHost();
     };
-  }, [liveStream, user, startHost, stopHost]);
+  }, [roomId, agoraToken, userId]);
 
   // Auto scroll chat to newest message
   useEffect(() => {
@@ -91,9 +97,21 @@ export const CreatorLiveStreamOverlay = ({ liveStream, onEndStream }) => {
     if (sent) setChatDraft('');
   };
 
-  const handleConfirmEnd = () => {
-    stopHost();
-    if (onEndStream) onEndStream();
+  const handleConfirmEnd = async () => {
+    if (endingStream) return;
+    setEndingStream(true);
+    try {
+      if (liveStream?._id) {
+        await api.post('/creators/live/end', { streamId: liveStream._id });
+      }
+    } catch (err) {
+      console.error('Error ending live stream:', err);
+    } finally {
+      stopHost();
+      setEndingStream(false);
+      setShowConfirmEnd(false);
+      if (onEndStream) onEndStream();
+    }
   };
 
   if (!liveStream) return null;
@@ -102,13 +120,10 @@ export const CreatorLiveStreamOverlay = ({ liveStream, onEndStream }) => {
     <div className={`${styles.overlayContainer} ${!darkMode ? styles.light : ''}`}>
       {/* Video Stream Area */}
       <div className={styles.videoArea}>
-        {/* Video Element for Camera ON */}
-        <video
+        {/* Agora Video Container for Camera ON */}
+        <div
           ref={(el) => attachLocalVideo(el)}
           className={styles.videoElement}
-          playsInline
-          autoPlay
-          muted
           style={{ display: isCameraOn ? 'block' : 'none' }}
         />
 
@@ -273,26 +288,33 @@ export const CreatorLiveStreamOverlay = ({ liveStream, onEndStream }) => {
         />
       )}
 
-      {/* End Stream Confirmation Modal */}
+      {/* End Stream Confirmation Modal (Theme Matched) */}
       {showConfirmEnd && (
-        <div className={styles.modalBackdrop} onClick={() => setShowConfirmEnd(false)}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <h3 className={styles.modalTitle}>End Live Stream?</h3>
-            <p className={styles.modalText}>
-              Are you sure you want to end this live stream session? Viewers will be notified.
+        <div className={`${styles.confirmModalBackdrop} ${!darkMode ? styles.light : ''}`} onClick={() => !endingStream && setShowConfirmEnd(false)}>
+          <div className={styles.confirmModalBox} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.confirmModalIcon}>
+              <Radio size={24} className={styles.confirmRadioIcon} />
+            </div>
+            <h3 className={styles.confirmModalTitle}>End Live Stream?</h3>
+            <p className={styles.confirmModalText}>
+              Are you sure you want to end this live stream session? Your viewers will be disconnected and session metrics saved.
             </p>
-            <div className={styles.modalActions}>
+            <div className={styles.confirmModalActions}>
               <button
-                className={styles.cancelModalBtn}
+                type="button"
+                className={styles.confirmModalCancelBtn}
                 onClick={() => setShowConfirmEnd(false)}
+                disabled={endingStream}
               >
                 Continue Live
               </button>
               <button
-                className={styles.confirmModalBtn}
+                type="button"
+                className={styles.confirmModalEndBtn}
                 onClick={handleConfirmEnd}
+                disabled={endingStream}
               >
-                End Stream Now
+                {endingStream ? 'Ending...' : 'End Stream Now'}
               </button>
             </div>
           </div>

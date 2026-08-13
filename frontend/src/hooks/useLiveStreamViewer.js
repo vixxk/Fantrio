@@ -42,15 +42,38 @@ export const useLiveStreamViewer = () => {
       onStreamEndedRef.current = onStreamEnded;
 
       const handleUserPublished = async (user, mediaType) => {
-        if (mediaType !== 'video') return;
         await subscribeToUser(c, user, mediaType);
-        if (user.videoTrack) {
+        if (mediaType === 'video' && user.videoTrack) {
           remoteTrackRef.current = user.videoTrack;
-          if (videoElRef.current) user.videoTrack.play(videoElRef.current);
+          if (videoElRef.current) {
+            try {
+              user.videoTrack.play(videoElRef.current);
+            } catch (e) {
+              console.warn('Remote video play error:', e);
+            }
+          }
           setIsPlaying(true);
+        } else if (mediaType === 'audio' && user.audioTrack) {
+          try {
+            user.audioTrack.play();
+          } catch (e) {
+            console.warn('Remote audio play error:', e);
+          }
         }
       };
       onUserPublished(c, handleUserPublished);
+
+      // Check existing remote users who were already in the channel when joining
+      if (c.remoteUsers && c.remoteUsers.length > 0) {
+        for (const u of c.remoteUsers) {
+          if (u.hasVideo) {
+            handleUserPublished(u, 'video');
+          }
+          if (u.hasAudio) {
+            handleUserPublished(u, 'audio');
+          }
+        }
+      }
 
       const handleUserLeft = () => {
         if (onStreamEndedRef.current) onStreamEndedRef.current();
