@@ -239,9 +239,13 @@ export const useGiftEvents = ({ streamId = null, callRoomId = null, enabled = tr
 
   const sendGift = useCallback(
     async (gift, recipientId) => {
-      const targetId = recipientId || receiverId;
-      if (!targetId) {
-        throw new Error('No gift recipient');
+      let targetId = recipientId || receiverId;
+      if (targetId && typeof targetId === 'object') {
+        targetId = targetId._id || targetId.id || targetId;
+      }
+      targetId = targetId ? String(targetId) : null;
+      if (!targetId || targetId === '[object Object]') {
+        throw new Error('No valid gift recipient');
       }
       const ctx = contextRef.current;
       const res = await api.post(`/monetization/gift/${targetId}`, {

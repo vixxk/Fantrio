@@ -107,6 +107,7 @@ router.delete('/chats/:id', chatAdmin.deleteMessage);
 router.get('/calls', callAdmin.getCalls);
 router.get('/streams', callAdmin.getLiveStreams);
 router.get('/streams/stats', callAdmin.getLiveStreamStats);
+router.get('/streams/:id/details', callAdmin.getStreamDetails);
 router.post('/streams/:id/terminate', callAdmin.terminateStream);
 router.delete('/streams/:id', callAdmin.deleteStream);
 

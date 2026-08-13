@@ -399,12 +399,17 @@ exports.sendGift = catchAsync(async (req, res, next) => {
     return next(new ApiError(404, 'Recipient not found'));
   }
 
-  // Only fans can send gifts to creators
-  if (req.user.role === 'creator') {
-    return next(new ApiError(403, 'Only fans can send gifts to creators'));
+  // Prevent gifting oneself
+  if (targetUserId === req.user._id.toString()) {
+    return next(new ApiError(400, 'You cannot send a gift to yourself'));
   }
+
+  // Check that receiver is a creator (has a CreatorProfile or role)
   if (receiver.role !== 'creator') {
-    return next(new ApiError(400, 'Gifts can only be sent to creators'));
+    const isCreatorProfile = await CreatorProfile.exists({ userId: targetUserId });
+    if (!isCreatorProfile) {
+      return next(new ApiError(400, 'Gifts can only be sent to creators'));
+    }
   }
 
   // Blocked-user guards (same policy as tipping)

@@ -1,0 +1,563 @@
+/* Fan Live Stream Instagram-style Full Screen Overlay */
+.overlayContainer {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #050508;
+  color: #ffffff;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  user-select: none;
+}
+
+/* Light Theme Override */
+.light {
+  background: #0f0f14;
+  color: #ffffff;
+}
+
+/* Main Video Area */
+.videoArea {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.videoElement {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #000;
+}
+
+/* Camera OFF / Waiting Video View */
+.cameraOffView {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, #240b22 0%, #0d040f 70%, #000000 100%);
+  gap: 1.25rem;
+  z-index: 1;
+}
+
+.avatarPulseContainer {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pulseRing1,
+.pulseRing2,
+.pulseRing3 {
+  position: absolute;
+  inset: -15px;
+  border-radius: 50%;
+  border: 2px solid rgba(225, 0, 117, 0.4);
+  animation: pulseAura 3s infinite ease-out;
+}
+
+.pulseRing2 {
+  animation-delay: 1s;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.pulseRing3 {
+  animation-delay: 2s;
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+@keyframes pulseAura {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.45);
+    opacity: 0;
+  }
+}
+
+.cameraOffAvatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e10075;
+  box-shadow: 0 0 30px rgba(225, 0, 117, 0.5);
+  position: relative;
+  z-index: 2;
+}
+
+.cameraOffBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.9);
+  padding: 0.4rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Vignette Gradients */
+.topVignette {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 140px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.bottomVignette {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 280px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.5) 60%, rgba(0, 0, 0, 0) 100%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Instagram Header Bar */
+.headerBar {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  right: 1rem;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.creatorInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 0.35rem 0.75rem 0.35rem 0.4rem;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid #e10075;
+}
+
+.nameBlock {
+  display: flex;
+  flex-direction: column;
+}
+
+.displayName {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.streamTitle {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.headerMetaRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.liveTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: linear-gradient(135deg, #e10075 0%, #ff0055 100%);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  letter-spacing: 0.05em;
+  box-shadow: 0 0 12px rgba(225, 0, 117, 0.5);
+}
+
+.liveDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.viewerChip {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 0.3rem 0.65rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.headerRightControls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.leaderboardBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(225, 0, 117, 0.25) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #fbbf24;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.leaderboardBtn:hover {
+  transform: translateY(-1px);
+  border-color: #fbbf24;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.closeBtn {
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.closeBtn:hover {
+  background: rgba(239, 68, 68, 0.8);
+  transform: scale(1.05);
+}
+
+/* Floating Chat Overlay */
+.floatingChatContainer {
+  position: absolute;
+  bottom: 80px;
+  left: 1rem;
+  width: min(380px, 85vw);
+  max-height: 280px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  pointer-events: auto;
+}
+
+.chatMessageList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+  padding-right: 0.4rem;
+  max-height: 260px;
+  scroll-behavior: smooth;
+}
+
+.chatMessageList::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chatMessageList::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.chatBubble {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.4rem 0.75rem;
+  border-radius: 16px;
+  animation: slideUp 0.25s ease-out;
+  align-self: flex-start;
+  max-width: 100%;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chatAvatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.chatBody {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.chatSenderName {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.2;
+}
+
+.chatText {
+  font-size: 0.8rem;
+  color: #ffffff;
+  word-break: break-word;
+  line-height: 1.35;
+}
+
+/* Bottom Action Bar */
+.bottomActionBar {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  right: 1rem;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.chatComposerForm {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  padding: 0.35rem 0.5rem 0.35rem 0.85rem;
+}
+
+.composerInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-size: 0.84rem;
+}
+
+.composerInput::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.emojiBtn {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0 0.2rem;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.emojiBtn:hover {
+  opacity: 1;
+}
+
+.composerSendBtn {
+  background: #e10075;
+  color: #ffffff;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.composerSendBtn:hover:not(:disabled) {
+  background: #c5006a;
+  transform: scale(1.05);
+}
+
+.composerSendBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.actionButtonsGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.giftTriggerBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: linear-gradient(135deg, #e10075 0%, #ff0055 100%);
+  color: #ffffff;
+  border: none;
+  padding: 0.55rem 0.9rem;
+  border-radius: 24px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(225, 0, 117, 0.4);
+  transition: all 0.2s ease;
+}
+
+.giftTriggerBtn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 20px rgba(225, 0, 117, 0.6);
+}
+
+.balanceChip {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0.4rem 0.75rem;
+  border-radius: 24px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fbbf24;
+}
+
+.rechargePlusBtn {
+  background: rgba(245, 158, 11, 0.25);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.15rem 0.4rem;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-left: 0.2rem;
+}
+
+.rechargePlusBtn:hover {
+  background: rgba(245, 158, 11, 0.4);
+}
+
+.coinImg {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 640px) {
+  .headerBar {
+    top: 0.75rem;
+    left: 0.75rem;
+    right: 0.75rem;
+  }
+
+  .floatingChatContainer {
+    bottom: 75px;
+    left: 0.75rem;
+    width: calc(100vw - 1.5rem);
+    max-height: 220px;
+  }
+
+  .bottomActionBar {
+    bottom: 0.75rem;
+    left: 0.75rem;
+    right: 0.75rem;
+    gap: 0.4rem;
+  }
+
+  .giftTriggerBtn {
+    padding: 0.55rem 0.7rem;
+  }
+
+  .streamTitle {
+    display: none;
+  }
+}

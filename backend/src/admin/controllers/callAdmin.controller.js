@@ -291,3 +291,115 @@ exports.terminateStream = catchAsync(async (req, res, next) => {
     stream
   });
 });
+
+// Detailed admin stream analytics: tipping/gift logs, gifts leaderboard, viewers list
+exports.getStreamDetails = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  const stream = await LiveStream.findById(id)
+    .populate('creatorId', 'username displayName avatarUrl isVerifiedBadge')
+    .populate('viewers', 'username displayName avatarUrl isVerifiedBadge');
+
+  if (!stream) {
+    return next(new ApiError(404, 'Live stream not found'));
+  }
+
+  const Transaction = require('../../models/Transaction');
+
+  const transactions = await Transaction.find({
+    referenceId: id,
+    status: 'completed'
+  })
+    .populate('senderId', 'displayName username avatarUrl isVerifiedBadge')
+    .sort({ createdAt: -1 })
+    .lean();
+
+  const tippingLogs = transactions.map((t) => {
+    const meta = t.metadata || {};
+    return {
+      _id: t._id,
+      type: t.type,
+      amountCoins: t.amountCoins || 0,
+      giftName: meta.giftName || (t.type === 'live_entry' ? 'Entry Fee' : 'Tip'),
+      giftEmoji: meta.giftEmoji || (t.type === 'live_entry' ? '🎟️' : '🪙'),
+      giftCoins: meta.giftCoins || t.amountCoins || 0,
+      giftTier: meta.giftTier || 1,
+      sender: t.senderId
+        ? {
+            id: t.senderId._id,
+            displayName: t.senderId.displayName || t.senderId.username || 'Fan',
+            username: t.senderId.username,
+            avatarUrl: t.senderId.avatarUrl || ''
+          }
+        : { displayName: 'Anonymous', avatarUrl: '' },
+      createdAt: t.createdAt
+    };
+  });
+
+  const giftsMap = new Map();
+  transactions.forEach((t) => {
+    if (!t.senderId) return;
+    const senderId = String(t.senderId._id);
+    const existing = giftsMap.get(senderId) || {
+      userId: senderId,
+      displayName: t.senderId.displayName || t.senderId.username || 'Fan',
+      username: t.senderId.username || '',
+      avatarUrl: t.senderId.avatarUrl || '',
+      totalCoins: 0,
+      giftCount: 0
+    };
+    existing.totalCoins += Number(t.amountCoins) || 0;
+    if (t.type === 'gift') {
+      existing.giftCount += 1;
+    }
+    giftsMap.set(senderId, existing);
+  });
+
+  const giftsLeaderboard = [...giftsMap.values()].sort((a, b) => b.totalCoins - a.totalCoins);
+  const totalEarningsCoins = transactions.reduce((acc, t) => acc + (Number(t.amountCoins) || 0), 0);
+
+  const viewersList = (stream.viewers || []).map((v) => ({
+    userId: v._id,
+    displayName: v.displayName || v.username || 'Viewer',
+    username: v.username || '',
+    avatarUrl: v.avatarUrl || ''
+  }));
+
+  let durationStr = '0m';
+  if (stream.startedAt) {
+    const end = stream.endedAt ? new Date(stream.endedAt) : new Date();
+    const mins = Math.max(0, Math.round((end - new Date(stream.startedAt)) / 60000));
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    durationStr = h > 0 ? `${h}h ${m}m` : `${m}m`;
+  }
+
+  res.status(200).json({
+    status: 'success',
+    streamDetails: {
+      stream: {
+        _id: stream._id,
+        streamTitle: stream.streamTitle,
+        category: stream.category,
+        language: stream.language,
+        status: stream.status,
+        isLive: stream.isLive,
+        roomId: stream.roomId,
+        startedAt: stream.startedAt,
+        endedAt: stream.endedAt,
+        scheduledAt: stream.scheduledAt,
+        duration: durationStr,
+        viewerCount: stream.viewerCount || 0,
+        peakViewers: stream.peakViewers || 0,
+        totalViews: stream.totalViews || 0,
+        entryPriceCoins: stream.entryPriceCoins || 0,
+        totalEarningsCoins,
+        creator: stream.creatorId
+      },
+      tippingLogs,
+      giftsLeaderboard,
+      viewersList
+    }
+  });
+});
+

@@ -24,6 +24,7 @@ import { GiftOverlay } from '../../gifts/GiftOverlay';
 import { GiftPanel } from '../../gifts/GiftPanel';
 import { GiftLeaderboard } from '../../gifts/GiftLeaderboard';
 import { QuickRecharge } from '../../gifts/QuickRecharge';
+import { FanLiveStreamOverlay } from './FanLiveStreamOverlay';
 import { useToast } from '../../../components/Toast/Toast';
 import styles from './LiveStreamsPage.module.css';
 
@@ -815,12 +816,29 @@ export const LiveStreamsPage = () => {
         </div>
       )}
 
-      {/* Join Stream Modal */}
-      {joinStream && (
+      {/* Active Fan Instagram Live Overlay */}
+      {joinStream && joinResult?.status === 'success' && (
+        <FanLiveStreamOverlay
+          stream={joinStream}
+          viewer={viewer}
+          giftEvents={giftEvents}
+          sendGift={sendGift}
+          giftLeaderboard={giftLeaderboard}
+          giftSummary={giftSummary}
+          chatMessages={chatMessages}
+          sendChatMessage={sendChatMessage}
+          chatSending={chatSending}
+          onLeaveStream={handleLeaveStream}
+          balance={balance}
+        />
+      )}
+
+      {/* Pre-join Stream Confirmation Modal (or Error state) */}
+      {joinStream && (!joinResult || joinResult.status === 'error') && (
         <div className={styles.joinModalBackdrop} onClick={handleLeaveStream}>
           <div className={styles.joinModal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.joinModalHeader}>
-              <h3 className={styles.joinModalTitle}>{joinResult?.status === 'success' ? 'Watching Live' : 'Join Stream'}</h3>
+              <h3 className={styles.joinModalTitle}>Join Stream</h3>
               <button className={styles.joinModalClose} onClick={handleLeaveStream}>
                 <X size={20} />
               </button>
@@ -849,112 +867,9 @@ export const LiveStreamsPage = () => {
                     <p className={styles.joinPriceNote}>This stream is free to join.</p>
                   )}
                 </>
-              ) : joinResult.status === 'error' ? (
+              ) : (
                 <div className={styles.joinErrorBox}>
                   <p className={styles.joinErrorText}>{joinResult.message}</p>
-                </div>
-              ) : (
-                <div className={styles.joinSuccessBox}>
-                  <div className={styles.liveViewerArea}>
-                    <video
-                      ref={(el) => el && viewer.attachVideo(el)}
-                      className={styles.liveViewerVideo}
-                      playsInline
-                      autoPlay
-                    />
-                    {!viewer.isPlaying && (
-                      <div className={styles.liveWaitingOverlay}>
-                        {viewerError ? (
-                          <span className={styles.liveWaitingText}>{viewerError}</span>
-                        ) : (
-                          <>
-                            <Loader2 size={22} className={styles.joinSpin} />
-                            <span className={styles.liveWaitingText}>Waiting for the stream…</span>
-                          </>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  {joinResult.entryPaid && (
-                    <span className={styles.joinSuccessMeta}>
-                      {joinResult.chargeAmount > 0
-                        ? `${joinResult.chargeAmount} coins charged for entry.`
-                        : 'Entry already paid.'}
-                    </span>
-                  )}
-                  <div className={styles.joinStreamLiveInfo}>
-                    <span className={styles.joinSuccessTitle}>
-                      {joinResult.creatorName ? `${joinResult.creatorName}'s Live Stream` : 'Live Stream'}
-                    </span>
-                    <span className={styles.joinSuccessMeta}>
-                      {joinResult.streamTitle} · {joinResult.viewerCount} watching
-                    </span>
-                  </div>
-                  <div className={styles.streamGiftBar}>
-                    <span className={styles.streamBalanceChip}>
-                      <img src="/coin.png" alt="Coin" className={styles.streamCoinImg} />
-                      {balance.toLocaleString()}
-                      <button
-                        className={styles.streamRechargeBtn}
-                        onClick={() => setRechargeOpen(true)}
-                        title="Recharge coins"
-                      >
-                        <Coins size={11} /> Recharge
-                      </button>
-                    </span>
-                    <button className={styles.streamGiftBtn} onClick={() => setGiftOpen(true)}>
-                      <Gift size={16} /> Send Gift
-                    </button>
-                  </div>
-                  {/* Per-stream gift summary — appears after the first gift */}
-                  {giftSummary && giftSummary.sentCount > 0 && (
-                    <div className={styles.streamGiftSummary}>
-                      <Gift size={13} />
-                      <span>You sent</span>
-                      <strong>{giftSummary.sentCount}</strong>
-                      <img src="/coin.png" alt="Coin" className={styles.streamCoinImgSm} />
-                      <span>{giftSummary.sentCoins.toLocaleString()}</span>
-                    </div>
-                  )}
-                  <div className={styles.streamChatBox}>
-                    <div className={styles.streamChatHeader}>
-                      <MessageSquare size={13} />
-                      <span>Live Chat</span>
-                      <span className={styles.streamChatCount}>{chatMessages.length}</span>
-                    </div>
-                    {/* Pinned top-gifters — always visible above the messages */}
-                    <GiftLeaderboard leaderboard={giftLeaderboard} />
-                    <div ref={chatListRef} className={styles.streamChatList}>
-                      {chatMessages.length === 0 ? (
-                        <span className={styles.streamChatEmpty}>No messages yet — say hi!</span>
-                      ) : (
-                        chatMessages.map((m) => (
-                          <div key={m._id} className={styles.streamChatMsg}>
-                            <span className={styles.streamChatName}>{m.displayName}</span>
-                            <span className={styles.streamChatText}>{m.text}</span>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                    <form className={styles.streamChatComposer} onSubmit={handleChatSend}>
-                      <input
-                        type="text"
-                        className={styles.streamChatInput}
-                        placeholder="Send a message…"
-                        maxLength={500}
-                        value={chatDraft}
-                        onChange={(e) => setChatDraft(e.target.value)}
-                      />
-                      <button
-                        type="submit"
-                        className={styles.streamChatSend}
-                        disabled={!chatDraft.trim() || chatSending}
-                        aria-label="Send message"
-                      >
-                        <Send size={14} />
-                      </button>
-                    </form>
-                  </div>
                 </div>
               )}
             </div>
@@ -974,10 +889,8 @@ export const LiveStreamsPage = () => {
                     'Join Stream'
                   )}
                 </button>
-              ) : joinResult.status === 'error' ? (
-                <button className={styles.joinConfirmBtn} onClick={handleLeaveStream}>Close</button>
               ) : (
-                <button className={styles.joinConfirmBtn} onClick={handleLeaveStream}>Leave Stream</button>
+                <button className={styles.joinConfirmBtn} onClick={handleLeaveStream}>Close</button>
               )}
             </div>
           </div>

@@ -9,12 +9,14 @@ import {
   Coins,
   Check,
   Eye,
-  CalendarClock
+  CalendarClock,
+  BarChart2
 } from 'lucide-react';
 import { useAdminUI } from './AdminUI';
 import { SkeletonTable } from './AdminSkeletons';
 import { AdminPeriodFilter } from './AdminPeriodFilter';
 import { AdminFilterButton } from './AdminFilterButton';
+import { StreamDetailsModal } from '../creators/live-streams/StreamDetailsModal';
 import styles from './AdminPage.module.css';
 
 const STATUS_FILTERS = [
@@ -55,6 +57,7 @@ export const AdminLiveStreams = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [detailsStreamId, setDetailsStreamId] = useState(null);
 
   useEffect(() => {
     fetchStreams();
@@ -260,6 +263,10 @@ export const AdminLiveStreams = () => {
                       <td className={styles.cellSub}>{streamStartTime(stream)}</td>
                       <td>
                         <div className={styles.actionBtns}>
+                          <button className={`${styles.buttonControl} ${styles.btnPrimary} ${styles.btnSm}`} onClick={() => setDetailsStreamId(stream._id)} title="View tipping logs & stream analytics">
+                            <BarChart2 size={12} />
+                            Logs & Stats
+                          </button>
                           {stream.status === 'live' && (
                             <button className={`${styles.buttonControl} ${styles.btnWarning} ${styles.btnSm}`} onClick={() => handleTerminate(stream._id)}>
                               <Ban size={12} />
@@ -361,6 +368,9 @@ export const AdminLiveStreams = () => {
                       </div>
                     </div>
                     <div className={styles.actionBtns} style={{ width: '100%' }}>
+                      <button className={`${styles.buttonControl} ${styles.btnPrimary}`} onClick={() => setDetailsStreamId(stream._id)} style={{ flex: 1 }}>
+                        <BarChart2 size={14} /> Logs & Stats
+                      </button>
                       {stream.status === 'live' && (
                         <button className={`${styles.buttonControl} ${styles.btnWarning}`} onClick={() => handleTerminate(stream._id)} style={{ flex: 1 }}>
                           <Ban size={14} /> Terminate
@@ -408,6 +418,14 @@ export const AdminLiveStreams = () => {
             </button>
           </div>
         </div>
+      )}
+
+      {detailsStreamId && (
+        <StreamDetailsModal
+          streamId={detailsStreamId}
+          isAdmin={true}
+          onClose={() => setDetailsStreamId(null)}
+        />
       )}
     </div>
   );

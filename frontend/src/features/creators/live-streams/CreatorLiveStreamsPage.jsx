@@ -10,11 +10,13 @@ import ShimmerSkeleton from '../../../components/ShimmerSkeleton/ShimmerSkeleton
 import {
   Radio, Calendar, Plus, Eye, TrendingUp, Edit2, Zap, Check,
   MessageSquare, Music, Dumbbell, MoreHorizontal, X, Trash2, Loader2,
-  ChevronLeft, ChevronRight, ChevronUp, Send, Gift
+  ChevronLeft, ChevronRight, ChevronUp, Send, Gift, BarChart2
 } from 'lucide-react';
 import { PeriodDropdown } from '../analytics/PeriodDropdown';
 import { DateTimePicker } from '../../../components/DateTimePicker/DateTimePicker';
 import { ConfirmDeleteDialog } from '../../../components/ConfirmDeleteDialog/ConfirmDeleteDialog';
+import { CreatorLiveStreamOverlay } from './CreatorLiveStreamOverlay';
+import { StreamDetailsModal } from './StreamDetailsModal';
 import { DEFAULT_CATEGORIES } from './streamCategories';
 import styles from './CreatorLiveStreamsPage.module.css';
 
@@ -129,6 +131,7 @@ export const CreatorLiveStreamsPage = () => {
   // shape: { type: 'cancel' | 'delete' | 'end', stream }
   const [confirmAction, setConfirmAction] = useState(null);
   const [confirmBusy, setConfirmBusy] = useState(false);
+  const [detailsStreamId, setDetailsStreamId] = useState(null);
 
   // Category options from API (overview.categories) with fallback to defaults
   const categoryOptions = useMemo(() => {
@@ -537,6 +540,14 @@ export const CreatorLiveStreamsPage = () => {
 
   return (
     <div ref={pageRef} className={`${styles.pageContainer} ${!darkMode ? styles.light : ''}`}>
+      {/* Active Host Instagram Live Stream Overlay */}
+      {overview.liveNow && (
+        <CreatorLiveStreamOverlay
+          liveStream={overview.liveNow}
+          onEndStream={() => openConfirm('end', overview.liveNow)}
+        />
+      )}
+
       {/* Main Content Grid */}
       <div className={styles.mainGrid}>
         {/* Left Column */}
@@ -955,6 +966,7 @@ export const CreatorLiveStreamsPage = () => {
                             </td>
                             <td className={styles.td}>
                               <div className={styles.actions}>
+                                <button className={styles.actionBtn} title="View stream audit & tipping logs" onClick={() => setDetailsStreamId(stream._id)}><BarChart2 size={14} /></button>
                                 <button className={styles.actionBtn} title="View analytics" onClick={() => navigateTo('/creators/analytics')}><TrendingUp size={14} /></button>
                                 <button className={styles.actionBtn} title="Delete stream" onClick={() => openConfirm('delete', stream)}><Trash2 size={14} /></button>
                               </div>
@@ -977,6 +989,7 @@ export const CreatorLiveStreamsPage = () => {
                             <div className={styles.mobileRecentTitleRow}>
                               <span className={styles.mobileRecentTitle}>{stream.title}</span>
                               <div className={styles.mobileRecentActions}>
+                                <button className={styles.actionBtn} title="View stream audit & tipping logs" onClick={() => setDetailsStreamId(stream._id)}><BarChart2 size={13} /></button>
                                 <button className={styles.actionBtn} onClick={() => navigateTo('/creators/analytics')}><TrendingUp size={13} /></button>
                                 <button className={styles.actionBtn} title="Delete stream" onClick={() => openConfirm('delete', stream)}><Trash2 size={13} /></button>
                               </div>
@@ -1371,6 +1384,13 @@ export const CreatorLiveStreamsPage = () => {
           </div>
         </div>
       </div>
+
+      {detailsStreamId && (
+        <StreamDetailsModal
+          streamId={detailsStreamId}
+          onClose={() => setDetailsStreamId(null)}
+        />
+      )}
     </div>
   );
 };
