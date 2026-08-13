@@ -898,16 +898,42 @@ exports.getCallStats = catchAsync(async (req, res, next) => {
     { id: 'missedCalls', label: 'Missed Calls', value: String(missedCalls.length), change: missedChange, changeType: missedChange.startsWith('-') ? 'positive' : 'negative', period: prevLabel, icon: 'phoneMissed', color: '#ef4444' }
   ];
 
-  // Recent calls
-  const fanIds = [...new Set(calls.map((c) => c.callerId ? c.callerId.toString() : '').filter(Boolean))];
-  const fans = fanIds.length ? await User.find({ _id: { $in: fanIds } }).select('username displayName avatarUrl') : [];
-  const fanMap = {};
-  fans.forEach((f) => { fanMap[f._id.toString()] = f; });
+  // Gifts per call room ID
+  const roomIds = calls.map((c) => c.roomId).filter(Boolean);
+  let giftsByRoom = {};
+  if (roomIds.length) {
+    const giftTxs = await Transaction.find({
+      type: 'gift',
+      status: 'completed',
+      'metadata.callRoomId': { $in: roomIds }
+    }).select('amountCoins metadata').lean();
+    giftsByRoom = giftTxs.reduce((acc, g) => {
+      const room = g.metadata && g.metadata.callRoomId;
+      if (!room) return acc;
+      acc[room] = (acc[room] || 0) + (Number(g.amountCoins) || 0);
+      return acc;
+    }, {});
+  }
 
   const recentCalls = calls.slice(0, 30).map((c, idx) => {
     const fan = c.callerId ? fanMap[c.callerId.toString()] : null;
     const date = c.createdAt.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
     const time = c.createdAt.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+
+    let durSecs = 0;
+    if (c.startedAt && c.endedAt) {
+      durSecs = Math.max(0, Math.floor((new Date(c.endedAt).getTime() - new Date(c.startedAt).getTime()) / 1000));
+    } else if (c.startedAt && c.status === 'active') {
+      durSecs = Math.max(0, Math.floor((Date.now() - new Date(c.startedAt).getTime()) / 1000));
+    } else if (c.totalMinutesBilling) {
+      durSecs = c.totalMinutesBilling * 60;
+    }
+    const mins = Math.floor(durSecs / 60);
+    const secs = durSecs % 60;
+    const exactDurationStr = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+    const giftsEarned = giftsByRoom[c.roomId] || 0;
+
     return {
       id: idx + 1,
       createdAt: c.createdAt,
@@ -919,7 +945,8 @@ exports.getCallStats = catchAsync(async (req, res, next) => {
       dateTime: `${date}\n${time}`,
       date,
       time,
-      duration: c.totalMinutesBilling ? `${String(Math.floor(c.totalMinutesBilling)).padStart(2, '0')}:${String(Math.round((c.totalMinutesBilling % 1) * 60)).padStart(2, '0')}` : '00:00',
+      duration: exactDurationStr,
+      gifts: giftsEarned > 0 ? `${giftsEarned} coins` : '0 coins',
       earned: `${c.totalCoinsBilled || 0} coins`,
       status: c.status.charAt(0).toUpperCase() + c.status.slice(1),
       type: c.type === 'video' ? 'Video Call' : 'Audio Call',

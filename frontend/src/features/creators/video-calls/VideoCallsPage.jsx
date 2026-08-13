@@ -315,10 +315,10 @@ export const VideoCallsPage = () => {
                 </div>
               </div>
               <div className={styles.heroAiGraphic}>
-                <img src="/video_call_ai.png" alt="AI Video Call" className={styles.aiGraphicImg} />
+                <img src="/video_call_ai.png" alt="Video Call Studio" className={styles.aiGraphicImg} />
                 <div className={styles.aiGraphicBadge}>
                   <span className={styles.aiBadgeDot} />
-                  AI Stream Active
+                  HD Video Call
                 </div>
               </div>
             </div>
@@ -399,6 +399,7 @@ export const VideoCallsPage = () => {
                     <th className={styles.th}>Fan</th>
                     <th className={styles.th}>Date & Time</th>
                     <th className={styles.th}>Duration</th>
+                    <th className={styles.th}>Gifts</th>
                     <th className={styles.th}>Earned</th>
                     <th className={`${styles.th} ${styles.hideMobile}`}>Status</th>
                     <th className={styles.th}></th>
@@ -421,6 +422,7 @@ export const VideoCallsPage = () => {
                         <span className={styles.dateTime}>{call.dateTime}</span>
                       </td>
                       <td className={styles.td}>{call.duration}</td>
+                      <td className={`${styles.td} ${styles.earned}`}>{call.gifts || '0 coins'}</td>
                       <td className={`${styles.td} ${styles.earned}`}>{call.earned}</td>
                       <td className={`${styles.td} ${styles.hideMobile}`}>
                         <span className={`${styles.statusBadge} ${getStatusClass(call.status)}`}>
@@ -445,7 +447,7 @@ export const VideoCallsPage = () => {
                   ))}
                   {visibleRecentCalls.length === 0 && (
                     <tr>
-                      <td className={styles.td} colSpan={6} style={{ textAlign: 'center', padding: '32px 0', opacity: 0.6 }}>
+                      <td className={styles.td} colSpan={7} style={{ textAlign: 'center', padding: '32px 0', opacity: 0.6 }}>
                         No {activeTab === 'All' ? '' : activeTab.toLowerCase() + ' '}video calls yet.
                       </td>
                     </tr>
@@ -652,6 +654,10 @@ export const VideoCallsPage = () => {
               <div className={styles.detailRow}>
                 <span className={styles.detailLabel}>Duration</span>
                 <span className={styles.detailValue}>{detailsCall.duration}</span>
+              </div>
+              <div className={styles.detailRow}>
+                <span className={styles.detailLabel}>Gifts</span>
+                <span className={styles.detailValue}>{detailsCall.gifts || '0 coins'}</span>
               </div>
               <div className={styles.detailRow}>
                 <span className={styles.detailLabel}>Earned</span>

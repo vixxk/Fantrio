@@ -314,10 +314,10 @@ export const AudioCallsPage = () => {
                 </div>
               </div>
               <div className={styles.heroAiGraphic}>
-                <img src="/audio_call_ai.png" alt="AI Audio Call" className={styles.aiGraphicImg} />
+                <img src="/audio_call_ai.png" alt="Audio Call Studio" className={styles.aiGraphicImg} />
                 <div className={styles.aiGraphicBadge}>
                   <span className={styles.aiBadgeDot} />
-                  AI Voice Engine
+                  HD Voice Call
                 </div>
               </div>
             </div>
@@ -398,6 +398,7 @@ export const AudioCallsPage = () => {
                     <th className={styles.th}>Fan</th>
                     <th className={styles.th}>Date & Time</th>
                     <th className={styles.th}>Duration</th>
+                    <th className={styles.th}>Gifts</th>
                     <th className={styles.th}>Earned</th>
                     <th className={`${styles.th} ${styles.hideMobile}`}>Status</th>
                     <th className={styles.th}></th>
@@ -420,6 +421,7 @@ export const AudioCallsPage = () => {
                         <span className={styles.dateTime}>{call.dateTime}</span>
                       </td>
                       <td className={styles.td}>{call.duration}</td>
+                      <td className={`${styles.td} ${styles.earned}`}>{call.gifts || '0 coins'}</td>
                       <td className={`${styles.td} ${styles.earned}`}>{call.earned}</td>
                       <td className={`${styles.td} ${styles.hideMobile}`}>
                         <span className={`${styles.statusBadge} ${getStatusClass(call.status)}`}>
@@ -444,7 +446,7 @@ export const AudioCallsPage = () => {
                   ))}
                   {visibleRecentCalls.length === 0 && (
                     <tr>
-                      <td className={styles.td} colSpan={6} style={{ textAlign: 'center', padding: '32px 0', opacity: 0.6 }}>
+                      <td className={styles.td} colSpan={7} style={{ textAlign: 'center', padding: '32px 0', opacity: 0.6 }}>
                         No {activeTab === 'All' ? '' : activeTab.toLowerCase() + ' '}audio calls yet.
                       </td>
                     </tr>
@@ -661,6 +663,10 @@ export const AudioCallsPage = () => {
               <div className={styles.detailRow}>
                 <span className={styles.detailLabel}>Duration</span>
                 <span className={styles.detailValue}>{detailsCall.duration}</span>
+              </div>
+              <div className={styles.detailRow}>
+                <span className={styles.detailLabel}>Gifts</span>
+                <span className={styles.detailValue}>{detailsCall.gifts || '0 coins'}</span>
               </div>
               <div className={styles.detailRow}>
                 <span className={styles.detailLabel}>Earned</span>
