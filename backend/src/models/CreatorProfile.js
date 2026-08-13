@@ -63,12 +63,12 @@ const creatorProfileSchema = new mongoose.Schema(
       },
       audioCallPerMin: {
         type: Number,
-        default: 0,
+        default: 5,
         min: [0, 'Audio call rate cannot be negative']
       },
       videoCallPerMin: {
         type: Number,
-        default: 0,
+        default: 10,
         min: [0, 'Video call rate cannot be negative']
       }
     },

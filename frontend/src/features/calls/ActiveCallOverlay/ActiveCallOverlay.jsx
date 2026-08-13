@@ -51,17 +51,19 @@ export const ActiveCallOverlay = ({
   return (
     <div className={styles.callModalOverlay}>
       <div className={styles.callTopBar}>
-        <span className={styles.callBalanceChip}>
-          <img src="/coin.png" alt="Coin" className={styles.callCoinImg} />
-          {balance.toLocaleString()}
+        <div className={styles.callBalanceChip}>
+          <div className={styles.callCoinInfo}>
+            <img src="/coin.png" alt="Coin" className={styles.callCoinImg} />
+            <span className={styles.callBalanceText}>{balance.toLocaleString()} Coins</span>
+          </div>
           <button
             className={styles.callRechargeBtn}
             onClick={onRecharge}
             title="Recharge coins"
           >
-            <Coins size={11} /> Recharge
+            <Coins size={12} /> Recharge
           </button>
-        </span>
+        </div>
       </div>
 
       <div className={styles.callModalContent}>

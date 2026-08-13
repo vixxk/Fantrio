@@ -183,11 +183,24 @@ export const VideoCallsPage = () => {
       );
     };
 
-    const handleAvailability = ({ userId, videoAvailable }) => {
+    const handleAvailability = ({ userId, creatorId, isBusy, isOnline, videoAvailable }) => {
+      const targetId = String(userId || creatorId);
       if (videoAvailable === false) {
-        setCreators((prev) => prev.filter((c) => String(c.userId || c._id) !== String(userId)));
+        setCreators((prev) => prev.filter((c) => String(c.userId || c._id) !== targetId));
       } else {
-        loadCreators();
+        setCreators((prev) =>
+          prev.map((c) => {
+            const cId = String(c.userId || c._id);
+            if (cId === targetId) {
+              return {
+                ...c,
+                ...(isBusy !== undefined ? { isBusy } : {}),
+                ...(isOnline !== undefined ? { isOnline } : {})
+              };
+            }
+            return c;
+          })
+        );
       }
     };
 

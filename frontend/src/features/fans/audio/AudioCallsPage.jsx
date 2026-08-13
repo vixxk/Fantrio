@@ -184,11 +184,24 @@ export const AudioCallsPage = () => {
       );
     };
 
-    const handleAvailability = ({ userId, audioAvailable }) => {
+    const handleAvailability = ({ userId, creatorId, isBusy, isOnline, audioAvailable }) => {
+      const targetId = String(userId || creatorId);
       if (audioAvailable === false) {
-        setCreators((prev) => prev.filter((c) => String(c.userId || c._id) !== String(userId)));
+        setCreators((prev) => prev.filter((c) => String(c.userId || c._id) !== targetId));
       } else {
-        loadCreators();
+        setCreators((prev) =>
+          prev.map((c) => {
+            const cId = String(c.userId || c._id);
+            if (cId === targetId) {
+              return {
+                ...c,
+                ...(isBusy !== undefined ? { isBusy } : {}),
+                ...(isOnline !== undefined ? { isOnline } : {})
+              };
+            }
+            return c;
+          })
+        );
       }
     };
 
@@ -378,15 +391,15 @@ export const AudioCallsPage = () => {
 
                         {/* Card Actions */}
                         <div className={styles.actionsRow} onClick={(e) => e.stopPropagation()}>
-                          {!creator.isOnline ? (
+                          {creator.isBusy ? (
+                            <button className={`${styles.actionBtn} ${styles.busyBtn}`} disabled>
+                              <Phone className={styles.btnPhoneIcon} size={16} />
+                              <span>Busy</span>
+                            </button>
+                          ) : !creator.isOnline ? (
                             <button className={`${styles.actionBtn} ${styles.offlineBtn}`} disabled>
                               <Phone className={styles.btnPhoneIcon} size={16} />
                               <span>Offline</span>
-                            </button>
-                          ) : creator.isBusy ? (
-                            <button className={`${styles.actionBtn} ${styles.busyBtn}`} disabled>
-                              <Phone className={styles.btnPhoneIcon} size={16} />
-                              <span>Busy Now</span>
                             </button>
                           ) : (
                             <button 

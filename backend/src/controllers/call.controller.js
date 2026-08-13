@@ -20,6 +20,15 @@ const findActiveCallForUser = async (userId, excludeCallLogId = null) =>
     $or: [{ callerId: userId }, { receiverId: userId }]
   });
 
+const getCreatorCallRate = (profile, type) => {
+  const rates = profile?.rates || {};
+  const val = type === 'video' ? rates.videoCallPerMin : rates.audioCallPerMin;
+  if (typeof val === 'number' && !isNaN(val) && val >= 0) {
+    return val;
+  }
+  return type === 'video' ? 10 : 5;
+};
+
 // Initiate audio or video call
 exports.initiateCall = catchAsync(async (req, res, next) => {
   const { receiverId, type } = req.body;
@@ -62,9 +71,7 @@ exports.initiateCall = catchAsync(async (req, res, next) => {
     return next(new ApiError(400, 'This creator is currently offline and cannot take calls.'));
   }
 
-  const rate = type === 'video'
-    ? (creatorProfile.rates.videoCallPerMin || 50)
-    : (creatorProfile.rates.audioCallPerMin || 30);
+  const rate = getCreatorCallRate(creatorProfile, type);
 
   // Receiver must not be in an active call (busy)
   const receiverBusy = await findActiveCallForUser(receiverId);
@@ -217,6 +224,9 @@ exports.acceptCall = catchAsync(async (req, res, next) => {
   callLog.lastBilledAt = new Date();
   await callLog.save();
 
+  // Set creator isBusy state & broadcast update so fan cards show "Busy"
+  await CreatorProfile.updateOne({ userId: callLog.receiverId }, { $set: { isBusy: true } });
+
   // Notify caller via WebSockets
   const io = req.app.get('io');
   if (io) {
@@ -225,6 +235,12 @@ exports.acceptCall = catchAsync(async (req, res, next) => {
       roomId: callLog.roomId,
       status: 'active',
       acceptedAt: callLog.updatedAt
+    });
+    io.emit('creator_availability_change', {
+      userId: callLog.receiverId.toString(),
+      creatorId: callLog.receiverId.toString(),
+      isBusy: true,
+      isOnline: true
     });
   }
 
@@ -305,10 +321,10 @@ exports.endCall = catchAsync(async (req, res, next) => {
   callLog.endedAt = Date.now();
   await callLog.save();
 
-  // Notify other user
-  const otherUserId = req.user._id.toString() === callLog.callerId.toString()
-    ? callLog.receiverId.toString()
-    : callLog.callerId.toString();
+  // Reset creator isBusy state & broadcast availability update
+  if (callLog.receiverId) {
+    await CreatorProfile.updateOne({ userId: callLog.receiverId }, { $set: { isBusy: false } });
+  }
 
   const io = req.app.get('io');
   if (io) {
@@ -318,6 +334,14 @@ exports.endCall = catchAsync(async (req, res, next) => {
       status: callLog.status,
       endedAt: callLog.endedAt
     });
+    if (callLog.receiverId) {
+      io.emit('creator_availability_change', {
+        userId: callLog.receiverId.toString(),
+        creatorId: callLog.receiverId.toString(),
+        isBusy: false,
+        isOnline: true
+      });
+    }
   }
 
   res.status(200).json({
@@ -364,6 +388,10 @@ exports.heartbeat = catchAsync(async (req, res, next) => {
     callLog.endedAt = Date.now();
     await callLog.save();
 
+    if (callLog.receiverId) {
+      await CreatorProfile.updateOne({ userId: callLog.receiverId }, { $set: { isBusy: false } });
+    }
+
     const io = req.app.get('io');
     if (io) {
       io.to(callLog.callerId.toString()).emit('call_terminated', {
@@ -374,6 +402,14 @@ exports.heartbeat = catchAsync(async (req, res, next) => {
         roomId,
         reason: 'insufficient_funds'
       });
+      if (callLog.receiverId) {
+        io.emit('creator_availability_change', {
+          userId: callLog.receiverId.toString(),
+          creatorId: callLog.receiverId.toString(),
+          isBusy: false,
+          isOnline: true
+        });
+      }
     }
 
     return res.status(200).json({
@@ -508,9 +544,8 @@ exports.getCallableCreators = catchAsync(async (req, res, next) => {
     isBusy: busyIds.has(p.userId.toString()),
     rating: p.rating,
     ratingCount: p.ratingCount,
-    // Must stay in sync with the fallbacks used in initiateCall so the rate
-    // shown to the listener matches what is actually charged per minute.
-    rate: type === 'video' ? (p.rates.videoCallPerMin || 50) : (p.rates.audioCallPerMin || 30),
+    // Must stay in sync with the set rate from creator profile
+    rate: getCreatorCallRate(p, type),
     isTopRated: p.isTopRated !== undefined ? p.isTopRated : ((p.rating || 0) >= 4.8 && (p.ratingCount || 0) >= 100),
     category: p.categories && p.categories[0] ? p.categories[0] : '',
     categories: p.categories,

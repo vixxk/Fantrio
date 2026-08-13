@@ -5,7 +5,7 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  z-index: 12020;
+  z-index: 200020;
   background: rgba(5, 6, 12, 0.68);
   backdrop-filter: blur(5px);
   display: flex;

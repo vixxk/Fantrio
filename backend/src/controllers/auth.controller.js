@@ -209,6 +209,10 @@ exports.register = catchAsync(async (req, res, next) => {
           userId: newUser._id,
           username: newUser.username,
           displayName: newUser.displayName,
+          rates: {
+            audioCallPerMin: 5,
+            videoCallPerMin: 10
+          },
           verificationStatus: 'approved'
         });
       }
@@ -299,6 +303,10 @@ exports.verifyOtp = catchAsync(async (req, res, next) => {
         userId: user._id,
         username: user.username,
         displayName: user.displayName,
+        rates: {
+          audioCallPerMin: 5,
+          videoCallPerMin: 10
+        },
         verificationStatus: 'approved'
       });
     }
