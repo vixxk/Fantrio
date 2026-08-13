@@ -37,18 +37,32 @@ export const AudioCallsPage = () => {
     startCall,
     endCall: hangUp,
     toggleMute,
-    setIsSpeakerOn,
+    toggleSpeaker,
+    remoteMicMuted,
     formatDuration
   } = useOutgoingCall({ type: 'audio' });
 
   // Live gifts + recharge inside the active call
-  const { events: giftEvents, sendGift } = useGiftEvents({
+  const { events: giftEvents, sendGift, summary: giftSummary, leaderboard: giftLeaderboard } = useGiftEvents({
     callRoomId: activeCall?.roomId || null,
     enabled: !!activeCall && activeCall.status === 'active',
     receiverId: activeCall?.creator?.userId || activeCall?.creator?._id || null
   });
   const [giftOpen, setGiftOpen] = useState(false);
   const [rechargeOpen, setRechargeOpen] = useState(false);
+
+  // If the call ends while the gift picker or recharge modal is open, close
+  // them so they don't linger over the creator grid. (Render-phase state
+  // adjustment — the project's established pattern for reacting to prop
+  // changes, see useGiftEvents.)
+  const [prevActiveCall, setPrevActiveCall] = useState(activeCall);
+  if (activeCall !== prevActiveCall) {
+    setPrevActiveCall(activeCall);
+    if (!activeCall) {
+      setGiftOpen(false);
+      setRechargeOpen(false);
+    }
+  }
 
   // Filter States
   const [searchQuery, setSearchQuery] = useState('');
@@ -503,7 +517,8 @@ export const AudioCallsPage = () => {
           </div>
         </div>
 
-        {/* Price Range */}          <div className={styles.filterSection}>
+        {/* Price Range */}
+        <div className={styles.filterSection}>
           <h4 className={styles.filterSectionLabel}>Price Per Minute</h4>
           <div className={styles.sliderHeader}>
             <span className={styles.sliderMinText}>5 Coins</span>
@@ -652,10 +667,13 @@ export const AudioCallsPage = () => {
         isMuted={isMuted}
         onToggleMute={toggleMute}
         isSpeakerOn={isSpeakerOn}
-        onToggleSpeaker={() => setIsSpeakerOn(!isSpeakerOn)}
+        onToggleSpeaker={toggleSpeaker}
         onHangUp={hangUp}
         onOpenGift={() => setGiftOpen(true)}
         onRecharge={() => setRechargeOpen(true)}
+        giftSummary={giftSummary}
+        giftLeaderboard={giftLeaderboard}
+        remoteMicMuted={remoteMicMuted}
       />
 
       {/* Gift animation layer + gift picker + recharge (active call only) */}
@@ -665,7 +683,7 @@ export const AudioCallsPage = () => {
           receiverName={activeCall?.creator?.displayName || 'this creator'}
           balance={balance}
           onSendGift={(gift) => sendGift(gift)}
-          onRecharge={() => { setGiftOpen(false); setRechargeOpen(true); }}
+          onRecharge={() => setRechargeOpen(true)}
           onClose={() => setGiftOpen(false)}
         />
       )}

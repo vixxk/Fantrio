@@ -741,10 +741,7 @@ export const PostDetailPage = () => {
           receiverName={post.creatorId?.displayName || 'Creator'}
           balance={balance}
           onSendGift={handleSendGift}
-          onRecharge={() => {
-            setShowGiftPanel(false);
-            setShowQuickRecharge(true);
-          }}
+          onRecharge={() => setShowQuickRecharge(true)}
           onClose={() => setShowGiftPanel(false)}
         />
       )}

@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
 import { connectSocket } from '../services/socket';
 import { GIFT_TIERS } from '../features/gifts/giftCatalog';
+import { playGiftChime } from '../utils/sound';
 
 // Gifts play strictly one after another (classic live-gift rail): each
 // animation runs for its full tier duration before the next queued gift
@@ -29,11 +30,23 @@ const MAX_QUEUE = 20;
  * @param {string|null} opts.receiverId - default gift recipient
  */
 export const useGiftEvents = ({ streamId = null, callRoomId = null, enabled = true, receiverId = null } = {}) => {
-  const { refreshBalance } = useApp();
+  const { refreshBalance, user } = useApp();
   const [events, setEvents] = useState([]);
   const [leaderboard, setLeaderboard] = useState([]);
+  // Per-context (call/stream) gift totals from the current user's perspective:
+  // how many gifts they sent vs received, plus the coin values. Reset whenever
+  // the stream/call context changes.
+  const [summary, setSummary] = useState({ sentCount: 0, sentCoins: 0, receivedCount: 0, receivedCoins: 0 });
+
+  // Keep the viewer's id reachable from event handlers without recreating
+  // the callbacks (used to split sent vs received in the summary).
+  const myUserIdRef = useRef(user?.id || user?._id || null);
+  useEffect(() => {
+    myUserIdRef.current = user?.id || user?._id || null;
+  }, [user?.id, user?._id]);
   const queueRef = useRef([]);
   const activeRef = useRef(null); // eventId currently animating
+  const recentRef = useRef(new Map()); // eventId -> timestamp (played recently)
   const timerRef = useRef(null);
   const contextRef = useRef({ streamId, callRoomId });
 
@@ -102,12 +115,42 @@ export const useGiftEvents = ({ streamId = null, callRoomId = null, enabled = tr
     (evt) => {
       const tier = GIFT_TIERS[evt.tier] ? evt.tier : 1;
       // Dedup: the sender's optimistic event and the socket echo share an
-      // eventId (the backend transaction id).
+      // eventId (the backend transaction id). Also remember recently played
+      // eventIds so a late-arriving echo can't replay a gift whose animation
+      // already finished (which would also double-count the leaderboard).
       if (activeRef.current === evt.eventId || queueRef.current.some((e) => e.eventId === evt.eventId)) return;
+      const now = Date.now();
+      if (recentRef.current.has(evt.eventId)) {
+        if (now - recentRef.current.get(evt.eventId) < 15000) return;
+      }
+      recentRef.current.set(evt.eventId, now);
+      if (recentRef.current.size > 60) {
+        for (const [id, ts] of recentRef.current) {
+          if (now - ts > 30000) recentRef.current.delete(id);
+        }
+      }
       queueRef.current.push({ ...evt, tier });
       if (queueRef.current.length > MAX_QUEUE) {
         queueRef.current.splice(0, queueRef.current.length - MAX_QUEUE);
       }
+      // Soft chime + haptic tap when a gift lands in a 1:1 call or live
+      // stream. Played once per gift (the optimistic event and socket echo
+      // share an eventId and are deduped above) and throttled inside
+      // playGiftChime so gift bursts on busy streams don't stack chimes.
+      const ctx = contextRef.current;
+      if (ctx.callRoomId || ctx.streamId) {
+        playGiftChime(tier);
+      }
+      // Tally the per-call/stream summary. Each accepted event is counted
+      // exactly once (the sender's optimistic event and the socket echo are
+      // deduped by eventId above).
+      const isMine = evt.sender && String(evt.sender.id) === String(myUserIdRef.current);
+      const coins = Number(evt.coins) || 0;
+      setSummary((prev) =>
+        isMine
+          ? { ...prev, sentCount: prev.sentCount + 1, sentCoins: prev.sentCoins + coins }
+          : { ...prev, receivedCount: prev.receivedCount + 1, receivedCoins: prev.receivedCoins + coins }
+      );
       applyGiftToLeaderboard(evt);
       playNext();
     },
@@ -147,6 +190,7 @@ export const useGiftEvents = ({ streamId = null, callRoomId = null, enabled = tr
   if (contextKey !== prevContextKey) {
     setPrevContextKey(contextKey);
     setLeaderboard([]);
+    setSummary({ sentCount: 0, sentCoins: 0, receivedCount: 0, receivedCoins: 0 });
   }
 
   // Seed the leaderboard from the backend ledger when a stream context turns
@@ -181,10 +225,14 @@ export const useGiftEvents = ({ streamId = null, callRoomId = null, enabled = tr
 
   // Clear the pending rail timer + queue on unmount.
   useEffect(() => {
+    // Capture the stable ref values so the cleanup never touches a replaced
+    // ref (recentRef.current is only ever mutated, never reassigned).
+    const recent = recentRef.current;
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
       queueRef.current = [];
       activeRef.current = null;
+      recent.clear();
       playNextRef.current = null;
     };
   }, []);
@@ -218,5 +266,5 @@ export const useGiftEvents = ({ streamId = null, callRoomId = null, enabled = tr
     [receiverId, addEvent, refreshBalance]
   );
 
-  return { events, sendGift, leaderboard };
+  return { events, sendGift, leaderboard, summary };
 };

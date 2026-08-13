@@ -192,7 +192,8 @@ export const MessagesPage = () => {
     startCall: startAudioCall,
     endCall: endAudioCall,
     toggleMute: toggleAudioMute,
-    setIsSpeakerOn: setAudioSpeakerOn,
+    toggleSpeaker: toggleAudioSpeaker,
+    remoteMicMuted: audioRemoteMicMuted,
     formatDuration: formatAudioDuration
   } = useOutgoingCall({ type: 'audio' });
 
@@ -207,17 +208,24 @@ export const MessagesPage = () => {
     toggleMute: toggleVideoMute,
     toggleCamera: toggleVideoCamera,
     isCameraOff: videoCameraOff,
-    setIsSpeakerOn: setVideoSpeakerOn,
+    toggleSpeaker: toggleVideoSpeaker,
+    remoteMicMuted: videoRemoteMicMuted,
     attachRemote: attachVideoRemote,
     attachLocal: attachVideoLocal,
-    formatDuration: formatVideoDuration
+    formatDuration: formatVideoDuration,
+    remoteCameraOff: videoRemoteCameraOff
   } = useOutgoingCall({ type: 'video' });
 
   // Only one call can be active at a time — combine for the gift context + overlays
   const activeCallForGifts = audioCall || videoCall;
 
   // Live gifts + recharge inside the active call (same as the call pages)
-  const { events: callGiftEvents, sendGift: sendCallGift } = useGiftEvents({
+  const {
+    events: callGiftEvents,
+    sendGift: sendCallGift,
+    summary: callGiftSummary,
+    leaderboard: callGiftLeaderboard
+  } = useGiftEvents({
     callRoomId: activeCallForGifts?.roomId || null,
     enabled: !!activeCallForGifts && activeCallForGifts.status === 'active',
     receiverId: activeCallForGifts?.creator?.userId || activeCallForGifts?.creator?._id || null
@@ -671,10 +679,13 @@ export const MessagesPage = () => {
           isMuted={audioMuted}
           onToggleMute={toggleAudioMute}
           isSpeakerOn={audioSpeakerOn}
-          onToggleSpeaker={() => setAudioSpeakerOn(!audioSpeakerOn)}
+          onToggleSpeaker={toggleAudioSpeaker}
           onHangUp={endAudioCall}
           onOpenGift={() => setGiftOpen(true)}
           onRecharge={() => setRechargeOpen(true)}
+          giftSummary={callGiftSummary}
+          giftLeaderboard={callGiftLeaderboard}
+          remoteMicMuted={audioRemoteMicMuted}
         />
       )}
 
@@ -689,7 +700,7 @@ export const MessagesPage = () => {
           isMuted={videoMuted}
           onToggleMute={toggleVideoMute}
           isSpeakerOn={videoSpeakerOn}
-          onToggleSpeaker={() => setVideoSpeakerOn(!videoSpeakerOn)}
+          onToggleSpeaker={toggleVideoSpeaker}
           isCameraOff={videoCameraOff}
           onToggleCamera={toggleVideoCamera}
           onHangUp={endVideoCall}
@@ -698,6 +709,10 @@ export const MessagesPage = () => {
           remoteStream={videoRemoteStream}
           attachRemote={attachVideoRemote}
           attachLocal={attachVideoLocal}
+          remoteCameraOff={videoRemoteCameraOff}
+          giftSummary={callGiftSummary}
+          giftLeaderboard={callGiftLeaderboard}
+          remoteMicMuted={videoRemoteMicMuted}
         />
       )}
 
@@ -709,7 +724,7 @@ export const MessagesPage = () => {
           receiverName={activeCallForGifts?.creator?.displayName || 'this creator'}
           balance={balance}
           onSendGift={(gift) => sendCallGift(gift)}
-          onRecharge={() => { setGiftOpen(false); setRechargeOpen(true); }}
+          onRecharge={() => setRechargeOpen(true)}
           onClose={() => setGiftOpen(false)}
         />
       )}
@@ -1211,10 +1226,7 @@ export const MessagesPage = () => {
               receiverName={selectedConv.user.displayName}
               balance={balance}
               onSendGift={handleSendGiftInChat}
-              onRecharge={() => {
-                setShowTipModal(false);
-                setRechargeOpen(true);
-              }}
+              onRecharge={() => setRechargeOpen(true)}
               onClose={() => setShowTipModal(false)}
             />
           )}
@@ -1823,10 +1835,7 @@ export const MessagesPage = () => {
           receiverName={selectedConv.user.displayName}
           balance={balance}
           onSendGift={handleSendGiftInChat}
-          onRecharge={() => {
-            setShowTipModal(false);
-            setRechargeOpen(true);
-          }}
+          onRecharge={() => setRechargeOpen(true)}
           onClose={() => setShowTipModal(false)}
         />
       )}

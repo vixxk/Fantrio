@@ -49,6 +49,7 @@ export const GiftPanel = ({ type = 'chat', receiverName = 'this creator', balanc
   }, [type]);
 
   const handleGiftClick = (gift) => {
+    if (sendingId || sentId) return;
     if (app.user?.role === 'creator') {
       toast.error('Only fans can send gifts to creators.');
       return;
@@ -62,11 +63,31 @@ export const GiftPanel = ({ type = 'chat', receiverName = 'this creator', balanc
   };
 
   const handleConfirmSend = async () => {
-    if (!confirmGift) return;
+    if (!confirmGift || sendingId) return;
     const targetGift = confirmGift;
     setConfirmGift(null);
-    onSendGift(targetGift);
-    onClose();
+    setSendingId(targetGift.id);
+    try {
+      await onSendGift(targetGift);
+      setSendingId(null);
+      // Brief "Sent ✓" confirmation on the card before closing the panel.
+      setSentId(targetGift.id);
+      window.setTimeout(() => {
+        setSentId(null);
+        onClose();
+      }, 800);
+    } catch (err) {
+      setSendingId(null);
+      const msg = err && err.message ? err.message : 'Failed to send gift. Please try again.';
+      console.error('Failed to send gift:', err);
+      // Balance may have gone stale (e.g. spent elsewhere): jump straight to
+      // recharge so the fan can top up and keep gifting.
+      if (/insufficient/i.test(msg)) {
+        onRecharge();
+        return;
+      }
+      toast.error(msg);
+    }
   };
 
   return (

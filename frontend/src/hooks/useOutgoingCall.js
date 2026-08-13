@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
 import { getSocket } from '../services/socket';
 import { useToast } from '../components/Toast/Toast';
+import { pickAlternatePlaybackDevice } from '../services/agora';
 import { useAgoraCall } from './useAgoraCall';
 import { playRingtone, stopRingtone } from '../utils/ringtone';
 
@@ -68,12 +69,14 @@ export const useOutgoingCall = ({ type }) => {
     if (endingRef.current) return;
     endingRef.current = true;
     const cur = activeCallRef.current;
+    // Release local camera/mic FIRST so the browser's in-use indicator turns
+    // off immediately, then notify the backend (which may be slow or offline).
+    clearCall();
     if (cur && cur.roomId) {
       try {
         await api.post('/calls/end', { roomId: cur.roomId });
       } catch (e) { console.error('end call failed', e); }
     }
-    clearCall();
     refreshBalance();
     endingRef.current = false;
   }, [clearCall, refreshBalance]);
@@ -99,11 +102,14 @@ export const useOutgoingCall = ({ type }) => {
 
   const checkMediaPermissions = async (callType) => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return true;
+    // Video calls need BOTH mic and camera — the backend only has one
+    // media permission path, so falling back to audio-only here would leave
+    // the caller in a video call with no video (and no way to fix it).
+    const constraints = callType === 'video'
+      ? { audio: true, video: true }
+      : { audio: true };
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: callType === 'video'
-      });
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
       stream.getTracks().forEach((track) => track.stop());
       return true;
     } catch (err) {
@@ -117,9 +123,17 @@ export const useOutgoingCall = ({ type }) => {
       toast.warning('You are already in an active call. End it before starting a new one.');
       return;
     }
+    // A previous call may have left the guard set (e.g. a no-answer timeout
+    // path that ends without going through endCall). Make sure a fresh call
+    // is never blocked by stale state from the previous one.
+    endingRef.current = false;
     const rate = creator.rate || creator[videoCall ? 'videoCallPerMin' : 'audioCallPerMin'] || 0;
     if (creator.isBusy) {
       toast.warning(`${creator.displayName} is currently busy on another call.`);
+      return;
+    }
+    if (creator.isOnline === false) {
+      toast.warning(`${creator.displayName} is currently offline and cannot take calls.`);
       return;
     }
     if (balance < rate) {
@@ -153,9 +167,19 @@ export const useOutgoingCall = ({ type }) => {
     setCallDuration(0);
     playRingtone('outgoing');
 
+    // Set when the ring times out (no answer). Prevents a late call_accepted
+    // from the receiver racing the timeout and reviving a call the user
+    // already saw end.
+    let callEnded = false;
+
     const ringTimeout = setTimeout(() => {
       setActiveCall((prev) => {
         if (prev && prev.status === 'connecting' && prev.roomId === roomId) {
+          callEnded = true;
+          // Drop this call's socket listeners BEFORE clearing so a late
+          // call_accepted/call_rejected for this room can't fire on the
+          // next call the user starts.
+          removeSocketListeners();
           try { api.post('/calls/end', { roomId }); } catch { /* noop */ }
           clearCall();
           toast.info('No answer. Creator did not accept call request.');
@@ -168,11 +192,16 @@ export const useOutgoingCall = ({ type }) => {
     const socket = getSocket();
 
     const handleAccepted = (payload) => {
-      if (payload.roomId !== roomId) return;
+      if (callEnded || payload.roomId !== roomId) return;
       stopRingtone();
       clearTimeout(ringTimeout);
       setActiveCall((prev) => (prev ? { ...prev, status: 'active' } : prev));
       setCallDuration(0);
+      // The call starts with both parties' mic & camera ON (fresh tracks are
+      // created enabled by joinCall). Reset the UI flags so the buttons always
+      // reflect the true state at connect.
+      setIsMuted(false);
+      setIsCameraOff(false);
       refreshBalance();
 
       // Join Agora room as the caller. NOTE: the hook expects `channel`, not
@@ -209,7 +238,13 @@ export const useOutgoingCall = ({ type }) => {
       if (payload.roomId && payload.roomId !== roomId) return;
       clearTimeout(ringTimeout);
       clearCall();
-      toast.info('The call was declined.');
+      if (payload?.reason === 'receiver_busy') {
+        toast.info(`${creator.displayName} is busy on another call right now.`);
+      } else if (payload?.reason === 'insufficient_funds') {
+        toast.error('The call could not start — your coin balance is too low.');
+      } else {
+        toast.info('The call was declined.');
+      }
       refreshBalance();
     };
 
@@ -244,7 +279,7 @@ export const useOutgoingCall = ({ type }) => {
       { event: 'call_terminated', handler: handleTerminated },
       { event: 'call_warning', handler: handleCallWarning }
     ];
-  }, [type, videoCall, balance, user, ag, endCall, clearCall, refreshBalance, toast]);
+  }, [type, videoCall, balance, user, ag, endCall, clearCall, removeSocketListeners, refreshBalance, toast]);
 
   // Attach remote stream (an Agora track, not a MediaStream) to a <video>.
   // Keeps the element in a ref so the stream can be re-attached when it
@@ -287,6 +322,18 @@ export const useOutgoingCall = ({ type }) => {
     return `${mins}:${secs}`;
   };
 
+  // Toggle the speaker: flips the UI state AND routes the remote audio to the
+  // matching output device — speaker ON → default output, speaker OFF →
+  // earpiece/alternate output — on browsers that support setSinkId (Chrome/
+  // Edge desktop). Where the browser doesn't support it, it stays a visual
+  // toggle and routing is skipped.
+  const toggleSpeaker = useCallback(async () => {
+    const next = !isSpeakerOn;
+    setIsSpeakerOn(next);
+    const sink = next ? 'default' : await pickAlternatePlaybackDevice();
+    ag.setPlaybackSink(sink).catch(() => {});
+  }, [isSpeakerOn, ag]);
+
   return {
     activeCall,
     callDuration,
@@ -299,9 +346,12 @@ export const useOutgoingCall = ({ type }) => {
     toggleMute,
     toggleCamera,
     setIsSpeakerOn,
+    toggleSpeaker,
     attachRemote,
     attachLocal,
     formatDuration,
-    videoCall
+    videoCall,
+    remoteCameraOff: ag.remoteCameraOff,
+    remoteMicMuted: ag.remoteMicMuted
   };
 };

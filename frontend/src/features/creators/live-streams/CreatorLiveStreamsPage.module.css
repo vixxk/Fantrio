@@ -1986,6 +1986,43 @@
   font-family: monospace;
 }
 
+/* Per-stream gift summary pill — the host sees gifts received */
+.hostGiftSummary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  margin-top: 4px;
+  padding: 3px 12px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 0, 127, 0.35);
+  border-radius: 999px;
+  color: #ff7ab8;
+  font-size: 0.74rem;
+  font-weight: 700;
+  animation: hostSummaryIn 0.3s ease-out both;
+}
+
+.hostGiftSummary strong {
+  color: #ffffff;
+}
+
+.hostCoinImgSm {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+@keyframes hostSummaryIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.light .hostGiftSummary {
+  background: rgba(26, 22, 37, 0.04);
+  border-color: rgba(225, 0, 117, 0.35);
+}
+
 .endStreamBtn {
   flex-shrink: 0;
   background: #ef4444;

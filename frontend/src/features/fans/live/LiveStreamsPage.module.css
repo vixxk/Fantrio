@@ -1932,6 +1932,43 @@
   transform: translateY(-1px);
 }
 
+/* Per-stream gift summary pill (below the balance/gift bar) */
+.streamGiftSummary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 4px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 0, 127, 0.35);
+  border-radius: 999px;
+  color: #ff7ab8;
+  font-size: 0.78rem;
+  font-weight: 700;
+  animation: streamSummaryIn 0.3s ease-out both;
+}
+
+.streamGiftSummary strong {
+  color: #ffffff;
+}
+
+.streamCoinImgSm {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+@keyframes streamSummaryIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.light .streamGiftSummary {
+  background: rgba(26, 22, 37, 0.04);
+  border-color: rgba(225, 0, 117, 0.35);
+}
+
 .light .streamBalanceChip {
   background: rgba(26, 22, 37, 0.04);
   border-color: rgba(26, 22, 37, 0.12);

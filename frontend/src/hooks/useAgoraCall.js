@@ -13,6 +13,7 @@ import {
   onUserUnpublished,
   onUserLeft,
   onConnectionStateChange,
+  setTrackPlaybackDevice,
 } from '../services/agora';
 
 export const useAgoraCall = () => {
@@ -25,6 +26,18 @@ export const useAgoraCall = () => {
   const streamIdRef = useRef('');
   const callbacksRef = useRef({});
   const [joined, setJoined] = useState(false);
+  // True while the remote user's camera is off (or not published yet). Lets
+  // the UI show the avatar fallback instead of a black screen when they turn
+  // their camera off. Only ever reflects the REMOTE party's video.
+  const [remoteCameraOff, setRemoteCameraOff] = useState(true);
+  // True while the remote user's microphone is muted. Driven purely by the
+  // remote party's publish/unpublish events — their mute never touches the
+  // local tracks.
+  const [remoteMicMuted, setRemoteMicMuted] = useState(false);
+  // Output device (speaker) chosen via the speaker button. Kept in a ref so it
+  // survives track changes and is re-applied whenever the remote audio track
+  // is (re)published. 'default' routes to the browser's default speakers.
+  const playbackSinkRef = useRef('default');
 
   const cleanupListeners = useCallback(() => {
     const c = clientRef.current;
@@ -38,9 +51,10 @@ export const useAgoraCall = () => {
     callbacksRef.current = {};
   }, []);
 
-  // Remote track priority: video wins for video calls, audio is the fallback
-  // (audio tracks auto-play in Agora once subscribed, so this is only used to
-  // attach video to a <video> element and to surface the stream).
+  // Remote track priority: video wins for video calls, audio is the fallback.
+  // Remote audio is played explicitly at subscribe time (see
+  // handleUserPublished) — audio calls have no <video> element to attach to,
+  // so the audio track must be played to the default output on its own.
   const pickRemoteStream = useCallback(() => {
     return remoteVideoTrackRef.current || remoteAudioTrackRef.current;
   }, []);
@@ -84,7 +98,10 @@ export const useAgoraCall = () => {
     remoteAudioTrackRef.current = null;
     remoteUserIdRef.current = '';
     streamIdRef.current = '';
+    playbackSinkRef.current = 'default';
     setJoined(false);
+    setRemoteCameraOff(true);
+    setRemoteMicMuted(false);
   }, [cleanupListeners]);
 
   // Clean up on component unmount to guarantee hardware release
@@ -127,8 +144,27 @@ export const useAgoraCall = () => {
         await subscribeToUser(c, user, mediaType);
         if (mediaType === 'video' && user.videoTrack) {
           remoteVideoTrackRef.current = user.videoTrack;
+          setRemoteCameraOff(false);
         } else if (mediaType === 'audio' && user.audioTrack) {
           remoteAudioTrackRef.current = user.audioTrack;
+          setRemoteMicMuted(false);
+          // Remote audio is not auto-played by the SDK after subscribe — play
+          // it explicitly (no element: plays through the default output), so
+          // audio calls are audible on both ends.
+          try {
+            remoteAudioTrackRef.current.play();
+          } catch (err) {
+            console.error('Failed to play remote audio track:', err);
+          }
+          // Re-apply the user's chosen speaker sink (e.g. after the remote
+          // mutes and re-publishes audio mid-call).
+          if (playbackSinkRef.current && playbackSinkRef.current !== 'default') {
+            try {
+              await setTrackPlaybackDevice(remoteAudioTrackRef.current, playbackSinkRef.current);
+            } catch (err) {
+              console.warn('Failed to re-apply playback device:', err);
+            }
+          }
         }
         if (onRemoteStream) onRemoteStream(pickRemoteStream());
       };
@@ -138,8 +174,14 @@ export const useAgoraCall = () => {
       // Remote toggling a track (mute/camera off) must NOT end the call —
       // just clear that track and keep the other one playing.
       const handleUserUnpublished = (user, mediaType) => {
-        if (mediaType === 'video') remoteVideoTrackRef.current = null;
-        else if (mediaType === 'audio') remoteAudioTrackRef.current = null;
+        // Only the remote party's track is affected — never the local tracks.
+        if (mediaType === 'video') {
+          remoteVideoTrackRef.current = null;
+          setRemoteCameraOff(true);
+        } else if (mediaType === 'audio') {
+          remoteAudioTrackRef.current = null;
+          setRemoteMicMuted(true);
+        }
         if (onRemoteStream) onRemoteStream(pickRemoteStream());
       };
       onUserUnpublished(c, handleUserUnpublished);
@@ -153,7 +195,7 @@ export const useAgoraCall = () => {
       callbacksRef.current['user-left'] = handleUserLeft;
 
       let hasBeenConnected = false;
-      const handleConnectionStateChange = (curState, revState, reason) => {
+      const handleConnectionStateChange = (curState) => {
         if (curState === 'CONNECTED') {
           hasBeenConnected = true;
         }
@@ -173,20 +215,23 @@ export const useAgoraCall = () => {
     }
   }, [endCall, pickRemoteStream]);
 
+  // These only ever touch the LOCAL track — the remote user's own mic/camera
+  // state is completely independent. They return the new MUTED / OFF state,
+  // which is what every caller stores in isMuted / isCameraOff.
   const toggleMute = useCallback(() => {
     const track = localAudioTrackRef.current;
     if (!track) return false;
-    const next = !track.enabled;
+    const next = !track.enabled; // next *enabled* state
     track.setEnabled(next);
-    return next;
+    return !next; // new muted state
   }, []);
 
   const toggleCamera = useCallback(() => {
     const track = localVideoTrackRef.current;
     if (!track) return false;
-    const next = !track.enabled;
+    const next = !track.enabled; // next *enabled* state
     track.setEnabled(next);
-    return next;
+    return !next; // new camera-off state
   }, []);
 
   const attachLocal = useCallback(async (el) => {
@@ -209,6 +254,16 @@ export const useAgoraCall = () => {
     track.play(el);
   }, [pickRemoteStream]);
 
+  // Route the remote audio to a specific output device (speaker toggle).
+  // Stores the choice so it is re-applied if the remote track is re-published.
+  const setPlaybackSink = useCallback(async (deviceId) => {
+    playbackSinkRef.current = deviceId || 'default';
+    const track = remoteAudioTrackRef.current;
+    if (track) {
+      await setTrackPlaybackDevice(track, playbackSinkRef.current);
+    }
+  }, []);
+
   return {
     joined,
     joinCall,
@@ -217,5 +272,8 @@ export const useAgoraCall = () => {
     toggleCamera,
     attachLocal,
     attachRemote,
+    remoteCameraOff,
+    remoteMicMuted,
+    setPlaybackSink,
   };
 };

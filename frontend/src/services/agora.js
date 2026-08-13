@@ -105,3 +105,55 @@ export const offUserLeft = (c, handler) => {
 export const offConnectionStateChange = (c, handler) => {
   c.off('connection-state-change', handler);
 };
+
+/* ==========================================================================
+   Audio output routing (the "speaker" button)
+   Backed by the browser's setSinkId API, surfaced by the SDK as
+   IRemoteAudioTrack.setPlaybackDevice. Supported on browsers with setSinkId
+   (Chrome/Edge desktop and others); everywhere else these helpers no-op so
+   the speaker button stays a pure visual toggle.
+   ========================================================================== */
+
+export const supportsSinkSelection = () =>
+  typeof window !== 'undefined' &&
+  typeof HTMLMediaElement !== 'undefined' &&
+  typeof HTMLMediaElement.prototype.setSinkId === 'function';
+
+// Enumerate the available audio output devices (speakers/earpiece).
+// skipPermissionCheck=true avoids a permission prompt — we only need the
+// device ids; labels stay empty until the user grants permission.
+export const getPlaybackDevices = async () => {
+  if (!supportsSinkSelection() || typeof AgoraRTC.getPlaybackDevices !== 'function') {
+    return [];
+  }
+  try {
+    return await AgoraRTC.getPlaybackDevices(true);
+  } catch (e) {
+    console.warn('Failed to enumerate playback devices:', e);
+    return [];
+  }
+};
+
+// Best "speaker off" sink: the earpiece ('communications') when available,
+// otherwise the first non-default output device, otherwise the default.
+export const pickAlternatePlaybackDevice = async () => {
+  const devices = await getPlaybackDevices();
+  const comm = devices.find((d) => d.deviceId === 'communications');
+  if (comm && comm.deviceId) return comm.deviceId;
+  const alt = devices.find((d) => d.deviceId && d.deviceId !== 'default');
+  return alt ? alt.deviceId : 'default';
+};
+
+// Route a remote audio track to a specific output device.
+export const setTrackPlaybackDevice = async (track, deviceId) => {
+  if (!supportsSinkSelection() || !track || typeof track.setPlaybackDevice !== 'function') {
+    return false;
+  }
+  try {
+    await track.setPlaybackDevice(deviceId || 'default');
+    return true;
+  } catch (e) {
+    console.warn('Failed to set playback device:', e);
+    return false;
+  }
+};

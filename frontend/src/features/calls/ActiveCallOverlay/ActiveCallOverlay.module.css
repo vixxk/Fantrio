@@ -265,7 +265,16 @@
 }
 
 /* ========== Action Bar & Controls ========== */
+/* The audio/video surfaces are absolutely positioned (inset: 0), so the
+   controls are pinned to the bottom of the call card instead of collapsing
+   to the top of the flex container. */
 .callControls {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 95vw;
   display: flex;
   align-items: center;
   gap: 1.5rem;
@@ -275,7 +284,7 @@
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 999px;
-  margin-bottom: 1rem;
+  margin: 0;
 }
 
 .controlBtn {
@@ -340,8 +349,43 @@
   left: 0;
   right: 0;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   z-index: 20;
+}
+
+.topBarRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Gift-chime mute toggle (bell icon) next to the balance chip */
+.chimeMuteBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.chimeMuteBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.05);
+}
+
+.chimeMuteBtnActive {
+  background: rgba(255, 0, 127, 0.2);
+  border-color: rgba(255, 0, 127, 0.55);
+  color: #ff7ab8;
 }
 
 .callBalanceChip {
@@ -363,6 +407,87 @@
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+/* Per-call gift summary pill (below the balance chip) */
+.callGiftSummary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 14px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 0, 127, 0.35);
+  border-radius: 999px;
+  color: #ff7ab8;
+  font-size: 0.78rem;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  animation: labelIn 0.3s ease-out both;
+}
+
+.callGiftSummary strong {
+  color: #ffffff;
+}
+
+/* Dismiss (×) button inside the gift summary pill */
+.giftSummaryDismiss {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-left: 2px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.giftSummaryDismiss:hover {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+/* Top gifter crown inside the summary pill */
+.topGifterCrown {
+  font-size: 15px;
+  line-height: 1;
+  animation: crownPulse 1.4s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.7));
+}
+
+@keyframes crownPulse {
+  0%, 100% { transform: scale(1) rotate(-6deg); }
+  50% { transform: scale(1.18) rotate(6deg); }
+}
+
+.callCoinImgSm {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+@keyframes labelIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Brief pop when the live balance changes (gift sent / billed / recharge) */
+.balancePop {
+  display: inline-block;
+  animation: balancePopAnim 0.45s ease-out;
+}
+
+@keyframes balancePopAnim {
+  0% { transform: scale(1); color: #ffd166; }
+  40% { transform: scale(1.14); }
+  100% { transform: scale(1); }
 }
 
 .callCoinImg {
@@ -401,6 +526,27 @@
   background: rgba(255, 215, 102, 0.12);
   border-color: rgba(255, 215, 102, 0.4);
   color: #ffd166;
+}
+
+/* Remote party muted their mic — bottom-left badge on their tile */
+.remoteMicMutedBadge {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  z-index: 8;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  animation: fadeIn 0.25s ease-out;
 }
 
 /* ========== Modern Theme Call End Confirmation Modal ========== */

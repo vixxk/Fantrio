@@ -876,10 +876,7 @@ export const Feed = () => {
           receiverName={receiverName}
           balance={balance}
           onSendGift={handleSendGift}
-          onRecharge={() => {
-            setGiftOpen(false);
-            setRechargeOpen(true);
-          }}
+          onRecharge={() => setRechargeOpen(true)}
           onClose={() => {
             setGiftOpen(false);
             setActiveTipCreator(null);

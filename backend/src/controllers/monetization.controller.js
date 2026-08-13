@@ -440,6 +440,7 @@ exports.sendGift = catchAsync(async (req, res, next) => {
   };
 
   // If gift was sent for a post, attach a gift comment card to the post
+  let updatedPost = null;
   if (postId && mongoose.Types.ObjectId.isValid(postId)) {
     try {
       const postObj = await Post.findById(postId);
@@ -555,7 +556,7 @@ exports.sendGift = catchAsync(async (req, res, next) => {
       commentsCount: updatedPost.comments ? updatedPost.comments.length : 0,
       giftCount: updatedPost.comments ? updatedPost.comments.filter(c => c.isGift).length : 0
     } : null,
-    balanceCoins: updatedWallet ? updatedWallet.balanceCoins : 0,
+    balanceCoins: senderWallet ? senderWallet.balanceCoins : 0,
     transaction
   });
 });

@@ -55,7 +55,7 @@ export const LiveStreamsPage = () => {
 
   // Live gifts + recharge while watching a stream. Animations are broadcast to
   // the whole `live_stream_{id}` room so the host and every viewer see them.
-  const { events: giftEvents, sendGift, leaderboard: giftLeaderboard } = useGiftEvents({
+  const { events: giftEvents, sendGift, leaderboard: giftLeaderboard, summary: giftSummary } = useGiftEvents({
     streamId: joinStream?._id || null,
     enabled: !!joinResult && joinResult.status === 'success',
     receiverId: joinStream?.creatorId || null
@@ -906,6 +906,16 @@ export const LiveStreamsPage = () => {
                       <Gift size={16} /> Send Gift
                     </button>
                   </div>
+                  {/* Per-stream gift summary — appears after the first gift */}
+                  {giftSummary && giftSummary.sentCount > 0 && (
+                    <div className={styles.streamGiftSummary}>
+                      <Gift size={13} />
+                      <span>You sent</span>
+                      <strong>{giftSummary.sentCount}</strong>
+                      <img src="/coin.png" alt="Coin" className={styles.streamCoinImgSm} />
+                      <span>{giftSummary.sentCoins.toLocaleString()}</span>
+                    </div>
+                  )}
                   <div className={styles.streamChatBox}>
                     <div className={styles.streamChatHeader}>
                       <MessageSquare size={13} />
@@ -981,7 +991,7 @@ export const LiveStreamsPage = () => {
           receiverName={joinStream?.displayName || 'this creator'}
           balance={balance}
           onSendGift={(gift) => sendGift(gift)}
-          onRecharge={() => { setGiftOpen(false); setRechargeOpen(true); }}
+          onRecharge={() => setRechargeOpen(true)}
           onClose={() => setGiftOpen(false)}
         />
       )}

@@ -75,7 +75,8 @@ export const MobileChatPage = () => {
     startCall: startAudioCall,
     endCall: endAudioCall,
     toggleMute: toggleAudioMute,
-    setIsSpeakerOn: setAudioSpeakerOn,
+    toggleSpeaker: toggleAudioSpeaker,
+    remoteMicMuted: audioRemoteMicMuted,
     formatDuration: formatAudioDuration
   } = useOutgoingCall({ type: 'audio' });
 
@@ -90,15 +91,22 @@ export const MobileChatPage = () => {
     toggleMute: toggleVideoMute,
     toggleCamera: toggleVideoCamera,
     isCameraOff: videoCameraOff,
-    setIsSpeakerOn: setVideoSpeakerOn,
+    toggleSpeaker: toggleVideoSpeaker,
+    remoteMicMuted: videoRemoteMicMuted,
     attachRemote: attachVideoRemote,
     attachLocal: attachVideoLocal,
-    formatDuration: formatVideoDuration
+    formatDuration: formatVideoDuration,
+    remoteCameraOff: videoRemoteCameraOff
   } = useOutgoingCall({ type: 'video' });
 
   const activeCallForGifts = audioCall || videoCall;
 
-  const { events: callGiftEvents, sendGift: sendCallGift } = useGiftEvents({
+  const {
+    events: callGiftEvents,
+    sendGift: sendCallGift,
+    summary: callGiftSummary,
+    leaderboard: callGiftLeaderboard
+  } = useGiftEvents({
     callRoomId: activeCallForGifts?.roomId || null,
     enabled: !!activeCallForGifts && activeCallForGifts.status === 'active',
     receiverId: activeCallForGifts?.creator?.userId || activeCallForGifts?.creator?._id || null
@@ -444,10 +452,13 @@ export const MobileChatPage = () => {
           isMuted={audioMuted}
           onToggleMute={toggleAudioMute}
           isSpeakerOn={audioSpeakerOn}
-          onToggleSpeaker={() => setAudioSpeakerOn(!audioSpeakerOn)}
+          onToggleSpeaker={toggleAudioSpeaker}
           onHangUp={endAudioCall}
           onOpenGift={() => setGiftOpen(true)}
           onRecharge={() => setRechargeOpen(true)}
+          giftSummary={callGiftSummary}
+          giftLeaderboard={callGiftLeaderboard}
+          remoteMicMuted={audioRemoteMicMuted}
         />
       )}
 
@@ -461,7 +472,7 @@ export const MobileChatPage = () => {
           isMuted={videoMuted}
           onToggleMute={toggleVideoMute}
           isSpeakerOn={videoSpeakerOn}
-          onToggleSpeaker={() => setVideoSpeakerOn(!videoSpeakerOn)}
+          onToggleSpeaker={toggleVideoSpeaker}
           isCameraOff={videoCameraOff}
           onToggleCamera={toggleVideoCamera}
           onHangUp={endVideoCall}
@@ -470,6 +481,10 @@ export const MobileChatPage = () => {
           remoteStream={videoRemoteStream}
           attachRemote={attachVideoRemote}
           attachLocal={attachVideoLocal}
+          remoteCameraOff={videoRemoteCameraOff}
+          giftSummary={callGiftSummary}
+          giftLeaderboard={callGiftLeaderboard}
+          remoteMicMuted={videoRemoteMicMuted}
         />
       )}
 
@@ -479,7 +494,7 @@ export const MobileChatPage = () => {
           receiverName={activeCallForGifts?.creator?.displayName || 'this creator'}
           balance={balance}
           onSendGift={(gift) => sendCallGift(gift)}
-          onRecharge={() => { setGiftOpen(false); setRechargeOpen(true); }}
+          onRecharge={() => setRechargeOpen(true)}
           onClose={() => setGiftOpen(false)}
         />
       )}

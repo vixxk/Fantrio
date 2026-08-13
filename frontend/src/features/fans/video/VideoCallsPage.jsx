@@ -41,20 +41,35 @@ export const VideoCallsPage = () => {
     toggleMute,
     toggleCamera,
     isCameraOff,
-    setIsSpeakerOn,
+    toggleSpeaker,
     attachRemote,
     attachLocal,
-    formatDuration
+    formatDuration,
+    remoteCameraOff,
+    remoteMicMuted
   } = useOutgoingCall({ type: 'video' });
 
   // Live gifts + recharge inside the active call
-  const { events: giftEvents, sendGift } = useGiftEvents({
+  const { events: giftEvents, sendGift, summary: giftSummary, leaderboard: giftLeaderboard } = useGiftEvents({
     callRoomId: activeCall?.roomId || null,
     enabled: !!activeCall && activeCall.status === 'active',
     receiverId: activeCall?.creator?.userId || activeCall?.creator?._id || null
   });
   const [giftOpen, setGiftOpen] = useState(false);
   const [rechargeOpen, setRechargeOpen] = useState(false);
+
+  // If the call ends while the gift picker or recharge modal is open, close
+  // them so they don't linger over the creator grid. (Render-phase state
+  // adjustment — the project's established pattern for reacting to prop
+  // changes, see useGiftEvents.)
+  const [prevActiveCall, setPrevActiveCall] = useState(activeCall);
+  if (activeCall !== prevActiveCall) {
+    setPrevActiveCall(activeCall);
+    if (!activeCall) {
+      setGiftOpen(false);
+      setRechargeOpen(false);
+    }
+  }
 
   // Filter States
   const [searchQuery, setSearchQuery] = useState('');
@@ -652,7 +667,7 @@ export const VideoCallsPage = () => {
         isMuted={isMuted}
         onToggleMute={toggleMute}
         isSpeakerOn={isSpeakerOn}
-        onToggleSpeaker={() => setIsSpeakerOn(!isSpeakerOn)}
+        onToggleSpeaker={toggleSpeaker}
         isCameraOff={isCameraOff}
         onToggleCamera={toggleCamera}
         onHangUp={hangUp}
@@ -661,6 +676,10 @@ export const VideoCallsPage = () => {
         remoteStream={remoteStream}
         attachRemote={attachRemote}
         attachLocal={attachLocal}
+        remoteCameraOff={remoteCameraOff}
+        giftSummary={giftSummary}
+        giftLeaderboard={giftLeaderboard}
+        remoteMicMuted={remoteMicMuted}
       />
 
       {/* Gift animation layer + gift picker + recharge (active call only) */}
@@ -670,7 +689,7 @@ export const VideoCallsPage = () => {
           receiverName={activeCall?.creator?.displayName || 'this creator'}
           balance={balance}
           onSendGift={(gift) => sendGift(gift)}
-          onRecharge={() => { setGiftOpen(false); setRechargeOpen(true); }}
+          onRecharge={() => setRechargeOpen(true)}
           onClose={() => setGiftOpen(false)}
         />
       )}

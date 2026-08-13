@@ -327,7 +327,12 @@ exports.endCall = catchAsync(async (req, res, next) => {
   }
 
   const io = req.app.get('io');
-  if (io) {
+  // Notify the other party so they release local media (camera/mic) and reset
+  // their UI even if the Agora channel leave event is delayed or lost.
+  const otherUserId = callLog.callerId.toString() === req.user._id.toString()
+    ? (callLog.receiverId ? callLog.receiverId.toString() : '')
+    : callLog.callerId.toString();
+  if (io && otherUserId) {
     io.to(otherUserId).emit('call_ended', {
       roomId,
       callLogId: callLog._id,

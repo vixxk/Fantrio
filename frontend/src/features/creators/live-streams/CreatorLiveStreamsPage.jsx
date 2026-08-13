@@ -10,7 +10,7 @@ import ShimmerSkeleton from '../../../components/ShimmerSkeleton/ShimmerSkeleton
 import {
   Radio, Calendar, Plus, Eye, TrendingUp, Edit2, Zap, Check,
   MessageSquare, Music, Dumbbell, MoreHorizontal, X, Trash2, Loader2,
-  ChevronLeft, ChevronRight, ChevronUp, Send
+  ChevronLeft, ChevronRight, ChevronUp, Send, Gift
 } from 'lucide-react';
 import { PeriodDropdown } from '../analytics/PeriodDropdown';
 import { DateTimePicker } from '../../../components/DateTimePicker/DateTimePicker';
@@ -260,7 +260,7 @@ export const CreatorLiveStreamsPage = () => {
 
   // Real-time gift animations while live — the host sees every gift their
   // viewers send (socket events land on the creator's own user room).
-  const { events: giftEvents, leaderboard: giftLeaderboard } = useGiftEvents({
+  const { events: giftEvents, leaderboard: giftLeaderboard, summary: giftSummary } = useGiftEvents({
     streamId: overview.liveNow?._id || null,
     enabled: !!overview.liveNow
   });
@@ -551,6 +551,16 @@ export const CreatorLiveStreamsPage = () => {
                 <span className={styles.liveBannerMeta}>
                   {overview.liveNow.viewerCount || 0} viewers · {overview.liveNow.category} · {overview.liveNow.roomId}
                 </span>
+                {/* Per-stream gift summary — the host sees gifts received */}
+                {giftSummary && giftSummary.receivedCount > 0 && (
+                  <span className={styles.hostGiftSummary}>
+                    <Gift size={13} />
+                    <span>Received</span>
+                    <strong>{giftSummary.receivedCount}</strong>
+                    <img src="/coin.png" alt="Coin" className={styles.hostCoinImgSm} />
+                    <span>{giftSummary.receivedCoins.toLocaleString()}</span>
+                  </span>
+                )}
               </div>
               <button className={styles.endStreamBtn} onClick={() => openConfirm('end', overview.liveNow)}>
                 End Stream

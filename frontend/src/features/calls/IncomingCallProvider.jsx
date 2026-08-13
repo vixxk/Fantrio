@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
-import { Phone, PhoneOff, Mic, MicOff, Video, VideoOff, Gift, Coins } from 'lucide-react';
+import { Phone, PhoneOff, Mic, MicOff, Video, VideoOff, Gift, Coins, Bell, BellOff } from 'lucide-react';
+import { isGiftChimeMuted, setGiftChimeMuted } from '../../utils/sound';
 import { useApp } from '../../context/AppContext';
+import { useToast } from '../../components/Toast/Toast';
 import { api } from '../../services/api';
 import { getSocket, connectSocket, joinSocketRoom } from '../../services/socket';
 import { useAgoraCall } from '../../hooks/useAgoraCall';
@@ -17,7 +19,8 @@ const IncomingCallContext = createContext(null);
 export const useIncomingCall = () => useContext(IncomingCallContext);
 
 export const IncomingCallProvider = ({ children }) => {
-  const { user, token, refreshBalance, balance } = useApp();
+  const { user, refreshBalance, balance } = useApp();
+  const { toast } = useToast();
   const [incoming, setIncoming] = useState(null);
   const [active, setActive] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
@@ -27,15 +30,45 @@ export const IncomingCallProvider = ({ children }) => {
   const [giftOpen, setGiftOpen] = useState(false);
   const [rechargeOpen, setRechargeOpen] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
+
+  // The gift summary pill can be dismissed so it doesn't crowd small screens.
+  // It stays hidden for the rest of the call (per-call state — fresh each call).
+  const [giftSummaryDismissed, setGiftSummaryDismissed] = useState(false);
+
+  // Gift-chime mute toggle (shared preference, persisted in localStorage).
+  const [chimeMuted, setChimeMuted] = useState(isGiftChimeMuted());
+  const toggleChimeMuted = () => {
+    setChimeMuted((prev) => {
+      const next = !prev;
+      setGiftChimeMuted(next);
+      return next;
+    });
+  };
+
+  // Pop the balance chip whenever the live balance changes (gift received /
+  // call billed / recharge) so credits are visible in real time on screen.
+  const [balancePulse, setBalancePulse] = useState(0);
+  const prevBalanceRef = useRef(balance);
+  useEffect(() => {
+    if (prevBalanceRef.current !== balance) {
+      prevBalanceRef.current = balance;
+      setBalancePulse((n) => n + 1);
+    }
+  }, [balance]);
+
   const ag = useAgoraCall();
 
   // Live gifts + recharge while the call is active. Both parties see the same
   // animation in real time (socket events); the receiver can also gift back.
-  const { events: giftEvents, sendGift } = useGiftEvents({
+  const { events: giftEvents, sendGift, summary: giftSummary, leaderboard: giftLeaderboard } = useGiftEvents({
     callRoomId: active?.roomId || null,
     enabled: !!active && active.status === 'active',
     receiverId: (incoming || active)?.caller?.id || null
   });
+
+  // Top gifter this call = the leaderboard leader (sorted by total coins).
+  // In a 1:1 call that's the fan once they've sent a gift.
+  const topGifter = giftLeaderboard && giftLeaderboard.length > 0 ? giftLeaderboard[0] : null;
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
@@ -79,6 +112,8 @@ export const IncomingCallProvider = ({ children }) => {
         setIncoming((curr) => {
           if (curr && curr.callLogId === payload.callLogId) {
             stopRingtone();
+            // Release the ringing preview track before the overlay unmounts.
+            ag.endCall();
             try { api.post(`/calls/reject/${payload.callLogId}`); } catch { /* noop */ }
             return null;
           }
@@ -87,20 +122,12 @@ export const IncomingCallProvider = ({ children }) => {
       }, 30000);
     };
 
-    const handleGift = (evt) => {
-      if (evt && evt.giftId) {
-        setGiftEvents((prev) => [...prev, evt]);
-      }
-    };
-
     socket.on('incoming_call', handleIncoming);
-    socket.on('gift_received', handleGift);
     return () => {
       socket.off('incoming_call', handleIncoming);
-      socket.off('gift_received', handleGift);
       if (ringTimeoutRef.current) clearTimeout(ringTimeoutRef.current);
     };
-  }, [user, incoming]);
+  }, [user, incoming, ag]);
 
   const cleanupTimers = useCallback(() => {
     stopRingtone();
@@ -118,12 +145,14 @@ export const IncomingCallProvider = ({ children }) => {
     stopRingtone();
     cleanupTimers();
     const cur = activeRef.current;
+    // Release local camera/mic first so the browser's in-use indicator turns
+    // off immediately, then notify the backend (which may be slow or offline).
+    ag.endCall();
     if (notifyBackend && cur && cur.roomId) {
       try {
         await api.post('/calls/end', { roomId: cur.roomId });
       } catch { /* noop */ }
     }
-    ag.endCall();
     setActive(null);
     setIncoming(null);
     setRemoteStream(null);
@@ -136,21 +165,17 @@ export const IncomingCallProvider = ({ children }) => {
 
   const checkMediaPermissions = async (callType) => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return true;
+    // Video calls need BOTH mic and camera — the receiver accepts the call as
+    // the requested type, so degrading a video call to audio-only here would
+    // leave the creator in a video call with no video (and no way to fix it).
+    const constraints = callType === 'video'
+      ? { audio: true, video: true }
+      : { audio: true };
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: callType === 'video'
-      });
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
       stream.getTracks().forEach((track) => track.stop());
       return true;
     } catch (err) {
-      if (callType === 'video') {
-        try {
-          const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          audioStream.getTracks().forEach((track) => track.stop());
-          return true;
-        } catch { /* mic permission failed as well */ }
-      }
       console.error('Media permission denied or error:', err);
       return false;
     }
@@ -194,6 +219,11 @@ export const IncomingCallProvider = ({ children }) => {
 
       setActive((prev) => ({ ...prev, status: 'active' }));
       setCallDuration(0);
+      // The call starts with both parties' mic & camera ON (fresh tracks are
+      // created enabled by joinCall). Reset the UI flags so the buttons always
+      // reflect the true state at connect.
+      setIsMuted(false);
+      setIsCameraOff(false);
 
       // Duration timer
       durationTimer.current = setInterval(() => {
@@ -203,7 +233,7 @@ export const IncomingCallProvider = ({ children }) => {
       console.error('accept call failed', err);
       endActiveCall(false);
     }
-  }, [incoming, user, ag, endActiveCall]);
+  }, [incoming, user, ag, endActiveCall, toast]);
 
   const rejectCall = useCallback(async () => {
     if (!incoming) return;
@@ -211,10 +241,13 @@ export const IncomingCallProvider = ({ children }) => {
     if (ringTimeoutRef.current) clearTimeout(ringTimeoutRef.current);
     const { callLogId } = incoming;
     setIncoming(null);
+    // Release any preview tracks created while the call was ringing (the local
+    // video self-view is live during ringing), otherwise the camera stays on.
+    ag.endCall();
     try {
       await api.post(`/calls/reject/${callLogId}`);
     } catch { /* noop */ }
-  }, [incoming]);
+  }, [incoming, ag]);
 
   // Attach remote stream (an Agora track, not a MediaStream) to the video element
   // once it arrives. `track.play(el)` handles the actual rendering.
@@ -285,7 +318,10 @@ export const IncomingCallProvider = ({ children }) => {
           <div className={`${styles.container} ${isVideo ? styles.videoContainer : styles.audioContainer}`}>
             {isVideo && (
               <div className={styles.videoArea}>
-                {activeStatus === 'active' && remoteStream ? (
+                {/* Only render the remote video element when the remote party's
+                    camera is actually on — otherwise show the avatar fallback.
+                    (Their camera toggling never affects the local tracks.) */}
+                {activeStatus === 'active' && remoteStream && !ag.remoteCameraOff ? (
                   <video ref={remoteVideoRef} className={styles.remoteVideo} playsInline autoPlay muted={false} />
                 ) : (
                   <div className={styles.cameraOffOverlay}>
@@ -302,7 +338,12 @@ export const IncomingCallProvider = ({ children }) => {
                     <span className={styles.username}>@{peer?.username || 'user'}</span>
                     <div className={styles.statusBox}>
                       {activeStatus === 'incoming' && <span className={styles.blink}>Incoming Video Call...</span>}
-                      {activeStatus === 'connecting' && <span className={styles.blink}>Connecting...</span>}
+                      {activeStatus === 'connecting' && (
+                        <div className={styles.activeMeta}>
+                          <span className={styles.blink}>Connecting...</span>
+                          {!!active?.rate && <span className={styles.rate}>({active.rate} Coins / min)</span>}
+                        </div>
+                      )}
                       {activeStatus === 'active' && (
                         <div className={styles.activeMeta}>
                           <span className={styles.duration}>{formatDuration(callDuration)}</span>
@@ -311,6 +352,12 @@ export const IncomingCallProvider = ({ children }) => {
                       )}
                     </div>
                   </div>
+                )}
+                {/* Remote party muted their mic — show it on their tile */}
+                {activeStatus === 'active' && ag.remoteMicMuted && (
+                  <span className={styles.remoteMicMutedBadge}>
+                    <MicOff size={13} /> Mic muted
+                  </span>
                 )}
                 <div className={styles.localVideoContainer}>
                   <video
@@ -351,7 +398,12 @@ export const IncomingCallProvider = ({ children }) => {
 
                 <div className={styles.statusBox}>
                   {activeStatus === 'incoming' && <span className={styles.blink}>Incoming Audio Call...</span>}
-                  {activeStatus === 'connecting' && <span className={styles.blink}>Connecting...</span>}
+                  {activeStatus === 'connecting' && (
+                    <div className={styles.activeMeta}>
+                      <span className={styles.blink}>Connecting...</span>
+                      {!!active?.rate && <span className={styles.rate}>({active.rate} Coins / min)</span>}
+                    </div>
+                  )}
                   {activeStatus === 'active' && (
                     <div className={styles.activeMeta}>
                       <span className={styles.duration}>{formatDuration(callDuration)}</span>
@@ -359,6 +411,13 @@ export const IncomingCallProvider = ({ children }) => {
                     </div>
                   )}
                 </div>
+
+                {/* Remote party muted their mic — show it on their tile */}
+                {activeStatus === 'active' && ag.remoteMicMuted && (
+                  <span className={styles.remoteMicMutedBadge}>
+                    <MicOff size={13} /> Mic muted
+                  </span>
+                )}
               </div>
             )}
 
@@ -388,20 +447,78 @@ export const IncomingCallProvider = ({ children }) => {
             ) : (
               <>
                 <div className={`${styles.callTopBar} ${!controlsVisible ? styles.controlsHidden : ''}`}>
-                  <span className={styles.callBalanceChip}>
-                    <img src="/coin.png" alt="Coin" className={styles.callCoinImg} />
-                    {balance.toLocaleString()}
+                  <span className={styles.topBarRow}>
                     <button
-                      className={styles.callRechargeBtn}
+                      type="button"
+                      className={`${styles.chimeMuteBtn} ${chimeMuted ? styles.chimeMuteBtnActive : ''}`}
                       onClick={(e) => {
                         e.stopPropagation();
-                        setRechargeOpen(true);
+                        toggleChimeMuted();
                       }}
-                      title="Recharge coins"
+                      title={chimeMuted ? 'Unmute gift chimes' : 'Mute gift chimes'}
+                      aria-label={chimeMuted ? 'Unmute gift chimes' : 'Mute gift chimes'}
                     >
-                      <Coins size={11} /> Recharge
+                      {chimeMuted ? <BellOff size={14} /> : <Bell size={14} />}
                     </button>
+                    <span className={styles.callBalanceChip}>
+                      <img src="/coin.png" alt="Coin" className={styles.callCoinImg} />
+                      <span
+                        key={balancePulse}
+                        className={`${styles.callBalanceText} ${balancePulse > 0 ? styles.balancePop : ''}`}
+                      >
+                        {balance.toLocaleString()}
+                      </span>
+                      <button
+                        className={styles.callRechargeBtn}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setRechargeOpen(true);
+                        }}
+                        title="Recharge coins"
+                      >
+                        <Coins size={11} /> Recharge
+                      </button>
+                    </span>
                   </span>
+
+                  {/* Per-call gift summary — the creator sees gifts received
+                      from the fan during this call. Dismissible (×) so it
+                      doesn't crowd small screens. */}
+                  {giftSummary && !giftSummaryDismissed && giftSummary.receivedCount > 0 && (
+                    <span className={styles.callGiftSummary}>
+                      <Gift size={13} />
+                      <span>Received</span>
+                      <strong>{giftSummary.receivedCount}</strong>
+                      <img src="/coin.png" alt="Coin" className={styles.callCoinImgSm} />
+                      <span>{giftSummary.receivedCoins.toLocaleString()}</span>
+                      <button
+                        type="button"
+                        className={styles.giftSummaryDismiss}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setGiftSummaryDismissed(true);
+                        }}
+                        title="Hide gift summary"
+                        aria-label="Hide gift summary"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  )}
+
+                  {/* Top gifter this call — highlight the fan who sent the most */}
+                  {topGifter && (
+                    <span className={styles.topGifterChip}>
+                      <img
+                        src={topGifter.avatarUrl || '/profile.png'}
+                        alt={topGifter.displayName || 'Top gifter'}
+                        className={styles.topGifterAvatar}
+                      />
+                      <span className={styles.topGifterCrown}>👑</span>
+                      <span className={styles.topGifterLabel}>Top gifter</span>
+                      <strong className={styles.topGifterName}>{topGifter.displayName || 'Fan'}</strong>
+                    </span>
+                  )}
                 </div>
                 <div
                   className={`${styles.controls} ${!controlsVisible ? styles.controlsHidden : ''}`}
@@ -514,7 +631,7 @@ export const IncomingCallProvider = ({ children }) => {
           receiverName={peer?.displayName || 'this caller'}
           balance={balance}
           onSendGift={(gift) => sendGift(gift)}
-          onRecharge={() => { setGiftOpen(false); setRechargeOpen(true); }}
+          onRecharge={() => setRechargeOpen(true)}
           onClose={() => setGiftOpen(false)}
         />
       )}
