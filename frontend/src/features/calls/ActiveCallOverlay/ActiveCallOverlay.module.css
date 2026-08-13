@@ -753,3 +753,162 @@
     height: 56px;
   }
 }
+
+/* ==========================================================================
+   Light Theme Overrides (Audio & Video Call Overlays & Modals)
+   ========================================================================== */
+.light.callModalOverlay {
+  background: rgba(248, 250, 252, 0.96);
+}
+
+.light.videoCallOverlay {
+  background: #f8fafc;
+}
+
+.light .callModalContent {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+}
+
+.light .audioCallContent {
+  background: radial-gradient(circle at center, #f5f3ff 0%, #e2e8f0 100%);
+}
+
+.light .videoArea {
+  background: #f8fafc;
+}
+
+.light .cameraOffOverlay {
+  background: radial-gradient(circle at center, #f5f3ff 0%, #e2e8f0 100%);
+}
+
+.light .name {
+  color: #0f172a;
+}
+
+.light .handle {
+  color: rgba(15, 23, 42, 0.65);
+}
+
+.light .connectingText {
+  color: #334155;
+}
+
+.light .durationText {
+  color: #0f172a;
+}
+
+.light .rateText {
+  color: #d97706;
+}
+
+.light .localVideoContainer {
+  border-color: rgba(255, 255, 255, 0.9);
+  background: #f1f5f9;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.light .callBalanceChip {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.light .callBalanceText {
+  color: #0f172a;
+}
+
+.light .chimeMuteBtn {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  color: #334155;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.light .chimeMuteBtn:hover {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.light .chimeMuteBtnActive {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.light .callGiftSummary {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #0f172a;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.light .callGiftSummary span {
+  color: #334155;
+}
+
+.light .callGiftSummary strong {
+  color: #0f172a;
+}
+
+.light .callControls {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.light .controlBtn {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #0f172a;
+}
+
+.light .controlBtn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.1);
+  color: #000000;
+}
+
+.light .controlActive {
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+}
+
+.light .remoteMicMutedBadge {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #0f172a;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+/* Call End Confirmation Modal Light Mode */
+.light .confirmModalBackdrop {
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(8px);
+}
+
+.light .confirmModalBox {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+}
+
+.light .confirmModalTitle {
+  color: #0f172a;
+}
+
+.light .confirmModalText {
+  color: #475569;
+}
+
+.light .confirmModalCancelBtn {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.light .confirmModalCancelBtn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}

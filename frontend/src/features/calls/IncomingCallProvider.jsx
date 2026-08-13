@@ -19,7 +19,7 @@ const IncomingCallContext = createContext(null);
 export const useIncomingCall = () => useContext(IncomingCallContext);
 
 export const IncomingCallProvider = ({ children }) => {
-  const { user, refreshBalance, balance } = useApp();
+  const { user, refreshBalance, balance, darkMode } = useApp();
   const { toast } = useToast();
   const [incoming, setIncoming] = useState(null);
   const [active, setActive] = useState(null);
@@ -342,7 +342,7 @@ export const IncomingCallProvider = ({ children }) => {
       {children}
       {showOverlay && (
         <div
-          className={`${styles.overlay} ${isVideo ? styles.videoOverlay : ''}`}
+          className={`${styles.overlay} ${isVideo ? styles.videoOverlay : ''} ${!darkMode ? styles.light : ''}`}
           onClick={() => setControlsVisible((prev) => !prev)}
         >
           <div className={`${styles.container} ${isVideo ? styles.videoContainer : styles.audioContainer}`}>

@@ -12,7 +12,7 @@ const PRESETS = [100, 300, 500, 1000, 2000];
  * coins are simply credited to the wallet instantly.
  */
 export const QuickRecharge = ({ onClose, reason }) => {
-  const { balance, addCoins } = useApp();
+  const { balance, addCoins, darkMode } = useApp();
   const { toast } = useToast();
   const [amount, setAmount] = useState(500);
   const [custom, setCustom] = useState('');
@@ -39,7 +39,7 @@ export const QuickRecharge = ({ onClose, reason }) => {
   };
 
   return (
-    <div className={styles.backdrop} onClick={onClose}>
+    <div className={`${styles.backdrop} ${!darkMode ? styles.light : styles.dark}`} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <button className={styles.closeBtn} onClick={onClose} aria-label="Close">
           <X size={18} />

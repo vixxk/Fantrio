@@ -36,7 +36,7 @@ export const ActiveCallOverlay = ({
   giftSummary = null,
   giftLeaderboard = []
 }) => {
-  const { user } = useApp();
+  const { user, darkMode } = useApp();
   const isFan = user?.role !== 'creator';
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
@@ -72,7 +72,7 @@ export const ActiveCallOverlay = ({
 
   return (
     <div
-      className={`${styles.callModalOverlay} ${isVideo ? styles.videoCallOverlay : ''}`}
+      className={`${styles.callModalOverlay} ${isVideo ? styles.videoCallOverlay : ''} ${!darkMode ? styles.light : ''}`}
       onClick={() => setControlsVisible((prev) => !prev)}
     >
       {/* Top Bar for Coin Balance + Quick Recharge + per-call gift summary */}

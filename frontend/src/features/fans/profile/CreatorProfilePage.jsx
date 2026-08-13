@@ -28,6 +28,7 @@ import {
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/Toast/Toast';
 import { api } from '../../../services/api';
+import { getSocket } from '../../../services/socket';
 import styles from './CreatorProfilePage.module.css';
 
 const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80';
@@ -143,6 +144,51 @@ export const CreatorProfilePage = () => {
       mounted = false;
     };
   }, [username, loadCreatorPosts]);
+
+  useEffect(() => {
+    let socket = null;
+    try {
+      socket = getSocket();
+    } catch { /* noop */ }
+
+    const handlePresence = ({ userId, creatorId, isOnline }) => {
+      if (!creator) return;
+      const targetId = String(userId || creatorId);
+      const cUserId = String(creator.userId?._id || creator.userId || '');
+      const cCreatorId = String(creator._id || '');
+      if (cUserId === targetId || cCreatorId === targetId) {
+        setCreator((prev) => (prev ? { ...prev, isOnline } : prev));
+      }
+    };
+
+    const handleAvailability = ({ userId, creatorId, isOnline, audioAvailable, videoAvailable }) => {
+      if (!creator) return;
+      const targetId = String(userId || creatorId);
+      const cUserId = String(creator.userId?._id || creator.userId || '');
+      const cCreatorId = String(creator._id || '');
+      if (cUserId === targetId || cCreatorId === targetId) {
+        setCreator((prev) =>
+          prev
+            ? {
+                ...prev,
+                ...(isOnline !== undefined ? { isOnline } : {}),
+                ...(audioAvailable !== undefined ? { audioAvailable } : {}),
+                ...(videoAvailable !== undefined ? { videoAvailable } : {})
+              }
+            : prev
+        );
+      }
+    };
+
+    if (socket) {
+      socket.on('user_presence_change', handlePresence);
+      socket.on('creator_availability_change', handleAvailability);
+      return () => {
+        socket.off('user_presence_change', handlePresence);
+        socket.off('creator_availability_change', handleAvailability);
+      };
+    }
+  }, [creator]);
 
   const handleFollow = useCallback(async () => {
     const creatorId = creator?.userId?._id || creator?.userId;

@@ -11,6 +11,7 @@ import { ConfirmDeleteDialog } from '../../components/ConfirmDeleteDialog/Confir
 import { useConfirmDelete } from '../../hooks/useConfirmDelete';
 import { useToast } from '../../components/Toast/Toast';
 import { useAppDialog } from '../../components/AppDialog/AppDialog';
+import { getSocket } from '../../services/socket';
 import styles from './AllCreators.module.css';
 
 export const AllCreators = () => {
@@ -154,6 +155,55 @@ export const AllCreators = () => {
     Promise.resolve().then(() => fetchCreators());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, searchQuery, sortBy, statusFilter, category, contentType, country, language, followerRange]);
+
+  useEffect(() => {
+    let socket = null;
+    try {
+      socket = getSocket();
+    } catch { /* noop */ }
+
+    const handlePresence = ({ userId, creatorId, isOnline }) => {
+      const targetId = String(userId || creatorId);
+      setCreators((prev) =>
+        prev.map((c) => {
+          const cUserId = String(c.userId?._id || c.userId || c._id);
+          const cCreatorId = String(c._id);
+          if (cUserId === targetId || cCreatorId === targetId) {
+            return { ...c, isOnline };
+          }
+          return c;
+        })
+      );
+    };
+
+    const handleAvailability = ({ userId, creatorId, isOnline, audioAvailable, videoAvailable }) => {
+      const targetId = String(userId || creatorId);
+      setCreators((prev) =>
+        prev.map((c) => {
+          const cUserId = String(c.userId?._id || c.userId || c._id);
+          const cCreatorId = String(c._id);
+          if (cUserId === targetId || cCreatorId === targetId) {
+            return {
+              ...c,
+              ...(isOnline !== undefined ? { isOnline } : {}),
+              ...(audioAvailable !== undefined ? { audioAvailable } : {}),
+              ...(videoAvailable !== undefined ? { videoAvailable } : {})
+            };
+          }
+          return c;
+        })
+      );
+    };
+
+    if (socket) {
+      socket.on('user_presence_change', handlePresence);
+      socket.on('creator_availability_change', handleAvailability);
+      return () => {
+        socket.off('user_presence_change', handlePresence);
+        socket.off('creator_availability_change', handleAvailability);
+      };
+    }
+  }, []);
 
   const handleResetFilters = () => {
     setStatusFilter('all');

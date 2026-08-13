@@ -251,3 +251,76 @@
 @media (max-width: 420px) {
   .presetGrid { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* Light Theme Support */
+.light.backdrop {
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.light .modal {
+  background: linear-gradient(180deg, #ffffff 0%, #f8f6fc 100%);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.15);
+}
+
+.light .closeBtn {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .closeBtn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: #1a1625;
+}
+
+.light .title {
+  color: #1a1625;
+}
+
+.light .sub {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .balanceRow {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.light .balanceLabel {
+  color: rgba(26, 22, 37, 0.6);
+}
+
+.light .preset {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.06);
+  color: #1a1625;
+}
+
+.light .preset:hover {
+  border-color: rgba(225, 0, 117, 0.4);
+  background: rgba(225, 0, 117, 0.08);
+}
+
+.light .presetActive {
+  border-color: #e10075;
+  background: rgba(225, 0, 117, 0.12);
+}
+
+.light .customInput {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #1a1625;
+}
+
+.light .customInput::placeholder {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .note {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .successTitle {
+  color: #1a1625;
+}

@@ -469,22 +469,26 @@ exports.sendGift = catchAsync(async (req, res, next) => {
   }
 
   // Create persistent Message record for chat threads so it renders as a Gift Card
+  // ONLY for gifts sent directly in chat (not inside calls, streams, or posts).
   let chatMessage = null;
-  try {
-    const Message = require('../models/Message');
-    chatMessage = await Message.create({
-      senderId: req.user._id,
-      receiverId,
-      content: `${gift.emoji} Sent ${gift.name} (${gift.coins.toLocaleString()} Coins)!`,
-      isGift: true,
-      giftName: gift.name,
-      giftEmoji: gift.emoji,
-      giftCoins: gift.coins,
-      giftTier: gift.tier || 1
-    });
-    if (chatMessage) meta.messageId = chatMessage._id;
-  } catch (err) {
-    console.error('Failed to create gift chat message:', err);
+  const isChatGift = !callRoomId && !streamId && !postId;
+  if (isChatGift) {
+    try {
+      const Message = require('../models/Message');
+      chatMessage = await Message.create({
+        senderId: req.user._id,
+        receiverId,
+        content: `${gift.emoji} Sent ${gift.name} (${gift.coins.toLocaleString()} Coins)!`,
+        isGift: true,
+        giftName: gift.name,
+        giftEmoji: gift.emoji,
+        giftCoins: gift.coins,
+        giftTier: gift.tier || 1
+      });
+      if (chatMessage) meta.messageId = chatMessage._id;
+    } catch (err) {
+      console.error('Failed to create gift chat message:', err);
+    }
   }
 
   if (transaction) {
