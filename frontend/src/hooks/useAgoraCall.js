@@ -87,8 +87,8 @@ export const useAgoraCall = () => {
       const localAudioTrack = await createLocalAudioTrack();
       localAudioTrackRef.current = localAudioTrack;
 
-      let localVideoTrack = null;
-      if (type === 'video') {
+      let localVideoTrack = localVideoTrackRef.current;
+      if (type === 'video' && !localVideoTrack) {
         try {
           localVideoTrack = await createLocalVideoTrack();
           localVideoTrackRef.current = localVideoTrack;
@@ -172,10 +172,18 @@ export const useAgoraCall = () => {
     return next;
   }, []);
 
-  const attachLocal = useCallback((el) => {
-    const track = localVideoTrackRef.current;
-    if (!el || !track) return;
-    track.play(el);
+  const attachLocal = useCallback(async (el) => {
+    if (!el) return;
+    try {
+      if (!localVideoTrackRef.current) {
+        localVideoTrackRef.current = await createLocalVideoTrack();
+      }
+      if (localVideoTrackRef.current) {
+        localVideoTrackRef.current.play(el);
+      }
+    } catch (err) {
+      console.warn('Failed to attach local video preview:', err);
+    }
   }, []);
 
   const attachRemote = useCallback((el) => {

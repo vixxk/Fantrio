@@ -266,6 +266,8 @@ export const IncomingCallProvider = ({ children }) => {
     return `${mins}:${secs}`;
   };
 
+  const [showEndConfirm, setShowEndConfirm] = useState(false);
+
   const showOverlay = incoming || active;
   const isVideo = (incoming || active)?.type === 'video';
   const peer = (incoming || active)?.caller;
@@ -275,45 +277,78 @@ export const IncomingCallProvider = ({ children }) => {
     <IncomingCallContext.Provider value={{ incoming, active, acceptCall, rejectCall, endActiveCall }}>
       {children}
       {showOverlay && (
-        <div className={styles.overlay}>
-          <div className={styles.container}>
+        <div className={`${styles.overlay} ${isVideo ? styles.videoOverlay : ''}`}>
+          <div className={`${styles.container} ${isVideo ? styles.videoContainer : ''}`}>
             {isVideo && (
               <div className={styles.videoArea}>
-                <video ref={remoteVideoRef} className={styles.remoteVideo} playsInline autoPlay muted={false} />
-                <video ref={localVideoRef} className={styles.localVideo} playsInline autoPlay muted />
+                {activeStatus === 'active' && remoteStream ? (
+                  <video ref={remoteVideoRef} className={styles.remoteVideo} playsInline autoPlay muted={false} />
+                ) : (
+                  <div className={styles.cameraOffOverlay}>
+                    <div className={styles.avatarWrap}>
+                      <div className={styles.pulseRing} />
+                      <div className={`${styles.pulseRing} ${styles.ringDelayed}`} />
+                      {peer?.avatarUrl ? (
+                        <img src={peer.avatarUrl} alt={peer.displayName} className={styles.avatar} />
+                      ) : (
+                        <div className={styles.avatar}>{peer?.displayName?.[0] || '?'}</div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                <div className={styles.localVideoContainer}>
+                  <video
+                    ref={localVideoRef}
+                    className={`${styles.localVideo} ${isCameraOff ? styles.localVideoHidden : ''}`}
+                    playsInline
+                    autoPlay
+                    muted
+                  />
+                  {isCameraOff && (
+                    <div className={styles.localCameraOffFallback}>
+                      <span>Cam Off</span>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
-            <div className={styles.avatarWrap}>
-              <div className={styles.pulseRing} />
-              <div className={`${styles.pulseRing} ${styles.ringDelayed}`} />
-              {peer?.avatarUrl ? (
-                <img src={peer.avatarUrl} alt={peer.displayName} className={styles.avatar} />
-              ) : (
-                <div className={styles.avatar}>{peer?.displayName?.[0] || '?'}</div>
-              )}
-            </div>
+            {(!isVideo || activeStatus !== 'active' || isCameraOff) && (
+              <div className={styles.infoCenterCard}>
+                {!isVideo && (
+                  <div className={styles.avatarWrap}>
+                    <div className={styles.pulseRing} />
+                    <div className={`${styles.pulseRing} ${styles.ringDelayed}`} />
+                    {peer?.avatarUrl ? (
+                      <img src={peer.avatarUrl} alt={peer.displayName} className={styles.avatar} />
+                    ) : (
+                      <div className={styles.avatar}>{peer?.displayName?.[0] || '?'}</div>
+                    )}
+                  </div>
+                )}
 
-            <h2 className={styles.name}>{peer?.displayName || 'Incoming Call'}</h2>
-            <span className={styles.username}>@{peer?.username || 'fan'}</span>
+                <h2 className={styles.name}>{peer?.displayName || 'Incoming Call'}</h2>
+                <span className={styles.username}>@{peer?.username || 'fan'}</span>
 
-            <div className={styles.statusBox}>
-              {activeStatus === 'incoming' && <span className={styles.blink}>Incoming {isVideo ? 'Video' : 'Audio'} Call...</span>}
-              {activeStatus === 'connecting' && <span className={styles.blink}>Connecting...</span>}
-              {activeStatus === 'active' && (
-                <div className={styles.activeMeta}>
-                  <span className={styles.duration}>{formatDuration(callDuration)}</span>
-                  <span className={styles.rate}>({active.rate} Coins / min)</span>
+                <div className={styles.statusBox}>
+                  {activeStatus === 'incoming' && <span className={styles.blink}>Incoming {isVideo ? 'Video' : 'Audio'} Call...</span>}
+                  {activeStatus === 'connecting' && <span className={styles.blink}>Connecting...</span>}
+                  {activeStatus === 'active' && (
+                    <div className={styles.activeMeta}>
+                      <span className={styles.duration}>{formatDuration(callDuration)}</span>
+                      <span className={styles.rate}>({active.rate} Coins / min)</span>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {activeStatus === 'incoming' ? (
               <div className={styles.controls}>
-                <button className={styles.rejectBtn} onClick={rejectCall}>
+                <button className={styles.rejectBtn} onClick={rejectCall} title="Decline Call">
                   <PhoneOff size={26} />
                 </button>
-                <button className={styles.acceptBtn} onClick={acceptCall}>
+                <button className={styles.acceptBtn} onClick={acceptCall} title="Accept Call">
                   <Phone size={26} />
                 </button>
               </div>
@@ -338,6 +373,7 @@ export const IncomingCallProvider = ({ children }) => {
                     onClick={() => setGiftOpen(true)}
                     disabled={activeStatus !== 'active'}
                     aria-label="Send a gift"
+                    title="Send Gift"
                   >
                     <Gift size={22} />
                   </button>
@@ -345,6 +381,7 @@ export const IncomingCallProvider = ({ children }) => {
                     className={`${styles.controlBtn} ${isMuted ? styles.controlActive : ''}`}
                     onClick={toggleMute}
                     disabled={activeStatus !== 'active'}
+                    title={isMuted ? 'Unmute Mic' : 'Mute Mic'}
                   >
                     {isMuted ? <MicOff size={22} /> : <Mic size={22} />}
                   </button>
@@ -353,24 +390,59 @@ export const IncomingCallProvider = ({ children }) => {
                       className={`${styles.controlBtn} ${isCameraOff ? styles.controlActive : ''}`}
                       onClick={toggleCamera}
                       disabled={activeStatus !== 'active'}
+                      title={isCameraOff ? 'Turn Camera On' : 'Turn Camera Off'}
                     >
                       {isCameraOff ? <VideoOff size={22} /> : <Video size={22} />}
                     </button>
                   )}
-                  <button className={styles.hangupBtn} onClick={() => endActiveCall()}>
+                  <button className={styles.hangupBtn} onClick={() => setShowEndConfirm(true)} title="End Call">
                     <Phone size={26} className={styles.hangupIcon} />
                   </button>
                   <button
                     className={`${styles.controlBtn} ${styles.controlBtnCoins}`}
                     onClick={() => setRechargeOpen(true)}
-                    disabled={activeStatus !== 'active'}
                     aria-label="Recharge coins"
+                    title="Recharge Balance"
                   >
                     <Coins size={22} />
                   </button>
                 </div>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Theme End Call Confirmation Modal */}
+      {showEndConfirm && (
+        <div className={styles.confirmModalBackdrop} onClick={() => setShowEndConfirm(false)}>
+          <div className={styles.confirmModalBox} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.confirmModalIcon}>
+              <Phone size={24} className={styles.confirmPhoneIcon} />
+            </div>
+            <h3 className={styles.confirmModalTitle}>End Call?</h3>
+            <p className={styles.confirmModalText}>
+              Are you sure you want to end this call with <strong>{peer?.displayName || 'this user'}</strong>?
+            </p>
+            <div className={styles.confirmModalActions}>
+              <button
+                type="button"
+                className={styles.confirmModalCancelBtn}
+                onClick={() => setShowEndConfirm(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className={styles.confirmModalEndBtn}
+                onClick={() => {
+                  setShowEndConfirm(false);
+                  endActiveCall();
+                }}
+              >
+                End Call
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -5,31 +5,50 @@
   right: 0;
   bottom: 0;
   background: rgba(7, 5, 11, 0.94);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
   z-index: 99999;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+.videoOverlay {
+  background: rgba(4, 2, 8, 0.97);
+}
+
 .container {
-  width: 100%;
-  max-width: 420px;
+  width: 440px;
+  max-width: 95vw;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 1rem;
-  padding: 2rem;
+  gap: 1.2rem;
+  padding: 2.5rem 1.5rem 1.5rem;
   position: relative;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+
+.videoContainer {
+  width: 90vw;
+  max-width: 1050px;
+  height: 82vh;
+  max-height: 780px;
+  border-radius: 28px;
+  padding: 0;
+  background: #06040a;
 }
 
 .videoArea {
   position: absolute;
   inset: 0;
-  border-radius: 20px;
+  border-radius: 28px;
   overflow: hidden;
-  background: #000;
+  background: #08060c;
 }
 
 .remoteVideo {
@@ -38,24 +57,76 @@
   object-fit: cover;
 }
 
-.localVideo {
+.cameraOffOverlay {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 128px;
-  height: 172px;
-  border-radius: 12px;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, #1b0f2e 0%, #06040a 100%);
+  z-index: 1;
+}
+
+.localVideoContainer {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 140px;
+  height: 190px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  z-index: 5;
+  background: #110d1a;
+}
+
+.localVideo {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  z-index: 3;
-  background: #111;
+  display: block;
+}
+
+.localVideoHidden {
+  display: none;
+}
+
+.localCameraOffFallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #191226;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.infoCenterCard {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: auto;
+  margin-bottom: auto;
+  padding: 1.5rem;
+  border-radius: 24px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .avatarWrap {
   position: relative;
-  width: 140px;
-  height: 140px;
-  margin-top: 2rem;
+  width: 130px;
+  height: 130px;
+  margin-bottom: 1rem;
   z-index: 2;
 }
 
@@ -109,7 +180,7 @@
 .username {
   font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.5);
-  margin-top: -0.6rem;
+  margin-top: -0.3rem;
   z-index: 2;
 }
 
@@ -119,6 +190,7 @@
   align-items: center;
   justify-content: center;
   z-index: 2;
+  margin-top: 0.5rem;
 }
 
 .blink {
@@ -136,7 +208,8 @@
 .activeMeta {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: center;
+  gap: 2px;
 }
 
 .duration {
@@ -148,23 +221,28 @@
 
 .rate {
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .controls {
   display: flex;
   align-items: center;
-  gap: 2rem;
-  margin-top: 1.5rem;
-  z-index: 2;
+  gap: 1.5rem;
+  z-index: 10;
+  padding: 12px 24px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  margin-bottom: 1rem;
 }
 
 .controlBtn {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -174,17 +252,19 @@
 }
 
 .controlBtn:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.18);
+  transform: scale(1.05);
 }
 
 .controlActive {
   background: #ff007f;
   border-color: #ff007f;
+  box-shadow: 0 0 16px rgba(255, 0, 127, 0.5);
 }
 
 .rejectBtn {
-  width: 70px;
-  height: 70px;
+  width: 62px;
+  height: 62px;
   border-radius: 50%;
   background: #ff1744;
   border: none;
@@ -193,13 +273,13 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(255, 23, 68, 0.4);
+  box-shadow: 0 8px 24px rgba(255, 23, 68, 0.45);
   transition: all 0.2s;
 }
 
 .acceptBtn {
-  width: 70px;
-  height: 70px;
+  width: 62px;
+  height: 62px;
   border-radius: 50%;
   background: #00c853;
   border: none;
@@ -208,18 +288,18 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(0, 200, 83, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 200, 83, 0.45);
   transition: all 0.2s;
 }
 
 .rejectBtn:hover,
 .acceptBtn:hover {
-  transform: scale(1.05);
+  transform: scale(1.08);
 }
 
 .hangupBtn {
-  width: 70px;
-  height: 70px;
+  width: 62px;
+  height: 62px;
   border-radius: 50%;
   background: #ff1744;
   border: none;
@@ -227,12 +307,12 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(255, 23, 68, 0.4);
+  box-shadow: 0 8px 24px rgba(255, 23, 68, 0.45);
   transition: all 0.2s;
 }
 
 .hangupBtn:hover {
-  transform: scale(1.05);
+  transform: scale(1.08);
 }
 
 .hangupIcon {
@@ -240,35 +320,34 @@
   transform: rotate(135deg);
 }
 
-/* Gift + recharge controls inside the active call overlay */
 .callTopBar {
   position: absolute;
-  top: 24px;
+  top: 20px;
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
-  z-index: 10;
+  z-index: 20;
 }
 
 .callBalanceChip {
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 999px;
-  padding: 6px 8px 6px 12px;
+  padding: 6px 8px 6px 14px;
   color: #fff;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 800;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 .callCoinImg {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   object-fit: contain;
 }
 
@@ -280,28 +359,16 @@
   border: none;
   border-radius: 999px;
   color: #fff;
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 800;
-  padding: 4px 10px;
+  padding: 5px 12px;
   cursor: pointer;
-  transition: opacity 0.2s, transform 0.2s;
+  transition: all 0.2s;
 }
 
 .callRechargeBtn:hover {
-  opacity: 0.9;
+  opacity: 0.95;
   transform: scale(1.05);
-}
-
-.callRechargeBtn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.controlBtn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  pointer-events: none;
 }
 
 .controlBtnGift {
@@ -310,18 +377,155 @@
   color: #ff7ab8;
 }
 
-.controlBtnGift:hover {
-  background: linear-gradient(135deg, rgba(225, 0, 117, 0.55), rgba(126, 0, 243, 0.55));
-  color: #fff;
-}
-
 .controlBtnCoins {
   background: rgba(255, 215, 102, 0.12);
   border-color: rgba(255, 215, 102, 0.4);
   color: #ffd166;
 }
 
-.controlBtnCoins:hover {
-  background: rgba(255, 215, 102, 0.22);
-  color: #fff;
+.confirmModalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.confirmModalBox {
+  width: 360px;
+  max-width: 90vw;
+  background: linear-gradient(145deg, #181026, #0e0917);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+}
+
+.confirmModalIcon {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: rgba(255, 23, 68, 0.15);
+  border: 1px solid rgba(255, 23, 68, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.confirmPhoneIcon {
+  color: #ff1744;
+  transform: rotate(135deg);
+}
+
+.confirmModalTitle {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.5rem 0;
+}
+
+.confirmModalText {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.4;
+}
+
+.confirmModalActions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.confirmModalCancelBtn {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.confirmModalCancelBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.confirmModalEndBtn {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: #ff1744;
+  border: none;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(255, 23, 68, 0.4);
+  transition: background 0.2s;
+}
+
+.confirmModalEndBtn:hover {
+  background: #d50000;
+}
+
+@media (max-width: 768px) {
+  .overlay {
+    padding: 0;
+  }
+
+  .videoContainer {
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+    border: none;
+  }
+
+  .localVideoContainer {
+    top: 70px;
+    right: 14px;
+    width: 105px;
+    height: 145px;
+    border-radius: 14px;
+  }
+
+  .callTopBar {
+    top: 16px;
+  }
+
+  .controls {
+    position: absolute;
+    bottom: 24px;
+    gap: 1rem;
+    padding: 8px 16px;
+    margin: 0;
+  }
+
+  .controlBtn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .rejectBtn, .acceptBtn, .hangupBtn {
+    width: 56px;
+    height: 56px;
+  }
 }
