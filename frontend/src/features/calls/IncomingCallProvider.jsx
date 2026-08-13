@@ -278,7 +278,7 @@ export const IncomingCallProvider = ({ children }) => {
       {children}
       {showOverlay && (
         <div className={`${styles.overlay} ${isVideo ? styles.videoOverlay : ''}`}>
-          <div className={`${styles.container} ${isVideo ? styles.videoContainer : ''}`}>
+          <div className={`${styles.container} ${isVideo ? styles.videoContainer : styles.audioContainer}`}>
             {isVideo && (
               <div className={styles.videoArea}>
                 {activeStatus === 'active' && remoteStream ? (
@@ -292,6 +292,18 @@ export const IncomingCallProvider = ({ children }) => {
                         <img src={peer.avatarUrl} alt={peer.displayName} className={styles.avatar} />
                       ) : (
                         <div className={styles.avatar}>{peer?.displayName?.[0] || '?'}</div>
+                      )}
+                    </div>
+                    <h2 className={styles.name}>{peer?.displayName || 'Incoming Call'}</h2>
+                    <span className={styles.username}>@{peer?.username || 'user'}</span>
+                    <div className={styles.statusBox}>
+                      {activeStatus === 'incoming' && <span className={styles.blink}>Incoming Video Call...</span>}
+                      {activeStatus === 'connecting' && <span className={styles.blink}>Connecting...</span>}
+                      {activeStatus === 'active' && (
+                        <div className={styles.activeMeta}>
+                          <span className={styles.duration}>{formatDuration(callDuration)}</span>
+                          <span className={styles.rate}>({active.rate} Coins / min)</span>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -313,25 +325,23 @@ export const IncomingCallProvider = ({ children }) => {
               </div>
             )}
 
-            {(!isVideo || activeStatus !== 'active' || isCameraOff) && (
-              <div className={styles.infoCenterCard}>
-                {!isVideo && (
-                  <div className={styles.avatarWrap}>
-                    <div className={styles.pulseRing} />
-                    <div className={`${styles.pulseRing} ${styles.ringDelayed}`} />
-                    {peer?.avatarUrl ? (
-                      <img src={peer.avatarUrl} alt={peer.displayName} className={styles.avatar} />
-                    ) : (
-                      <div className={styles.avatar}>{peer?.displayName?.[0] || '?'}</div>
-                    )}
-                  </div>
-                )}
+            {!isVideo && (
+              <div className={styles.audioSurface}>
+                <div className={styles.avatarWrap}>
+                  <div className={styles.pulseRing} />
+                  <div className={`${styles.pulseRing} ${styles.ringDelayed}`} />
+                  {peer?.avatarUrl ? (
+                    <img src={peer.avatarUrl} alt={peer.displayName} className={styles.avatar} />
+                  ) : (
+                    <div className={styles.avatar}>{peer?.displayName?.[0] || '?'}</div>
+                  )}
+                </div>
 
                 <h2 className={styles.name}>{peer?.displayName || 'Incoming Call'}</h2>
-                <span className={styles.username}>@{peer?.username || 'fan'}</span>
+                <span className={styles.username}>@{peer?.username || 'user'}</span>
 
                 <div className={styles.statusBox}>
-                  {activeStatus === 'incoming' && <span className={styles.blink}>Incoming {isVideo ? 'Video' : 'Audio'} Call...</span>}
+                  {activeStatus === 'incoming' && <span className={styles.blink}>Incoming Audio Call...</span>}
                   {activeStatus === 'connecting' && <span className={styles.blink}>Connecting...</span>}
                   {activeStatus === 'active' && (
                     <div className={styles.activeMeta}>

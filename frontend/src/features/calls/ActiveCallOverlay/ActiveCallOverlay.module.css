@@ -38,7 +38,7 @@
   overflow: hidden;
 }
 
-/* Expanded space for Desktop Video Calls */
+/* Expanded space for Desktop Video & Audio Calls */
 .videoCallContent {
   width: 90vw;
   max-width: 1050px;
@@ -47,6 +47,28 @@
   border-radius: 28px;
   padding: 0;
   background: #06040a;
+}
+
+.audioCallContent {
+  width: 90vw;
+  max-width: 1050px;
+  height: 82vh;
+  max-height: 780px;
+  border-radius: 28px;
+  padding: 0;
+  background: radial-gradient(circle at center, #1b0f2e 0%, #06040a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+}
+
+.audioCallSurface {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
 }
 
 /* ========== video surfaces (video calls only) ========== */
@@ -188,27 +210,27 @@
 }
 
 .callName {
-  font-size: 1.6rem;
+  font-size: 1.65rem;
   font-weight: 800;
   color: #ffffff;
-  margin: 0;
+  margin-top: 0.6rem;
+  margin-bottom: 0.3rem;
   z-index: 2;
 }
 
 .callUsername {
   font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.5);
-  margin-top: -0.3rem;
+  margin-bottom: 1.25rem;
   z-index: 2;
 }
 
 .callStatusBox {
-  height: 40px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 2;
-  margin-top: 0.5rem;
 }
 
 .statusBlink {
@@ -490,7 +512,8 @@
     padding: 0;
   }
 
-  .videoCallContent {
+  .videoCallContent,
+  .audioCallContent {
     width: 100vw;
     height: 100vh;
     max-width: none;

@@ -55,9 +55,9 @@ export const ActiveCallOverlay = ({
         </div>
       </div>
 
-      <div className={`${styles.callModalContent} ${isVideo ? styles.videoCallContent : ''}`}>
+      <div className={`${styles.callModalContent} ${isVideo ? styles.videoCallContent : styles.audioCallContent}`}>
         {/* Video Surface Area */}
-        {isVideo && (
+        {isVideo ? (
           <div className={styles.videoArea}>
             {call.status === 'active' && remoteStream ? (
               <video
@@ -77,7 +77,19 @@ export const ActiveCallOverlay = ({
                     className={styles.callAvatar}
                   />
                 </div>
-                {call.status === 'active' && (
+                <h2 className={styles.callName}>{creator.displayName || 'Creator'}</h2>
+                <span className={styles.callUsername}>@{creator.username || 'user'}</span>
+                <div className={styles.callStatusBox}>
+                  {call.status === 'connecting' && <span className={styles.statusBlink}>Connecting...</span>}
+                  {call.status === 'ringing' && <span className={styles.statusBlink}>Ringing call...</span>}
+                  {call.status === 'active' && (
+                    <div className={styles.activeCallMeta}>
+                      <span className={styles.duration}>{formatDuration(duration)}</span>
+                      <span className={styles.billingRate}>({call.rate} Coins / min)</span>
+                    </div>
+                  )}
+                </div>
+                {call.status === 'active' && isCameraOff && (
                   <span className={styles.cameraOffBadge}>
                     <CameraOff size={14} /> Camera Off
                   </span>
@@ -102,22 +114,18 @@ export const ActiveCallOverlay = ({
               )}
             </div>
           </div>
-        )}
-
-        {/* Audio Call / Connecting Info overlay */}
-        {(!isVideo || call.status !== 'active' || isCameraOff) && (
-          <div className={styles.infoCenterCard}>
-            {!isVideo && (
-              <div className={styles.callAvatarWrapper}>
-                <div className={styles.pulseRing} />
-                <div className={`${styles.pulseRing} ${styles.ringDelayed}`} />
-                <img
-                  src={creator.avatarUrl || '/profile.png'}
-                  alt={creator.displayName || 'Creator'}
-                  className={styles.callAvatar}
-                />
-              </div>
-            )}
+        ) : (
+          /* Audio Call Surface: Identical Full Screen Centered Layout */
+          <div className={styles.audioCallSurface}>
+            <div className={styles.callAvatarWrapper}>
+              <div className={styles.pulseRing} />
+              <div className={`${styles.pulseRing} ${styles.ringDelayed}`} />
+              <img
+                src={creator.avatarUrl || '/profile.png'}
+                alt={creator.displayName || 'Creator'}
+                className={styles.callAvatar}
+              />
+            </div>
 
             <h2 className={styles.callName}>{creator.displayName || 'Creator'}</h2>
             <span className={styles.callUsername}>@{creator.username || 'user'}</span>
