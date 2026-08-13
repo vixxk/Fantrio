@@ -177,7 +177,9 @@ export const useAgoraCall = () => {
 
       const handleUserPublished = async (user, mediaType) => {
         remoteUserIdRef.current = user.uid;
-        await subscribeToUser(c, user, mediaType);
+        const subResult = await subscribeToUser(c, user, mediaType);
+        if (!subResult) return;
+
         if (mediaType === 'video' && user.videoTrack) {
           remoteVideoTrackRef.current = user.videoTrack;
           setRemoteCameraOff(false);

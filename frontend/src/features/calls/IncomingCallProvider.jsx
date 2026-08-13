@@ -161,15 +161,24 @@ export const IncomingCallProvider = ({ children }) => {
     setIsCameraOff(false);
     refreshBalance();
     endingRef.current = false;
+    // Refresh page for receiver after call ends or cuts
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
   }, [cleanupTimers, ag, refreshBalance]);
+
+  const endActiveCallRef = useRef(endActiveCall);
+  useEffect(() => {
+    endActiveCallRef.current = endActiveCall;
+  }, [endActiveCall]);
 
   useEffect(() => {
     return () => {
       if (activeRef.current) {
-        endActiveCall(true);
+        endActiveCallRef.current(true);
       }
     };
-  }, [endActiveCall]);
+  }, []);
 
   const checkMediaPermissions = async (callType) => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return true;

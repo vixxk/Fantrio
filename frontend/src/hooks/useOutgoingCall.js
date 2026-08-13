@@ -79,6 +79,10 @@ export const useOutgoingCall = ({ type }) => {
     }
     refreshBalance();
     endingRef.current = false;
+    // Refresh page for caller after call ends or cuts
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
   }, [clearCall, refreshBalance]);
 
   // Lock navigation to the ongoing call view while a call is connecting or active
@@ -100,13 +104,18 @@ export const useOutgoingCall = ({ type }) => {
     };
   }, [activeCall]);
 
+  const endCallRef = useRef(endCall);
+  useEffect(() => {
+    endCallRef.current = endCall;
+  }, [endCall]);
+
   useEffect(() => {
     return () => {
       if (activeCallRef.current) {
-        endCall();
+        endCallRef.current();
       }
     };
-  }, [endCall]);
+  }, []);
 
   const checkMediaPermissions = async (callType) => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return true;
