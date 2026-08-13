@@ -3,12 +3,23 @@ import { io } from 'socket.io-client';
 const SOCKET_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
 let socket = null;
+let activeUserId = null;
 
 export const getSocket = () => {
   if (!socket) {
     socket = io(SOCKET_URL, {
       transports: ['websocket', 'polling'],
-      autoConnect: false
+      autoConnect: false,
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000
+    });
+
+    socket.on('connect', () => {
+      if (activeUserId) {
+        socket.emit('join_room', activeUserId);
+      }
     });
   }
   return socket;
@@ -24,8 +35,13 @@ export const connectSocket = () => {
 
 export const joinSocketRoom = (userId) => {
   if (!userId) return;
+  const uid = String(userId);
+  activeUserId = uid;
   const s = connectSocket();
-  s.emit('join_room', userId);
+  
+  if (s.connected) {
+    s.emit('join_room', uid);
+  }
 };
 
 export const disconnectSocket = () => {
@@ -33,6 +49,7 @@ export const disconnectSocket = () => {
     socket.disconnect();
     socket = null;
   }
+  activeUserId = null;
 };
 
 export default getSocket;

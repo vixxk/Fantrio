@@ -208,7 +208,8 @@ exports.register = catchAsync(async (req, res, next) => {
         await CreatorProfile.create({
           userId: newUser._id,
           username: newUser.username,
-          displayName: newUser.displayName
+          displayName: newUser.displayName,
+          verificationStatus: 'approved'
         });
       }
     }
@@ -297,7 +298,8 @@ exports.verifyOtp = catchAsync(async (req, res, next) => {
       await CreatorProfile.create({
         userId: user._id,
         username: user.username,
-        displayName: user.displayName
+        displayName: user.displayName,
+        verificationStatus: 'approved'
       });
     }
   }

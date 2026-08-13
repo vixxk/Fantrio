@@ -1848,6 +1848,15 @@ exports.toggleCallAvailability = catchAsync(async (req, res, next) => {
     return next(new ApiError(404, 'Creator profile not found'));
   }
 
+  const io = req.app.get('io');
+  if (io) {
+    io.emit('creator_availability_change', {
+      userId: req.user._id.toString(),
+      audioAvailable: profile.audioAvailable,
+      videoAvailable: profile.videoAvailable
+    });
+  }
+
   res.status(200).json({
     status: 'success',
     profile

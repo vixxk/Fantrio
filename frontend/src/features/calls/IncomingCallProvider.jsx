@@ -48,15 +48,15 @@ export const IncomingCallProvider = ({ children }) => {
 
   // Connect socket when user logs in and register to their room
   useEffect(() => {
-    if (token && user) {
+    if (user?.id) {
       connectSocket();
       joinSocketRoom(user.id);
     }
-  }, [token, user]);
+  }, [user]);
 
   // Listen for incoming calls
   useEffect(() => {
-    if (!token || !user) return;
+    if (!user?.id) return;
     const socket = getSocket();
     socket.on('incoming_call', (payload) => {
       if (activeRef.current || incoming) {

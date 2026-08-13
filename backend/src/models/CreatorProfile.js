@@ -53,7 +53,7 @@ const creatorProfileSchema = new mongoose.Schema(
     verificationStatus: {
       type: String,
       enum: ['pending', 'approved', 'rejected'],
-      default: 'pending'
+      default: 'approved'
     },
     rates: {
       subscriptionMonthly: {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../../services/api';
+import { getSocket } from '../../../services/socket';
 import { useApp } from '../../../context/AppContext';
 import { 
   Star, 
@@ -155,6 +156,42 @@ export const AudioCallsPage = () => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
+
+  useEffect(() => {
+    let socket = null;
+    try {
+      socket = getSocket();
+    } catch { /* noop */ }
+    
+    const handlePresence = ({ userId, isOnline }) => {
+      setCreators((prev) =>
+        prev.map((c) => {
+          const cUserId = String(c.userId || c._id);
+          if (cUserId === String(userId)) {
+            return { ...c, isOnline };
+          }
+          return c;
+        })
+      );
+    };
+
+    const handleAvailability = ({ userId, audioAvailable }) => {
+      if (audioAvailable === false) {
+        setCreators((prev) => prev.filter((c) => String(c.userId || c._id) !== String(userId)));
+      } else {
+        loadCreators();
+      }
+    };
+
+    if (socket) {
+      socket.on('user_presence_change', handlePresence);
+      socket.on('creator_availability_change', handleAvailability);
+      return () => {
+        socket.off('user_presence_change', handlePresence);
+        socket.off('creator_availability_change', handleAvailability);
+      };
+    }
+  }, []);
 
   useEffect(() => {
     Promise.resolve().then(() => {
