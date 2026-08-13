@@ -89,8 +89,12 @@ export const useAgoraCall = () => {
 
       let localVideoTrack = null;
       if (type === 'video') {
-        localVideoTrack = await createLocalVideoTrack();
-        localVideoTrackRef.current = localVideoTrack;
+        try {
+          localVideoTrack = await createLocalVideoTrack();
+          localVideoTrackRef.current = localVideoTrack;
+        } catch (camErr) {
+          console.warn('Local camera capture unavailable, proceeding with audio only:', camErr);
+        }
       }
 
       const streamId = `${uid}_${Date.now()}`;
@@ -131,8 +135,12 @@ export const useAgoraCall = () => {
       onUserLeft(c, handleUserLeft);
       callbacksRef.current['user-left'] = handleUserLeft;
 
-      const handleConnectionStateChange = (state, reason) => {
-        if (onCallEnded && (state === 'DISCONNECTED' || state === 'FAILED' || reason === 'USER_OFFLINE')) {
+      let hasBeenConnected = false;
+      const handleConnectionStateChange = (curState, revState, reason) => {
+        if (curState === 'CONNECTED') {
+          hasBeenConnected = true;
+        }
+        if (onCallEnded && (curState === 'FAILED' || (hasBeenConnected && curState === 'DISCONNECTED'))) {
           onCallEnded();
         }
       };

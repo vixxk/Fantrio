@@ -1904,6 +1904,33 @@ exports.toggleCallAvailability = catchAsync(async (req, res, next) => {
     return next(new ApiError(404, 'Creator profile not found'));
   }
 
+  if (!available) {
+    try {
+      const CallLog = require('../models/CallLog');
+      const activeCalls = await CallLog.find({
+        status: { $in: ['initiated', 'active'] },
+        type,
+        $or: [{ callerId: req.user._id }, { receiverId: req.user._id }]
+      });
+
+      for (const call of activeCalls) {
+        call.status = 'completed';
+        call.endedAt = new Date();
+        await call.save();
+
+        const callerIdStr = call.callerId ? call.callerId.toString() : null;
+        const receiverIdStr = call.receiverId ? call.receiverId.toString() : null;
+
+        if (callerIdStr && io) io.to(callerIdStr).emit('call_ended', { roomId: call.roomId, reason: 'Creator went offline' });
+        if (receiverIdStr && io) io.to(receiverIdStr).emit('call_ended', { roomId: call.roomId, reason: 'Creator went offline' });
+      }
+
+      await CreatorProfile.updateOne({ userId: req.user._id }, { $set: { isBusy: false } });
+    } catch (err) {
+      console.error('Error ending calls on availability toggle offline:', err);
+    }
+  }
+
   const io = req.app.get('io');
   if (io) {
     io.emit('creator_availability_change', {

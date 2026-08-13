@@ -129,13 +129,22 @@ export const AudioCallsPage = () => {
       if (activePill === 'Online Now') {
         filtered = filtered.filter(c => c.isOnline && !c.isBusy);
       }
-      if (activePill === 'Popular') {
-        filtered = [...filtered].sort((a, b) => (b.ratingCount || 0) - (a.ratingCount || 0));
-      } else if (activePill === 'Price: Low to High') {
-        filtered = [...filtered].sort((a, b) => a.rate - b.rate);
-      } else if (activePill === 'Price: High to Low') {
-        filtered = [...filtered].sort((a, b) => b.rate - a.rate);
-      }
+
+      // Prioritize online creators first on the cards list
+      filtered = [...filtered].sort((a, b) => {
+        const aOnline = a.isOnline && !a.isBusy ? 2 : a.isOnline ? 1 : 0;
+        const bOnline = b.isOnline && !b.isBusy ? 2 : b.isOnline ? 1 : 0;
+        if (aOnline !== bOnline) return bOnline - aOnline;
+
+        if (activePill === 'Popular') {
+          return (b.ratingCount || 0) - (a.ratingCount || 0);
+        } else if (activePill === 'Price: Low to High') {
+          return a.rate - b.rate;
+        } else if (activePill === 'Price: High to Low') {
+          return b.rate - a.rate;
+        }
+        return (b.ratingCount || 0) - (a.ratingCount || 0);
+      });
 
       setCreators(filtered);
     } catch (err) {

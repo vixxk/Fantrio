@@ -135,6 +135,13 @@ export const IncomingCallProvider = ({ children }) => {
       stream.getTracks().forEach((track) => track.stop());
       return true;
     } catch (err) {
+      if (callType === 'video') {
+        try {
+          const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          audioStream.getTracks().forEach((track) => track.stop());
+          return true;
+        } catch { /* mic permission failed as well */ }
+      }
       console.error('Media permission denied or error:', err);
       return false;
     }

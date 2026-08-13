@@ -13,8 +13,9 @@ const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 // Find any active or ringing call the user is part of (used for "busy" checks)
-const findActiveCallForUser = async (userId) =>
+const findActiveCallForUser = async (userId, excludeCallLogId = null) =>
   CallLog.findOne({
+    ...(excludeCallLogId ? { _id: { $ne: excludeCallLogId } } : {}),
     status: { $in: ['initiated', 'active'] },
     $or: [{ callerId: userId }, { receiverId: userId }]
   });
@@ -164,8 +165,8 @@ exports.acceptCall = catchAsync(async (req, res, next) => {
     return next(new ApiError(400, 'Call is no longer waiting for acceptance'));
   }
 
-  // A user can only be in one active call
-  const busy = await findActiveCallForUser(req.user._id);
+  // A user can only be in one active call (excluding this pending call)
+  const busy = await findActiveCallForUser(req.user._id, callLog._id);
   if (busy) {
     callLog.status = 'rejected';
     callLog.endedAt = Date.now();
@@ -474,7 +475,7 @@ exports.getCallableCreators = catchAsync(async (req, res, next) => {
 
   const [profiles, total] = await Promise.all([
     CreatorProfile.find(filter)
-      .sort({ rating: -1, followerCount: -1 })
+      .sort({ isOnline: -1, rating: -1, followerCount: -1 })
       .skip((page - 1) * limit)
       .limit(limit)
       .lean(),

@@ -117,6 +117,9 @@ const updatePresence = (userId, online) => {
         // availability guard, discover filters and profile pages agree.
         CreatorProfile.updateOne({ userId }, { $set: { isOnline: online } })
       ]);
+      if (!online) {
+        await endActiveCallsForUser(userId);
+      }
       // Broadcast real-time presence change to all connected socket clients
       io.emit('user_presence_change', { userId: String(userId), isOnline: online });
     })
