@@ -578,7 +578,7 @@ export const IncomingCallProvider = ({ children }) => {
                     </span>
                   </span>
 
-                  {type === 'video' && activeStatus === 'active' && (
+                  {isVideo && activeStatus === 'active' && (
                     <div className={styles.videoTopTimer}>
                       <span className={styles.timerDot} />
                       <span className={styles.videoTimerText}>{formatDuration(callDuration)}</span>

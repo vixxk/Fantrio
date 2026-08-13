@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useApp } from '../../../context/AppContext';
 import ShimmerSkeleton from '../../../components/ShimmerSkeleton/ShimmerSkeleton';
 import { Phone, Clock, Wallet, PhoneOff, Users, ChevronDown, Edit2, MoreVertical, ArrowRight, Lightbulb, Info, X, Loader2, Play } from 'lucide-react';
-import { api } from '../../../services/api';
+import { api, BASE_URL } from '../../../services/api';
 import { useToast } from '../../../components/Toast/Toast';
 import { PeriodDropdown } from '../analytics/PeriodDropdown';
 import { CallRateDialog } from '../calls/CallRateDialog';
@@ -38,7 +38,7 @@ export const AudioCallsPage = () => {
 
   // Real-time SSE listener for Creator online/offline button state
   useEffect(() => {
-    const sseUrl = `${import.meta.env.VITE_API_URL || '/api'}/creators/presence/sse`;
+    const sseUrl = `${BASE_URL}/creators/presence/sse`;
     const sse = new EventSource(sseUrl, { withCredentials: true });
     sse.onmessage = (e) => {
       try {

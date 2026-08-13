@@ -1,5 +1,5 @@
 const BACKEND_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
-const BASE_URL = `${BACKEND_URL}/api/v1`;
+export const BASE_URL = `${BACKEND_URL}/api/v1`;
 
 class ApiService {
   constructor() {

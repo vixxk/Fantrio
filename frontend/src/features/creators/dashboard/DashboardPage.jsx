@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../../context/AppContext';
-import { api } from '../../../services/api';
+import { api, BASE_URL } from '../../../services/api';
 import { getSocket, joinSocketRoom } from '../../../services/socket';
 import ShimmerSkeleton from '../../../components/ShimmerSkeleton/ShimmerSkeleton';
 import {
@@ -71,7 +71,7 @@ export const DashboardPage = () => {
 
   // Real-time SSE listener for Creator presence & quickActions online status sync on Dashboard
   useEffect(() => {
-    const sseUrl = `${import.meta.env.VITE_API_URL || '/api'}/creators/presence/sse`;
+    const sseUrl = `${BASE_URL}/creators/presence/sse`;
     const sse = new EventSource(sseUrl, { withCredentials: true });
     sse.onmessage = (e) => {
       try {
