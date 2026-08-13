@@ -59,26 +59,39 @@ export const useAgoraCall = () => {
     return remoteVideoTrackRef.current || remoteAudioTrackRef.current;
   }, []);
 
+  const stopAndCloseTrack = (track, c) => {
+    if (!track) return;
+    if (c) {
+      try { unpublishTrack(c, track); } catch (e) { /* ignore unpublish errors on disconnect */ }
+    }
+    try {
+      const mst = typeof track.getMediaStreamTrack === 'function' ? track.getMediaStreamTrack() : null;
+      if (mst && typeof mst.stop === 'function') {
+        mst.stop();
+      }
+    } catch (e) {
+      console.warn('Native MediaStreamTrack stop error:', e);
+    }
+    try {
+      if (typeof track.stop === 'function') track.stop();
+    } catch (e) {
+      console.warn('Agora track.stop error:', e);
+    }
+    try {
+      if (typeof track.close === 'function') track.close();
+    } catch (e) {
+      console.warn('Agora track.close error:', e);
+    }
+  };
+
   const endCall = useCallback(() => {
     const c = clientRef.current;
-    if (localAudioTrackRef.current) {
-      try {
-        if (c) unpublishTrack(c, localAudioTrackRef.current);
-        localAudioTrackRef.current.stop();
-        localAudioTrackRef.current.close();
-      } catch (e) {
-        console.error('endCall audio track cleanup error', e);
-      }
-    }
-    if (localVideoTrackRef.current) {
-      try {
-        if (c) unpublishTrack(c, localVideoTrackRef.current);
-        localVideoTrackRef.current.stop();
-        localVideoTrackRef.current.close();
-      } catch (e) {
-        console.error('endCall video track cleanup error', e);
-      }
-    }
+    
+    stopAndCloseTrack(localAudioTrackRef.current, c);
+    stopAndCloseTrack(localVideoTrackRef.current, c);
+    stopAndCloseTrack(remoteVideoTrackRef.current, null);
+    stopAndCloseTrack(remoteAudioTrackRef.current, null);
+
     if (c) {
       try {
         if (remoteUserIdRef.current) {
@@ -87,7 +100,11 @@ export const useAgoraCall = () => {
       } catch (e) {
         console.error('endCall cleanup error', e);
       }
-      leaveAgoraChannel(c);
+      try {
+        leaveAgoraChannel(c);
+      } catch (e) {
+        console.error('leaveAgoraChannel error', e);
+      }
     }
     cleanupListeners();
     destroyAgoraClient();
@@ -104,9 +121,14 @@ export const useAgoraCall = () => {
     setRemoteMicMuted(false);
   }, [cleanupListeners]);
 
-  // Clean up on component unmount to guarantee hardware release
+  // Clean up on component unmount and page unload to guarantee hardware release
   useEffect(() => {
+    const handleUnload = () => {
+      endCall();
+    };
+    window.addEventListener('beforeunload', handleUnload);
     return () => {
+      window.removeEventListener('beforeunload', handleUnload);
       endCall();
     };
   }, [endCall]);

@@ -725,24 +725,23 @@
     border-radius: 4px;
   }
   
-  .profileDropdown {
-    padding: 0.3rem 0.6rem;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background-color: rgba(0, 0, 0, 0.2);
+  .profileDropdown,
+  .creatorProfileDropdown {
+    padding: 0.3rem !important;
+    border: none !important;
+    background-color: transparent !important;
   }
   
-  .profileDropdown .username {
-    display: none;
-  }
-  
-  .profileDropdown .caret {
-    display: none;
+  .profileDropdown .username,
+  .profileDropdown .caret,
+  .profileMeta {
+    display: none !important;
   }
   
   .avatar {
-    width: 22px;
-    height: 22px;
-    border-width: 1.5px;
+    width: 28px !important;
+    height: 28px !important;
+    border-width: 1.5px !important;
   }
 
   .creatorHeader {
@@ -761,22 +760,6 @@
 
   .creatorHeaderSubtitle {
     display: none;
-  }
-
-  .profileMeta {
-    gap: 0.1rem;
-  }
-
-  .profileName {
-    font-size: 0.75rem;
-  }
-
-  .profileRole {
-    font-size: 0.62rem;
-  }
-
-  .creatorProfileDropdown {
-    padding: 0 !important;
   }
 }
 

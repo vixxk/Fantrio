@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
-import { Phone, PhoneOff, Mic, MicOff, Video, VideoOff, Gift, Coins, Bell, BellOff } from 'lucide-react';
+import { Phone, PhoneOff, Mic, MicOff, Video, VideoOff, Gift, Coins, Bell, BellOff, X } from 'lucide-react';
 import { isGiftChimeMuted, setGiftChimeMuted } from '../../utils/sound';
 import { useApp } from '../../context/AppContext';
 import { useToast } from '../../components/Toast/Toast';
@@ -162,6 +162,14 @@ export const IncomingCallProvider = ({ children }) => {
     refreshBalance();
     endingRef.current = false;
   }, [cleanupTimers, ag, refreshBalance]);
+
+  useEffect(() => {
+    return () => {
+      if (activeRef.current) {
+        endActiveCall(true);
+      }
+    };
+  }, [endActiveCall]);
 
   const checkMediaPermissions = async (callType) => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return true;
@@ -501,22 +509,8 @@ export const IncomingCallProvider = ({ children }) => {
                         title="Hide gift summary"
                         aria-label="Hide gift summary"
                       >
-                        ×
+                        <X size={11} />
                       </button>
-                    </span>
-                  )}
-
-                  {/* Top gifter this call — highlight the fan who sent the most */}
-                  {topGifter && (
-                    <span className={styles.topGifterChip}>
-                      <img
-                        src={topGifter.avatarUrl || '/profile.png'}
-                        alt={topGifter.displayName || 'Top gifter'}
-                        className={styles.topGifterAvatar}
-                      />
-                      <span className={styles.topGifterCrown}>👑</span>
-                      <span className={styles.topGifterLabel}>Top gifter</span>
-                      <strong className={styles.topGifterName}>{topGifter.displayName || 'Fan'}</strong>
                     </span>
                   )}
                 </div>
@@ -571,17 +565,6 @@ export const IncomingCallProvider = ({ children }) => {
                     title="End Call"
                   >
                     <Phone size={26} className={styles.hangupIcon} />
-                  </button>
-                  <button
-                    className={`${styles.controlBtn} ${styles.controlBtnCoins}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setRechargeOpen(true);
-                    }}
-                    aria-label="Recharge coins"
-                    title="Recharge Balance"
-                  >
-                    <Coins size={22} />
                   </button>
                 </div>
               </>

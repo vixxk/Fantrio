@@ -100,6 +100,14 @@ export const useOutgoingCall = ({ type }) => {
     };
   }, [activeCall]);
 
+  useEffect(() => {
+    return () => {
+      if (activeCallRef.current) {
+        endCall();
+      }
+    };
+  }, [endCall]);
+
   const checkMediaPermissions = async (callType) => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return true;
     // Video calls need BOTH mic and camera — the backend only has one

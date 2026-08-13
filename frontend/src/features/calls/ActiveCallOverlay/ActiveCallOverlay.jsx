@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Gift, Mic, MicOff, Phone, Volume2, VolumeX, Coins, Video, VideoOff, CameraOff, Bell, BellOff } from 'lucide-react';
+import { Gift, Mic, MicOff, Phone, Volume2, VolumeX, Coins, Video, VideoOff, CameraOff, Bell, BellOff, X } from 'lucide-react';
 import { useApp } from '../../../context/AppContext';
 import { isGiftChimeMuted, setGiftChimeMuted } from '../../../utils/sound';
 import styles from './ActiveCallOverlay.module.css';
@@ -66,11 +66,6 @@ export const ActiveCallOverlay = ({
     }
   }, [balance]);
 
-  // Top gifter this call = the leaderboard leader (sorted by total coins). In
-  // a 1:1 call that's the fan once they've sent a gift.
-  const topGifter = giftLeaderboard && giftLeaderboard.length > 0 ? giftLeaderboard[0] : null;
-  const isTopGifter = !!topGifter && String(topGifter.userId) === String(user?.id || user?._id);
-
   if (!call) return null;
   const isVideo = type === 'video';
   const creator = call.creator || {};
@@ -132,11 +127,6 @@ export const ActiveCallOverlay = ({
                   <strong>{giftSummary.sentCount}</strong>
                   <img src="/coin.png" alt="Coin" className={styles.callCoinImgSm} />
                   <span>{giftSummary.sentCoins.toLocaleString()}</span>
-                  {isTopGifter && (
-                    <span className={styles.topGifterCrown} title="Top gifter this call">
-                      👑
-                    </span>
-                  )}
                 </>
               ) : (
                 <>
@@ -156,7 +146,7 @@ export const ActiveCallOverlay = ({
                 title="Hide gift summary"
                 aria-label="Hide gift summary"
               >
-                ×
+                <X size={11} />
               </button>
             </div>
           )}
@@ -351,19 +341,6 @@ export const ActiveCallOverlay = ({
             title={isSpeakerOn ? 'Speaker On' : 'Speaker Off'}
           >
             {isSpeakerOn ? <Volume2 size={22} /> : <VolumeX size={22} />}
-          </button>
-
-          <button
-            type="button"
-            className={`${styles.controlBtn} ${styles.controlBtnCoins}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              onRecharge();
-            }}
-            aria-label="Recharge coins"
-            title="Recharge Balance"
-          >
-            <Coins size={22} />
           </button>
         </div>
       </div>
