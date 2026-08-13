@@ -17,7 +17,8 @@ import {
   Coins,
   Send,
   MessageSquare,
-  Search
+  Search,
+  Radio
 } from 'lucide-react';
 import { useGiftEvents } from '../../../hooks/useGiftEvents';
 import { GiftOverlay } from '../../gifts/GiftOverlay';
@@ -109,6 +110,25 @@ export const LiveStreamsPage = () => {
     });
   };
 
+  const [streamEndedInfo, setStreamEndedInfo] = useState(null);
+
+  const triggerStreamEnded = (targetStream) => {
+    const info = {
+      creatorName: targetStream?.displayName || targetStream?.username || 'The creator',
+      streamTitle: targetStream?.streamTitle || targetStream?.title || 'Live Stream',
+      coverUrl: targetStream?.coverUrl || targetStream?.thumbnail || '/Girl.png'
+    };
+    try { viewer.leave(); } catch (e) { /* noop */ }
+    const streamId = joinStream?._id || targetStream?._id;
+    setJoinStream(null);
+    setJoinResult(null);
+    if (streamId) {
+      api.post(`/creators/live/${streamId}/leave`).catch(() => {});
+    }
+    setStreamEndedInfo(info);
+    loadStreams();
+  };
+
   const executeJoin = async (targetStream) => {
     if (!targetStream) return;
     setJoinLoading(true);
@@ -127,8 +147,7 @@ export const LiveStreamsPage = () => {
             token: res.agoraToken,
             uid: user?.id,
             onStreamEnded: () => {
-              handleLeaveStream();
-              toast.info('The live stream has ended.');
+              triggerStreamEnded(targetStream);
             }
           });
         } catch (joinErr) {
@@ -267,9 +286,12 @@ export const LiveStreamsPage = () => {
       // Keep the open Join modal'viewer count in sync too
       setJoinStream((prev) => (prev && prev._id === payload.streamId ? { ...prev, viewerCount: payload.viewerCount } : prev));
     },
-    onStreamEvent: () => {
-      // A stream went live or ended elsewhere — refresh so cards appear/disappear
-      loadStreams();
+    onStreamEvent: (payload) => {
+      if (payload && !payload.isLive && joinStream && String(payload.streamId) === String(joinStream._id)) {
+        triggerStreamEnded(joinStream);
+      } else {
+        loadStreams();
+      }
     }
   });
 
@@ -921,6 +943,44 @@ export const LiveStreamsPage = () => {
         />
       )}
       {rechargeOpen && <QuickRecharge onClose={() => setRechargeOpen(false)} />}
+
+      {/* Stream Ended Themed Modal */}
+      {streamEndedInfo && (
+        <div className={styles.joinModalBackdrop} onClick={() => setStreamEndedInfo(null)}>
+          <div className={styles.joinModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.joinModalHeader}>
+              <h3 className={styles.joinModalTitle}>Stream Ended</h3>
+              <button className={styles.joinModalClose} onClick={() => setStreamEndedInfo(null)}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className={styles.joinModalBody}>
+              <div className={styles.endedStreamBox}>
+                <div className={styles.endedAvatarContainer}>
+                  <Radio size={28} className={styles.endedRadioIcon} />
+                </div>
+                <h4 className={styles.endedTitle}>Live Stream Has Ended</h4>
+                <p className={styles.endedDescription}>
+                  <strong>{streamEndedInfo.creatorName}</strong> has ended the live stream <em>"{streamEndedInfo.streamTitle}"</em>. Thank you for watching!
+                </p>
+              </div>
+            </div>
+
+            <div className={styles.joinModalFooter}>
+              <button
+                className={styles.joinConfirmBtn}
+                onClick={() => {
+                  setStreamEndedInfo(null);
+                  loadStreams();
+                }}
+              >
+                Back to Live Streams
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

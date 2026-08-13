@@ -34,11 +34,28 @@ export const useLiveStreamHost = () => {
     }
   }, []);
 
-  const startTimer = useCallback(() => {
+  const startTimer = useCallback((startedAt) => {
     stopTimer();
-    setDurationSeconds(0);
+    const getElapsed = () => {
+      if (startedAt) {
+        const t = new Date(startedAt).getTime();
+        if (!Number.isNaN(t)) {
+          return Math.max(0, Math.floor((Date.now() - t) / 1000));
+        }
+      }
+      return null;
+    };
+
+    const initial = getElapsed();
+    setDurationSeconds(initial !== null ? initial : 0);
+
     timerRef.current = setInterval(() => {
-      setDurationSeconds((prev) => prev + 1);
+      const elapsed = getElapsed();
+      if (elapsed !== null) {
+        setDurationSeconds(elapsed);
+      } else {
+        setDurationSeconds((prev) => prev + 1);
+      }
     }, 1000);
   }, [stopTimer]);
 
@@ -77,7 +94,7 @@ export const useLiveStreamHost = () => {
   }, [stopTimer]);
 
   // Start hosting stream
-  const startHost = useCallback(async ({ channel, token, uid }) => {
+  const startHost = useCallback(async ({ channel, token, uid, startedAt }) => {
     cleanup();
     setCameraError(null);
 
@@ -112,7 +129,7 @@ export const useLiveStreamHost = () => {
       }
 
       setIsLive(true);
-      startTimer();
+      startTimer(startedAt);
       return true;
     } catch (err) {
       console.error('Failed to start live host session:', err);
@@ -190,6 +207,17 @@ export const useLiveStreamHost = () => {
       }
     }
   }, [isCameraOn]);
+
+  // Auto-play local video when track & container are ready
+  useEffect(() => {
+    if (isCameraOn && videoTrackRef.current && videoContainerRef.current) {
+      try {
+        videoTrackRef.current.play(videoContainerRef.current);
+      } catch (e) {
+        console.warn('Failed to play video track on DOM update:', e);
+      }
+    }
+  }, [isCameraOn, isLive]);
 
   // End hosting session
   const stopHost = useCallback(() => {

@@ -67,10 +67,10 @@ export const useLiveStreamViewer = () => {
       if (c.remoteUsers && c.remoteUsers.length > 0) {
         for (const u of c.remoteUsers) {
           if (u.hasVideo) {
-            handleUserPublished(u, 'video');
+            await handleUserPublished(u, 'video');
           }
           if (u.hasAudio) {
-            handleUserPublished(u, 'audio');
+            await handleUserPublished(u, 'audio');
           }
         }
       }
@@ -104,9 +104,26 @@ export const useLiveStreamViewer = () => {
     videoElRef.current = el;
     const track = remoteTrackRef.current;
     if (el && track && typeof track.play === 'function') {
-      track.play(el);
+      try {
+        track.play(el);
+        setIsPlaying(true);
+      } catch (e) {
+        console.warn('Failed to play remote track in attachVideo:', e);
+      }
     }
   }, []);
+
+  // Auto-play remote video track when container and track become ready
+  useEffect(() => {
+    if (remoteTrackRef.current && videoElRef.current) {
+      try {
+        remoteTrackRef.current.play(videoElRef.current);
+        setIsPlaying(true);
+      } catch (e) {
+        console.warn('Failed to play remote track on container update:', e);
+      }
+    }
+  }, [joined]);
 
   // Cleanup on unmount (leave the channel, destroy the client)
   useEffect(() => {

@@ -544,7 +544,10 @@ export const CreatorLiveStreamsPage = () => {
       {overview.liveNow && (
         <CreatorLiveStreamOverlay
           liveStream={overview.liveNow}
-          onEndStream={() => openConfirm('end', overview.liveNow)}
+          onEndStream={() => {
+            setConfirmAction(null);
+            loadOverview();
+          }}
         />
       )}
 

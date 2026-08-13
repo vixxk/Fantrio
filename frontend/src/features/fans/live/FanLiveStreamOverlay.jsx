@@ -31,6 +31,7 @@ export const FanLiveStreamOverlay = ({
 }) => {
   const { darkMode } = useApp();
   const [chatDraft, setChatDraft] = useState('');
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [giftOpen, setGiftOpen] = useState(false);
   const [rechargeOpen, setRechargeOpen] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
@@ -64,7 +65,6 @@ export const FanLiveStreamOverlay = ({
         <div
           ref={(el) => el && viewer?.attachVideo && viewer.attachVideo(el)}
           className={styles.videoElement}
-          style={{ display: viewer?.isPlaying ? 'block' : 'none' }}
         />
 
         {/* Camera OFF / Connecting Overlay */}
@@ -115,24 +115,40 @@ export const FanLiveStreamOverlay = ({
             </div>
           </div>
 
-          <div className={styles.headerRightControls}>
-            <button
-              className={styles.leaderboardBtn}
-              onClick={() => setShowLeaderboard(true)}
-              title="Top Gifters Leaderboard"
-            >
-              <Trophy size={13} />
-              <span>Top Gifters</span>
-            </button>
+          {/* Top Right Controls & Coin Balance under close button */}
+          <div className={styles.topRightControlsColumn}>
+            <div className={styles.headerRightControls}>
+              <button
+                className={styles.leaderboardBtn}
+                onClick={() => setShowLeaderboard(true)}
+                title="Top Gifters Leaderboard"
+              >
+                <Trophy size={13} />
+                <span>Top Gifters</span>
+              </button>
 
-            <button
-              className={styles.closeBtn}
-              onClick={onLeaveStream}
-              title="Leave Stream"
-              aria-label="Leave Stream"
-            >
-              <X size={18} />
-            </button>
+              <button
+                className={styles.closeBtn}
+                onClick={onLeaveStream}
+                title="Leave Stream"
+                aria-label="Leave Stream"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Balance chip positioned directly under cross button */}
+            <div className={styles.topBalanceChip}>
+              <img src="/coin.png" alt="Coin" className={styles.coinImg} />
+              <span>{(balance || 0).toLocaleString()}</span>
+              <button
+                className={styles.rechargePlusBtn}
+                onClick={() => setRechargeOpen(true)}
+                title="Recharge coins"
+              >
+                +
+              </button>
+            </div>
           </div>
         </div>
 
@@ -160,54 +176,59 @@ export const FanLiveStreamOverlay = ({
 
         {/* Bottom Action Bar */}
         <div className={styles.bottomActionBar}>
-          {/* Chat Composer Form */}
-          <form className={styles.chatComposerForm} onSubmit={handleChatSend}>
-            <input
-              type="text"
-              className={styles.composerInput}
-              placeholder="Send a message…"
-              maxLength={500}
-              value={chatDraft}
-              onChange={(e) => setChatDraft(e.target.value)}
-            />
-            <button
-              type="button"
-              className={styles.emojiBtn}
-              onClick={() => addEmoji('❤️')}
-              title="Quick Love"
-            >
-              <Smile size={16} />
-            </button>
-            <button
-              type="submit"
-              className={styles.composerSendBtn}
-              disabled={!chatDraft.trim() || chatSending}
-            >
-              <Send size={13} />
-            </button>
-          </form>
+          <div className={styles.composerWrapper}>
+            {/* Interactive Emoji Reaction Bar */}
+            {showEmojiPicker && (
+              <div className={styles.emojiPickerBar}>
+                {['❤️', '🔥', '👏', '😍', '🎉', '🚀', '💯', '💎', '✨', '👑', '😮', '💖'].map((emoji) => (
+                  <button
+                    key={emoji}
+                    type="button"
+                    className={styles.emojiPickItem}
+                    onClick={() => addEmoji(emoji)}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+            )}
 
-          {/* Action Buttons: Gift & Recharge */}
-          <div className={styles.actionButtonsGroup}>
-            <button
-              className={styles.giftTriggerBtn}
-              onClick={() => setGiftOpen(true)}
-            >
-              <Gift size={16} /> Send Gift
-            </button>
-
-            <div className={styles.balanceChip}>
-              <img src="/coin.png" alt="Coin" className={styles.coinImg} />
-              <span>{(balance || 0).toLocaleString()}</span>
+            {/* Chat Composer Form */}
+            <form className={styles.chatComposerForm} onSubmit={handleChatSend}>
+              <input
+                type="text"
+                className={styles.composerInput}
+                placeholder="Send a message…"
+                maxLength={500}
+                value={chatDraft}
+                onChange={(e) => setChatDraft(e.target.value)}
+                onFocus={() => setShowEmojiPicker(false)}
+              />
               <button
-                className={styles.rechargePlusBtn}
-                onClick={() => setRechargeOpen(true)}
-                title="Recharge coins"
+                type="button"
+                className={`${styles.emojiBtn} ${showEmojiPicker ? styles.emojiBtnActive : ''}`}
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                title="Emoji Picker"
               >
-                +
+                <Smile size={16} />
               </button>
-            </div>
+              <button
+                type="submit"
+                className={styles.composerSendBtn}
+                disabled={!chatDraft.trim() || chatSending}
+              >
+                <Send size={13} />
+              </button>
+            </form>
           </div>
+
+          {/* Send Gift Action Button */}
+          <button
+            className={styles.giftTriggerBtn}
+            onClick={() => setGiftOpen(true)}
+          >
+            <Gift size={16} /> Send Gift
+          </button>
         </div>
       </div>
 

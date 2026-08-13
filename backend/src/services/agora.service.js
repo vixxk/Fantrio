@@ -5,7 +5,8 @@ const CERTIFICATE = process.env.AGORA_CERTIFICATE || '160786f9a6d543a2ab8d2399cb
 
 const generateAgoraToken = (userId, channelName, roleInput = 'publisher', expireSeconds = 3600) => {
   const uidStr = userId ? userId.toString() : 'guest';
-  const role = (roleInput === 'subscriber' || roleInput === 2) ? RtcRole.SUBSCRIBER : RtcRole.PUBLISHER;
+  const isPublisher = roleInput === 'publisher' || roleInput === 'host';
+  const role = isPublisher ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER;
 
   if (!APP_ID || !CERTIFICATE) {
     return null;

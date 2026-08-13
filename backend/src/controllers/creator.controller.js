@@ -1336,7 +1336,12 @@ exports.getMyLiveStreams = catchAsync(async (req, res, next) => {
       };
     });
 
-  const liveNow = allStreams.find((s) => s.isLive) || null;
+  let liveNowDoc = allStreams.find((s) => s.isLive) || null;
+  let liveNow = null;
+  if (liveNowDoc) {
+    liveNow = liveNowDoc.toObject ? liveNowDoc.toObject() : { ...liveNowDoc };
+    liveNow.agoraToken = agoraService.generateAgoraToken(req.user._id, liveNow.roomId, 'publisher');
+  }
 
   // Overview stats
   const totalStreams = allStreams.length;
@@ -1677,8 +1682,8 @@ exports.startLiveStream = catchAsync(async (req, res, next) => {
     });
   }
 
-  // Generate token for creator to stream (privilege 2 = publisher)
-  const agoraToken = agoraService.generateAgoraToken(req.user._id, roomId, 2);
+  // Generate token for creator to stream (publisher role)
+  const agoraToken = agoraService.generateAgoraToken(req.user._id, roomId, 'publisher');
 
   // Update profile status
   await CreatorProfile.findOneAndUpdate(
@@ -1805,9 +1810,9 @@ exports.joinLiveStream = catchAsync(async (req, res, next) => {
     }
   }
 
-  // Creator publishes, fans watch
-  const privilege = isOwner ? 2 : 1;
-  const agoraToken = agoraService.generateAgoraToken(req.user._id, stream.roomId, privilege);
+  // Creator publishes ('publisher'), fans watch ('subscriber')
+  const role = isOwner ? 'publisher' : 'subscriber';
+  const agoraToken = agoraService.generateAgoraToken(req.user._id, stream.roomId, role);
 
   let creatorName = '';
   const profile = await CreatorProfile.findOne({ userId: stream.creatorId }).select('displayName username');

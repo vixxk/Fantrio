@@ -6,6 +6,7 @@ import { useGiftEvents } from '../../../hooks/useGiftEvents';
 import { useStreamChat } from '../../../hooks/useStreamChat';
 import { GiftOverlay } from '../../gifts/GiftOverlay';
 import { StreamLeaderboardModal } from '../../gifts/StreamLeaderboardModal';
+import { ConfirmDeleteDialog } from '../../../components/ConfirmDeleteDialog/ConfirmDeleteDialog';
 import {
   Camera,
   CameraOff,
@@ -18,7 +19,8 @@ import {
   Send,
   Power,
   X,
-  BadgeCheck
+  BadgeCheck,
+  Trash2
 } from 'lucide-react';
 import styles from './CreatorLiveStreamOverlay.module.css';
 
@@ -73,7 +75,8 @@ export const CreatorLiveStreamOverlay = ({ liveStream, onEndStream }) => {
       startHost({
         channel: roomId,
         token: agoraToken,
-        uid: userId
+        uid: userId,
+        startedAt: liveStream?.startedAt
       }).catch((err) => {
         console.warn('Host streaming auto-start error:', err);
       });
@@ -81,7 +84,7 @@ export const CreatorLiveStreamOverlay = ({ liveStream, onEndStream }) => {
     return () => {
       stopHost();
     };
-  }, [roomId, agoraToken, userId]);
+  }, [roomId, agoraToken, userId, liveStream?.startedAt]);
 
   // Auto scroll chat to newest message
   useEffect(() => {
@@ -288,38 +291,19 @@ export const CreatorLiveStreamOverlay = ({ liveStream, onEndStream }) => {
         />
       )}
 
-      {/* End Stream Confirmation Modal (Theme Matched) */}
-      {showConfirmEnd && (
-        <div className={`${styles.confirmModalBackdrop} ${!darkMode ? styles.light : ''}`} onClick={() => !endingStream && setShowConfirmEnd(false)}>
-          <div className={styles.confirmModalBox} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.confirmModalIcon}>
-              <Radio size={24} className={styles.confirmRadioIcon} />
-            </div>
-            <h3 className={styles.confirmModalTitle}>End Live Stream?</h3>
-            <p className={styles.confirmModalText}>
-              Are you sure you want to end this live stream session? Your viewers will be disconnected and session metrics saved.
-            </p>
-            <div className={styles.confirmModalActions}>
-              <button
-                type="button"
-                className={styles.confirmModalCancelBtn}
-                onClick={() => setShowConfirmEnd(false)}
-                disabled={endingStream}
-              >
-                Continue Live
-              </button>
-              <button
-                type="button"
-                className={styles.confirmModalEndBtn}
-                onClick={handleConfirmEnd}
-                disabled={endingStream}
-              >
-                {endingStream ? 'Ending...' : 'End Stream Now'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* End Stream Confirmation Modal (Standard App Theme) */}
+      <ConfirmDeleteDialog
+        open={showConfirmEnd}
+        title="End Live Stream?"
+        confirmLabel="End Stream"
+        busyLabel="Ending…"
+        message="End your current live stream? Viewers will be disconnected."
+        icon={<Trash2 size={22} />}
+        deleting={endingStream}
+        darkMode={darkMode}
+        onCancel={() => !endingStream && setShowConfirmEnd(false)}
+        onConfirm={handleConfirmEnd}
+      />
     </div>
   );
 };
