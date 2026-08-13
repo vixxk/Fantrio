@@ -12,10 +12,10 @@ const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
 const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-// Find any active call the user is part of (used for "busy" checks)
+// Find any active or ringing call the user is part of (used for "busy" checks)
 const findActiveCallForUser = async (userId) =>
   CallLog.findOne({
-    status: 'active',
+    status: { $in: ['initiated', 'active'] },
     $or: [{ callerId: userId }, { receiverId: userId }]
   });
 
@@ -184,7 +184,36 @@ exports.acceptCall = catchAsync(async (req, res, next) => {
   // Generate a fresh token for the receiver for this room
   const receiverToken = agoraService.generateAgoraToken(req.user._id, callLog.roomId);
 
+  // Charge 1st minute immediately upon call acceptance
+  const rate = callLog.coinRatePerMinute;
+  const callerWallet = await Wallet.findOne({ userId: callLog.callerId });
+  if (!callerWallet || callerWallet.balanceCoins < rate) {
+    callLog.status = 'rejected';
+    callLog.endedAt = Date.now();
+    await callLog.save();
+    const io = req.app.get('io');
+    if (io) {
+      io.to(callLog.callerId.toString()).emit('call_rejected', {
+        callLogId: callLog._id,
+        roomId: callLog.roomId,
+        reason: 'insufficient_funds'
+      });
+    }
+    return next(new ApiError(400, 'Caller balance is insufficient to start the call.'));
+  }
+
+  await walletService.transferCoins(
+    callLog.callerId,
+    callLog.receiverId,
+    rate,
+    'call_billing',
+    callLog._id
+  );
+
   callLog.status = 'active';
+  callLog.totalMinutesBilling = 1;
+  callLog.totalCoinsBilled = rate;
+  callLog.lastBilledAt = new Date();
   await callLog.save();
 
   // Notify caller via WebSockets
@@ -313,6 +342,17 @@ exports.heartbeat = catchAsync(async (req, res, next) => {
     return next(new ApiError(400, 'Cannot process heartbeat for an inactive call session'));
   }
 
+  // Deduplication guard: if billed less than 45 seconds ago, skip duplicate billing
+  if (callLog.lastBilledAt) {
+    const elapsedSeconds = (Date.now() - new Date(callLog.lastBilledAt).getTime()) / 1000;
+    if (elapsedSeconds < 45) {
+      return res.status(200).json({
+        status: 'active',
+        callLog
+      });
+    }
+  }
+
   const rate = callLog.coinRatePerMinute;
 
   // Verify caller wallet balance
@@ -354,6 +394,7 @@ exports.heartbeat = catchAsync(async (req, res, next) => {
   // Update call metadata logs
   callLog.totalMinutesBilling += 1;
   callLog.totalCoinsBilled += rate;
+  callLog.lastBilledAt = new Date();
   await callLog.save();
 
   // Double check if caller has funds left for the NEXT minute

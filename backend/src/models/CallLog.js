@@ -43,6 +43,10 @@ const callLogSchema = new mongoose.Schema(
     endedAt: {
       type: Date,
       default: null
+    },
+    lastBilledAt: {
+      type: Date,
+      default: null
     }
   },
   {

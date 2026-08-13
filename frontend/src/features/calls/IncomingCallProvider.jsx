@@ -54,11 +54,13 @@ export const IncomingCallProvider = ({ children }) => {
     }
   }, [user]);
 
+  const ringTimeoutRef = useRef(null);
+
   // Listen for incoming calls
   useEffect(() => {
     if (!user?.id) return;
     const socket = getSocket();
-    socket.on('incoming_call', (payload) => {
+    const handleIncoming = (payload) => {
       if (activeRef.current || incoming) {
         // Receiver busy: auto reject
         try {
@@ -67,16 +69,31 @@ export const IncomingCallProvider = ({ children }) => {
         return;
       }
       setIncoming(payload);
-    });
-    return () => {
-      socket.off('incoming_call');
+
+      // Auto-dismiss & reject incoming call after 30s timeout if unanswered
+      if (ringTimeoutRef.current) clearTimeout(ringTimeoutRef.current);
+      ringTimeoutRef.current = setTimeout(() => {
+        setIncoming((curr) => {
+          if (curr && curr.callLogId === payload.callLogId) {
+            try { api.post(`/calls/reject/${payload.callLogId}`); } catch { /* noop */ }
+            return null;
+          }
+          return curr;
+        });
+      }, 30000);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, user]);
+
+    socket.on('incoming_call', handleIncoming);
+    return () => {
+      socket.off('incoming_call', handleIncoming);
+      if (ringTimeoutRef.current) clearTimeout(ringTimeoutRef.current);
+    };
+  }, [user, incoming]);
 
   const cleanupTimers = useCallback(() => {
     if (durationTimer.current) clearInterval(durationTimer.current);
     if (heartbeatTimer.current) clearInterval(heartbeatTimer.current);
+    if (ringTimeoutRef.current) clearTimeout(ringTimeoutRef.current);
     durationTimer.current = null;
     heartbeatTimer.current = null;
   }, []);
@@ -120,6 +137,7 @@ export const IncomingCallProvider = ({ children }) => {
 
   const acceptCall = useCallback(async () => {
     if (!incoming) return;
+    if (ringTimeoutRef.current) clearTimeout(ringTimeoutRef.current);
     const { callLogId, roomId, type, caller, rate, receiverToken } = incoming;
 
     const hasPermission = await checkMediaPermissions(type);
@@ -145,7 +163,7 @@ export const IncomingCallProvider = ({ children }) => {
       await ag.joinCall({
         channel: roomId,
         token,
-        uid: user.id,
+        uid: user?.id || user?._id,
         type,
         onRemoteStream: (stream) => setRemoteStream(stream),
         onRemoteLeave: () => endActiveCall(),
@@ -159,26 +177,15 @@ export const IncomingCallProvider = ({ children }) => {
       durationTimer.current = setInterval(() => {
         setCallDuration((d) => d + 1);
       }, 1000);
-
-      // Heartbeat billing (per minute)
-      heartbeatTimer.current = setInterval(async () => {
-        try {
-          const hb = await api.post('/calls/heartbeat', { roomId });
-          if (hb.status === 'terminated') {
-            endActiveCall();
-          } else {
-            refreshBalance();
-          }
-        } catch { /* noop */ }
-      }, 60000);
     } catch (err) {
       console.error('accept call failed', err);
       endActiveCall(false);
     }
-  }, [incoming, user, ag, endActiveCall, refreshBalance]);
+  }, [incoming, user, ag, endActiveCall]);
 
   const rejectCall = useCallback(async () => {
     if (!incoming) return;
+    if (ringTimeoutRef.current) clearTimeout(ringTimeoutRef.current);
     const { callLogId } = incoming;
     setIncoming(null);
     try {

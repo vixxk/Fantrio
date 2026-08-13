@@ -145,10 +145,23 @@ export const useOutgoingCall = ({ type }) => {
     setActiveCall({ creator, status: 'connecting', roomId, callLogId, rate: callRate, token });
     setCallDuration(0);
 
+    const ringTimeout = setTimeout(() => {
+      setActiveCall((prev) => {
+        if (prev && prev.status === 'connecting' && prev.roomId === roomId) {
+          try { api.post('/calls/end', { roomId }); } catch { /* noop */ }
+          clearCall();
+          toast.info('No answer. Creator did not accept call request.');
+          return null;
+        }
+        return prev;
+      });
+    }, 30000);
+
     const socket = getSocket();
 
     const handleAccepted = (payload) => {
       if (payload.roomId !== roomId) return;
+      clearTimeout(ringTimeout);
       setActiveCall((prev) => (prev ? { ...prev, status: 'active' } : prev));
       setCallDuration(0);
       refreshBalance();
@@ -158,8 +171,8 @@ export const useOutgoingCall = ({ type }) => {
       // the Agora connection even with valid credentials.
       ag.joinCall({
         channel: roomId,
-        token,
-        uid: user.id,
+        token: payload?.token || token,
+        uid: user?.id || user?._id,
         type,
         onRemoteStream: (stream) => setRemoteStream(stream),
         onRemoteLeave: () => endCall(),
@@ -185,6 +198,7 @@ export const useOutgoingCall = ({ type }) => {
 
     const handleRejected = (payload) => {
       if (payload.roomId && payload.roomId !== roomId) return;
+      clearTimeout(ringTimeout);
       clearCall();
       toast.info('The call was declined.');
       refreshBalance();

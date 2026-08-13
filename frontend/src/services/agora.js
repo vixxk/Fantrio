@@ -3,7 +3,7 @@
 // `undefined`, so the correct API is `AgoraRTC.createClient(...)` etc.
 import AgoraRTC from 'agora-rtc-sdk-ng';
 
-const APP_ID = import.meta.env.VITE_AGORA_APP_ID || '';
+const APP_ID = import.meta.env.VITE_AGORA_APP_ID || '8834c7bd129d4aba90bc322fdba03b4b';
 
 let client = null;
 
@@ -16,7 +16,9 @@ export const getAgoraClient = () => {
 
 export const joinAgoraChannel = async ({ channel, token, uid }) => {
   const c = getAgoraClient();
-  await c.join(APP_ID, channel, token, uid);
+  const userIdStr = String(uid);
+  const tokenToUse = (token && typeof token === 'string' && token.length > 10) ? token : null;
+  await c.join(APP_ID, channel, tokenToUse, userIdStr);
   return c;
 };
 
