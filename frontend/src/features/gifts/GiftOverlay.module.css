@@ -5,7 +5,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  z-index: 12010;
+  z-index: 100005;
   pointer-events: none;
   overflow: hidden;
   background: transparent;
@@ -33,9 +33,10 @@
 
 /* Tier durations override the base float duration */
 .giftTier1 { animation-duration: 2.8s; }
-.giftTier2 { animation-duration: 3.8s; }
-.giftTier3 { animation-duration: 4.6s; }
-.giftTier4 { animation-duration: 5.6s; }
+.giftTier2 { animation-duration: 3.6s; }
+.giftTier3 { animation-duration: 4.5s; }
+.giftTier4 { animation-duration: 5.5s; }
+.giftTier5 { animation-duration: 6.8s; }
 
 /* ---- Emoji pop-in + tier sizing ---- */
 .emojiWrap {
@@ -60,6 +61,7 @@
 .giftTier2 .emoji { font-size: 76px; }
 .giftTier3 .emoji { font-size: 92px; }
 .giftTier4 .emoji { font-size: 112px; }
+.giftTier5 .emoji { font-size: 135px; }
 
 /* Tier 3+ pulsing glow behind the emoji */
 .giftTier3 .emojiWrap {
@@ -68,10 +70,19 @@
 .giftTier4 .emojiWrap {
   animation: popIn 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) both, emojiGlow 1.4s ease-in-out infinite 0.4s;
 }
+.giftTier5 .emojiWrap {
+  animation: popIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both, emojiGlowRainbow 1.2s ease-in-out infinite 0.3s;
+}
 
 @keyframes emojiGlow {
   0%, 100% { filter: drop-shadow(0 0 6px rgba(255, 215, 100, 0.55)) drop-shadow(0 0 22px rgba(225, 0, 117, 0.45)); }
   50% { filter: drop-shadow(0 0 16px rgba(255, 215, 100, 0.95)) drop-shadow(0 0 40px rgba(225, 0, 117, 0.7)); }
+}
+
+@keyframes emojiGlowRainbow {
+  0%, 100% { filter: drop-shadow(0 0 12px rgba(255, 0, 127, 0.8)) drop-shadow(0 0 35px rgba(255, 215, 0, 0.7)); }
+  33% { filter: drop-shadow(0 0 16px rgba(126, 0, 243, 0.9)) drop-shadow(0 0 45px rgba(52, 211, 153, 0.8)); }
+  66% { filter: drop-shadow(0 0 20px rgba(0, 200, 255, 0.9)) drop-shadow(0 0 55px rgba(255, 0, 127, 0.85)); }
 }
 
 .crownMini {
@@ -89,7 +100,8 @@
 
 /* ---- Expanding shockwave rings (tier 2+) ---- */
 .ring,
-.ringTwo {
+.ringTwo,
+.ringThree {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -105,6 +117,7 @@
 .giftTier2 .ring { animation-duration: 1.0s; }
 .giftTier3 .ring { animation-duration: 1.3s; border-width: 4px; width: 150px; height: 150px; }
 .giftTier4 .ring { animation-duration: 1.6s; border-width: 5px; width: 190px; height: 190px; }
+.giftTier5 .ring { animation-duration: 1.8s; border-width: 6px; width: 230px; height: 230px; }
 
 .ringTwo {
   animation-delay: 0.22s;
@@ -112,10 +125,102 @@
 }
 .giftTier3 .ringTwo { animation-duration: 1.5s; width: 190px; height: 190px; }
 .giftTier4 .ringTwo { animation-duration: 1.8s; width: 250px; height: 250px; }
+.giftTier5 .ringTwo { animation-duration: 2.1s; width: 310px; height: 310px; }
+
+.ringThree {
+  animation-delay: 0.45s;
+  border-color: rgba(0, 200, 255, 0.95);
+  border-style: dashed;
+  width: 380px;
+  height: 380px;
+  animation-duration: 2.4s;
+  box-shadow: 0 0 35px rgba(0, 200, 255, 0.8), inset 0 0 35px rgba(255, 0, 127, 0.6);
+}
 
 @keyframes ringOut {
   0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0.95; }
   100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
+}
+
+/* Screen edge ambient flash */
+.screenFlash {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 40%, rgba(225, 0, 117, 0.22) 100%);
+  animation: screenPulse 0.8s ease-out 2;
+  z-index: -1;
+}
+
+.screenFlashRainbow {
+  background: radial-gradient(circle at center, transparent 30%, rgba(255, 215, 0, 0.28) 70%, rgba(225, 0, 117, 0.35) 100%);
+  animation: screenPulse 0.9s ease-out 3;
+}
+
+@keyframes screenPulse {
+  0% { opacity: 0; transform: scale(0.96); }
+  50% { opacity: 1; transform: scale(1.02); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+/* Confetti & Coin Rain */
+.confettiContainer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.confettiPiece {
+  position: absolute;
+  top: -20px;
+  width: 10px;
+  height: 18px;
+  border-radius: 3px;
+  opacity: 0.9;
+  animation: confettiFall linear forwards;
+}
+
+.fallingCoin {
+  position: absolute;
+  top: -30px;
+  font-size: 24px;
+  line-height: 1;
+  animation: confettiFall ease-in forwards;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(105vh) rotate(720deg);
+    opacity: 0.1;
+  }
+}
+
+/* Supreme / Legendary Tag */
+.supremeTag {
+  margin-top: 6px;
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ff007f, #ffd166, #7e00f3);
+  background-size: 200% 200%;
+  animation: gradientShift 2s linear infinite, popIn 0.5s ease-out both;
+  box-shadow: 0 0 16px rgba(255, 215, 0, 0.8);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 /* ---- Radial particles (tier 2+) ---- */
@@ -142,6 +247,7 @@
 
 .giftTier3 .particle { animation-duration: 1.5s; }
 .giftTier4 .particle { animation-duration: 1.8s; }
+.giftTier5 .particle { animation-duration: 2.2s; }
 
 /* ---- Royal golden rays (tier 4 only) ---- */
 .rays {
@@ -246,6 +352,7 @@
   .giftTier2 .emoji { font-size: 56px; }
   .giftTier3 .emoji { font-size: 68px; }
   .giftTier4 .emoji { font-size: 82px; }
+  .giftTier5 .emoji { font-size: 96px; }
   .giftAnim { bottom: 26%; }
   .rays { width: 420px; height: 420px; }
 }

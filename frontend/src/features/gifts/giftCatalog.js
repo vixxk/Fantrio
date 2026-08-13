@@ -28,16 +28,28 @@ export const CHAT_GIFTS = [
 
 export const GIFTS = [...COMMENT_GIFTS, ...CHAT_GIFTS];
 
+// Dynamically compute tier from coin value if not set
+export const getTierFromCoins = (coins = 0) => {
+  const c = Number(coins) || 0;
+  if (c >= 5000) return 5;
+  if (c >= 1000) return 4;
+  if (c >= 300) return 3;
+  if (c >= 100) return 2;
+  return 1;
+};
+
 // Animation intensity grows with the tier (the "royalty" of the gift):
-//   tier 1 Classic — pop & float
-//   tier 2 Premium — burst + sparkles
-//   tier 3 Luxury  — glow + rings + confetti
-//   tier 4 Royal   — full-screen golden spectacle
+//   tier 1 Classic         — pop & float
+//   tier 2 Premium         — burst + neon shockwave ring
+//   tier 3 Luxury          — dual aura + radial particles + crown + screen pulse
+//   tier 4 Royal           — golden sunburst rays + triple shockwaves + confetti rain
+//   tier 5 Ultra Legendary — full screen cosmic spectacle + coin rain + rainbow border flash
 export const GIFT_TIERS = {
-  1: { label: 'Classic', duration: 3000, cssClass: 'giftTier1' },
-  2: { label: 'Premium', duration: 3800, cssClass: 'giftTier2' },
-  3: { label: 'Luxury', duration: 4600, cssClass: 'giftTier3' },
-  4: { label: 'Royal', duration: 5600, cssClass: 'giftTier4' }
+  1: { label: 'Classic', duration: 2800, cssClass: 'giftTier1' },
+  2: { label: 'Premium', duration: 3600, cssClass: 'giftTier2' },
+  3: { label: 'Luxury', duration: 4500, cssClass: 'giftTier3' },
+  4: { label: 'Royal', duration: 5500, cssClass: 'giftTier4' },
+  5: { label: 'Ultra Legendary', duration: 6800, cssClass: 'giftTier5' }
 };
 
 // Deterministic pseudo-random from a string seed (event ids) so particles stay

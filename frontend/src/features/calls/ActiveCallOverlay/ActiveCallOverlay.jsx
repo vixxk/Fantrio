@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Gift, Mic, MicOff, Phone, Volume2, VolumeX, Coins, Video, VideoOff, CameraOff } from 'lucide-react';
+import { useApp } from '../../../context/AppContext';
 import styles from './ActiveCallOverlay.module.css';
 
 /**
@@ -30,16 +31,22 @@ export const ActiveCallOverlay = ({
   attachRemote,
   attachLocal
 }) => {
+  const { user } = useApp();
+  const isFan = user?.role !== 'creator';
   const [showEndConfirm, setShowEndConfirm] = useState(false);
+  const [controlsVisible, setControlsVisible] = useState(true);
 
   if (!call) return null;
   const isVideo = type === 'video';
   const creator = call.creator || {};
 
   return (
-    <div className={`${styles.callModalOverlay} ${isVideo ? styles.videoCallOverlay : ''}`}>
+    <div
+      className={`${styles.callModalOverlay} ${isVideo ? styles.videoCallOverlay : ''}`}
+      onClick={() => setControlsVisible((prev) => !prev)}
+    >
       {/* Top Bar for Coin Balance + Quick Recharge */}
-      <div className={styles.callTopBar}>
+      <div className={`${styles.callTopBar} ${!controlsVisible ? styles.controlsHidden : ''}`}>
         <div className={styles.callBalanceChip}>
           <div className={styles.callCoinInfo}>
             <img src="/coin.png" alt="Coin" className={styles.callCoinImg} />
@@ -47,7 +54,10 @@ export const ActiveCallOverlay = ({
           </div>
           <button
             className={styles.callRechargeBtn}
-            onClick={onRecharge}
+            onClick={(e) => {
+              e.stopPropagation();
+              onRecharge();
+            }}
             title="Recharge coins"
           >
             <Coins size={12} /> Recharge
@@ -146,22 +156,33 @@ export const ActiveCallOverlay = ({
         )}
 
         {/* Call Action Bar */}
-        <div className={styles.callControls}>
-          <button
-            type="button"
-            className={`${styles.controlBtn} ${styles.controlBtnGift}`}
-            onClick={onOpenGift}
-            disabled={call.status !== 'active'}
-            aria-label="Send a gift"
-            title="Send Gift"
-          >
-            <Gift size={22} />
-          </button>
+        <div
+          className={`${styles.callControls} ${!controlsVisible ? styles.controlsHidden : ''}`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {isFan && (
+            <button
+              type="button"
+              className={`${styles.controlBtn} ${styles.controlBtnGift}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenGift();
+              }}
+              disabled={call.status !== 'active'}
+              aria-label="Send a gift"
+              title="Send Gift"
+            >
+              <Gift size={22} />
+            </button>
+          )}
 
           <button
             type="button"
             className={`${styles.controlBtn} ${isMuted ? styles.controlActive : ''}`}
-            onClick={onToggleMute}
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleMute();
+            }}
             disabled={call.status !== 'active'}
             title={isMuted ? 'Unmute Mic' : 'Mute Mic'}
           >
@@ -172,7 +193,10 @@ export const ActiveCallOverlay = ({
             <button
               type="button"
               className={`${styles.controlBtn} ${isCameraOff ? styles.controlActive : ''}`}
-              onClick={onToggleCamera}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleCamera();
+              }}
               disabled={call.status !== 'active'}
               title={isCameraOff ? 'Turn Camera On' : 'Turn Camera Off'}
             >
@@ -183,7 +207,10 @@ export const ActiveCallOverlay = ({
           <button
             type="button"
             className={styles.hangupBtn}
-            onClick={() => setShowEndConfirm(true)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowEndConfirm(true);
+            }}
             title="End Call"
           >
             <Phone size={26} className={styles.hangupIcon} />
@@ -192,7 +219,10 @@ export const ActiveCallOverlay = ({
           <button
             type="button"
             className={`${styles.controlBtn} ${!isSpeakerOn ? styles.controlActive : ''}`}
-            onClick={onToggleSpeaker}
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleSpeaker();
+            }}
             disabled={call.status !== 'active'}
             title={isSpeakerOn ? 'Speaker On' : 'Speaker Off'}
           >
@@ -202,7 +232,10 @@ export const ActiveCallOverlay = ({
           <button
             type="button"
             className={`${styles.controlBtn} ${styles.controlBtnCoins}`}
-            onClick={onRecharge}
+            onClick={(e) => {
+              e.stopPropagation();
+              onRecharge();
+            }}
             aria-label="Recharge coins"
             title="Recharge Balance"
           >

@@ -506,6 +506,12 @@
   background: #d50000;
 }
 
+.controlsHidden {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
 /* ========== Mobile Viewport Adjustments ========== */
 @media (max-width: 768px) {
   .callModalOverlay {
@@ -522,8 +528,12 @@
     border: none;
   }
 
+  .remoteVideo {
+    object-fit: contain !important;
+  }
+
   .localVideoContainer {
-    top: 70px;
+    top: 90px;
     right: 14px;
     width: 105px;
     height: 145px;
@@ -531,15 +541,20 @@
   }
 
   .callTopBar {
-    top: 16px;
+    top: 70px;
+    padding-top: 10px;
   }
 
   .callControls {
     position: absolute;
-    bottom: 24px;
-    gap: 1rem;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    gap: 0.8rem;
     padding: 8px 16px;
     margin: 0;
+    width: max-content;
+    max-width: 95vw;
   }
 
   .controlBtn {

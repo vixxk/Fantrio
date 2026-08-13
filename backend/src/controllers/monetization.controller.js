@@ -385,16 +385,33 @@ exports.sendGift = catchAsync(async (req, res, next) => {
     return next(new ApiError(400, 'You cannot send a gift to yourself'));
   }
 
-  const receiver = await User.findById(receiverId);
+  let targetUserId = receiverId;
+  let receiver = await User.findById(receiverId);
+  if (!receiver) {
+    const CreatorProfile = require('../models/CreatorProfile');
+    const creator = await CreatorProfile.findById(receiverId);
+    if (creator && creator.userId) {
+      targetUserId = creator.userId.toString();
+      receiver = await User.findById(targetUserId);
+    }
+  }
   if (!receiver) {
     return next(new ApiError(404, 'Recipient not found'));
   }
 
+  // Only fans can send gifts to creators
+  if (req.user.role === 'creator') {
+    return next(new ApiError(403, 'Only fans can send gifts to creators'));
+  }
+  if (receiver.role !== 'creator') {
+    return next(new ApiError(400, 'Gifts can only be sent to creators'));
+  }
+
   // Blocked-user guards (same policy as tipping)
-  if (req.user.blockedUsers.includes(receiverId)) {
+  if (req.user.blockedUsers.includes(targetUserId)) {
     return next(new ApiError(400, 'You cannot send a gift to a user you have blocked'));
   }
-  const blockedByReceiver = await User.exists({ _id: receiverId, blockedUsers: req.user._id });
+  const blockedByReceiver = await User.exists({ _id: targetUserId, blockedUsers: req.user._id });
   if (blockedByReceiver) {
     return next(new ApiError(400, 'You cannot send a gift to this user'));
   }
@@ -405,7 +422,7 @@ exports.sendGift = catchAsync(async (req, res, next) => {
   // admins can link them back to the CallLog by roomId.
   const transaction = await walletService.transferCoins(
     req.user._id,
-    receiverId,
+    targetUserId,
     gift.coins,
     'gift',
     streamId || null,
@@ -500,19 +517,26 @@ exports.sendGift = catchAsync(async (req, res, next) => {
   };
 
   const io = req.app.get('io');
+  const senderWallet = await Wallet.findOne({ userId: req.user._id });
+  const receiverWallet = await Wallet.findOne({ userId: targetUserId });
+
   if (io) {
     io.to(req.user._id.toString()).emit('gift_received', senderPayload);
-    io.to(receiverId.toString()).emit('gift_received', senderPayload);
+    io.to(targetUserId.toString()).emit('gift_received', senderPayload);
     if (streamId) {
       io.to(`live_stream_${streamId}`).emit('gift_received', senderPayload);
     }
     if (chatMessage) {
       io.to(req.user._id.toString()).emit('new_message', chatMessage);
-      io.to(receiverId.toString()).emit('new_message', chatMessage);
+      io.to(targetUserId.toString()).emit('new_message', chatMessage);
+    }
+    if (senderWallet) {
+      io.to(req.user._id.toString()).emit('balance_updated', { balanceCoins: senderWallet.balanceCoins });
+    }
+    if (receiverWallet) {
+      io.to(targetUserId.toString()).emit('balance_updated', { balanceCoins: receiverWallet.balanceCoins });
     }
   }
-
-  const updatedWallet = await Wallet.findOne({ userId: req.user._id });
 
   res.status(200).json({
     status: 'success',

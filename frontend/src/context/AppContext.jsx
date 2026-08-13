@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useRef, useContext } from 'react';
 import { api } from '../services/api';
+import { getSocket, joinSocketRoom } from '../services/socket';
 
 const AppContext = createContext();
 
@@ -306,6 +307,27 @@ export const AppProvider = ({ children }) => {
     window.addEventListener('auth:expired', handleAuthExpired);
     return () => window.removeEventListener('auth:expired', handleAuthExpired);
   }, []);
+
+  // Real-time wallet balance sync via Socket.io
+  useEffect(() => {
+    if (!user?.id) return;
+    let socket = null;
+    try {
+      socket = getSocket();
+      joinSocketRoom(user.id);
+      const handleBalanceUpdated = (data) => {
+        if (data && typeof data.balanceCoins === 'number') {
+          setBalance(data.balanceCoins);
+        }
+      };
+      socket.on('balance_updated', handleBalanceUpdated);
+      return () => {
+        socket.off('balance_updated', handleBalanceUpdated);
+      };
+    } catch (err) {
+      console.error('Socket init for balance failed:', err);
+    }
+  }, [user?.id]);
 
   const applyAuth = async (res) => {
     if (res.token) {

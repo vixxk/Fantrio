@@ -436,10 +436,16 @@ exports.heartbeat = catchAsync(async (req, res, next) => {
 
   // Double check if caller has funds left for the NEXT minute
   const updatedWallet = await Wallet.findOne({ userId: callLog.callerId });
+  const receiverWallet = await Wallet.findOne({ userId: callLog.receiverId });
+  const io = req.app.get('io');
+  if (io) {
+    if (updatedWallet) io.to(callLog.callerId.toString()).emit('balance_updated', { balanceCoins: updatedWallet.balanceCoins });
+    if (receiverWallet) io.to(callLog.receiverId.toString()).emit('balance_updated', { balanceCoins: receiverWallet.balanceCoins });
+  }
+
   let nextMinuteStatus = 'active';
   if (!updatedWallet || updatedWallet.balanceCoins < rate) {
     nextMinuteStatus = 'pending_termination_next_minute';
-    const io = req.app.get('io');
     if (io) {
       // Alert users that call will disconnect if they don't recharge
       io.to(callLog.callerId.toString()).emit('call_warning', {

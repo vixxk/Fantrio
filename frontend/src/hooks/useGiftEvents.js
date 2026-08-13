@@ -126,11 +126,9 @@ export const useGiftEvents = ({ streamId = null, callRoomId = null, enabled = tr
       // current view has no context id (no active call/stream), reject events
       // so gifts from other contexts can't leak into an unrelated overlay.
       if (ctx.type === 'stream') {
-        if (!streamId || String(ctx.streamId) !== String(streamId)) return;
-      } else if (ctx.type === 'call') {
-        if (!callRoomId || String(ctx.callRoomId) !== String(callRoomId)) return;
-      } else {
-        return;
+        if (streamId && String(ctx.streamId) !== String(streamId)) return;
+      } else if (ctx.type === 'call' || callRoomId) {
+        if (callRoomId && ctx.callRoomId && String(ctx.callRoomId) !== String(callRoomId)) return;
       }
       addEvent(payload);
     };

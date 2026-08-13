@@ -26,6 +26,7 @@ export const IncomingCallProvider = ({ children }) => {
   const [callDuration, setCallDuration] = useState(0);
   const [giftOpen, setGiftOpen] = useState(false);
   const [rechargeOpen, setRechargeOpen] = useState(false);
+  const [controlsVisible, setControlsVisible] = useState(true);
   const ag = useAgoraCall();
 
   // Live gifts + recharge while the call is active. Both parties see the same
@@ -277,7 +278,10 @@ export const IncomingCallProvider = ({ children }) => {
     <IncomingCallContext.Provider value={{ incoming, active, acceptCall, rejectCall, endActiveCall }}>
       {children}
       {showOverlay && (
-        <div className={`${styles.overlay} ${isVideo ? styles.videoOverlay : ''}`}>
+        <div
+          className={`${styles.overlay} ${isVideo ? styles.videoOverlay : ''}`}
+          onClick={() => setControlsVisible((prev) => !prev)}
+        >
           <div className={`${styles.container} ${isVideo ? styles.videoContainer : styles.audioContainer}`}>
             {isVideo && (
               <div className={styles.videoArea}>
@@ -310,7 +314,12 @@ export const IncomingCallProvider = ({ children }) => {
                 )}
                 <div className={styles.localVideoContainer}>
                   <video
-                    ref={localVideoRef}
+                    ref={(el) => {
+                      localVideoRef.current = el;
+                      if (el && isVideo) {
+                        ag.attachLocal(el);
+                      }
+                    }}
                     className={`${styles.localVideo} ${isCameraOff ? styles.localVideoHidden : ''}`}
                     playsInline
                     autoPlay
@@ -354,42 +363,70 @@ export const IncomingCallProvider = ({ children }) => {
             )}
 
             {activeStatus === 'incoming' ? (
-              <div className={styles.controls}>
-                <button className={styles.rejectBtn} onClick={rejectCall} title="Decline Call">
+              <div className={styles.controls} onClick={(e) => e.stopPropagation()}>
+                <button
+                  className={styles.rejectBtn}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    rejectCall();
+                  }}
+                  title="Decline Call"
+                >
                   <PhoneOff size={26} />
                 </button>
-                <button className={styles.acceptBtn} onClick={acceptCall} title="Accept Call">
+                <button
+                  className={styles.acceptBtn}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    acceptCall();
+                  }}
+                  title="Accept Call"
+                >
                   <Phone size={26} />
                 </button>
               </div>
             ) : (
               <>
-                <div className={styles.callTopBar}>
+                <div className={`${styles.callTopBar} ${!controlsVisible ? styles.controlsHidden : ''}`}>
                   <span className={styles.callBalanceChip}>
                     <img src="/coin.png" alt="Coin" className={styles.callCoinImg} />
                     {balance.toLocaleString()}
                     <button
                       className={styles.callRechargeBtn}
-                      onClick={() => setRechargeOpen(true)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setRechargeOpen(true);
+                      }}
                       title="Recharge coins"
                     >
                       <Coins size={11} /> Recharge
                     </button>
                   </span>
                 </div>
-                <div className={styles.controls}>
-                  <button
-                    className={`${styles.controlBtn} ${styles.controlBtnGift}`}
-                    onClick={() => setGiftOpen(true)}
-                    disabled={activeStatus !== 'active'}
-                    aria-label="Send a gift"
-                    title="Send Gift"
-                  >
-                    <Gift size={22} />
-                  </button>
+                <div
+                  className={`${styles.controls} ${!controlsVisible ? styles.controlsHidden : ''}`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {user?.role !== 'creator' && (
+                    <button
+                      className={`${styles.controlBtn} ${styles.controlBtnGift}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setGiftOpen(true);
+                      }}
+                      disabled={activeStatus !== 'active'}
+                      aria-label="Send a gift"
+                      title="Send Gift"
+                    >
+                      <Gift size={22} />
+                    </button>
+                  )}
                   <button
                     className={`${styles.controlBtn} ${isMuted ? styles.controlActive : ''}`}
-                    onClick={toggleMute}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleMute();
+                    }}
                     disabled={activeStatus !== 'active'}
                     title={isMuted ? 'Unmute Mic' : 'Mute Mic'}
                   >
@@ -398,19 +435,32 @@ export const IncomingCallProvider = ({ children }) => {
                   {isVideo && (
                     <button
                       className={`${styles.controlBtn} ${isCameraOff ? styles.controlActive : ''}`}
-                      onClick={toggleCamera}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleCamera();
+                      }}
                       disabled={activeStatus !== 'active'}
                       title={isCameraOff ? 'Turn Camera On' : 'Turn Camera Off'}
                     >
                       {isCameraOff ? <VideoOff size={22} /> : <Video size={22} />}
                     </button>
                   )}
-                  <button className={styles.hangupBtn} onClick={() => setShowEndConfirm(true)} title="End Call">
+                  <button
+                    className={styles.hangupBtn}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowEndConfirm(true);
+                    }}
+                    title="End Call"
+                  >
                     <Phone size={26} className={styles.hangupIcon} />
                   </button>
                   <button
                     className={`${styles.controlBtn} ${styles.controlBtnCoins}`}
-                    onClick={() => setRechargeOpen(true)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setRechargeOpen(true);
+                    }}
                     aria-label="Recharge coins"
                     title="Recharge Balance"
                   >

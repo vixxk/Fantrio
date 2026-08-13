@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import {
   joinAgoraChannel,
   createLocalAudioTrack,
@@ -47,16 +47,26 @@ export const useAgoraCall = () => {
 
   const endCall = useCallback(() => {
     const c = clientRef.current;
+    if (localAudioTrackRef.current) {
+      try {
+        if (c) unpublishTrack(c, localAudioTrackRef.current);
+        localAudioTrackRef.current.stop();
+        localAudioTrackRef.current.close();
+      } catch (e) {
+        console.error('endCall audio track cleanup error', e);
+      }
+    }
+    if (localVideoTrackRef.current) {
+      try {
+        if (c) unpublishTrack(c, localVideoTrackRef.current);
+        localVideoTrackRef.current.stop();
+        localVideoTrackRef.current.close();
+      } catch (e) {
+        console.error('endCall video track cleanup error', e);
+      }
+    }
     if (c) {
       try {
-        if (localAudioTrackRef.current) {
-          unpublishTrack(c, localAudioTrackRef.current);
-          localAudioTrackRef.current.close();
-        }
-        if (localVideoTrackRef.current) {
-          unpublishTrack(c, localVideoTrackRef.current);
-          localVideoTrackRef.current.close();
-        }
         if (remoteUserIdRef.current) {
           unsubscribeFromUser(c, { uid: remoteUserIdRef.current });
         }
@@ -76,6 +86,13 @@ export const useAgoraCall = () => {
     streamIdRef.current = '';
     setJoined(false);
   }, [cleanupListeners]);
+
+  // Clean up on component unmount to guarantee hardware release
+  useEffect(() => {
+    return () => {
+      endCall();
+    };
+  }, [endCall]);
 
   const joinCall = useCallback(async ({ channel, token, uid, type, onRemoteStream, onRemoteLeave, onCallEnded }) => {
     endCall();

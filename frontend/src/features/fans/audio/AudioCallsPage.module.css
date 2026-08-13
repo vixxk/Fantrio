@@ -1729,3 +1729,10 @@
   background: rgba(255, 215, 102, 0.22);
   color: #fff;
 }
+
+@media (max-width: 768px) {
+  .callTopBar {
+    top: 70px !important;
+    padding-top: 10px !important;
+  }
+}

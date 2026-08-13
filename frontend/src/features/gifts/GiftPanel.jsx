@@ -49,6 +49,10 @@ export const GiftPanel = ({ type = 'chat', receiverName = 'this creator', balanc
   }, [type]);
 
   const handleGiftClick = (gift) => {
+    if (app.user?.role === 'creator') {
+      toast.error('Only fans can send gifts to creators.');
+      return;
+    }
     const coinPrice = typeof gift.coins === 'number' ? gift.coins : Number(gift.coins) || 0;
     if (safeBalance < coinPrice) {
       onRecharge();
