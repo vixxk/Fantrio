@@ -61,9 +61,7 @@ export const useAgoraCall = () => {
 
   const stopAndCloseTrack = (track, c) => {
     if (!track) return;
-    if (c) {
-      try { unpublishTrack(c, track); } catch (e) { /* ignore unpublish errors on disconnect */ }
-    }
+    // 1. Instantly stop the native browser MediaStreamTrack hardware!
     try {
       const mst = typeof track.getMediaStreamTrack === 'function' ? track.getMediaStreamTrack() : null;
       if (mst && typeof mst.stop === 'function') {
@@ -72,47 +70,63 @@ export const useAgoraCall = () => {
     } catch (e) {
       console.warn('Native MediaStreamTrack stop error:', e);
     }
+    // 2. Stop playback in Agora SDK
     try {
       if (typeof track.stop === 'function') track.stop();
     } catch (e) {
       console.warn('Agora track.stop error:', e);
     }
+    // 3. Close track in Agora SDK
     try {
       if (typeof track.close === 'function') track.close();
     } catch (e) {
       console.warn('Agora track.close error:', e);
+    }
+    // 4. Unpublish from Agora client if connected
+    if (c) {
+      try {
+        unpublishTrack(c, track).catch(() => {});
+      } catch (e) { /* ignore */ }
     }
   };
 
   const endCall = useCallback(() => {
     const c = clientRef.current;
     
-    stopAndCloseTrack(localAudioTrackRef.current, c);
-    stopAndCloseTrack(localVideoTrackRef.current, c);
-    stopAndCloseTrack(remoteVideoTrackRef.current, null);
-    stopAndCloseTrack(remoteAudioTrackRef.current, null);
+    const localAudio = localAudioTrackRef.current;
+    const localVideo = localVideoTrackRef.current;
+    const remoteVideo = remoteVideoTrackRef.current;
+    const remoteAudio = remoteAudioTrackRef.current;
+
+    // Clear track refs immediately to prevent stale usage
+    localAudioTrackRef.current = null;
+    localVideoTrackRef.current = null;
+    remoteVideoTrackRef.current = null;
+    remoteAudioTrackRef.current = null;
+
+    // Release camera & mic hardware IMMEDIATELY
+    stopAndCloseTrack(localAudio, c);
+    stopAndCloseTrack(localVideo, c);
+    stopAndCloseTrack(remoteVideo, null);
+    stopAndCloseTrack(remoteAudio, null);
 
     if (c) {
       try {
         if (remoteUserIdRef.current) {
-          unsubscribeFromUser(c, { uid: remoteUserIdRef.current });
+          unsubscribeFromUser(c, { uid: remoteUserIdRef.current }).catch(() => {});
         }
       } catch (e) {
-        console.error('endCall cleanup error', e);
+        console.warn('endCall cleanup error', e);
       }
       try {
-        leaveAgoraChannel(c);
+        leaveAgoraChannel(c).catch(() => {});
       } catch (e) {
-        console.error('leaveAgoraChannel error', e);
+        console.warn('leaveAgoraChannel error', e);
       }
     }
     cleanupListeners();
     destroyAgoraClient();
     clientRef.current = null;
-    localAudioTrackRef.current = null;
-    localVideoTrackRef.current = null;
-    remoteVideoTrackRef.current = null;
-    remoteAudioTrackRef.current = null;
     remoteUserIdRef.current = '';
     streamIdRef.current = '';
     playbackSinkRef.current = 'default';

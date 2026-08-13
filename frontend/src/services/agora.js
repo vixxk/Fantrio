@@ -33,22 +33,41 @@ export const createLocalVideoTrack = async () => {
 };
 
 export const publishTrack = async (c, track) => {
-  await c.publish([track]);
+  if (!c || !track) return;
+  try {
+    await c.publish([track]);
+  } catch (e) {
+    console.warn('publishTrack warning:', e?.message || e);
+  }
 };
 
 export const subscribeToUser = async (c, user, mediaType) => {
-  // Passing mediaType subscribes only the published type, so e.g. a mute
-  // (user-unpublished) on one track can't disrupt the other track.
-  await c.subscribe(user, mediaType);
-  return user;
+  if (!c || !user) return null;
+  try {
+    await c.subscribe(user, mediaType);
+    return user;
+  } catch (e) {
+    console.warn('subscribeToUser warning:', e?.message || e);
+    return null;
+  }
 };
 
 export const unpublishTrack = async (c, track) => {
-  await c.unpublish(track);
+  if (!c || !track) return;
+  try {
+    await c.unpublish(track);
+  } catch (e) {
+    console.warn('unpublishTrack warning:', e?.message || e);
+  }
 };
 
 export const unsubscribeFromUser = async (c, user) => {
-  await c.unsubscribe(user);
+  if (!c || !user) return;
+  try {
+    await c.unsubscribe(user);
+  } catch (e) {
+    console.warn('unsubscribeFromUser warning:', e?.message || e);
+  }
 };
 
 export const leaveAgoraChannel = async (c) => {
@@ -56,7 +75,7 @@ export const leaveAgoraChannel = async (c) => {
     try {
       await c.leave();
     } catch (e) {
-      console.error('leaveAgoraChannel error', e);
+      console.warn('leaveAgoraChannel warning:', e?.message || e);
     }
   }
 };

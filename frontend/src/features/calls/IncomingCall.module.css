@@ -731,7 +731,7 @@
   }
 
   .localVideoContainer {
-    top: 135px;
+    top: 175px;
     right: 14px;
     width: 105px;
     height: 145px;
@@ -740,7 +740,7 @@
   }
 
   .callTopBar {
-    top: 16px;
+    top: 70px !important;
     padding-top: 0;
     z-index: 30;
   }
