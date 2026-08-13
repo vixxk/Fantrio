@@ -55,6 +55,7 @@ app.set('io', io);
 // ============================================================================
 const User = require('./models/User');
 const CreatorProfile = require('./models/CreatorProfile');
+const CallLog = require('./models/CallLog');
 
 // socket.id -> userId, plus a per-user count of open sockets (multiple tabs).
 const socketUserMap = new Map();
@@ -67,6 +68,38 @@ const CREATOR_OFFLINE_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
 // Serializes presence writes per user so a rapid connect→disconnect can never
 // resolve out of order and leave a stale flag (the call guard trusts this).
 const presenceQueue = new Map();
+
+// Helper to end any ongoing call immediately if a participant goes offline / disconnects
+const endActiveCallsForUser = async (userId) => {
+  try {
+    const activeCalls = await CallLog.find({
+      status: { $in: ['initiated', 'active'] },
+      $or: [{ callerId: userId }, { receiverId: userId }]
+    });
+
+    for (const call of activeCalls) {
+      call.status = 'completed';
+      call.endedAt = new Date();
+      await call.save();
+
+      const callerIdStr = call.callerId ? call.callerId.toString() : null;
+      const receiverIdStr = call.receiverId ? call.receiverId.toString() : null;
+
+      if (callerIdStr) io.to(callerIdStr).emit('call_ended', { roomId: call.roomId, reason: 'Participant disconnected' });
+      if (receiverIdStr) io.to(receiverIdStr).emit('call_ended', { roomId: call.roomId, reason: 'Participant disconnected' });
+
+      // Reset creator busy availability
+      if (call.receiverId) {
+        await CreatorProfile.updateOne({ userId: call.receiverId }, { $set: { isBusy: false } });
+        io.emit('creator_availability_change', { creatorId: call.receiverId.toString(), isBusy: false, isOnline: true });
+      }
+
+      console.log(`[Presence/Call] Ended call ${call._id} because participant ${userId} went offline.`);
+    }
+  } catch (err) {
+    console.error(`[Presence/Call] Error ending active calls for user ${userId}:`, err);
+  }
+};
 
 // Only write to the DB on actual presence transitions to avoid write churn.
 // `lastSeenAt` records the last time the user went ONLINE; going offline
@@ -110,6 +143,9 @@ const resetPresenceOnBoot = async () => {
 const markUserOfflineIfNoSockets = async (userId) => {
   const count = userSocketCount.get(userId) || 0;
   if (count > 0) return; // still connected from another tab
+
+  // Automatically end any active calls if participant drops connection / goes offline
+  endActiveCallsForUser(userId);
 
   try {
     const user = await User.findById(userId).select('role').lean();
