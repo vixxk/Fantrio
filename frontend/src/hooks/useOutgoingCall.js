@@ -76,23 +76,24 @@ export const useOutgoingCall = ({ type }) => {
     endingRef.current = false;
   }, [clearCall, refreshBalance]);
 
-  // Automatically end call for both fan and creator if user goes back, leaves page, or unmounts
+  // Lock navigation to the ongoing call view while a call is connecting or active
   useEffect(() => {
-    const handlePopState = () => {
+    const handlePopState = (e) => {
       if (activeCallRef.current) {
-        endCall();
+        e?.preventDefault?.();
+        window.history.pushState(null, '', window.location.href);
       }
     };
 
-    window.addEventListener('popstate', handlePopState);
+    if (activeCall) {
+      window.history.pushState(null, '', window.location.href);
+      window.addEventListener('popstate', handlePopState);
+    }
 
     return () => {
       window.removeEventListener('popstate', handlePopState);
-      if (activeCallRef.current) {
-        endCall();
-      }
     };
-  }, [endCall]);
+  }, [activeCall]);
 
   const checkMediaPermissions = async (callType) => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return true;
@@ -110,6 +111,10 @@ export const useOutgoingCall = ({ type }) => {
   };
 
   const startCall = useCallback(async (creator) => {
+    if (activeCallRef.current) {
+      toast.warning('You are already in an active call. End it before starting a new one.');
+      return;
+    }
     const rate = creator.rate || creator[videoCall ? 'videoCallPerMin' : 'audioCallPerMin'] || 0;
     if (creator.isBusy) {
       toast.warning(`${creator.displayName} is currently busy on another call.`);

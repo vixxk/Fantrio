@@ -202,26 +202,24 @@ export const IncomingCallProvider = ({ children }) => {
   }, [remoteStream]);
 
   // If the provider unmounts mid-call (e.g. logout / tab switch / going back), clean up the
-  // Agora session, billing heartbeat and backend session so no orphaned call
-  // lingers and the other party isn't left hanging.
+  // Lock navigation to the ongoing call view while a call is incoming or active
   useEffect(() => {
-    const handlePopState = () => {
-      if (activeRef.current) {
-        endActiveCall();
+    const handlePopState = (e) => {
+      if (activeRef.current || incoming) {
+        e?.preventDefault?.();
+        window.history.pushState(null, '', window.location.href);
       }
     };
-    window.addEventListener('popstate', handlePopState);
+
+    if (active || incoming) {
+      window.history.pushState(null, '', window.location.href);
+      window.addEventListener('popstate', handlePopState);
+    }
 
     return () => {
       window.removeEventListener('popstate', handlePopState);
-      cleanupTimers();
-      const cur = activeRef.current;
-      if (cur && cur.roomId) {
-        api.post('/calls/end', { roomId: cur.roomId }).catch(() => {});
-      }
-      ag.endCall();
     };
-  }, [endActiveCall, cleanupTimers, ag]);
+  }, [active, incoming]);
 
   // Attach local preview once active
   useEffect(() => {
