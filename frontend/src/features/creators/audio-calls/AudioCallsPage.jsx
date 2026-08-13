@@ -313,34 +313,12 @@ export const AudioCallsPage = () => {
                   {audioAvailable ? 'Online Now' : 'Offline'}
                 </div>
               </div>
-              <div className={styles.heroWaveform}>
-                {/* Mirrored waveform visualization */}
-                <svg viewBox="0 0 280 80" className={styles.waveformSvg}>
-                  <defs>
-                    <linearGradient id="waveGradientLeft" x1="0%" y1="0%" x2="0%" y2="0%">
-                      <stop offset="0%" stopColor="#7e00f3" />
-                      <stop offset="100%" stopColor="#9b51e0" />
-                    </linearGradient>
-                    <linearGradient id="waveGradientRight" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#9b51e0" />
-                      <stop offset="100%" stopColor="#e10075" />
-                    </linearGradient>
-                  </defs>
-                  {/* Left cluster (smaller) */}
-                  {[2,4,6,8,12,16,22,26,30,26,22,16,12,8,6,4,2,1,2,3,2,1].map((h, i) => (
-                    <g key={`l${i}`}>
-                      <rect x={4 + i * 6} y={40 - h} width="3" height={h} fill="url(#waveGradientLeft)" rx="1.5" />
-                      <rect x={4 + i * 6} y={40} width="3" height={h * 0.9} fill="url(#waveGradientLeft)" rx="1.5" />
-                    </g>
-                  ))}
-                  {/* Right cluster (larger, taller) */}
-                  {[1,2,4,8,14,22,30,36,32,28,22,16,12,8,5,3,2,1].map((h, i) => (
-                    <g key={`r${i}`}>
-                      <rect x={140 + i * 6} y={40 - h} width="3" height={h} fill="url(#waveGradientRight)" rx="1.5" />
-                      <rect x={140 + i * 6} y={40} width="3" height={h * 0.9} fill="url(#waveGradientRight)" rx="1.5" />
-                    </g>
-                  ))}
-                </svg>
+              <div className={styles.heroAiGraphic}>
+                <img src="/audio_call_ai.png" alt="AI Audio Call" className={styles.aiGraphicImg} />
+                <div className={styles.aiGraphicBadge}>
+                  <span className={styles.aiBadgeDot} />
+                  AI Voice Engine
+                </div>
               </div>
             </div>
             <div className={styles.heroActions}>

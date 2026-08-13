@@ -305,7 +305,7 @@ export const StorePage = () => {
                       </thead>
                       <tbody>
                         {filteredProducts.length === 0 && (
-                          <tr><td colSpan={7} style={{ textAlign: 'center', padding: '2rem', color: 'rgba(255,255,255,0.4)' }}>No products yet — add your first product!</td></tr>
+                          <tr><td colSpan={7} style={{ textAlign: 'center', padding: '2rem', color: darkMode ? 'rgba(255,255,255,0.45)' : '#4b5563', fontWeight: 500 }}>No products yet — add your first product!</td></tr>
                         )}
                         {filteredProducts.map((product) => (
                           <tr key={product._id} className={styles.tableRow}>
@@ -447,7 +447,7 @@ export const StorePage = () => {
               <h3 className={styles.sidebarCardTitle}>Recent Orders</h3>
             </div>
             <div className={styles.ordersList}>
-              {data.recentOrders.length === 0 && <p style={{ color: 'rgba(255,255,255,0.4)', padding: '0.5rem 0' }}>No orders yet.</p>}
+              {data.recentOrders.length === 0 && <p style={{ color: darkMode ? 'rgba(255,255,255,0.45)' : '#4b5563', padding: '0.5rem 0', fontWeight: 500 }}>No orders yet.</p>}
               {data.recentOrders.slice(0, 5).map((order) => (
                 <div key={order.id} className={styles.orderItem}>
                   <img src={order.avatar} alt={order.customer} className={styles.orderAvatar} />
@@ -467,7 +467,7 @@ export const StorePage = () => {
               <h3 className={styles.sidebarCardTitle}>Top Selling Products</h3>
             </div>
             <div className={styles.topProductsList}>
-              {data.topSellingProducts.length === 0 && <p style={{ color: 'rgba(255,255,255,0.4)', padding: '0.5rem 0' }}>No sales yet.</p>}
+              {data.topSellingProducts.length === 0 && <p style={{ color: darkMode ? 'rgba(255,255,255,0.45)' : '#4b5563', padding: '0.5rem 0', fontWeight: 500 }}>No sales yet.</p>}
               {data.topSellingProducts.map((product) => (
                 <div key={product.id} className={styles.topProductItem}>
                   <div className={styles.rankBadge} data-rank={product.rank}>{product.rank}</div>

@@ -35,7 +35,10 @@ export const createLocalVideoTrack = async () => {
 export const publishTrack = async (c, track) => {
   if (!c || !track) return;
   try {
-    await c.publish([track]);
+    const tracks = Array.isArray(track) ? track.filter(Boolean) : [track];
+    if (tracks.length > 0) {
+      await c.publish(tracks);
+    }
   } catch (e) {
     console.warn('publishTrack warning:', e?.message || e);
   }

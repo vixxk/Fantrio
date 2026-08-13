@@ -921,7 +921,7 @@ export const DashboardPage = () => {
               </div>
             ) : (
             <div className={styles.recentGrid}>
-              {filteredRecent.length === 0 && <p style={{ color: 'rgba(255,255,255,0.4)', padding: '1rem 0' }}>No content yet.</p>}
+              {filteredRecent.length === 0 && <p style={{ color: darkMode ? 'rgba(255,255,255,0.45)' : '#4b5563', padding: '1rem 0', fontWeight: 500 }}>No content yet.</p>}
               {filteredRecent.map((item) => (
                 <div key={item.id} className={styles.recentCard}>
                   <div className={styles.recentThumbWrap}>
@@ -1022,7 +1022,7 @@ export const DashboardPage = () => {
               </div>
             ) : (
             <div className={styles.streamsList}>
-              {data.upcomingStreams.length === 0 && <p style={{ color: 'rgba(255,255,255,0.4)', padding: '0.5rem 0' }}>No upcoming streams.</p>}
+              {data.upcomingStreams.length === 0 && <p style={{ color: darkMode ? 'rgba(255,255,255,0.45)' : '#4b5563', padding: '0.5rem 0', fontWeight: 500 }}>No upcoming streams.</p>}
               {data.upcomingStreams.map((stream) => (
                 <div key={stream.id} className={styles.streamItem}>
                   <img src={stream.thumbnail || '/Girl.png'} alt={stream.title} className={styles.streamThumb} />

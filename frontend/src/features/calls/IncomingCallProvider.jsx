@@ -313,18 +313,7 @@ export const IncomingCallProvider = ({ children }) => {
 
       // Duration timer
       durationTimer.current = setInterval(() => {
-        setCallDuration((d) => {
-          const next = d + 1;
-          if (next === 1 && user?.role !== 'creator' && type === 'video') {
-            ag.toggleCamera();
-            setIsCameraOff(true);
-            setTimeout(() => {
-              ag.toggleCamera();
-              setIsCameraOff(false);
-            }, 150);
-          }
-          return next;
-        });
+        setCallDuration((d) => d + 1);
       }, 1000);
     } catch (err) {
       console.error('accept call failed', err);
@@ -588,6 +577,13 @@ export const IncomingCallProvider = ({ children }) => {
                       )}
                     </span>
                   </span>
+
+                  {type === 'video' && activeStatus === 'active' && (
+                    <div className={styles.videoTopTimer}>
+                      <span className={styles.timerDot} />
+                      <span className={styles.videoTimerText}>{formatDuration(callDuration)}</span>
+                    </div>
+                  )}
 
                   {/* Per-call gift summary — the creator sees gifts received
                       from the fan during this call. Dismissible (×) so it

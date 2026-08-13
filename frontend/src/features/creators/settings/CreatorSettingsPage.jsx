@@ -231,10 +231,62 @@ export const CreatorSettingsPage = () => {
       <div className={`${styles.pageContainer} ${!darkMode ? styles.light : ''}`}>
         <div className={styles.mainGrid}>
           <div className={styles.leftColumn}>
-            <section className={styles.settingsSection}>
-              <ShimmerSkeleton variant="text" width="35%" height="18px" />
-              <ShimmerSkeleton variant="text" width="60%" height="13px" marginTop="0.5rem" />
-            </section>
+            {/* Profile Section Skeleton */}
+            <div className={styles.settingsSection} style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
+              <ShimmerSkeleton variant="text" width="35%" height="20px" marginBottom="0.5rem" />
+              <ShimmerSkeleton variant="text" width="60%" height="13px" marginBottom="1.5rem" />
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1.2rem' }}>
+                <ShimmerSkeleton variant="avatar" width="64px" height="64px" />
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  <ShimmerSkeleton variant="text" width="40%" height="16px" />
+                  <ShimmerSkeleton variant="text" width="25%" height="12px" />
+                </div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <ShimmerSkeleton variant="text" width="100%" height="40px" borderRadius="8px" />
+                <ShimmerSkeleton variant="text" width="100%" height="70px" borderRadius="8px" />
+              </div>
+            </div>
+
+            {/* Monetization Rates Skeleton */}
+            <div className={styles.settingsSection} style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
+              <ShimmerSkeleton variant="text" width="30%" height="18px" marginBottom="0.5rem" />
+              <ShimmerSkeleton variant="text" width="55%" height="13px" marginBottom="1.2rem" />
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
+                <ShimmerSkeleton variant="card" height="65px" borderRadius="10px" />
+                <ShimmerSkeleton variant="card" height="65px" borderRadius="10px" />
+                <ShimmerSkeleton variant="card" height="65px" borderRadius="10px" />
+              </div>
+            </div>
+
+            {/* Bottom Settings Grid Skeleton */}
+            <div className={styles.bottomGrid}>
+              <div className={styles.settingsSection} style={{ padding: '1.5rem' }}>
+                <ShimmerSkeleton variant="text" width="45%" height="18px" marginBottom="1rem" />
+                <ShimmerSkeleton variant="text" height="38px" marginBottom="0.6rem" borderRadius="8px" />
+                <ShimmerSkeleton variant="text" height="38px" marginBottom="0.6rem" borderRadius="8px" />
+                <ShimmerSkeleton variant="text" height="38px" borderRadius="8px" />
+              </div>
+              <div className={styles.settingsSection} style={{ padding: '1.5rem' }}>
+                <ShimmerSkeleton variant="text" width="45%" height="18px" marginBottom="1rem" />
+                <ShimmerSkeleton variant="text" height="38px" marginBottom="0.6rem" borderRadius="8px" />
+                <ShimmerSkeleton variant="text" height="38px" marginBottom="0.6rem" borderRadius="8px" />
+                <ShimmerSkeleton variant="text" height="38px" borderRadius="8px" />
+              </div>
+            </div>
+          </div>
+
+          {/* Right Sidebar Skeleton */}
+          <div className={styles.rightSidebar}>
+            <div className={styles.sidebarCard} style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
+              <ShimmerSkeleton variant="text" width="50%" height="18px" marginBottom="1rem" />
+              <ShimmerSkeleton variant="text" height="42px" borderRadius="8px" marginBottom="0.75rem" />
+              <ShimmerSkeleton variant="text" height="42px" borderRadius="8px" />
+            </div>
+            <div className={styles.sidebarCard} style={{ padding: '1.5rem' }}>
+              <ShimmerSkeleton variant="text" width="50%" height="18px" marginBottom="1rem" />
+              <ShimmerSkeleton variant="text" height="110px" borderRadius="12px" />
+            </div>
           </div>
         </div>
       </div>

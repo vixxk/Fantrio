@@ -423,7 +423,7 @@ export const EarningsPage = () => {
                   </thead>
                   <tbody>
                     {currentTransactions.length === 0 && (
-                      <tr><td colSpan={5} className={styles.td} style={{ textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>No transactions in this category yet.</td></tr>
+                      <tr><td colSpan={5} className={styles.td} style={{ textAlign: 'center', color: darkMode ? 'rgba(255,255,255,0.45)' : '#4b5563', fontWeight: 500 }}>No transactions in this category yet.</td></tr>
                     )}
                     {currentTransactions.map((tx) => {
                       const TypeIcon = typeIconMap[tx.type] || Users;
@@ -524,7 +524,7 @@ export const EarningsPage = () => {
               <h3 className={styles.sidebarCardTitle}>Top Subscribers</h3>
             </div>
             <div className={styles.subscribersList}>
-              {data.topSubscribers.length === 0 && <p style={{ color: 'rgba(255,255,255,0.4)', padding: '0.5rem 0' }}>No data yet.</p>}
+              {data.topSubscribers.length === 0 && <p style={{ color: darkMode ? 'rgba(255,255,255,0.45)' : '#4b5563', padding: '0.5rem 0', fontWeight: 500 }}>No data yet.</p>}
               {data.topSubscribers.map((sub) => (
                 <div key={sub.rank} className={styles.subscriberItem}>
                   <div className={styles.rankBadge} data-rank={sub.rank}>{sub.rank}</div>
@@ -545,7 +545,7 @@ export const EarningsPage = () => {
               <h3 className={styles.sidebarCardTitle}>Payout History</h3>
             </div>
             <div className={styles.payoutList}>
-              {data.payoutHistory.length === 0 && <p style={{ color: 'rgba(255,255,255,0.4)', padding: '0.5rem 0' }}>No payouts yet.</p>}
+              {data.payoutHistory.length === 0 && <p style={{ color: darkMode ? 'rgba(255,255,255,0.45)' : '#4b5563', padding: '0.5rem 0', fontWeight: 500 }}>No payouts yet.</p>}
               {data.payoutHistory.slice(0, 4).map((payout) => (
                 <div key={payout.id} className={styles.payoutItem}>
                   <div className={styles.payoutItemIcon}>

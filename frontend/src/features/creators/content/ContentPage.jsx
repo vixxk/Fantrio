@@ -544,7 +544,7 @@ export const ContentPage = () => {
                     </thead>
                     <tbody>
                       {displayedContent.length === 0 && (
-                        <tr><td colSpan={8} style={{ textAlign: 'center', padding: '2rem', color: 'rgba(255,255,255,0.4)' }}>No content yet — upload your first post!</td></tr>
+                        <tr><td colSpan={8} style={{ textAlign: 'center', padding: '2rem', color: darkMode ? 'rgba(255,255,255,0.45)' : '#4b5563', fontWeight: 500 }}>No content yet — upload your first post!</td></tr>
                       )}
                       {displayedContent.map((item) => (
                         <tr key={item._id || item.id} className={styles.tableRow}>

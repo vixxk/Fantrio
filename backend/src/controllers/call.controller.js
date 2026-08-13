@@ -218,10 +218,12 @@ exports.acceptCall = catchAsync(async (req, res, next) => {
     callLog._id
   );
 
+  const now = new Date();
   callLog.status = 'active';
+  callLog.startedAt = now;
+  callLog.lastBilledAt = now;
   callLog.totalMinutesBilling = 1;
   callLog.totalCoinsBilled = rate;
-  callLog.lastBilledAt = new Date();
   await callLog.save();
 
   // Set creator isBusy state & broadcast update so fan cards show "Busy"
@@ -317,8 +319,52 @@ exports.endCall = catchAsync(async (req, res, next) => {
     });
   }
 
-  callLog.status = callLog.status === 'initiated' ? 'missed' : 'completed';
-  callLog.endedAt = Date.now();
+  const endedAt = new Date();
+  const wasActive = callLog.status === 'active';
+  callLog.status = wasActive ? 'completed' : 'missed';
+  callLog.endedAt = endedAt;
+
+  if (wasActive) {
+    // Calculate exact call duration in seconds
+    const startTime = callLog.startedAt || callLog.updatedAt || callLog.createdAt;
+    const durationSeconds = Math.max(0, Math.floor((endedAt.getTime() - new Date(startTime).getTime()) / 1000));
+
+    // Per-minute billing rule: Math.ceil(durationSeconds / 60)
+    // e.g. 2 min 1 sec (121 seconds) = Math.ceil(121 / 60) = 3 minutes.
+    const totalBillableMinutes = durationSeconds > 0 ? Math.ceil(durationSeconds / 60) : 1;
+
+    const billedMinutes = callLog.totalMinutesBilling || 0;
+    const unbilledMinutes = totalBillableMinutes - billedMinutes;
+
+    if (unbilledMinutes > 0) {
+      const rate = callLog.coinRatePerMinute;
+      const additionalCost = unbilledMinutes * rate;
+
+      const callerWallet = await Wallet.findOne({ userId: callLog.callerId });
+      const availableCoins = callerWallet ? callerWallet.balanceCoins : 0;
+
+      if (availableCoins > 0 && rate > 0) {
+        const coinsToDeduct = Math.min(additionalCost, availableCoins);
+        const actualMinutesBilled = Math.ceil(coinsToDeduct / rate);
+
+        try {
+          await walletService.transferCoins(
+            callLog.callerId,
+            callLog.receiverId,
+            coinsToDeduct,
+            'call_billing',
+            callLog._id
+          );
+        } catch (e) {
+          console.warn('Final call billing transfer warning:', e?.message || e);
+        }
+
+        callLog.totalMinutesBilling = billedMinutes + actualMinutesBilled;
+        callLog.totalCoinsBilled = (callLog.totalCoinsBilled || 0) + coinsToDeduct;
+      }
+    }
+  }
+
   await callLog.save();
 
   // Reset creator isBusy state & broadcast availability update
@@ -346,6 +392,16 @@ exports.endCall = catchAsync(async (req, res, next) => {
         isBusy: false,
         isOnline: true
       });
+    }
+
+    // Refresh balance for both parties
+    const updatedCallerWallet = await Wallet.findOne({ userId: callLog.callerId });
+    const updatedReceiverWallet = await Wallet.findOne({ userId: callLog.receiverId });
+    if (updatedCallerWallet) {
+      io.to(callLog.callerId.toString()).emit('balance_updated', { balanceCoins: updatedCallerWallet.balanceCoins });
+    }
+    if (updatedReceiverWallet) {
+      io.to(callLog.receiverId.toString()).emit('balance_updated', { balanceCoins: updatedReceiverWallet.balanceCoins });
     }
   }
 

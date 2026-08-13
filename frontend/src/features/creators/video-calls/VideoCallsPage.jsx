@@ -314,19 +314,12 @@ export const VideoCallsPage = () => {
                   {videoAvailable ? 'Online Now' : 'Offline'}
                 </div>
               </div>
-              <div className={styles.heroWaveform}>
-                <svg viewBox="0 0 200 80" className={styles.waveformSvg}>
-                  <defs>
-                    <linearGradient id="camGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#3b82f6" />
-                      <stop offset="50%" stopColor="#8b5cf6" />
-                      <stop offset="100%" stopColor="#e10075" />
-                    </linearGradient>
-                  </defs>
-                  {[25,30,35,40,45,50,55,50,45,40,35,30,25,22,20,18,16,14,12,10,8,6,4,2].map((h, i) => (
-                    <rect key={i} x={4 + i * 8} y={40 - h/2} width="4" height={h} fill="url(#camGrad)" rx="2" opacity={0.15 + (i/24) * 0.35} />
-                  ))}
-                </svg>
+              <div className={styles.heroAiGraphic}>
+                <img src="/video_call_ai.png" alt="AI Video Call" className={styles.aiGraphicImg} />
+                <div className={styles.aiGraphicBadge}>
+                  <span className={styles.aiBadgeDot} />
+                  AI Stream Active
+                </div>
               </div>
             </div>
             <div className={styles.heroActions}>

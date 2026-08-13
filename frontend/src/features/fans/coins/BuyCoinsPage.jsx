@@ -468,7 +468,7 @@ export const BuyCoinsPage = () => {
                 <p className={styles.modalDesc}>
                   Total Price: <strong>${selectedPack.priceUSD.toFixed(2)}</strong>
                   {selectedPack.oldPriceUSD != null && (
-                    <> <span style={{ textDecoration: 'line-through', color: 'rgba(255,255,255,0.4)' }}>${selectedPack.oldPriceUSD.toFixed(2)}</span></>
+                    <> <span style={{ textDecoration: 'line-through', color: darkMode ? 'rgba(255,255,255,0.45)' : '#4b5563', fontWeight: 500 }}>${selectedPack.oldPriceUSD.toFixed(2)}</span></>
                   )}
                 </p>
 

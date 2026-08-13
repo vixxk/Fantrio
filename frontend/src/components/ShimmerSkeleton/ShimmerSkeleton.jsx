@@ -1,3 +1,4 @@
+import { useApp } from '../../context/AppContext';
 import styles from './ShimmerSkeleton.module.css';
 
 const SKELETON_THEMES = {
@@ -6,8 +7,8 @@ const SKELETON_THEMES = {
     shimmer: 'rgba(255, 255, 255, 0.06)',
   },
   light: {
-    bg: '#e6e6ec',
-    shimmer: 'rgba(255, 255, 255, 0.8)',
+    bg: '#e5e7eb',
+    shimmer: 'rgba(255, 255, 255, 0.85)',
   },
 };
 
@@ -20,7 +21,7 @@ const ShimmerSkeleton = ({
   marginLeft = 0,
   marginRight = 0,
   padding = 0,
-  light = false,
+  light,
   className = '',
   style = {},
   animate = true,
@@ -30,7 +31,23 @@ const ShimmerSkeleton = ({
   direction = 'column',
   alignItems = 'stretch',
 }) => {
-  const theme = light ? 'light' : 'dark';
+  let appCtx = null;
+  try {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    appCtx = useApp();
+  } catch {
+    appCtx = null;
+  }
+
+  const isLightMode = typeof light === 'boolean'
+    ? light
+    : appCtx && appCtx.darkMode !== undefined
+      ? !appCtx.darkMode
+      : typeof document !== 'undefined'
+        ? document.body.classList.contains('light') || !!document.querySelector('.lightTheme')
+        : false;
+
+  const theme = isLightMode ? 'light' : 'dark';
   const themeStyles = SKELETON_THEMES[theme];
 
   const baseStyle = {
@@ -58,9 +75,10 @@ const ShimmerSkeleton = ({
   } else if (variant === 'card') {
     baseStyle.width = width || '100%';
     baseStyle.height = height || 'auto';
-    baseStyle.borderRadius = '12px';
-    baseStyle.background = theme === 'light' ? '#ffffff' : '#121212';
-    baseStyle.border = `1px solid ${theme === 'light' ? 'rgba(0,0,0,0.06)' : '#222222'}`;
+    baseStyle.borderRadius = '16px';
+    baseStyle.background = isLightMode ? '#ffffff' : 'rgba(255, 255, 255, 0.03)';
+    baseStyle.border = `1px solid ${isLightMode ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.06)'}`;
+    baseStyle.boxShadow = isLightMode ? '0 4px 12px rgba(0, 0, 0, 0.03)' : 'none';
   } else if (variant === 'circle') {
     baseStyle.borderRadius = '50%';
     baseStyle.width = width || '40px';
@@ -93,7 +111,7 @@ const ShimmerSkeleton = ({
     ? Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className={`${styles.shimmerBlock} ${light ? styles.light : ''} ${className}`}
+          className={`${styles.shimmerBlock} ${isLightMode ? styles.light : ''} ${className}`}
           style={{
             ...baseStyle,
             ...shimmerStyle,
@@ -104,7 +122,7 @@ const ShimmerSkeleton = ({
       ))
     : (
         <div
-          className={`${styles.shimmerBlock} ${light ? styles.light : ''} ${className}`}
+          className={`${styles.shimmerBlock} ${isLightMode ? styles.light : ''} ${className}`}
           style={{
             ...baseStyle,
             ...shimmerStyle,

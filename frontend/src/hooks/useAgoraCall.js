@@ -154,27 +154,6 @@ export const useAgoraCall = () => {
       clientRef.current = c;
       callbacksRef.current = {};
 
-      const localAudioTrack = await createLocalAudioTrack();
-      localAudioTrackRef.current = localAudioTrack;
-
-      let localVideoTrack = localVideoTrackRef.current;
-      if (type === 'video' && !localVideoTrack) {
-        try {
-          localVideoTrack = await createLocalVideoTrack();
-          localVideoTrackRef.current = localVideoTrack;
-        } catch (camErr) {
-          console.warn('Local camera capture unavailable, proceeding with audio only:', camErr);
-        }
-      }
-
-      const streamId = `${uid}_${Date.now()}`;
-      streamIdRef.current = streamId;
-
-      if (localVideoTrack) {
-        await publishTrack(c, localVideoTrack);
-      }
-      await publishTrack(c, localAudioTrack);
-
       const handleUserPublished = async (user, mediaType) => {
         remoteUserIdRef.current = user.uid;
         const subResult = await subscribeToUser(c, user, mediaType);
@@ -186,16 +165,11 @@ export const useAgoraCall = () => {
         } else if (mediaType === 'audio' && user.audioTrack) {
           remoteAudioTrackRef.current = user.audioTrack;
           setRemoteMicMuted(false);
-          // Remote audio is not auto-played by the SDK after subscribe — play
-          // it explicitly (no element: plays through the default output), so
-          // audio calls are audible on both ends.
           try {
             remoteAudioTrackRef.current.play();
           } catch (err) {
             console.error('Failed to play remote audio track:', err);
           }
-          // Re-apply the user's chosen speaker sink (e.g. after the remote
-          // mutes and re-publishes audio mid-call).
           if (playbackSinkRef.current && playbackSinkRef.current !== 'default') {
             try {
               await setTrackPlaybackDevice(remoteAudioTrackRef.current, playbackSinkRef.current);
@@ -209,10 +183,7 @@ export const useAgoraCall = () => {
       onUserPublished(c, handleUserPublished);
       callbacksRef.current['user-published'] = handleUserPublished;
 
-      // Remote toggling a track (mute/camera off) must NOT end the call —
-      // just clear that track and keep the other one playing.
       const handleUserUnpublished = (user, mediaType) => {
-        // Only the remote party's track is affected — never the local tracks.
         if (mediaType === 'video') {
           remoteVideoTrackRef.current = null;
           setRemoteCameraOff(true);
@@ -225,7 +196,6 @@ export const useAgoraCall = () => {
       onUserUnpublished(c, handleUserUnpublished);
       callbacksRef.current['user-unpublished'] = handleUserUnpublished;
 
-      // Only a real channel leave (hang up / app close) should end the call.
       const handleUserLeft = () => {
         if (onRemoteLeave) onRemoteLeave();
       };
@@ -243,6 +213,41 @@ export const useAgoraCall = () => {
       };
       onConnectionStateChange(c, handleConnectionStateChange);
       callbacksRef.current['connection-state-change'] = handleConnectionStateChange;
+
+      // Subscribe to any remote users already in the channel
+      if (c.remoteUsers && c.remoteUsers.length > 0) {
+        c.remoteUsers.forEach((remoteUser) => {
+          if (remoteUser.hasVideo) {
+            handleUserPublished(remoteUser, 'video');
+          }
+          if (remoteUser.hasAudio) {
+            handleUserPublished(remoteUser, 'audio');
+          }
+        });
+      }
+
+      // Create local tracks
+      const localAudioTrack = await createLocalAudioTrack();
+      localAudioTrackRef.current = localAudioTrack;
+
+      let localVideoTrack = localVideoTrackRef.current;
+      if (type === 'video' && !localVideoTrack) {
+        try {
+          localVideoTrack = await createLocalVideoTrack();
+          localVideoTrackRef.current = localVideoTrack;
+        } catch (camErr) {
+          console.warn('Local camera capture unavailable, proceeding with audio only:', camErr);
+        }
+      }
+
+      const streamId = `${uid}_${Date.now()}`;
+      streamIdRef.current = streamId;
+
+      // Publish local tracks together in one batch
+      const tracksToPublish = [localVideoTrack, localAudioTrack].filter(Boolean);
+      if (tracksToPublish.length > 0) {
+        await publishTrack(c, tracksToPublish);
+      }
 
       setJoined(true);
       return { localAudioTrack, localVideoTrack, streamId };

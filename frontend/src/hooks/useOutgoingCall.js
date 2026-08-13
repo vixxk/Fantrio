@@ -236,18 +236,7 @@ export const useOutgoingCall = ({ type }) => {
       }).catch((e) => console.error('join call failed', e));
 
       durationTimer.current = setInterval(() => {
-        setCallDuration((d) => {
-          const next = d + 1;
-          if (next === 1 && user?.role !== 'creator' && type === 'video') {
-            ag.toggleCamera();
-            setIsCameraOff(true);
-            setTimeout(() => {
-              ag.toggleCamera();
-              setIsCameraOff(false);
-            }, 150);
-          }
-          return next;
-        });
+        setCallDuration((d) => d + 1);
       }, 1000);
       heartbeatTimer.current = setInterval(async () => {
         try {

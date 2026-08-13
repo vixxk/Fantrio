@@ -117,6 +117,13 @@ export const ActiveCallOverlay = ({
           </div>
         </div>
 
+        {isVideo && call.status === 'active' && (
+          <div className={styles.videoTopTimer}>
+            <span className={styles.timerDot} />
+            <span className={styles.videoTimerText}>{formatDuration(duration)}</span>
+          </div>
+        )}
+
         {/* Per-call gift summary — appears after the first gift. Fans see how
             many gifts they sent; creators see how many they received. The
             pill can be dismissed (×) so it doesn't crowd small screens. */}

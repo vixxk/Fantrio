@@ -174,23 +174,27 @@ body {
 
 /* Light theme skeletons */
 .light .skeleton-box,
-.lightTheme .skeleton-box {
-  background-color: rgba(0, 0, 0, 0.07);
+.lightTheme .skeleton-box,
+[data-theme="light"] .skeleton-box {
+  background-color: #e5e7eb !important;
 }
 
 .light .skeleton-box::after,
-.lightTheme .skeleton-box::after {
+.lightTheme .skeleton-box::after,
+[data-theme="light"] .skeleton-box::after {
   background: linear-gradient(
     90deg,
-    rgba(0, 0, 0, 0) 0%,
-    rgba(255, 255, 255, 0.75) 50%,
-    rgba(0, 0, 0, 0) 100%
-  );
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.85) 50%,
+    rgba(255, 255, 255, 0) 100%
+  ) !important;
 }
 
 .light .skeleton-card,
-.lightTheme .skeleton-card {
-  background: #ffffff;
-  border-color: rgba(0, 0, 0, 0.06);
+.lightTheme .skeleton-card,
+[data-theme="light"] .skeleton-card {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
