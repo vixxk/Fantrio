@@ -59,8 +59,15 @@ const liveStreamSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
-    // Concurrent viewers (used to compute an accurate viewer count).
+    // Concurrent active viewers.
     viewers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      }
+    ],
+    // Persistent history of all fans who joined this stream.
+    allViewers: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'

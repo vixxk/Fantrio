@@ -44,7 +44,7 @@ const categoryColorMap = {
   Others: '#6b7280',
 };
 
-const formatCoins = (n) => (n > 0 ? `${n} coins` : 'Free');
+const formatCoins = (n) => (n > 0 ? `${Math.round(n).toLocaleString()} coins` : 'Free');
 
 const formatViews = (n) => {
   const num = Number(n) || 0;

@@ -109,38 +109,18 @@ export const LiveStreamsPage = () => {
     });
   };
 
-  const openJoinModal = (stream) => {
-    setJoinResult(null);
-    setViewerError('');
-    setJoinStream(stream);
-  };
-
-  const handleLeaveStream = async () => {
-    // Leave the Agora channel first so the viewer count drops client-side too
-    try { viewer.leave(); } catch (e) { console.error('Failed to leave live channel', e); }
-    const streamId = joinStream?._id;
-    setJoinStream(null);
-    setJoinResult(null);
-    if (streamId) {
-      try { await api.post(`/creators/live/${streamId}/leave`); } catch { /* noop */ }
-    }
-  };
-
-  const handleJoin = async () => {
-    if (!joinStream) return;
+  const executeJoin = async (targetStream) => {
+    if (!targetStream) return;
     setJoinLoading(true);
     setViewerError('');
     try {
-      const res = await api.post(`/creators/live/${joinStream._id}/join`);
+      const res = await api.post(`/creators/live/${targetStream._id}/join`);
       if (res.status === 'success') {
         setJoinResult(res);
         setAllStreams((prev) => prev.map((s) =>
-          s._id === joinStream._id ? { ...s, viewerCount: res.viewerCount } : s
+          s._id === targetStream._id ? { ...s, viewerCount: res.viewerCount } : s
         ));
 
-        // Join the Agora channel as a passive subscriber and play the creator's
-        // video. A failure here is non-fatal — the backend join (entry payment
-        // + viewer tracking) already succeeded.
         try {
           await viewer.join({
             channel: res.roomId,
@@ -160,6 +140,34 @@ export const LiveStreamsPage = () => {
       setJoinResult({ status: 'error', message: err.message || 'Failed to join stream' });
     } finally {
       setJoinLoading(false);
+    }
+  };
+
+  const openJoinModal = (stream) => {
+    setJoinResult(null);
+    setViewerError('');
+    setJoinStream(stream);
+
+    // If the stream is free, or the fan has already paid for it previously,
+    // or is a subscriber with free access, join immediately without prompting to pay again.
+    if (stream.hasAccess || stream.alreadyPaid || !stream.entryPriceCoins || stream.entryPriceCoins === 0) {
+      executeJoin(stream);
+    }
+  };
+
+  const handleLeaveStream = async () => {
+    try { viewer.leave(); } catch (e) { console.error('Failed to leave live channel', e); }
+    const streamId = joinStream?._id;
+    setJoinStream(null);
+    setJoinResult(null);
+    if (streamId) {
+      try { await api.post(`/creators/live/${streamId}/leave`); } catch { /* noop */ }
+    }
+  };
+
+  const handleJoin = async () => {
+    if (joinStream) {
+      await executeJoin(joinStream);
     }
   };
 
@@ -857,7 +865,9 @@ export const LiveStreamsPage = () => {
                       </span>
                     </div>
                   </div>
-                  {joinStream.entryPriceCoins > 0 ? (
+                  {joinStream.alreadyPaid ? (
+                    <p className={styles.joinPriceNote}>You have already unlocked access to this live stream.</p>
+                  ) : joinStream.entryPriceCoins > 0 ? (
                     <p className={styles.joinPriceNote}>
                       {joinStream.freeForSubscribers
                         ? `This stream costs ${joinStream.entryPriceCoins} coins to enter — free for active subscribers.`
@@ -883,6 +893,8 @@ export const LiveStreamsPage = () => {
                 >
                   {joinLoading ? (
                     <span className={styles.joinLoading}><Loader2 size={16} className={styles.joinSpin} /> Joining…</span>
+                  ) : joinStream.alreadyPaid || joinStream.hasAccess ? (
+                    'Enter Stream (Unlocked)'
                   ) : joinStream.entryPriceCoins > 0 ? (
                     `Join for ${joinStream.entryPriceCoins} coins`
                   ) : (

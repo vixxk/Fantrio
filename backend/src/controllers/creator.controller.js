@@ -980,10 +980,39 @@ exports.getLiveStreams = catchAsync(async (req, res, next) => {
     (s) => !visibilityHidden.has(s.creatorId?._id?.toString())
   );
 
+  // Batch check which streams the user has already paid entry fees for or has free sub access for
+  const paidStreamIds = new Set();
+  const subCreatorIds = new Set();
+  if (req.user) {
+    const paidTxs = await Transaction.find({
+      senderId: req.user._id,
+      type: 'live_entry',
+      status: 'completed',
+      referenceId: { $in: visibleStreams.map((s) => s._id) }
+    }).select('referenceId');
+    paidTxs.forEach((tx) => {
+      if (tx.referenceId) paidStreamIds.add(tx.referenceId.toString());
+    });
+
+    const activeSubs = await Subscription.find({
+      userId: req.user._id,
+      status: 'active',
+      expiryDate: { $gt: new Date() }
+    }).select('creatorId');
+    activeSubs.forEach((sub) => {
+      if (sub.creatorId) subCreatorIds.add(sub.creatorId.toString());
+    });
+  }
+
   const mappedDbStreams = visibleStreams.map((stream) => {
     const creator = stream.creatorId || {};
     const profile = profileMap[creator._id?.toString()] || {};
     const isLive = !!stream.isLive;
+    const isAlreadyPaid = paidStreamIds.has(stream._id.toString());
+    const isSubscribedFree = !!stream.freeForSubscribers && subCreatorIds.has(creator._id?.toString());
+    const isOwner = req.user && creator._id?.toString() === req.user._id.toString();
+    const hasAccess = !stream.entryPriceCoins || stream.entryPriceCoins === 0 || isAlreadyPaid || isSubscribedFree || isOwner;
+
     return {
       _id: stream._id,
       creatorId: creator._id,
@@ -1001,6 +1030,8 @@ exports.getLiveStreams = catchAsync(async (req, res, next) => {
       status: isLive ? 'live' : 'scheduled',
       entryPriceCoins: stream.entryPriceCoins || 0,
       freeForSubscribers: !!stream.freeForSubscribers,
+      alreadyPaid: isAlreadyPaid,
+      hasAccess: !!hasAccess,
       scheduledAt: stream.scheduledAt,
       rating: profile.rating || 4.9,
       startedAt: stream.startedAt,
@@ -1246,22 +1277,17 @@ exports.getMyLiveStreams = catchAsync(async (req, res, next) => {
   if (periodStart) streamQuery.createdAt = { $gte: periodStart };
   const allStreams = await LiveStream.find(streamQuery).sort({ createdAt: -1 });
 
-  // Earnings per stream from paid entries (for recent + top lists).
-  // Reported net of platform commission, consistent with the creator dashboard.
-  const systemSetting = await SystemSetting.findOne();
-  const commRate = systemSetting ? systemSetting.commissionRate : 0.20;
-  const netShare = (gross) => Number((gross * (1 - commRate)).toFixed(2));
-
+  // Earnings per stream from paid entries and gifts (for recent + top lists) in whole coins
   const entryTxs = await Transaction.find({
     receiverId: req.user._id,
-    type: 'live_entry',
+    type: { $in: ['live_entry', 'gift'] },
     status: 'completed',
     referenceId: { $ne: null }
   });
   const earningsByStream = {};
   entryTxs.forEach((tx) => {
     const key = tx.referenceId ? tx.referenceId.toString() : '';
-    if (key) earningsByStream[key] = (earningsByStream[key] || 0) + netShare(tx.amountCoins || 0);
+    if (key) earningsByStream[key] = (earningsByStream[key] || 0) + (Number(tx.amountCoins) || 0);
   });
 
   const formatDuration = (seconds) => {
@@ -1760,24 +1786,22 @@ exports.joinLiveStream = catchAsync(async (req, res, next) => {
   let finalViewerCount = stream.viewerCount || 0;
   let freshTotalViews = stream.totalViews || 0;
   if (!isOwner) {
-    const upd = await LiveStream.updateOne(
-      { _id: stream._id, viewers: { $ne: req.user._id } },
-      { $addToSet: { viewers: req.user._id }, $inc: { viewerCount: 1, totalViews: 1 } }
-    );
-    if (upd.modifiedCount > 0) {
-      // Re-read the authoritative counts after the atomic update so concurrent
-      // joins/leaves can't emit stale viewer numbers.
-      const fresh = await LiveStream.findById(stream._id).select('viewerCount peakViewers totalViews');
-      if (fresh) {
-        finalViewerCount = fresh.viewerCount || 0;
-        freshTotalViews = fresh.totalViews || 0;
-        if ((fresh.peakViewers || 0) < finalViewerCount) {
-          await LiveStream.updateOne(
-            { _id: stream._id, peakViewers: { $lt: finalViewerCount } },
-            { $set: { peakViewers: finalViewerCount } }
-          );
-        }
+    await LiveStream.updateOne(
+      { _id: stream._id },
+      {
+        $addToSet: { viewers: req.user._id, allViewers: req.user._id },
+        $inc: { totalViews: 1 }
       }
+    );
+    const fresh = await LiveStream.findById(stream._id).select('viewers viewerCount peakViewers totalViews');
+    if (fresh) {
+      finalViewerCount = fresh.viewers ? fresh.viewers.length : 0;
+      freshTotalViews = fresh.totalViews || 0;
+      const updatePayload = { viewerCount: finalViewerCount };
+      if ((fresh.peakViewers || 0) < finalViewerCount) {
+        updatePayload.peakViewers = finalViewerCount;
+      }
+      await LiveStream.updateOne({ _id: stream._id }, { $set: updatePayload });
     }
   }
 
@@ -1821,17 +1845,14 @@ exports.leaveLiveStream = catchAsync(async (req, res, next) => {
     return next(new ApiError(404, 'Live stream not found'));
   }
 
-  const upd = await LiveStream.updateOne(
-    { _id: streamId, viewers: req.user._id },
-    { $pull: { viewers: req.user._id }, $inc: { viewerCount: -1 } }
+  await LiveStream.updateOne(
+    { _id: streamId },
+    { $pull: { viewers: req.user._id } }
   );
 
-  let newCount = before.viewerCount || 0;
-  if (upd.modifiedCount > 0) {
-    // Re-read the authoritative count after the atomic decrement.
-    const fresh = await LiveStream.findById(streamId).select('viewerCount');
-    newCount = fresh ? Math.max(0, fresh.viewerCount || 0) : Math.max(0, newCount - 1);
-  }
+  const fresh = await LiveStream.findById(streamId).select('viewers viewerCount');
+  const newCount = fresh && fresh.viewers ? fresh.viewers.length : 0;
+  await LiveStream.updateOne({ _id: streamId }, { $set: { viewerCount: newCount } });
 
   // Real-time viewer count broadcast
   const io = req.app.get('io');
@@ -2310,7 +2331,8 @@ exports.getStreamDetails = catchAsync(async (req, res, next) => {
 
   const stream = await LiveStream.findById(streamId)
     .populate('creatorId', 'username displayName avatarUrl isVerifiedBadge')
-    .populate('viewers', 'username displayName avatarUrl isVerifiedBadge');
+    .populate('viewers', 'username displayName avatarUrl isVerifiedBadge')
+    .populate('allViewers', 'username displayName avatarUrl isVerifiedBadge');
 
   if (!stream) {
     return next(new ApiError(404, 'Live stream not found'));
@@ -2332,15 +2354,18 @@ exports.getStreamDetails = catchAsync(async (req, res, next) => {
     .sort({ createdAt: -1 })
     .lean();
 
-  // Tipping / Gift Logs
-  const tippingLogs = transactions.map((t) => {
+  // Filter for gifts sent during stream (excluding joining fees and non-gifts)
+  const giftTransactions = transactions.filter((t) => t.type === 'gift');
+
+  // Gift Logs
+  const tippingLogs = giftTransactions.map((t) => {
     const meta = t.metadata || {};
     return {
       _id: t._id,
-      type: t.type,
+      type: 'gift',
       amountCoins: t.amountCoins || 0,
-      giftName: meta.giftName || (t.type === 'live_entry' ? 'Entry Fee' : 'Tip'),
-      giftEmoji: meta.giftEmoji || (t.type === 'live_entry' ? '🎟️' : '🪙'),
+      giftName: meta.giftName || 'Gift',
+      giftEmoji: meta.giftEmoji || '🎁',
       giftCoins: meta.giftCoins || t.amountCoins || 0,
       giftTier: meta.giftTier || 1,
       sender: t.senderId
@@ -2355,9 +2380,9 @@ exports.getStreamDetails = catchAsync(async (req, res, next) => {
     };
   });
 
-  // Calculate Gifts Leaderboard (Aggregated per sender)
+  // Calculate Gifts Leaderboard (Aggregated per sender ONLY for actual gifts)
   const giftsMap = new Map();
-  transactions.forEach((t) => {
+  giftTransactions.forEach((t) => {
     if (!t.senderId) return;
     const senderId = String(t.senderId._id);
     const existing = giftsMap.get(senderId) || {
@@ -2369,9 +2394,7 @@ exports.getStreamDetails = catchAsync(async (req, res, next) => {
       giftCount: 0
     };
     existing.totalCoins += Number(t.amountCoins) || 0;
-    if (t.type === 'gift') {
-      existing.giftCount += 1;
-    }
+    existing.giftCount += 1;
     giftsMap.set(senderId, existing);
   });
 
@@ -2380,9 +2403,10 @@ exports.getStreamDetails = catchAsync(async (req, res, next) => {
   // Total earnings computed from transactions
   const totalEarningsCoins = transactions.reduce((acc, t) => acc + (Number(t.amountCoins) || 0), 0);
 
-  // Viewers Leaderboard / List
-  const viewersList = (stream.viewers || []).map((v) => ({
-    userId: v._id,
+  // Viewers List (Include all viewers who joined, falling back to active viewers)
+  const rawViewers = (stream.allViewers && stream.allViewers.length > 0) ? stream.allViewers : (stream.viewers || []);
+  const viewersList = rawViewers.map((v) => ({
+    userId: v._id || v,
     displayName: v.displayName || v.username || 'Viewer',
     username: v.username || '',
     avatarUrl: v.avatarUrl || ''

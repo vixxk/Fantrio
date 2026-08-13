@@ -191,7 +191,7 @@ export const StreamDetailsModal = ({ streamId, isAdmin = false, onClose }) => {
                 onClick={() => setActiveTab('tipping')}
               >
                 <Gift size={15} />
-                <span><span className={styles.desktopOnly}>Tipping </span>Logs</span>
+                <span><span className={styles.desktopOnly}>Gift </span>Logs</span>
                 <span className={styles.tabBadge}>{tippingLogs.length}</span>
               </button>
 
@@ -216,13 +216,13 @@ export const StreamDetailsModal = ({ streamId, isAdmin = false, onClose }) => {
 
             {/* Tab View Content */}
             <div className={styles.tabContentArea}>
-              {/* TAB 1: Tipping & Gift Logs */}
+              {/* TAB 1: Gift Logs */}
               {activeTab === 'tipping' && (
                 <div className={styles.logsList}>
                   {tippingLogs.length === 0 ? (
                     <div className={styles.emptyTabState}>
                       <Gift size={32} className={styles.emptyIcon} />
-                      <p>No gifts or tips recorded for this live stream yet.</p>
+                      <p>No gifts recorded for this live stream yet.</p>
                     </div>
                   ) : (
                     tippingLogs.map((log) => (

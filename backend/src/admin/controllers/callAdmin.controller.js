@@ -298,7 +298,8 @@ exports.getStreamDetails = catchAsync(async (req, res, next) => {
 
   const stream = await LiveStream.findById(id)
     .populate('creatorId', 'username displayName avatarUrl isVerifiedBadge')
-    .populate('viewers', 'username displayName avatarUrl isVerifiedBadge');
+    .populate('viewers', 'username displayName avatarUrl isVerifiedBadge')
+    .populate('allViewers', 'username displayName avatarUrl isVerifiedBadge');
 
   if (!stream) {
     return next(new ApiError(404, 'Live stream not found'));
@@ -314,14 +315,17 @@ exports.getStreamDetails = catchAsync(async (req, res, next) => {
     .sort({ createdAt: -1 })
     .lean();
 
-  const tippingLogs = transactions.map((t) => {
+  // Filter for gifts sent during stream (excluding entry fees)
+  const giftTransactions = transactions.filter((t) => t.type === 'gift');
+
+  const tippingLogs = giftTransactions.map((t) => {
     const meta = t.metadata || {};
     return {
       _id: t._id,
-      type: t.type,
+      type: 'gift',
       amountCoins: t.amountCoins || 0,
-      giftName: meta.giftName || (t.type === 'live_entry' ? 'Entry Fee' : 'Tip'),
-      giftEmoji: meta.giftEmoji || (t.type === 'live_entry' ? '🎟️' : '🪙'),
+      giftName: meta.giftName || 'Gift',
+      giftEmoji: meta.giftEmoji || '🎁',
       giftCoins: meta.giftCoins || t.amountCoins || 0,
       giftTier: meta.giftTier || 1,
       sender: t.senderId
@@ -337,7 +341,7 @@ exports.getStreamDetails = catchAsync(async (req, res, next) => {
   });
 
   const giftsMap = new Map();
-  transactions.forEach((t) => {
+  giftTransactions.forEach((t) => {
     if (!t.senderId) return;
     const senderId = String(t.senderId._id);
     const existing = giftsMap.get(senderId) || {
@@ -349,17 +353,16 @@ exports.getStreamDetails = catchAsync(async (req, res, next) => {
       giftCount: 0
     };
     existing.totalCoins += Number(t.amountCoins) || 0;
-    if (t.type === 'gift') {
-      existing.giftCount += 1;
-    }
+    existing.giftCount += 1;
     giftsMap.set(senderId, existing);
   });
 
   const giftsLeaderboard = [...giftsMap.values()].sort((a, b) => b.totalCoins - a.totalCoins);
   const totalEarningsCoins = transactions.reduce((acc, t) => acc + (Number(t.amountCoins) || 0), 0);
 
-  const viewersList = (stream.viewers || []).map((v) => ({
-    userId: v._id,
+  const rawViewers = (stream.allViewers && stream.allViewers.length > 0) ? stream.allViewers : (stream.viewers || []);
+  const viewersList = rawViewers.map((v) => ({
+    userId: v._id || v,
     displayName: v.displayName || v.username || 'Viewer',
     username: v.username || '',
     avatarUrl: v.avatarUrl || ''
