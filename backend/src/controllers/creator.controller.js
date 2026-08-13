@@ -1828,6 +1828,62 @@ exports.leaveLiveStream = catchAsync(async (req, res, next) => {
   });
 });
 
+// SSE registry map for real-time presence/availability updates
+const sseClients = new Map();
+
+exports.broadcastSSEPresence = (userId, data) => {
+  const uid = String(userId);
+  if (sseClients.has(uid)) {
+    const jsonStr = JSON.stringify(data);
+    for (const res of sseClients.get(uid)) {
+      try {
+        res.write(`data: ${jsonStr}\n\n`);
+      } catch (err) {
+        console.error('SSE write error:', err);
+      }
+    }
+  }
+};
+
+exports.getPresenceSSE = catchAsync(async (req, res, next) => {
+  const userId = req.user._id.toString();
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
+  if (typeof res.flushHeaders === 'function') res.flushHeaders();
+
+  if (!sseClients.has(userId)) {
+    sseClients.set(userId, new Set());
+  }
+  sseClients.get(userId).add(res);
+
+  const profile = await CreatorProfile.findOne({ userId: req.user._id });
+  const initialPayload = {
+    isOnline: profile ? profile.isOnline !== false : false,
+    audioAvailable: profile ? profile.audioAvailable !== false : false,
+    videoAvailable: profile ? profile.videoAvailable !== false : false
+  };
+  res.write(`data: ${JSON.stringify(initialPayload)}\n\n`);
+
+  const keepAlive = setInterval(() => {
+    try {
+      res.write(': ping\n\n');
+    } catch { /* noop */ }
+  }, 15000);
+
+  req.on('close', () => {
+    clearInterval(keepAlive);
+    if (sseClients.has(userId)) {
+      sseClients.get(userId).delete(res);
+      if (sseClients.get(userId).size === 0) {
+        sseClients.delete(userId);
+      }
+    }
+  });
+});
+
 // Creator toggles call availability
 exports.toggleCallAvailability = catchAsync(async (req, res, next) => {
   const { type, available } = req.body; // type: 'audio' or 'video'
@@ -1856,6 +1912,12 @@ exports.toggleCallAvailability = catchAsync(async (req, res, next) => {
       videoAvailable: profile.videoAvailable
     });
   }
+
+  exports.broadcastSSEPresence(req.user._id, {
+    isOnline: profile.isOnline !== false,
+    audioAvailable: profile.audioAvailable,
+    videoAvailable: profile.videoAvailable
+  });
 
   res.status(200).json({
     status: 'success',

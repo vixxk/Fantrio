@@ -14,6 +14,7 @@ import { ConfirmDeleteDialog } from '../../../components/ConfirmDeleteDialog/Con
 import { useConfirmDelete } from '../../../hooks/useConfirmDelete';
 import { useToast } from '../../../components/Toast/Toast';
 import { CallRateDialog } from '../calls/CallRateDialog';
+import { useInactivityOffline } from '../../../hooks/useInactivityOffline';
 import styles from './DashboardPage.module.css';
 
 import { DEFAULT_CATEGORIES } from '../live-streams/streamCategories';
@@ -65,6 +66,35 @@ export const DashboardPage = () => {
   const { darkMode, navigateTo, setActiveTab, user } = useApp();
   const { toast } = useToast();
   const [rateTarget, setRateTarget] = useState(null);
+
+  useInactivityOffline(user?.role);
+
+  // Real-time SSE listener for Creator presence & quickActions online status sync on Dashboard
+  useEffect(() => {
+    const sseUrl = `${import.meta.env.VITE_API_URL || '/api'}/creators/presence/sse`;
+    const sse = new EventSource(sseUrl, { withCredentials: true });
+    sse.onmessage = (e) => {
+      try {
+        const payload = JSON.parse(e.data);
+        if (payload) {
+          setData((prev) => {
+            if (!prev || !prev.quickActions) return prev;
+            const updatedActions = prev.quickActions.map((action) => {
+              if (action.id === 'audio') {
+                return { ...action, isOnline: payload.isOnline && payload.audioAvailable !== false };
+              }
+              if (action.id === 'video') {
+                return { ...action, isOnline: payload.isOnline && payload.videoAvailable !== false };
+              }
+              return action;
+            });
+            return { ...prev, quickActions: updatedActions };
+          });
+        }
+      } catch { /* noop */ }
+    };
+    return () => sse.close();
+  }, []);
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [activeContentTab, setActiveContentTab] = useState('All');
   const [streamType, setStreamType] = useState('goLive');

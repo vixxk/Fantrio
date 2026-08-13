@@ -4,6 +4,7 @@ import { api } from '../services/api';
 import { getSocket } from '../services/socket';
 import { useToast } from '../components/Toast/Toast';
 import { useAgoraCall } from './useAgoraCall';
+import { playRingtone, stopRingtone } from '../utils/ringtone';
 
 export const useOutgoingCall = ({ type }) => {
   const { user, balance, refreshBalance } = useApp();
@@ -49,6 +50,7 @@ export const useOutgoingCall = ({ type }) => {
   }, []);
 
   const clearCall = useCallback(() => {
+    stopRingtone();
     cleanupTimers();
     removeSocketListeners();
     ag.endCall();
@@ -149,6 +151,7 @@ export const useOutgoingCall = ({ type }) => {
 
     setActiveCall({ creator, status: 'connecting', roomId, callLogId, rate: callRate, token });
     setCallDuration(0);
+    playRingtone('outgoing');
 
     const ringTimeout = setTimeout(() => {
       setActiveCall((prev) => {
@@ -166,6 +169,7 @@ export const useOutgoingCall = ({ type }) => {
 
     const handleAccepted = (payload) => {
       if (payload.roomId !== roomId) return;
+      stopRingtone();
       clearTimeout(ringTimeout);
       setActiveCall((prev) => (prev ? { ...prev, status: 'active' } : prev));
       setCallDuration(0);

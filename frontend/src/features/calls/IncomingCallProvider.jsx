@@ -8,6 +8,7 @@ import { useGiftEvents } from '../../hooks/useGiftEvents';
 import { GiftOverlay } from '../gifts/GiftOverlay';
 import { GiftPanel } from '../gifts/GiftPanel';
 import { QuickRecharge } from '../gifts/QuickRecharge';
+import { playRingtone, stopRingtone } from '../../utils/ringtone';
 import styles from './IncomingCall.module.css';
 
 const IncomingCallContext = createContext(null);
@@ -69,12 +70,14 @@ export const IncomingCallProvider = ({ children }) => {
         return;
       }
       setIncoming(payload);
+      playRingtone('incoming');
 
       // Auto-dismiss & reject incoming call after 30s timeout if unanswered
       if (ringTimeoutRef.current) clearTimeout(ringTimeoutRef.current);
       ringTimeoutRef.current = setTimeout(() => {
         setIncoming((curr) => {
           if (curr && curr.callLogId === payload.callLogId) {
+            stopRingtone();
             try { api.post(`/calls/reject/${payload.callLogId}`); } catch { /* noop */ }
             return null;
           }
@@ -91,6 +94,7 @@ export const IncomingCallProvider = ({ children }) => {
   }, [user, incoming]);
 
   const cleanupTimers = useCallback(() => {
+    stopRingtone();
     if (durationTimer.current) clearInterval(durationTimer.current);
     if (heartbeatTimer.current) clearInterval(heartbeatTimer.current);
     if (ringTimeoutRef.current) clearTimeout(ringTimeoutRef.current);
@@ -102,6 +106,7 @@ export const IncomingCallProvider = ({ children }) => {
     // Guard against double-end (user-left + connection drop fire back-to-back)
     if (endingRef.current) return;
     endingRef.current = true;
+    stopRingtone();
     cleanupTimers();
     const cur = activeRef.current;
     if (notifyBackend && cur && cur.roomId) {
@@ -137,6 +142,7 @@ export const IncomingCallProvider = ({ children }) => {
 
   const acceptCall = useCallback(async () => {
     if (!incoming) return;
+    stopRingtone();
     if (ringTimeoutRef.current) clearTimeout(ringTimeoutRef.current);
     const { callLogId, roomId, type, caller, rate, receiverToken } = incoming;
 
@@ -185,6 +191,7 @@ export const IncomingCallProvider = ({ children }) => {
 
   const rejectCall = useCallback(async () => {
     if (!incoming) return;
+    stopRingtone();
     if (ringTimeoutRef.current) clearTimeout(ringTimeoutRef.current);
     const { callLogId } = incoming;
     setIncoming(null);

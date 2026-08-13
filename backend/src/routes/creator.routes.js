@@ -38,6 +38,7 @@ router.get('/live/:streamId/chat', creatorController.getStreamChat);
 router.post('/live/:streamId/chat', creatorController.sendStreamChat);
 router.get('/live/:streamId/leaderboard', creatorController.getStreamLeaderboard);
 router.post('/profile/toggle-calls', restrictTo('creator'), creatorController.toggleCallAvailability);
+router.get('/presence/sse', restrictTo('creator'), creatorController.getPresenceSSE);
 router.get('/subscribers', restrictTo('creator'), creatorController.getCreatorSubscribers);
 
 // Creator panel (analytics hub, earnings, content, PPV, call stats, my profile)

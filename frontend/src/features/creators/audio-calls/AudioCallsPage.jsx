@@ -8,6 +8,7 @@ import { PeriodDropdown } from '../analytics/PeriodDropdown';
 import { CallRateDialog } from '../calls/CallRateDialog';
 import { ConfirmToggleDialog } from '../../../components/ConfirmToggleDialog/ConfirmToggleDialog';
 import { buildCallInsights } from '../callInsights';
+import { useInactivityOffline } from '../../../hooks/useInactivityOffline';
 import styles from './AudioCallsPage.module.css';
 
 const iconMap = {
@@ -19,7 +20,7 @@ const iconMap = {
 };
 
 export const AudioCallsPage = () => {
-  const { darkMode, navigateTo } = useApp();
+  const { darkMode, navigateTo, user } = useApp();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('All');
   const [period, setPeriod] = useState('All Time');
@@ -32,6 +33,27 @@ export const AudioCallsPage = () => {
   const [rateOpen, setRateOpen] = useState(false);
   const [toggling, setToggling] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+
+  useInactivityOffline(user?.role);
+
+  // Real-time SSE listener for Creator online/offline button state
+  useEffect(() => {
+    const sseUrl = `${import.meta.env.VITE_API_URL || '/api'}/creators/presence/sse`;
+    const sse = new EventSource(sseUrl, { withCredentials: true });
+    sse.onmessage = (e) => {
+      try {
+        const payload = JSON.parse(e.data);
+        if (payload) {
+          setData((prev) => (prev ? {
+            ...prev,
+            audioAvailable: payload.audioAvailable,
+            videoAvailable: payload.videoAvailable
+          } : prev));
+        }
+      } catch { /* noop */ }
+    };
+    return () => sse.close();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
