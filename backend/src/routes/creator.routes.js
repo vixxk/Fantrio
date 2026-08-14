@@ -37,6 +37,7 @@ router.post('/live/:streamId/leave', creatorController.leaveLiveStream);
 router.get('/live/:streamId/chat', creatorController.getStreamChat);
 router.post('/live/:streamId/chat', creatorController.sendStreamChat);
 router.get('/live/:streamId/leaderboard', creatorController.getStreamLeaderboard);
+router.get('/live/:streamId/viewers', creatorController.getStreamViewers);
 router.get('/live/:streamId/details', creatorController.getStreamDetails);
 router.post('/profile/toggle-calls', restrictTo('creator'), creatorController.toggleCallAvailability);
 router.get('/presence/sse', restrictTo('creator'), creatorController.getPresenceSSE);

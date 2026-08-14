@@ -166,19 +166,27 @@
   right: 1.25rem;
   z-index: 20;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
+}
+
+.headerLeftControls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  flex-shrink: 1;
 }
 
 .creatorInfo {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.65rem;
   background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  padding: 0.45rem 1rem 0.45rem 0.5rem;
+  padding: 0.45rem 0.85rem 0.45rem 0.5rem;
   border-radius: 36px;
   border: 1px solid rgba(255, 255, 255, 0.14);
 }
@@ -194,14 +202,16 @@
 .nameBlock {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  min-width: 0;
 }
 
 .displayName {
   font-size: 0.92rem;
   font-weight: 800;
   color: #ffffff;
-  line-height: 1.2;
-  display: flex;
+  line-height: 1;
+  display: inline-flex;
   align-items: center;
   gap: 0.35rem;
 }
@@ -213,6 +223,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-top: 2px;
 }
 
 .headerMetaRow {
@@ -224,16 +235,20 @@
 .liveTag {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  justify-content: center;
+  gap: 0.35rem;
   background: linear-gradient(135deg, #e10075 0%, #ff0055 100%);
   color: #ffffff;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 800;
-  padding: 0.3rem 0.7rem;
-  border-radius: 8px;
-  letter-spacing: 0.05em;
+  line-height: 1;
+  padding: 0.35rem 0.65rem;
+  border-radius: 12px;
+  letter-spacing: 0.04em;
   box-shadow: 0 0 14px rgba(225, 0, 117, 0.55);
   animation: pulseBadge 2s infinite ease-in-out;
+  flex-shrink: 0;
+  transform: translateY(-1px);
 }
 
 @keyframes pulseBadge {
@@ -242,10 +257,12 @@
 }
 
 .liveDot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: #ffffff;
+  flex-shrink: 0;
+  transform: translateY(-1px);
 }
 
 .viewerChip {
@@ -261,9 +278,25 @@
   font-weight: 700;
   color: rgba(255, 255, 255, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.14);
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.viewerChip:hover {
+  background: rgba(0, 0, 0, 0.75);
+  border-color: rgba(225, 0, 117, 0.5);
+  transform: scale(1.04);
 }
 
 .headerRightControls {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.stackedActionButtons {
   display: flex;
   align-items: center;
   gap: 0.65rem;
@@ -690,32 +723,161 @@
 /* Mobile Adjustments */
 @media (max-width: 640px) {
   .headerBar {
-    top: 0.75rem;
-    left: 0.75rem;
-    right: 0.75rem;
+    top: 0.65rem;
+    left: 0.65rem;
+    right: 0.65rem;
+    gap: 0.35rem;
+  }
+
+  .headerLeftControls {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 0;
+    flex-shrink: 1;
+    height: 36px;
+  }
+
+  .creatorInfo {
+    height: 36px;
+    padding: 0 0.55rem 0 0.25rem;
+    gap: 0.4rem;
+    max-width: 100%;
+    flex-shrink: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+  }
+
+  .avatar {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+  }
+
+  .nameBlock {
+    justify-content: center;
+  }
+
+  .displayName {
+    font-size: 0.75rem;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .liveTag {
+    height: 20px;
+    padding: 0 0.45rem;
+    font-size: 0.65rem;
+    line-height: 1;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    box-sizing: border-box;
+    transform: translateY(-1.5px);
+  }
+
+  .viewerChip {
+    height: 36px;
+    padding: 0 0.55rem;
+    font-size: 0.68rem;
+    gap: 0.25rem;
+    border-radius: 20px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    box-sizing: border-box;
+  }
+
+  .headerRightControls {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.35rem;
+    flex-shrink: 0;
+    height: 36px;
+  }
+
+  .timerChip {
+    height: 36px;
+    padding: 0 0.55rem;
+    font-size: 0.7rem;
+    gap: 0.25rem;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    box-sizing: border-box;
+  }
+
+  .stackedActionButtons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
+  }
+
+  .endPowerBtn {
+    order: 1;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-sizing: border-box;
+  }
+
+  .leaderboardBtn {
+    order: 2;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .leaderboardText {
+    display: none;
   }
 
   .floatingChatContainer {
     bottom: 75px;
-    left: 0.75rem;
-    width: calc(100vw - 1.5rem);
+    left: 0.65rem;
+    width: calc(100vw - 1.3rem);
     max-height: 220px;
   }
 
   .bottomControlBar {
-    bottom: 0.75rem;
-    left: 0.75rem;
-    right: 0.75rem;
+    bottom: 0.65rem;
+    left: 0.65rem;
+    right: 0.65rem;
     gap: 0.4rem;
   }
 
-  .controlCircleBtn,
-  .endPowerBtn {
+  .controlCircleBtn {
     width: 38px;
     height: 38px;
   }
 
   .streamTitle {
     display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .leaderboardBtn span {
+    display: none;
+  }
+  .leaderboardBtn {
+    padding: 0.35rem;
+    border-radius: 50%;
   }
 }

@@ -1591,6 +1591,34 @@ exports.getStreamLeaderboard = catchAsync(async (req, res, next) => {
   });
 });
 
+// Get current active viewers list for a live stream
+exports.getStreamViewers = catchAsync(async (req, res, next) => {
+  const { streamId } = req.params;
+
+  const stream = await LiveStream.findById(streamId).populate({
+    path: 'viewers',
+    select: 'displayName username avatarUrl isVerified'
+  });
+
+  if (!stream) {
+    return next(new ApiError(404, 'Live stream not found'));
+  }
+
+  const viewers = (stream.viewers || []).map((v) => ({
+    _id: v._id,
+    displayName: v.displayName || v.username || 'Fan',
+    username: v.username || '',
+    avatarUrl: v.avatarUrl || '/Girl.png',
+    isVerified: !!v.isVerified
+  }));
+
+  res.status(200).json({
+    status: 'success',
+    viewersCount: viewers.length,
+    viewers
+  });
+});
+
 // Creator cancels a scheduled stream (or deletes an ended one)
 exports.deleteLiveStream = catchAsync(async (req, res, next) => {
   const { streamId } = req.params;

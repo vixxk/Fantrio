@@ -174,7 +174,7 @@ export const GiftPanel = ({ type = 'chat', receiverName = 'this creator', balanc
                   onClick={handleConfirmSend}
                   disabled={!!sendingId}
                 >
-                  {sendingId ? 'Sending...' : 'Confirm & Send'}
+                  {sendingId ? 'Sending...' : 'Confirm'}
                 </button>
               </div>
             </div>

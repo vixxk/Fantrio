@@ -12,7 +12,8 @@ import {
   X,
   BadgeCheck,
   Loader2,
-  Smile
+  Smile,
+  Plus
 } from 'lucide-react';
 import styles from './FanLiveStreamOverlay.module.css';
 
@@ -92,31 +93,31 @@ export const FanLiveStreamOverlay = ({
 
         {/* Top Header Bar */}
         <div className={styles.headerBar}>
-          <div className={styles.creatorInfo}>
-            <img
-              src={stream.coverUrl || stream.avatarUrl || '/Girl.png'}
-              alt={stream.displayName || 'Creator'}
-              className={styles.avatar}
-            />
-            <div className={styles.nameBlock}>
-              <span className={styles.displayName}>
-                {stream.displayName || stream.username || 'Creator'}
-                {stream.isVerified && <BadgeCheck size={14} color="#e10075" />}
-              </span>
-              {stream.streamTitle && <span className={styles.streamTitle}>{stream.streamTitle}</span>}
-            </div>
-            <div className={styles.headerMetaRow}>
-              <span className={styles.liveTag}>
-                <span className={styles.liveDot} /> LIVE
-              </span>
+          <div className={styles.headerLeftControls}>
+            <div className={styles.creatorHeaderRow}>
+              <div className={styles.creatorInfo}>
+                <img
+                  src={stream.coverUrl || stream.avatarUrl || '/Girl.png'}
+                  alt={stream.displayName || 'Creator'}
+                  className={styles.avatar}
+                />
+                <div className={styles.nameBlock}>
+                  <span className={styles.displayName}>
+                    {stream.displayName || stream.username || 'Creator'}
+                    {stream.isVerified && <BadgeCheck size={14} color="#e10075" />}
+                  </span>
+                  {stream.streamTitle && <span className={styles.streamTitle}>{stream.streamTitle}</span>}
+                </div>
+                <span className={styles.liveTag}>
+                  <span className={styles.liveDot} /> LIVE
+                </span>
+              </div>
+
               <span className={styles.viewerChip}>
                 <Eye size={13} /> {stream.viewerCount || 0}
               </span>
             </div>
-          </div>
 
-          {/* Top Right Controls (Single Row) */}
-          <div className={styles.headerRightControls}>
             <div className={styles.topBalanceChip}>
               <img src="/coin.png" alt="Coin" className={styles.coinImg} />
               <span>{(balance || 0).toLocaleString()}</span>
@@ -124,28 +125,34 @@ export const FanLiveStreamOverlay = ({
                 className={styles.rechargePlusBtn}
                 onClick={() => setRechargeOpen(true)}
                 title="Recharge coins"
+                aria-label="Recharge coins"
               >
-                +
+                <Plus size={13} strokeWidth={3} />
               </button>
             </div>
+          </div>
 
-            <button
-              className={styles.leaderboardBtn}
-              onClick={() => setShowLeaderboard(true)}
-              title="Top Gifters Leaderboard"
-            >
-              <Trophy size={15} />
-              <span>Top Gifters</span>
-            </button>
+          {/* Top Right Controls */}
+          <div className={styles.headerRightControls}>
+            <div className={styles.stackedActionButtons}>
+              <button
+                className={styles.closeBtn}
+                onClick={onLeaveStream}
+                title="Leave Stream"
+                aria-label="Leave Stream"
+              >
+                <X size={16} />
+              </button>
 
-            <button
-              className={styles.closeBtn}
-              onClick={onLeaveStream}
-              title="Leave Stream"
-              aria-label="Leave Stream"
-            >
-              <X size={18} />
-            </button>
+              <button
+                className={styles.leaderboardBtn}
+                onClick={() => setShowLeaderboard(true)}
+                title="Top Gifters Leaderboard"
+              >
+                <Trophy size={16} />
+                <span className={styles.leaderboardText}>Top Gifters</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -223,8 +230,11 @@ export const FanLiveStreamOverlay = ({
           <button
             className={styles.giftTriggerBtn}
             onClick={() => setGiftOpen(true)}
+            title="Send Gift"
+            aria-label="Send Gift"
           >
-            <Gift size={16} /> Send Gift
+            <Gift size={18} />
+            <span className={styles.giftTriggerText}>Send Gift</span>
           </button>
         </div>
       </div>

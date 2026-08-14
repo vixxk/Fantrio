@@ -6,6 +6,7 @@ import { useGiftEvents } from '../../../hooks/useGiftEvents';
 import { useStreamChat } from '../../../hooks/useStreamChat';
 import { GiftOverlay } from '../../gifts/GiftOverlay';
 import { StreamLeaderboardModal } from '../../gifts/StreamLeaderboardModal';
+import { StreamViewersModal } from './StreamViewersModal';
 import { ConfirmDeleteDialog } from '../../../components/ConfirmDeleteDialog/ConfirmDeleteDialog';
 import {
   Camera,
@@ -61,6 +62,7 @@ export const CreatorLiveStreamOverlay = ({ liveStream, onEndStream }) => {
 
   const [chatDraft, setChatDraft] = useState('');
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showViewersModal, setShowViewersModal] = useState(false);
   const [showConfirmEnd, setShowConfirmEnd] = useState(false);
   const [endingStream, setEndingStream] = useState(false);
   const chatListRef = useRef(null);
@@ -156,27 +158,33 @@ export const CreatorLiveStreamOverlay = ({ liveStream, onEndStream }) => {
 
         {/* Top Header Bar */}
         <div className={styles.headerBar}>
-          <div className={styles.creatorInfo}>
-            <img
-              src={user?.avatarUrl || '/Girl.png'}
-              alt={user?.displayName || 'Creator'}
-              className={styles.avatar}
-            />
-            <div className={styles.nameBlock}>
-              <span className={styles.displayName}>
-                {user?.displayName || user?.username || 'Creator'}
-                {user?.isVerified && <BadgeCheck size={13} color="#e10075" />}
-              </span>
-              <span className={styles.streamTitle}>{liveStream.streamTitle}</span>
-            </div>
-            <div className={styles.headerMetaRow}>
+          <div className={styles.headerLeftControls}>
+            <div className={styles.creatorInfo}>
+              <img
+                src={user?.avatarUrl || '/Girl.png'}
+                alt={user?.displayName || 'Creator'}
+                className={styles.avatar}
+              />
+              <div className={styles.nameBlock}>
+                <span className={styles.displayName}>
+                  {user?.displayName || user?.username || 'Creator'}
+                  {user?.isVerified && <BadgeCheck size={13} color="#e10075" />}
+                </span>
+                <span className={styles.streamTitle}>{liveStream.streamTitle}</span>
+              </div>
               <span className={styles.liveTag}>
                 <span className={styles.liveDot} /> LIVE
               </span>
-              <span className={styles.viewerChip}>
-                <Eye size={12} /> {liveStream.viewerCount || 0}
-              </span>
             </div>
+
+            <button
+              type="button"
+              className={styles.viewerChip}
+              onClick={() => setShowViewersModal(true)}
+              title="View Live Stream Viewers"
+            >
+              <Eye size={13} /> {liveStream.viewerCount || 0}
+            </button>
           </div>
 
           <div className={styles.headerRightControls}>
@@ -185,22 +193,24 @@ export const CreatorLiveStreamOverlay = ({ liveStream, onEndStream }) => {
               <span>{formatTimer(durationSeconds)}</span>
             </div>
 
-            <button
-              className={styles.leaderboardBtn}
-              onClick={() => setShowLeaderboard(true)}
-              title="Top Gifters Leaderboard"
-            >
-              <Trophy size={14} />
-              <span>Top Gifters</span>
-            </button>
+            <div className={styles.stackedActionButtons}>
+              <button
+                className={styles.endPowerBtn}
+                onClick={() => setShowConfirmEnd(true)}
+                title="End Live Stream"
+              >
+                <Power size={18} />
+              </button>
 
-            <button
-              className={styles.endPowerBtn}
-              onClick={() => setShowConfirmEnd(true)}
-              title="End Live Stream"
-            >
-              <Power size={18} />
-            </button>
+              <button
+                className={styles.leaderboardBtn}
+                onClick={() => setShowLeaderboard(true)}
+                title="Top Gifters Leaderboard"
+              >
+                <Trophy size={16} />
+                <span className={styles.leaderboardText}>Top Gifters</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -275,6 +285,16 @@ export const CreatorLiveStreamOverlay = ({ liveStream, onEndStream }) => {
           </div>
         </div>
       </div>
+
+      {/* Viewers Popup Modal */}
+      {showViewersModal && (
+        <StreamViewersModal
+          streamId={liveStream?._id}
+          totalCount={liveStream?.viewerCount || 0}
+          chatMessages={chatMessages}
+          onClose={() => setShowViewersModal(false)}
+        />
+      )}
 
       {/* Leaderboard Modal */}
       {showLeaderboard && (
