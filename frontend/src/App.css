@@ -328,6 +328,7 @@ html, body, #root {
   }
   
   .bottomNavItem {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -343,6 +344,55 @@ html, body, #root {
     font-weight: 600;
     cursor: pointer;
     transition: color 0.2s;
+  }
+
+  /* Unread-conversations badge on the Messages/Chats nav button.
+     The repeated higher-specificity selectors beat the active-tab label rules
+     (`.bottomActive span` gradient text) so the badge keeps its colors even
+     while its own tab is active. */
+  .bottomNavBadge,
+  .bottomNavItem .bottomNavBadge,
+  .appShell .bottomNavItem .bottomNavBadge,
+  .appShell:not(.creatorMode) .bottomNavItem .bottomNavBadge,
+  .appShell.creatorMode .bottomNavItem .bottomNavBadge,
+  .appShell .bottomActive .bottomNavBadge {
+    position: absolute;
+    top: 3px;
+    left: calc(50% + 2px);
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%) !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-size: 0.6rem;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+    box-sizing: border-box;
+    box-shadow: 0 2px 6px rgba(225, 0, 117, 0.4);
+    z-index: 1;
+  }
+
+  /* Subtle one-shot pulse when a new message bumps the unread count */
+  .bottomNavBadgePulse {
+    animation: bottomNavBadgePulse 0.9s ease;
+  }
+
+  @keyframes bottomNavBadgePulse {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 2px 6px rgba(225, 0, 117, 0.4);
+    }
+    30% {
+      transform: scale(1.35);
+      box-shadow: 0 0 14px 3px rgba(225, 0, 117, 0.55);
+    }
+    100% {
+      transform: scale(1);
+      box-shadow: 0 2px 6px rgba(225, 0, 117, 0.4);
+    }
   }
   
   .bottomActive span {

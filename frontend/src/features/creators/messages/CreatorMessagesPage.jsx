@@ -6,7 +6,7 @@ import {
   Search, MoreVertical, SlidersHorizontal,
   Image as ImageIcon, Send, Star,
   MessageSquare, User, ChevronLeft, Trash2, Ban,
-  Eye, DollarSign, Gift
+  Eye, DollarSign, Gift, Unlock
 } from 'lucide-react';
 
 // Diamond Badge (kept for future use)
@@ -20,9 +20,12 @@ import {
   countActiveChatFilters
 } from '../../../components/ChatFiltersSheet/chatFilters';
 import { ChatThreadSkeleton, ChatScreenSkeleton } from '../../../components/ChatThreadSkeleton/ChatThreadSkeleton';
+import { ReadReceipt } from '../../../components/ReadReceipt/ReadReceipt';
 import { ChatComposerExtras } from '../../../components/ChatComposerExtras/ChatComposerExtras';
 import { insertEmojiAtCaret } from '../../../components/ChatComposerExtras/chatComposerUtils';
+import { formatLastSeen } from '../../../utils/lastSeen';
 import { ConfirmDeleteDialog } from '../../../components/ConfirmDeleteDialog/ConfirmDeleteDialog';
+import { PpvMediaDialog } from '../../../components/PpvMediaDialog/PpvMediaDialog';
 import { useConfirmDelete } from '../../../hooks/useConfirmDelete';
 import { useToast } from '../../../components/Toast/Toast';
 import { GiftMessageCard, parseGiftMessage } from '../../gifts/GiftMessageCard';
@@ -82,6 +85,7 @@ const mapConversation = (conv) => {
       avatarUrl: peer.avatarUrl || DEFAULT_AVATAR,
       isVerified: !!profile.isVerifiedBadge,
       isOnline: !!profile.isOnline,
+      lastSeenAt: profile.lastSeenAt || null,
       isTopFan: totalSpentCoins >= 1000,
       isHighSpender: totalSpentCoins >= 500,
       fanSince: stats.fanSince || '—',
@@ -127,7 +131,7 @@ const mapCreatorMessage = (m, currentUserId) => {
 };
 
 export const CreatorMessagesPage = () => {
-  const { darkMode, navigateTo, currentPath, user } = useApp();
+  const { darkMode, navigateTo, currentPath, user, refreshUnreadCount } = useApp();
   const { toast } = useToast();
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [mobileView, setMobileView] = useState(() => {
@@ -149,8 +153,17 @@ export const CreatorMessagesPage = () => {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const currentUserId = user?.id || null;
   const convIdsRef = useRef(new Set());
+  const conversationsRef = useRef([]);
   const [showMenu, setShowMenu] = useState(false);
   const messagesEndRef = useRef(null);
+  // Media file picked by the creator — drives the Send Media (free / PPV) popup
+  const [pendingMedia, setPendingMedia] = useState(null);
+  // Live "Fan unlocked your media" notices per conversation (realtime only)
+  const [unlockNotices, setUnlockNotices] = useState({});
+  // Fan IDs with a recent unlock — shows a "🔥 Unlocked" badge on the
+  // conversation row, auto-cleared after a few seconds.
+  const [recentUnlocks, setRecentUnlocks] = useState({});
+  const recentUnlockTimers = useRef({});
 
   // Favorite fans (persisted locally)
   const [favoriteIds, setFavoriteIds] = useState(() => {
@@ -213,6 +226,7 @@ export const CreatorMessagesPage = () => {
 
   useEffect(() => {
     convIdsRef.current = new Set(conversations.map(c => c.id));
+    conversationsRef.current = conversations;
   }, [conversations]);
 
   useEffect(() => {
@@ -228,6 +242,9 @@ export const CreatorMessagesPage = () => {
             [selectedConvId]: res.messages.map(m => mapCreatorMessage(m, currentUserId))
           }));
           setConversations(prev => prev.map(c => (c.id === selectedConvId ? { ...c, unreadCount: 0 } : c)));
+          // Fetching the thread marks it read on the server — keep the global
+          // unread-conversations badge in sync.
+          refreshUnreadCount();
         }
       } catch (err) {
         console.error('Failed to load messages:', err);
@@ -252,20 +269,30 @@ export const CreatorMessagesPage = () => {
           ? String(msg.receiverId)
           : String(msg.senderId);
         const uiMsg = mapCreatorMessage(msg, currentUserId);
-        if (selectedConvId && otherId === selectedConvId) {
+        const isOpenConv = !!selectedConvId && otherId === selectedConvId;
+        if (isOpenConv) {
           setMessagesMap(prev => ({
             ...prev,
             [selectedConvId]: [...(prev[selectedConvId] || []), uiMsg]
           }));
-        }
-        if (!convIdsRef.current.has(otherId)) {
+          // The user is actively viewing this conversation — mark the new
+          // message as read on the server so the unread badge stays accurate.
+          api.post(`/chat/read/${otherId}`).catch(() => {});
+        } else if (!convIdsRef.current.has(otherId)) {
+          // A brand-new conversation arrived — reload the list to show it.
           loadConversations();
         }
         setConversations(prev => {
           const idx = prev.findIndex(c => c.id === otherId);
           if (idx === -1) return prev;
           const next = [...prev];
-          next[idx] = { ...next[idx], lastMessage: msg.content || '📎 Media', time: 'Just now', lastMessageAt: Date.now() };
+          next[idx] = {
+            ...next[idx],
+            lastMessage: msg.content || (msg.isPaywall ? '🔒 ' + (msg.mediaType || 'Media') : '📎 Media'),
+            time: 'Just now',
+            lastMessageAt: Date.now(),
+            unreadCount: isOpenConv ? 0 : (next[idx].unreadCount || 0) + 1
+          };
           return next;
         });
       };
@@ -275,6 +302,136 @@ export const CreatorMessagesPage = () => {
       console.error('Socket init failed:', err);
     }
   }, [selectedConvId, currentUserId, loadConversations]);
+
+  // Live read receipts — when a fan reads our messages (in this thread or on
+  // another device), flip the sent ticks to read ticks in real time.
+  useEffect(() => {
+    if (!currentUserId) return;
+    let socket = null;
+    try {
+      socket = getSocket();
+      joinSocketRoom(currentUserId);
+      const onMessagesRead = (payload) => {
+        const peerId = payload && payload.peerId ? String(payload.peerId) : null;
+        const ids = payload && Array.isArray(payload.messageIds) ? payload.messageIds.map(String) : [];
+        if (!peerId || ids.length === 0) return;
+        const idSet = new Set(ids);
+        setMessagesMap(prev => {
+          const list = prev[peerId];
+          if (!list) return prev;
+          let changed = false;
+          const next = list.map(m => {
+            if (idSet.has(m.id) && !m.read) {
+              changed = true;
+              return { ...m, read: true };
+            }
+            return m;
+          });
+          return changed ? { ...prev, [peerId]: next } : prev;
+        });
+      };
+      socket.on('messages_read', onMessagesRead);
+      return () => { socket.off('messages_read', onMessagesRead); };
+    } catch (err) {
+      console.error('Socket init failed:', err);
+    }
+  }, [currentUserId]);
+
+  // Live notice when a fan unlocks one of our paywalled media messages — show
+  // a "Fan unlocked your media · +X coins" pill in that conversation.
+  useEffect(() => {
+    if (!currentUserId) return;
+    let socket = null;
+    try {
+      socket = getSocket();
+      joinSocketRoom(currentUserId);
+      const onMessageUnlocked = (payload) => {
+        const fanId = payload && payload.unlockedBy ? String(payload.unlockedBy) : null;
+        if (!fanId) return;
+        const conv = conversationsRef.current.find(c => c.id === fanId);
+        const notice = {
+          id: `${payload.messageId}-${Date.now()}`,
+          fanName: (conv && conv.user && conv.user.displayName) || '',
+          coinPrice: payload.coinPrice || 0
+        };
+        setUnlockNotices(prev => ({
+          ...prev,
+          [fanId]: [...(prev[fanId] || []), notice]
+        }));
+        // Show the 🔥 Unlocked badge on the conversation row, then auto-clear it.
+        setRecentUnlocks(prev => ({ ...prev, [fanId]: true }));
+        clearTimeout(recentUnlockTimers.current[fanId]);
+        recentUnlockTimers.current[fanId] = setTimeout(() => {
+          setRecentUnlocks(prev => {
+            if (!prev[fanId]) return prev;
+            const next = { ...prev };
+            delete next[fanId];
+            return next;
+          });
+          delete recentUnlockTimers.current[fanId];
+        }, 6000);
+      };
+      socket.on('message_unlocked', onMessageUnlocked);
+      return () => { socket.off('message_unlocked', onMessageUnlocked); };
+    } catch (err) {
+      console.error('Socket init failed:', err);
+    }
+  }, [currentUserId]);
+
+  // Remove a conversation in real time when it's deleted from another device
+  // (the global unread badge is refreshed by AppContext on the same event).
+  useEffect(() => {
+    if (!currentUserId) return;
+    let socket = null;
+    try {
+      socket = getSocket();
+      joinSocketRoom(currentUserId);
+      const onConversationDeleted = (payload) => {
+        const peerId = payload && payload.peerId ? String(payload.peerId) : null;
+        if (!peerId) return;
+        setConversations(prev => prev.filter(c => c.id !== peerId));
+        setMessagesMap(prev => {
+          if (!(peerId in prev)) return prev;
+          const next = { ...prev };
+          delete next[peerId];
+          return next;
+        });
+      };
+      socket.on('conversation_deleted', onConversationDeleted);
+      return () => { socket.off('conversation_deleted', onConversationDeleted); };
+    } catch (err) {
+      console.error('Socket init failed:', err);
+    }
+  }, [currentUserId]);
+
+  // Live presence — keep the chat header's Online / "Last seen …" line in sync
+  // when the fan goes online or offline on any device.
+  useEffect(() => {
+    if (!currentUserId) return;
+    let socket = null;
+    try {
+      socket = getSocket();
+      joinSocketRoom(currentUserId);
+      const onPresenceChange = ({ userId, isOnline, lastSeenAt }) => {
+        if (!userId) return;
+        setConversations(prev => prev.map(c => {
+          if (c.id !== String(userId)) return c;
+          return {
+            ...c,
+            user: {
+              ...c.user,
+              isOnline: !!isOnline,
+              ...(lastSeenAt ? { lastSeenAt } : {})
+            }
+          };
+        }));
+      };
+      socket.on('user_presence_change', onPresenceChange);
+      return () => { socket.off('user_presence_change', onPresenceChange); };
+    } catch (err) {
+      console.error('Socket init for presence failed:', err);
+    }
+  }, [currentUserId]);
 
   // Filter conversations
   const sortedConversations = useMemo(() => {
@@ -370,6 +527,7 @@ export const CreatorMessagesPage = () => {
       setMessagesMap((prev) => { const next = { ...prev }; delete next[conv.id]; return next; });
       setConversations((prev) => prev.filter((c) => c.id !== conv.id));
       navigateTo('/creators/messages');
+      refreshUnreadCount();
     },
   });
 
@@ -426,19 +584,28 @@ export const CreatorMessagesPage = () => {
     setInputText((prev) => insertEmojiAtCaret(prev, emoji, chatInputRef.current));
   };
 
-  // Upload a picked image (via presigned URL) and send it as a media message
-  const handleSendImage = async (file) => {
+  // A file was picked in the composer — open the Send Media popup so the
+  // creator can choose between a free send and a paid (PPV) unlock.
+  const handlePickMedia = (file) => {
+    if (!file) return;
+    setPendingMedia(file);
+  };
+
+  // Upload the picked media (via presigned URL) and send it as a chat message.
+  // `price` is 0 for a free send, or the coin price for a PPV unlock (the fan
+  // pays `price` to view it and the creator receives it on unlock).
+  const sendMedia = async (file, price) => {
     if (!file || !selectedConvId) return;
     const fileType = file.type || 'image/jpeg';
     const mediaType = fileType.startsWith('video/') ? 'video' : 'image';
+    const isPaywall = price > 0;
     try {
       const res = await api.post('/settings/presigned-upload', {
         fileName: (file.name || `chat-image-${Date.now()}.jpg`).replace(/[^a-zA-Z0-9._-]/g, '_'),
         fileType
       });
       if (res.status !== 'success') {
-        toast.error('Failed to get upload URL.');
-        return;
+        throw new Error('Failed to get upload URL.');
       }
       const putRes = await fetch(res.uploadUrl, {
         method: 'PUT',
@@ -446,14 +613,15 @@ export const CreatorMessagesPage = () => {
         body: file
       });
       if (!putRes.ok) {
-        toast.error('Upload to storage failed.');
-        return;
+        throw new Error('Upload to storage failed.');
       }
       const msgRes = await api.post('/chat/message', {
         receiverId: selectedConvId,
         content: '',
         mediaUrl: res.fileUrl,
-        mediaType
+        mediaType,
+        isPaywall,
+        coinPrice: isPaywall ? price : 0
       });
       if (msgRes.status === 'success' && msgRes.message) {
         const uiMsg = mapCreatorMessage(msgRes.message, currentUserId);
@@ -461,13 +629,17 @@ export const CreatorMessagesPage = () => {
           ...prev,
           [selectedConvId]: [...(prev[selectedConvId] || []), uiMsg]
         }));
+        const preview = isPaywall ? `🔒 ${mediaType === 'video' ? 'Video' : 'Photo'} · ${price} coins` : '📎 Media';
         setConversations(prev => prev.map(c => (c.id === selectedConvId
-          ? { ...c, lastMessage: '📎 Media', time: 'Just now', lastMessageAt: Date.now() }
+          ? { ...c, lastMessage: preview, time: 'Just now', lastMessageAt: Date.now() }
           : c)));
+        setPendingMedia(null);
+      } else {
+        throw new Error('Failed to send media.');
       }
     } catch (err) {
-      console.error('Failed to send image:', err);
-      toast.error('Failed to send image. Please try again.');
+      console.error('Failed to send media:', err);
+      throw new Error('Failed to send media. Please try again.', { cause: err });
     }
   };
 
@@ -527,7 +699,7 @@ export const CreatorMessagesPage = () => {
                 className={`${styles.mobileFilterPill} ${filter === 'unread' ? styles.mobileFilterActive : ''}`}
                 onClick={() => setTypeFilter('unread')}
               >
-                Unread
+                Unread ({unreadConversationCount})
               </button>
               <button
                 className={`${styles.mobileFilterPill} ${filter === 'favorites' ? styles.mobileFilterActive : ''}`}
@@ -570,9 +742,14 @@ export const CreatorMessagesPage = () => {
                       </div>
                       <div className={styles.convPreviewRow}>
                         <span className={styles.convPreviewText}>{conv.lastMessage}</span>
-                        {conv.unreadCount > 0 && (
-                          <span className={styles.unreadBadge}>{conv.unreadCount}</span>
-                        )}
+                        <div className={styles.convPreviewBadges}>
+                          {recentUnlocks[conv.id] && (
+                            <span className={styles.unlockBadge}>🔥 Unlocked</span>
+                          )}
+                          {conv.unreadCount > 0 && (
+                            <span className={styles.unreadBadge}>{conv.unreadCount}</span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -614,7 +791,7 @@ export const CreatorMessagesPage = () => {
                     {selectedConv.user.isVerified && <GradientBadgeCheck size={14} />}
                   </div>
                   <div className={styles.mobileChatStatus}>
-                    {selectedConv.user.isOnline ? 'Online' : 'Offline'}
+                    {selectedConv.user.isOnline ? 'Online' : formatLastSeen(selectedConv.user.lastSeenAt)}
                   </div>
                 </div>
               </div>
@@ -690,8 +867,20 @@ export const CreatorMessagesPage = () => {
                           )}
                           <div className={`${styles.msgTimestampInline} ${isCreator ? styles.timestampRight : styles.timestampLeft}`}>
                             <span className={styles.msgTimestamp}>{msg.time}</span>
+                            {isCreator && <ReadReceipt read={msg.read} />}
                           </div>
                         </div>
+                      </div>
+                    );
+                  })}
+                  {(unlockNotices[selectedConvId] || []).map((n) => {
+                    const noticeName = n.fanName || selectedConv?.user?.displayName || 'A fan';
+                    return (
+                      <div key={n.id} className={styles.unlockNoticeRow}>
+                        <span className={styles.unlockNotice}>
+                          <Unlock size={11} className={styles.unlockNoticeIcon} />
+                          {noticeName} unlocked your media{n.coinPrice > 0 ? ` · +${n.coinPrice} coins` : ''}
+                        </span>
                       </div>
                     );
                   })}
@@ -709,7 +898,7 @@ export const CreatorMessagesPage = () => {
                   style={{ display: 'none' }}
                   onChange={(e) => {
                     const file = e.target.files?.[0];
-                    if (file) handleSendImage(file);
+                    if (file) handlePickMedia(file);
                     e.target.value = '';
                   }}
                 />
@@ -761,7 +950,7 @@ export const CreatorMessagesPage = () => {
                     </h3>                      <span className={styles.profileUsername}>@{selectedConv.user.username}</span>
                       <div className={`${styles.profileStatus} ${selectedConv.user.isOnline ? styles.profileStatusOnline : ''}`}>
                         <span className={styles.profileStatusDot} />
-                        {selectedConv.user.isOnline ? 'Online' : 'Offline'}
+                        {selectedConv.user.isOnline ? 'Online' : formatLastSeen(selectedConv.user.lastSeenAt)}
                       </div>
                       {selectedConv.user.isTopFan && (
                         <div className={styles.topFanBadge}>
@@ -879,6 +1068,15 @@ export const CreatorMessagesPage = () => {
           onCancel={closeBlock}
           onConfirm={confirmBlockUser}
         />
+
+        {/* Send Media (Free / PPV) Popup */}
+        <PpvMediaDialog
+          open={!!pendingMedia}
+          file={pendingMedia}
+          darkMode={darkMode}
+          onCancel={() => setPendingMedia(null)}
+          onConfirm={(price) => sendMedia(pendingMedia, price)}
+        />
       </div>
 
       {/* Chat Filters Sheet */}
@@ -968,9 +1166,14 @@ export const CreatorMessagesPage = () => {
 
                     <div className={styles.convPreviewRow}>
                       <span className={styles.convPreviewText}>{conv.lastMessage}</span>
-                      {conv.unreadCount > 0 && (
-                        <span className={styles.unreadBadge}>{conv.unreadCount}</span>
-                      )}
+                      <div className={styles.convPreviewBadges}>
+                        {recentUnlocks[conv.id] && (
+                          <span className={styles.unlockBadge}>🔥 Unlocked</span>
+                        )}
+                        {conv.unreadCount > 0 && (
+                          <span className={styles.unreadBadge}>{conv.unreadCount}</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1012,7 +1215,7 @@ export const CreatorMessagesPage = () => {
                     </div>
                     <span className={`${styles.roomStatus} ${selectedConv.user.isOnline ? styles.roomStatusOnline : ''}`}>
                       <span className={styles.roomStatusDot} />
-                      {selectedConv.user.isOnline ? 'Online' : 'Offline'}
+                      {selectedConv.user.isOnline ? 'Online' : formatLastSeen(selectedConv.user.lastSeenAt)}
                     </span>
                     {selectedConv.user.isTopFan && (
                       <div className={styles.topFanTag}>
@@ -1096,8 +1299,21 @@ export const CreatorMessagesPage = () => {
                             )}
                             <div className={`${styles.msgTimestampInline} ${isCreator ? styles.timestampRight : styles.timestampLeft}`}>
                               <span className={styles.msgTimestamp}>{msg.time}</span>
+                              {isCreator && <ReadReceipt read={msg.read} />}
                             </div>
                           </div>
+                        </div>
+                      );
+                    })}
+
+                    {(unlockNotices[selectedConvId] || []).map((n) => {
+                      const noticeName = n.fanName || selectedConv?.user?.displayName || 'A fan';
+                      return (
+                        <div key={n.id} className={styles.unlockNoticeRow}>
+                          <span className={styles.unlockNotice}>
+                            <Unlock size={11} className={styles.unlockNoticeIcon} />
+                            {noticeName} unlocked your media{n.coinPrice > 0 ? ` · +${n.coinPrice} coins` : ''}
+                          </span>
                         </div>
                       );
                     })}
@@ -1116,7 +1332,7 @@ export const CreatorMessagesPage = () => {
                     style={{ display: 'none' }}
                     onChange={(e) => {
                       const file = e.target.files?.[0];
-                      if (file) handleSendImage(file);
+                      if (file) handlePickMedia(file);
                       e.target.value = '';
                     }}
                   />
@@ -1191,7 +1407,7 @@ export const CreatorMessagesPage = () => {
                     </h3>                      <span className={styles.profileUsername}>@{selectedConv.user.username}</span>
                       <div className={`${styles.profileStatus} ${selectedConv.user.isOnline ? styles.profileStatusOnline : ''}`}>
                         <span className={styles.profileStatusDot} />
-                        {selectedConv.user.isOnline ? 'Online' : 'Offline'}
+                        {selectedConv.user.isOnline ? 'Online' : formatLastSeen(selectedConv.user.lastSeenAt)}
                       </div>
                       {selectedConv.user.isTopFan && (
                         <div className={styles.topFanBadge}>
@@ -1336,6 +1552,15 @@ export const CreatorMessagesPage = () => {
         darkMode={darkMode}
         onCancel={closeBlock}
         onConfirm={confirmBlockUser}
+      />
+
+      {/* Send Media (Free / PPV) Popup */}
+      <PpvMediaDialog
+        open={!!pendingMedia}
+        file={pendingMedia}
+        darkMode={darkMode}
+        onCancel={() => setPendingMedia(null)}
+        onConfirm={(price) => sendMedia(pendingMedia, price)}
       />
     </div>
   );

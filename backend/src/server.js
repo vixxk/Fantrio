@@ -102,15 +102,15 @@ const endActiveCallsForUser = async (userId) => {
 };
 
 // Only write to the DB on actual presence transitions to avoid write churn.
-// `lastSeenAt` records the last time the user went ONLINE; going offline
-// leaves the timestamp untouched.
+// `lastSeenAt` records when the user was last online: stamped on connect and
+// refreshed on a true disconnect (last socket closed) so chat headers can
+// render an accurate "Last seen …" line.
 const updatePresence = (userId, online) => {
   const prev = presenceQueue.get(userId) || Promise.resolve();
   const next = prev
     .catch(() => {})
     .then(async () => {
-      const set = { isOnline: online };
-      if (online) set.lastSeenAt = new Date();
+      const set = { isOnline: online, lastSeenAt: new Date() };
       await Promise.all([
         User.updateOne({ _id: userId }, { $set: set }),
         // Mirror onto the creator profile when the user is a creator so the call
@@ -127,7 +127,10 @@ const updatePresence = (userId, online) => {
       io.emit('user_presence_change', {
         userId: String(userId),
         creatorId: creatorProfile ? creatorProfile._id.toString() : null,
-        isOnline: online
+        isOnline: online,
+        // When a user goes offline, lastSeenAt reflects when they were last
+        // online so chat headers can show an accurate "Last seen …" line.
+        lastSeenAt: set.lastSeenAt
       });
       io.emit('creator_availability_change', {
         userId: String(userId),

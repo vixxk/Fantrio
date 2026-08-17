@@ -1,9 +1,8 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { api } from '../../services/api';
-import { getSocket, joinSocketRoom } from '../../services/socket';
 import { 
-  Search, Bell, MessageCircle, Plus, Menu, ChevronDown, ChevronRight,
+  Search, Bell, Plus, Menu, ChevronDown, ChevronRight,
   User, Shield, CreditCard, Landmark, BookOpen, Headphones, Heart, AlertOctagon, FileText, PhoneCall, Loader
 } from 'lucide-react';
 import { ProfileDropdown } from './ProfileDropdown';
@@ -110,11 +109,10 @@ const renderSettingIcon = (iconName) => {
 };
 
 export const Header = ({ onMenuToggle }) => {
-  const { user, balance, darkMode, activeTab, setActiveTab, navigateTo } = useApp();
+  const { user, balance, darkMode, activeTab, setActiveTab, navigateTo, unreadConversations } = useApp();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [notificationUnreadCount, setNotificationUnreadCount] = useState(0);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [creatorResults, setCreatorResults] = useState([]);
@@ -122,41 +120,6 @@ export const Header = ({ onMenuToggle }) => {
   const [settingResults, setSettingResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const searchBoxRef = useRef(null);
-
-  // Load the real unread message count from the chat API
-  const loadUnreadCount = useCallback(async () => {
-    try {
-      const res = await api.get('/chat/conversations');
-      const conversations = res.conversations || [];
-      const total = conversations.filter((c) => (c.unreadCount || 0) > 0).length;
-      setUnreadCount(total);
-    } catch (err) {
-      console.error('Failed to load unread count:', err);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadUnreadCount();
-  }, [loadUnreadCount, activeTab]);
-
-  // Keep the unread badge in sync in real time via Socket.io
-  useEffect(() => {
-    if (!user?.id) return;
-    let socket = null;
-    try {
-      socket = getSocket();
-      joinSocketRoom(user.id);
-      const onNewMessage = (msg) => {
-        if (msg && String(msg.receiverId) === String(user.id)) {
-          setUnreadCount((prev) => prev + 1);
-        }
-      };
-      socket.on('new_message', onNewMessage);
-      return () => { socket.off('new_message', onNewMessage); };
-    } catch (err) {
-      console.error('Socket init failed:', err);
-    }
-  }, [user?.id]);
 
   // Close the search dropdown when clicking outside
   useEffect(() => {
@@ -220,14 +183,6 @@ export const Header = ({ onMenuToggle }) => {
     }, 300);
     return () => clearTimeout(t);
   }, [searchQuery]);
-
-  const goToMessages = () => {
-    if (activeTab.startsWith('Creator')) {
-      navigateTo('/creators/messages');
-    } else {
-      navigateTo('/messages');
-    }
-  };
 
   const handleAddCoinsClick = (e) => {
     e.stopPropagation();
@@ -549,9 +504,9 @@ export const Header = ({ onMenuToggle }) => {
           >
             <div className={styles.iconWrapper}>
               <Bell size={20} />
-              {(unreadCount > 0 || notificationUnreadCount > 0) && (
+              {(unreadConversations > 0 || notificationUnreadCount > 0) && (
                 <span className={styles.badge}>
-                  {Math.max(unreadCount, notificationUnreadCount) > 99 ? '99+' : Math.max(unreadCount, notificationUnreadCount)}
+                  {Math.max(unreadConversations, notificationUnreadCount) > 99 ? '99+' : Math.max(unreadConversations, notificationUnreadCount)}
                 </span>
               )}
             </div>

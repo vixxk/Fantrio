@@ -275,6 +275,13 @@
   flex: 1;
 }
 
+.convPreviewBadges {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
 .unreadBadge {
   background: #e10075;
   color: #ffffff;
@@ -287,6 +294,32 @@
   font-size: 0.68rem;
   font-weight: 700;
   flex-shrink: 0;
+}
+
+.unlockBadge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: #fbbf24;
+  background: rgba(234, 179, 8, 0.12);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  padding: 0.15rem 0.5rem;
+  border-radius: 99px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  animation: unlockBadgePop 0.25s ease;
+}
+
+@keyframes unlockBadgePop {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* ================= COLUMN 2: CHAT ROOM ================= */
@@ -551,6 +584,40 @@
 .readIndicator {
   color: #3b82f6;
   font-weight: 700;
+}
+
+/* Fan unlocked media — live system notice pill */
+.unlockNoticeRow {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 0.35rem 0;
+}
+
+.unlockNotice {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  background: rgba(225, 0, 117, 0.1);
+  border: 1px solid rgba(225, 0, 117, 0.25);
+  padding: 0.3rem 0.85rem;
+  border-radius: 99px;
+  max-width: 90%;
+  text-align: center;
+}
+
+.unlockNoticeIcon {
+  color: #e10075;
+  flex-shrink: 0;
+}
+
+.light .unlockNotice {
+  color: rgba(26, 22, 37, 0.65);
+  background: rgba(225, 0, 117, 0.08);
+  border-color: rgba(225, 0, 117, 0.28);
 }
 
 /* Chat Input Bar */
@@ -1153,6 +1220,12 @@
 
 .light .convPreviewText {
   color: rgba(0, 0, 0, 0.45);
+}
+
+.light .unlockBadge {
+  color: #b45309;
+  background: rgba(234, 179, 8, 0.1);
+  border-color: rgba(234, 179, 8, 0.35);
 }
 
 .light .onlineDot {
@@ -1824,6 +1897,12 @@
 .lightMobile .unreadBadge {
   background: #e10075;
   color: #ffffff;
+}
+
+.lightMobile .unlockBadge {
+  color: #b45309;
+  background: rgba(234, 179, 8, 0.1);
+  border-color: rgba(234, 179, 8, 0.35);
 }
 
 .lightMobile .emptyIcon {

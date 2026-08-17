@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useApp } from '../../context/AppContext';
 import { api } from '../../services/api';
+import { getSocket, joinSocketRoom } from '../../services/socket';
 import { 
   Bell, Landmark, Megaphone, CheckCheck 
 } from 'lucide-react';
@@ -20,6 +21,11 @@ export const NotificationDropdown = ({ isOpen, onClose, onUnreadCountChange, isC
       return [];
     }
   });
+
+  const onUnreadCountChangeRef = useRef(onUnreadCountChange);
+  useEffect(() => {
+    onUnreadCountChangeRef.current = onUnreadCountChange;
+  }, [onUnreadCountChange]);
 
   const loadNotifications = useCallback(async () => {
     if (!user) return;
@@ -118,16 +124,84 @@ export const NotificationDropdown = ({ isOpen, onClose, onUnreadCountChange, isC
       items.sort((a, b) => b.time - a.time);
       setNotifications(items);
 
-      // Report unread count up
+      // Report unread count up to Header badge
       const totalUnread = items.filter((i) => i.isUnread).length;
-      if (onUnreadCountChange) onUnreadCountChange(totalUnread);
+      if (onUnreadCountChangeRef.current) {
+        onUnreadCountChangeRef.current(totalUnread);
+      }
     } catch (err) {
       console.error('Failed to load notifications:', err);
     } finally {
       setLoading(false);
     }
-  }, [user, readIds, onUnreadCountChange]);
+  }, [user, readIds]);
 
+  // Load notifications automatically on mount / user change
+  useEffect(() => {
+    if (user?.id) {
+      loadNotifications();
+    }
+  }, [user?.id, loadNotifications]);
+
+  // Subscribe to real-time socket events & background polling so the bell badge stays up to date continuously
+  useEffect(() => {
+    if (!user?.id) return;
+
+    let socket = null;
+    let debounceTimer = null;
+
+    const scheduleRefresh = () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        loadNotifications();
+      }, 300);
+    };
+
+    try {
+      socket = getSocket();
+      joinSocketRoom(user.id);
+
+      socket.on('new_message', scheduleRefresh);
+      socket.on('message_deleted', scheduleRefresh);
+      socket.on('conversation_deleted', scheduleRefresh);
+      socket.on('balance_updated', scheduleRefresh);
+      socket.on('transaction_created', scheduleRefresh);
+      socket.on('announcement_created', scheduleRefresh);
+      socket.on('notification_updated', scheduleRefresh);
+    } catch (err) {
+      console.warn('Socket listener for notifications warning:', err);
+    }
+
+    // Interval polling every 15s to keep notifications up-to-date automatically
+    const pollInterval = setInterval(() => {
+      loadNotifications();
+    }, 15000);
+
+    // Refresh when user returns to tab
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        loadNotifications();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      if (socket) {
+        socket.off('new_message', scheduleRefresh);
+        socket.off('message_deleted', scheduleRefresh);
+        socket.off('conversation_deleted', scheduleRefresh);
+        socket.off('balance_updated', scheduleRefresh);
+        socket.off('transaction_created', scheduleRefresh);
+        socket.off('announcement_created', scheduleRefresh);
+        socket.off('notification_updated', scheduleRefresh);
+      }
+      clearTimeout(debounceTimer);
+      clearInterval(pollInterval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [user?.id, loadNotifications]);
+
+  // Refresh when dropdown is opened explicitly
   useEffect(() => {
     if (isOpen) {
       loadNotifications();
@@ -159,7 +233,9 @@ export const NotificationDropdown = ({ isOpen, onClose, onUnreadCountChange, isC
       localStorage.setItem(`read_notifications_${user?.id}`, JSON.stringify(updated));
     } catch (e) {}
     setNotifications((prev) => prev.map((n) => ({ ...n, isUnread: false })));
-    if (onUnreadCountChange) onUnreadCountChange(0);
+    if (onUnreadCountChangeRef.current) {
+      onUnreadCountChangeRef.current(0);
+    }
   };
 
   const handleItemClick = (item) => {
@@ -169,7 +245,14 @@ export const NotificationDropdown = ({ isOpen, onClose, onUnreadCountChange, isC
       try {
         localStorage.setItem(`read_notifications_${user?.id}`, JSON.stringify(updated));
       } catch (e) {}
-      setNotifications((prev) => prev.map((n) => (n.id === item.id ? { ...n, isUnread: false } : n)));
+      setNotifications((prev) => {
+        const next = prev.map((n) => (n.id === item.id ? { ...n, isUnread: false } : n));
+        const totalUnread = next.filter((i) => i.isUnread).length;
+        if (onUnreadCountChangeRef.current) {
+          onUnreadCountChangeRef.current(totalUnread);
+        }
+        return next;
+      });
     }
 
     if (item.targetRoute) {
@@ -280,3 +363,4 @@ export const NotificationDropdown = ({ isOpen, onClose, onUnreadCountChange, isC
     </div>
   );
 };
+

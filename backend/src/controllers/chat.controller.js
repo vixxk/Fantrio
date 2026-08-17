@@ -51,6 +51,60 @@ const formatMessageForUser = async (user, msg) => {
   };
 };
 
+// Total number of conversations that contain unread messages for the current
+// user. This is the source of truth for the unread badge shown on the nav
+// (desktop sidebar, mobile bottom nav, header) so every surface stays in sync.
+exports.getUnreadCount = catchAsync(async (req, res, next) => {
+  const result = await Message.aggregate([
+    { $match: { receiverId: req.user._id, isOpened: false, deletedFor: { $ne: req.user._id } } },
+    { $group: { _id: '$senderId' } },
+    { $count: 'count' }
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    unreadConversations: result[0]?.count || 0
+  });
+});
+
+// Mark every incoming message from a peer as read. Used when a user is actively
+// viewing a conversation and a realtime message arrives, so it never lingers as
+// unread (and never inflates the unread-conversations counter).
+exports.markMessagesRead = catchAsync(async (req, res, next) => {
+  const { receiverId } = req.params;
+  if (!receiverId) {
+    return next(new ApiError(400, 'Peer user ID is required'));
+  }
+
+  // Mark the peer's messages read and notify them in real time so their read
+  // receipt ticks update without a reload.
+  const unreadIncoming = await Message.find({
+    senderId: receiverId,
+    receiverId: req.user._id,
+    isOpened: false,
+    deletedFor: { $ne: req.user._id }
+  }).select('_id');
+
+  if (unreadIncoming.length > 0) {
+    await Message.updateMany(
+      { _id: { $in: unreadIncoming.map((m) => m._id) } },
+      { $set: { isOpened: true } }
+    );
+
+    const io = req.app.get('io');
+    if (io) {
+      io.to(receiverId.toString()).emit('messages_read', {
+        peerId: req.user._id.toString(),
+        messageIds: unreadIncoming.map((m) => m._id.toString())
+      });
+    }
+  }
+
+  res.status(200).json({
+    status: 'success'
+  });
+});
+
 // Retrieve chat threads
 // Each conversation carries the peer user, their creator profile (rates/status),
 // the last message, unread count, and fan stats so the UI can render the sidebar directly.
@@ -58,6 +112,7 @@ exports.getConversations = catchAsync(async (req, res, next) => {
   const conversations = await Message.aggregate([
     {
       $match: {
+        deletedFor: { $ne: req.user._id },
         $or: [{ senderId: req.user._id }, { receiverId: req.user._id }]
       }
     },
@@ -86,7 +141,7 @@ exports.getConversations = catchAsync(async (req, res, next) => {
 
   // Unread message counts per peer (messages sent TO the current user, not opened yet)
   const unread = await Message.aggregate([
-    { $match: { receiverId: req.user._id, isOpened: false } },
+    { $match: { receiverId: req.user._id, isOpened: false, deletedFor: { $ne: req.user._id } } },
     { $group: { _id: '$senderId', count: { $sum: 1 } } }
   ]);
   const unreadMap = {};
@@ -113,6 +168,7 @@ exports.getConversations = catchAsync(async (req, res, next) => {
     ? await Message.aggregate([
         {
           $match: {
+            deletedFor: { $ne: req.user._id },
             $or: [
               { senderId: req.user._id, receiverId: { $in: peerIds } },
               { senderId: { $in: peerIds }, receiverId: req.user._id }
@@ -277,6 +333,9 @@ exports.getConversations = catchAsync(async (req, res, next) => {
     if (profile) {
       profile.isOnline = profile.showOnlineStatus !== false && !!profile.isOnline;
       profile.isBusy = busyIds.has(peerId);
+      // Always carry the peer's last-online timestamp so the chat headers can
+      // render a "Last seen …" line when the peer is offline.
+      profile.lastSeenAt = u ? (u.lastSeenAt || null) : null;
       c.profile = profile;
     } else {
       c.profile = u
@@ -337,19 +396,38 @@ exports.getConversations = catchAsync(async (req, res, next) => {
 exports.getMessages = catchAsync(async (req, res, next) => {
   const { receiverId } = req.params;
 
-  // Retrieve DMs
+  // Retrieve DMs (excluding messages the current user soft-deleted for themselves)
   const messages = await Message.find({
+    deletedFor: { $ne: req.user._id },
     $or: [
       { senderId: req.user._id, receiverId },
       { senderId: receiverId, receiverId: req.user._id }
     ]
   }).sort({ createdAt: 1 });
 
-  // Mark all incoming messages as read
-  await Message.updateMany(
-    { senderId: receiverId, receiverId: req.user._id, isOpened: false },
-    { $set: { isOpened: true } }
-  );
+  // Mark all incoming messages as read, then notify the sender in real time so
+  // they see the read receipt ticks on their own copy of the thread.
+  const unreadIncoming = await Message.find({
+    senderId: receiverId,
+    receiverId: req.user._id,
+    isOpened: false,
+    deletedFor: { $ne: req.user._id }
+  }).select('_id');
+
+  if (unreadIncoming.length > 0) {
+    await Message.updateMany(
+      { _id: { $in: unreadIncoming.map((m) => m._id) } },
+      { $set: { isOpened: true } }
+    );
+
+    const io = req.app.get('io');
+    if (io) {
+      io.to(receiverId.toString()).emit('messages_read', {
+        peerId: req.user._id.toString(),
+        messageIds: unreadIncoming.map((m) => m._id.toString())
+      });
+    }
+  }
 
   const formattedMessages = await Promise.all(
     messages.map(async (msg) => await formatMessageForUser(req.user, msg))
@@ -431,12 +509,16 @@ exports.unlockMessage = catchAsync(async (req, res, next) => {
 
   const formatted = await formatMessageForUser(req.user, message);
 
-  // Notify the sender that their message was unlocked
+  // Notify the sender that their message was unlocked (payload includes the
+  // price so the creator can show a live "Fan unlocked your media · +X coins"
+  // notice in the chat).
   const io = req.app.get('io');
   if (io) {
     io.to(message.senderId.toString()).emit('message_unlocked', {
       messageId: message._id,
-      unlockedBy: req.user._id
+      unlockedBy: req.user._id,
+      coinPrice: message.coinPrice || 0,
+      fanName: req.user.displayName || req.user.username || 'A fan'
     });
   }
 
@@ -532,17 +614,33 @@ exports.deleteMessage = catchAsync(async (req, res, next) => {
   });
 });
 
-// Delete a complete conversation thread
+// Delete a complete conversation thread (soft delete for the requester only).
+// Messages are kept in the DB and flagged as deleted for the requester, so the
+// peer keeps their full chat history and their unread badges are unaffected.
 exports.deleteConversation = catchAsync(async (req, res, next) => {
   const { userId } = req.params;
 
-  // Delete all messages between req.user._id and userId
-  await Message.deleteMany({
-    $or: [
-      { senderId: req.user._id, receiverId: userId },
-      { senderId: userId, receiverId: req.user._id }
-    ]
-  });
+  // Mark every message in the thread as deleted for the requester (idempotent).
+  await Message.updateMany(
+    {
+      $or: [
+        { senderId: req.user._id, receiverId: userId },
+        { senderId: userId, receiverId: req.user._id }
+      ]
+    },
+    { $addToSet: { deletedFor: req.user._id } }
+  );
+
+  // Notify only the deleter's other devices so their conversation lists and
+  // unread badges update in real time. The peer is deliberately NOT notified:
+  // their history and unread state are unchanged.
+  const io = req.app.get('io');
+  if (io) {
+    io.to(req.user._id.toString()).emit('conversation_deleted', {
+      peerId: userId,
+      deletedBy: req.user._id
+    });
+  }
 
   res.status(200).json({
     status: 'success',

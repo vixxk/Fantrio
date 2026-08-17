@@ -43,18 +43,24 @@ import { LoginPage } from './features/auth/LoginPage';
 import { SignupPage } from './features/auth/SignupPage';
 import { IncomingCallProvider } from './features/calls/IncomingCallProvider';
 import { ToastProvider } from './components/Toast/Toast';
+import { NewMessageNotifier } from './components/NewMessageNotifier/NewMessageNotifier';
+import { UnlockNotifier } from './components/UnlockNotifier/UnlockNotifier';
 import { AppDialogProvider } from './components/AppDialog/AppDialog';
 import { Compass, Radio, Phone, MessageSquare, LayoutDashboard, PenSquare } from 'lucide-react';
 import './App.css';
 
 const AppContent = () => {
-  const { darkMode, activeTab, setActiveTab, currentPath, user, loading, navigateTo, replacePath } = useApp();
+  const { darkMode, activeTab, setActiveTab, currentPath, user, loading, navigateTo, replacePath, unreadConversations } = useApp();
   const isCreatorPage = activeTab.startsWith('Creator');
   const isFullScreenPage = activeTab === 'Public Creator Profile' || activeTab === 'Listener Profile';
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showBottomNav, setShowBottomNav] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const lastScrollY = useRef(0);
+  // Pulse the mobile nav unread badge when the unread-conversations counter
+  // goes up (a new message arrived) — cleared once the animation runs.
+  const [navBadgePulse, setNavBadgePulse] = useState(false);
+  const prevUnreadRef = useRef(unreadConversations);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -85,6 +91,26 @@ const AppContent = () => {
     window.addEventListener('scroll', handleScroll, { capture: true, passive: true });
     return () => window.removeEventListener('scroll', handleScroll, { capture: true });
   }, []);
+
+  // When the unread-conversations counter increases, flash the nav badge so
+  // the new message is noticeable even when the user is on another page.
+  // The first run (initial count load) is skipped so the badge only pulses on
+  // genuine increases.
+  const firstUnreadCheck = useRef(true);
+  useEffect(() => {
+    if (firstUnreadCheck.current) {
+      firstUnreadCheck.current = false;
+      prevUnreadRef.current = unreadConversations;
+      return;
+    }
+    const prev = prevUnreadRef.current;
+    prevUnreadRef.current = unreadConversations;
+    if (unreadConversations > prev) {
+      setNavBadgePulse(true);
+      const t = setTimeout(() => setNavBadgePulse(false), 900);
+      return () => clearTimeout(t);
+    }
+  }, [unreadConversations]);
 
   useEffect(() => {
     Promise.resolve().then(() => {
@@ -459,6 +485,9 @@ const AppContent = () => {
               onClick={() => setActiveTab('Creator Messages')}
             >
               <MessageSquare size={20} />
+              {unreadConversations > 0 && (
+                <span className={`bottomNavBadge ${navBadgePulse ? 'bottomNavBadgePulse' : ''}`}>{unreadConversations > 99 ? '99+' : unreadConversations}</span>
+              )}
               <span>Messages</span>
             </button>
             <button 
@@ -497,6 +526,9 @@ const AppContent = () => {
               onClick={() => setActiveTab('Messages')}
             >
               <MessageSquare size={20} />
+              {unreadConversations > 0 && (
+                <span className={`bottomNavBadge ${navBadgePulse ? 'bottomNavBadgePulse' : ''}`}>{unreadConversations > 99 ? '99+' : unreadConversations}</span>
+              )}
               <span>Chats</span>
             </button>
           </>
@@ -513,6 +545,8 @@ function App() {
       <ToastProvider>
         <AppDialogProvider>
           <IncomingCallProvider>
+            <NewMessageNotifier />
+            <UnlockNotifier />
             <AppContent />
           </IncomingCallProvider>
         </AppDialogProvider>

@@ -63,7 +63,15 @@ const messageSchema = new mongoose.Schema(
     isOpened: {
       type: Boolean,
       default: false
-    }
+    },
+    // Users who soft-deleted this message for themselves (conversation delete).
+    // The message stays in the DB so the peer keeps their chat history.
+    deletedFor: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      }
+    ]
   },
   {
     timestamps: true

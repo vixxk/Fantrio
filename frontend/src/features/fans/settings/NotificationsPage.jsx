@@ -1,12 +1,29 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../../services/api';
-import { MessageSquare, CreditCard, Bell, Check, X } from 'lucide-react';
+import { MessageSquare, CreditCard, Bell, Volume2, Check, X } from 'lucide-react';
+import { isChatPageSoundEnabled, isMessageSoundEnabled, setChatPageSoundEnabled, setMessageSoundEnabled } from '../../../utils/sound';
 import styles from './SettingsPage.module.css';
 
 export const NotificationsPage = ({ setStatus }) => {
   const [preferences, setPreferences] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  // Device-level sound prefs (kept in localStorage, like the gift chime mute)
+  // so they take effect instantly and don't need a server round-trip.
+  const [soundPrefs, setSoundPrefs] = useState(() => ({
+    messageSound: isMessageSoundEnabled(),
+    chatPageSound: isChatPageSoundEnabled()
+  }));
+
+  const toggleSoundPref = (key) => {
+    setSoundPrefs((prev) => {
+      const next = { ...prev, [key]: !prev[key] };
+      if (key === 'messageSound') setMessageSoundEnabled(next.messageSound);
+      else setChatPageSoundEnabled(next.chatPageSound);
+      return next;
+    });
+  };
 
   const loadPrefs = async () => {
     setLoading(true);
@@ -148,6 +165,47 @@ export const NotificationsPage = ({ setStatus }) => {
             </div>
           );
         })}
+
+        {/* Message sounds — device-level toggles (localStorage), not server
+            notification prefs, so they apply instantly to the sound layer. */}
+        <div className={styles.notifGroupCard}>
+          <div className={styles.notifGroupTitleRow}>
+            <Volume2 size={18} className={styles.groupIcon} />
+            <h4>Message Sounds</h4>
+          </div>
+          <div className={styles.notifList}>
+            <div className={styles.notifRow}>
+              <div className={styles.notifTextCol}>
+                <h5 className={styles.notifTitle}>Message Sounds</h5>
+                <p className={styles.notifDesc}>Play a sound when a DM arrives while you're not on the chat page.</p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={soundPrefs.messageSound}
+                className={`${styles.toggle} ${soundPrefs.messageSound ? styles.toggleOn : ''}`}
+                onClick={() => toggleSoundPref('messageSound')}
+              >
+                <span className={styles.toggleThumb} />
+              </button>
+            </div>
+            <div className={styles.notifRow}>
+              <div className={styles.notifTextCol}>
+                <h5 className={styles.notifTitle}>Chat Page Sounds</h5>
+                <p className={styles.notifDesc}>Chime for messages in other conversations while browsing the chat list on desktop.</p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={soundPrefs.chatPageSound}
+                className={`${styles.toggle} ${soundPrefs.chatPageSound ? styles.toggleOn : ''}`}
+                onClick={() => toggleSoundPref('chatPageSound')}
+              >
+                <span className={styles.toggleThumb} />
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

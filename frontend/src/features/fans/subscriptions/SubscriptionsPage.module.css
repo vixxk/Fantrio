@@ -1873,3 +1873,22 @@
   color: #b45309;
 }
 
+/* Cancel dialog notice */
+.cancelNotice {
+  display: block;
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #f87171;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.light .cancelNotice {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+}
+
+

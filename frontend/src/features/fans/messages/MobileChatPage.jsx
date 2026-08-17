@@ -3,6 +3,8 @@ import { useApp } from '../../../context/AppContext';
 import { api } from '../../../services/api';
 import { getSocket, joinSocketRoom } from '../../../services/socket';
 import { useToast } from '../../../components/Toast/Toast';
+import { ConfirmDeleteDialog } from '../../../components/ConfirmDeleteDialog/ConfirmDeleteDialog';
+import { useConfirmDelete } from '../../../hooks/useConfirmDelete';
 import { ChevronLeft, MoreVertical, Heart, Send, Smile, Image as ImageIcon, Lock, Check, Phone, Video, MessageSquare } from 'lucide-react';
 import styles from './MobileChatPage.module.css';
 import { ActiveCallOverlay } from '../../calls/ActiveCallOverlay/ActiveCallOverlay';
@@ -12,6 +14,8 @@ import { GiftOverlay } from '../../gifts/GiftOverlay';
 import { GiftPanel } from '../../gifts/GiftPanel';
 import { QuickRecharge } from '../../gifts/QuickRecharge';
 import { ChatScreenSkeleton } from '../../../components/ChatThreadSkeleton/ChatThreadSkeleton';
+import { ReadReceipt } from '../../../components/ReadReceipt/ReadReceipt';
+import { formatLastSeen } from '../../../utils/lastSeen';
 import { GiftMessageCard, parseGiftMessage } from '../../gifts/GiftMessageCard';
 
 const formatTime = (iso) => {
@@ -45,6 +49,7 @@ const mapMessage = (m, currentUserId) => {
     title: mediaType === 'image' ? 'Exclusive Photo' : mediaType === 'video' ? 'Premium Video' : 'Exclusive Media',
     textSub: m.isPaywall ? (isUser ? 'Unlocked media you sent' : 'Unlock to view this exclusive content') : '',
     previewUrl: m.mediaUrl || '',
+    read: !!m.isOpened,
     createdAt: m.createdAt
   };
 };
@@ -163,6 +168,7 @@ export const MobileChatPage = () => {
             isVerified: !!profile.isVerifiedBadge,
             isOnline: !!profile.isOnline,
             isBusy: !!profile.isBusy,
+            lastSeenAt: profile.lastSeenAt || null,
             audioRate: (profile.rates && profile.rates.audioCallPerMin) || 0,
             videoRate: (profile.rates && profile.rates.videoCallPerMin) || 0,
             audioAvailable: profile.audioAvailable !== false,
@@ -182,8 +188,9 @@ export const MobileChatPage = () => {
                 username: profile.username || '',
                 avatarUrl: profile.avatarUrl || '',
                 isVerified: !!profile.isVerifiedBadge,
-                isOnline: !!profile.isOnline,
+                isOnline: profRes.isOnline !== undefined ? !!profRes.isOnline : !!profile.isOnline,
                 isBusy: !!profRes.isBusy,
+                lastSeenAt: profRes.lastSeenAt || null,
                 audioRate: rates.audioCallPerMin || 0,
                 videoRate: rates.videoCallPerMin || 0,
                 audioAvailable: profile.audioAvailable !== false,
@@ -219,10 +226,62 @@ export const MobileChatPage = () => {
           : String(msg.senderId);
         if (otherId === convId) {
           setMessages((prev) => [...prev, mapMessage(msg, currentUserId)]);
+          // The user is actively viewing this conversation — mark the new
+          // message as read on the server so the unread badge stays accurate.
+          api.post(`/chat/read/${convId}`).catch(() => {});
         }
       };
       socket.on('new_message', onNewMessage);
       return () => { socket.off('new_message', onNewMessage); };
+    } catch (err) {
+      console.error('Socket init failed:', err);
+    }
+  }, [convId, currentUserId]);
+
+  // Live presence — keep the header's Online / "Last seen …" line in sync when
+  // the peer goes online or offline on any device.
+  useEffect(() => {
+    if (!currentUserId || !convId) return;
+    let socket = null;
+    try {
+      socket = getSocket();
+      joinSocketRoom(currentUserId);
+      const onPresenceChange = ({ userId, isOnline, lastSeenAt }) => {
+        if (!userId || String(userId) !== convId) return;
+        setPeer(prev => prev ? {
+          ...prev,
+          isOnline: !!isOnline,
+          ...(lastSeenAt ? { lastSeenAt } : {})
+        } : prev);
+      };
+      socket.on('user_presence_change', onPresenceChange);
+      return () => { socket.off('user_presence_change', onPresenceChange); };
+    } catch (err) {
+      console.error('Socket init for presence failed:', err);
+    }
+  }, [convId, currentUserId]);
+
+  // Live read receipts — when the creator reads our messages (here or on
+  // another device), flip the sent ticks to read ticks in real time.
+  useEffect(() => {
+    if (!currentUserId || !convId) return;
+    let socket = null;
+    try {
+      socket = getSocket();
+      joinSocketRoom(currentUserId);
+      const onMessagesRead = (payload) => {
+        const peerId = payload && payload.peerId ? String(payload.peerId) : null;
+        if (!peerId || peerId !== convId) return;
+        const ids = payload && Array.isArray(payload.messageIds) ? payload.messageIds.map(String) : [];
+        if (ids.length === 0) return;
+        const idSet = new Set(ids);
+        setMessages(prev => {
+          if (!prev.some(m => idSet.has(m.id) && !m.read)) return prev;
+          return prev.map(m => (idSet.has(m.id) ? { ...m, read: true } : m));
+        });
+      };
+      socket.on('messages_read', onMessagesRead);
+      return () => { socket.off('messages_read', onMessagesRead); };
     } catch (err) {
       console.error('Socket init failed:', err);
     }
@@ -244,21 +303,29 @@ export const MobileChatPage = () => {
     }
   };
 
-  const handleUnlock = async (msgId, price) => {
+  // Unlock PPV media — confirm the coin charge before unlocking
+  const {
+    target: unlockTarget,
+    open: openUnlock,
+    close: closeUnlock,
+    confirm: confirmUnlock,
+    deleting: unlocking,
+  } = useConfirmDelete({
+    onConfirm: ({ msgId }) => api.post(`/chat/message/${msgId}/unlock`),
+    successMessage: 'Media unlocked successfully!',
+    errorMessage: 'Failed to unlock. Please try again.',
+    onSuccess: ({ msgId }) => {
+      setMessages((prev) => prev.map((m) => (m.id === msgId ? { ...m, isLocked: false } : m)));
+      refreshBalance();
+    },
+  });
+
+  const handleUnlock = (msgId, price) => {
     if (balance < price) {
       toast.error(`Insufficient coins! You need ${price} Coins to unlock this media.`);
       return;
     }
-    try {
-      const res = await api.post(`/chat/message/${msgId}/unlock`);
-      if (res.status === 'success') {
-        setMessages((prev) => prev.map((m) => (m.id === msgId ? { ...m, isLocked: false } : m)));
-        refreshBalance();
-      }
-    } catch (err) {
-      console.error('Failed to unlock message:', err);
-      toast.error(err.message || 'Failed to unlock. Please try again.');
-    }
+    openUnlock({ msgId, price });
   };
 
   const handleBack = () => {
@@ -311,7 +378,7 @@ export const MobileChatPage = () => {
                 </svg>
               )}
             </div>
-            <span className={styles.status}>{peer.isBusy ? 'Busy' : (peer.isOnline ? 'Online' : 'Offline')}</span>
+            <span className={styles.status}>{peer.isBusy ? 'Busy' : (peer.isOnline ? 'Online' : formatLastSeen(peer.lastSeenAt))}</span>
           </div>
         </div>
 
@@ -416,7 +483,10 @@ export const MobileChatPage = () => {
                       <p className={styles.bubbleText}>{msg.text}</p>
                     </div>
                   )}
-                  <span className={`${styles.time} ${isMe ? styles.timeRight : styles.timeLeft}`}>{msg.time}</span>
+                  <span className={`${styles.time} ${isMe ? styles.timeRight : styles.timeLeft}`}>
+                    {msg.time}
+                    {isMe && <ReadReceipt read={msg.read} />}
+                  </span>
                 </div>
               </div>
             );
@@ -499,6 +569,27 @@ export const MobileChatPage = () => {
         />
       )}
       {rechargeOpen && <QuickRecharge onClose={() => setRechargeOpen(false)} />}
+
+      {/* Unlock PPV Media Confirmation */}
+      <ConfirmDeleteDialog
+        open={!!unlockTarget}
+        itemName={unlockTarget ? `${unlockTarget.price} coins` : ''}
+        title="Unlock Exclusive Media?"
+        confirmLabel="Unlock"
+        busyLabel="Unlocking…"
+        icon={<Lock size={22} />}
+        message={unlockTarget ? (
+          <>
+            Unlock this exclusive media for <strong>{unlockTarget.price} Coins</strong>?
+            <span className={styles.unlockConfirmNotice}>This purchase is non-refundable and cannot be cancelled for a refund later.</span>
+          </>
+        ) : ''}
+        deleting={unlocking}
+        darkMode={darkMode}
+        variant="premium"
+        onCancel={closeUnlock}
+        onConfirm={confirmUnlock}
+      />
     </div>
   );
 };

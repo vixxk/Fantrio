@@ -1,6 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { api } from '../../services/api';
 import {
   Home,
   Users,
@@ -27,26 +26,10 @@ export const Sidebar = ({ onClose }) => {
     darkMode, 
     setDarkMode, 
     logout,
-    navigateTo
+    navigateTo,
+    unreadConversations
   } = useApp();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  // Fetch total unread message count from the chat API
-  const loadUnreadCount = useCallback(async () => {
-    try {
-      const res = await api.get('/chat/conversations');
-      const conversations = res.conversations || [];
-      const total = conversations.filter(c => (c.unreadCount || 0) > 0).length;
-      setUnreadCount(total);
-    } catch (err) {
-      console.error('Failed to load unread count:', err);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadUnreadCount();
-  }, [loadUnreadCount, activeTab]);
 
   const menuItems = [
     { name: 'Discover Feed', icon: Home, badge: null },
@@ -55,7 +38,7 @@ export const Sidebar = ({ onClose }) => {
     { name: '1:1 Audio Calls', icon: Phone, badge: null },
     { name: '1:1 Video Calls', icon: Video, badge: null },
     { name: 'My Subscription', icon: Star, badge: null },
-    { name: 'Messages', icon: MessageCircle, badge: unreadCount },
+    { name: 'Messages', icon: MessageCircle, badge: unreadConversations },
     { name: 'Buy Coins', icon: Landmark, badge: null },
     { name: 'Transaction History', icon: History, badge: null },
     { name: 'Settings', icon: Settings, badge: null },

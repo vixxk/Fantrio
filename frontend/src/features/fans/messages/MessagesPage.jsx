@@ -17,9 +17,13 @@ import {
   countActiveChatFilters
 } from '../../../components/ChatFiltersSheet/chatFilters';
 import { ChatThreadSkeleton, ChatScreenSkeleton } from '../../../components/ChatThreadSkeleton/ChatThreadSkeleton';
+import { ReadReceipt } from '../../../components/ReadReceipt/ReadReceipt';
+import { formatLastSeen } from '../../../utils/lastSeen';
 import { ChatComposerExtras } from '../../../components/ChatComposerExtras/ChatComposerExtras';
 import { insertEmojiAtCaret } from '../../../components/ChatComposerExtras/chatComposerUtils';
 import { useToast } from '../../../components/Toast/Toast';
+import { ConfirmDeleteDialog } from '../../../components/ConfirmDeleteDialog/ConfirmDeleteDialog';
+import { useConfirmDelete } from '../../../hooks/useConfirmDelete';
 import { GiftPanel } from '../../../features/gifts/GiftPanel';
 import { QuickRecharge } from '../../../features/gifts/QuickRecharge';
 import { GiftOverlay } from '../../gifts/GiftOverlay';
@@ -85,6 +89,7 @@ const mapConversation = (conv) => {
       isVerified: !!profile.isVerifiedBadge,
       isOnline: !!profile.isOnline,
       isBusy: !!profile.isBusy,
+      lastSeenAt: profile.lastSeenAt || null,
       rating: profile.rating || 0,
       ratingCount: profile.ratingCount || 0,
       subscriptionPlan: sub && sub.plan ? sub.plan : '—',
@@ -127,12 +132,13 @@ const mapMessage = (m, currentUserId) => {
     title: mediaType === 'image' ? 'Exclusive Photo' : mediaType === 'video' ? 'Premium Video' : 'Exclusive Media',
     textSub: m.isPaywall ? (isUser ? 'Unlocked media you sent' : 'Unlock to view this exclusive content') : '',
     previewUrl: m.mediaUrl || '',
+    read: !!m.isOpened,
     createdAt: m.createdAt
   };
 };
 
 export const MessagesPage = () => {
-  const { darkMode, balance, currentPath, navigateTo, user, refreshBalance } = useApp();
+  const { darkMode, balance, currentPath, navigateTo, user, refreshBalance, refreshUnreadCount } = useApp();
   const { toast } = useToast();
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [showProfileSheet, setShowProfileSheet] = useState(false);
@@ -343,6 +349,9 @@ export const MessagesPage = () => {
             [selectedConvId]: res.messages.map(m => mapMessage(m, currentUserId))
           }));
           setConversations(prev => prev.map(c => (c.id === selectedConvId ? { ...c, unreadCount: 0 } : c)));
+          // Fetching the thread marks it read on the server — keep the global
+          // unread-conversations badge in sync.
+          refreshUnreadCount();
         }
       } catch (err) {
         console.error('Failed to load messages:', err);
@@ -393,7 +402,7 @@ export const MessagesPage = () => {
     const exists = conversations.some(c => c.id === selectedConvId);
     if (!exists) {
       let active = true;
-      setLoadingTargetCreator(true);
+      Promise.resolve().then(() => setLoadingTargetCreator(true));
       api.get(`/creators/by-user/${selectedConvId}`)
         .then(res => {
           if (active && res.creator) {
@@ -440,7 +449,7 @@ export const MessagesPage = () => {
         });
       return () => { active = false; };
     } else {
-      setLoadingTargetCreator(false);
+      Promise.resolve().then(() => setLoadingTargetCreator(false));
     }
   }, [selectedConvId, conversations, loadingConversations]);
 
@@ -456,20 +465,30 @@ export const MessagesPage = () => {
           ? String(msg.receiverId)
           : String(msg.senderId);
         const uiMsg = mapMessage(msg, currentUserId);
-        if (selectedConvId && otherId === selectedConvId) {
+        const isOpenConv = !!selectedConvId && otherId === selectedConvId;
+        if (isOpenConv) {
           setMessagesMap(prev => ({
             ...prev,
             [selectedConvId]: [...(prev[selectedConvId] || []), uiMsg]
           }));
-        }
-        if (!convIdsRef.current.has(otherId)) {
+          // The user is actively viewing this conversation — mark the new
+          // message as read on the server so the unread badge stays accurate.
+          api.post(`/chat/read/${otherId}`).catch(() => {});
+        } else if (!convIdsRef.current.has(otherId)) {
+          // A brand-new conversation arrived — reload the list to show it.
           loadConversations();
         }
         setConversations(prev => {
           const idx = prev.findIndex(c => c.id === otherId);
           if (idx === -1) return prev;
           const next = [...prev];
-          next[idx] = { ...next[idx], lastMessage: msg.content || '📎 Media', time: 'Just now' };
+          next[idx] = {
+            ...next[idx],
+            lastMessage: msg.content || (msg.isPaywall ? '🔒 ' + (msg.mediaType || 'Media') : '📎 Media'),
+            time: 'Just now',
+            lastMessageAt: Date.now(),
+            unreadCount: isOpenConv ? 0 : (next[idx].unreadCount || 0) + 1
+          };
           return next;
         });
       };
@@ -479,6 +498,95 @@ export const MessagesPage = () => {
       console.error('Socket init failed:', err);
     }
   }, [selectedConvId, currentUserId, loadConversations]);
+
+  // Live presence — keep the chat header's Online / "Last seen …" line in sync
+  // when the peer goes online or offline on any device.
+  useEffect(() => {
+    if (!currentUserId) return;
+    let socket = null;
+    try {
+      socket = getSocket();
+      joinSocketRoom(currentUserId);
+      const onPresenceChange = ({ userId, isOnline, lastSeenAt }) => {
+        if (!userId) return;
+        setConversations(prev => prev.map(c => {
+          if (c.id !== String(userId)) return c;
+          return {
+            ...c,
+            user: {
+              ...c.user,
+              isOnline: !!isOnline,
+              ...(lastSeenAt ? { lastSeenAt } : {})
+            }
+          };
+        }));
+      };
+      socket.on('user_presence_change', onPresenceChange);
+      return () => { socket.off('user_presence_change', onPresenceChange); };
+    } catch (err) {
+      console.error('Socket init for presence failed:', err);
+    }
+  }, [currentUserId]);
+
+  // Live read receipts — when the peer reads our messages (in this thread or on
+  // another device), flip the sent ticks to read ticks in real time.
+  useEffect(() => {
+    if (!currentUserId) return;
+    let socket = null;
+    try {
+      socket = getSocket();
+      joinSocketRoom(currentUserId);
+      const onMessagesRead = (payload) => {
+        const peerId = payload && payload.peerId ? String(payload.peerId) : null;
+        const ids = payload && Array.isArray(payload.messageIds) ? payload.messageIds.map(String) : [];
+        if (!peerId || ids.length === 0) return;
+        const idSet = new Set(ids);
+        setMessagesMap(prev => {
+          const list = prev[peerId];
+          if (!list) return prev;
+          let changed = false;
+          const next = list.map(m => {
+            if (idSet.has(m.id) && !m.read) {
+              changed = true;
+              return { ...m, read: true };
+            }
+            return m;
+          });
+          return changed ? { ...prev, [peerId]: next } : prev;
+        });
+      };
+      socket.on('messages_read', onMessagesRead);
+      return () => { socket.off('messages_read', onMessagesRead); };
+    } catch (err) {
+      console.error('Socket init failed:', err);
+    }
+  }, [currentUserId]);
+
+  // Remove a conversation in real time when it's deleted from another device
+  // (the global unread badge is refreshed by AppContext on the same event).
+  useEffect(() => {
+    if (!currentUserId) return;
+    let socket = null;
+    try {
+      socket = getSocket();
+      joinSocketRoom(currentUserId);
+      const onConversationDeleted = (payload) => {
+        const peerId = payload && payload.peerId ? String(payload.peerId) : null;
+        if (!peerId) return;
+        setConversations(prev => prev.filter(c => c.id !== peerId));
+        setMessagesMap(prev => {
+          if (!(peerId in prev)) return prev;
+          const next = { ...prev };
+          delete next[peerId];
+          return next;
+        });
+      };
+      socket.on('conversation_deleted', onConversationDeleted);
+      return () => { socket.off('conversation_deleted', onConversationDeleted); };
+    } catch (err) {
+      console.error('Socket init failed:', err);
+    }
+  }, [currentUserId]);
   const filteredConversations = useMemo(() => {
     const base = conversationsToFilter.filter((c) => {
       const matchesSearch = c.user.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -590,31 +698,38 @@ export const MessagesPage = () => {
     setInputText((prev) => insertEmojiAtCaret(prev, emoji, chatInputRef.current));
   };
 
-  const handleUnlockMedia = async (msgId, price) => {
+  // Unlock PPV media — confirm the coin charge before unlocking
+  const {
+    target: unlockTarget,
+    open: openUnlock,
+    close: closeUnlock,
+    confirm: confirmUnlock,
+    deleting: unlocking,
+  } = useConfirmDelete({
+    onConfirm: ({ msgId }) => api.post(`/chat/message/${msgId}/unlock`),
+    successMessage: 'Media unlocked successfully!',
+    errorMessage: 'Failed to unlock. Please try again.',
+    onSuccess: ({ msgId }, res) => {
+      const updated = res.message ? mapMessage(res.message, currentUserId) : null;
+      setMessagesMap(prev => ({
+        ...prev,
+        [selectedConvId]: (prev[selectedConvId] || []).map(m => {
+          if (m.id === msgId) {
+            return updated || { ...m, isLocked: false };
+          }
+          return m;
+        })
+      }));
+      refreshBalance();
+    },
+  });
+
+  const handleUnlockMedia = (msgId, price) => {
     if (balance < price) {
       toast.error(`Insufficient coins! You need ${price} Coins to unlock this media.`);
       return;
     }
-
-    try {
-      const res = await api.post(`/chat/message/${msgId}/unlock`);
-      if (res.status === 'success') {
-        const updated = res.message ? mapMessage(res.message, currentUserId) : null;
-        setMessagesMap(prev => ({
-          ...prev,
-          [selectedConvId]: (prev[selectedConvId] || []).map(m => {
-            if (m.id === msgId) {
-              return updated || { ...m, isLocked: false };
-            }
-            return m;
-          })
-        }));
-        refreshBalance();
-      }
-    } catch (err) {
-      console.error('Failed to unlock message:', err);
-      toast.error(err.message || 'Failed to unlock. Please try again.');
-    }
+    openUnlock({ msgId, price });
   };
 
   const handleSendGiftInChat = async (gift) => {
@@ -632,7 +747,7 @@ export const MessagesPage = () => {
         setShowTipModal(false);
 
         const rawMsg = res.message || {
-          _id: res.eventId || `gift_${Date.now()}`,
+          _id: res.eventId || `gift_${crypto.randomUUID()}`,
           senderId: currentUserId,
           receiverId: selectedConv.id,
           content: `${gift.emoji} Sent ${gift.name} (${gift.coins.toLocaleString()} Coins)!`,
@@ -727,10 +842,31 @@ export const MessagesPage = () => {
           onRecharge={() => setRechargeOpen(true)}
           onClose={() => setGiftOpen(false)}
         />
-      )}
-      {rechargeOpen && <QuickRecharge onClose={() => setRechargeOpen(false)} />}
+      )}      {rechargeOpen && <QuickRecharge onClose={() => setRechargeOpen(false)} />}
+
+      {/* Unlock PPV Media Confirmation */}
+      <ConfirmDeleteDialog
+        open={!!unlockTarget}
+        itemName={unlockTarget ? `${unlockTarget.price} coins` : ''}
+        title="Unlock Exclusive Media?"
+        confirmLabel="Unlock"
+        busyLabel="Unlocking…"
+        icon={<Lock size={22} />}
+        message={unlockTarget ? (
+          <>
+            Unlock this exclusive media for <strong>{unlockTarget.price} Coins</strong>?
+            <span className={styles.unlockConfirmNotice}>This purchase is non-refundable and cannot be cancelled for a refund later.</span>
+          </>
+        ) : ''}
+        deleting={unlocking}
+        darkMode={darkMode}
+        variant="premium"
+        onCancel={closeUnlock}
+        onConfirm={confirmUnlock}
+      />
     </>
   );
+
 
   if (isMobile) {
     return (
@@ -795,7 +931,7 @@ export const MessagesPage = () => {
                   className={`${styles.mobileFilterPill} ${filter === 'unread' ? styles.mobileFilterActive : ''}`}
                   onClick={() => setTypeFilter('unread')}
                 >
-                  Unread
+                  Unread ({unreadConversationCount})
                 </button>
                 <button
                   className={`${styles.mobileFilterPill} ${filter === 'subscribed' ? styles.mobileFilterActive : ''}`}
@@ -883,7 +1019,7 @@ export const MessagesPage = () => {
                       {selectedConv.user.isVerified && <GradientBadgeCheck size={14} />}
                     </div>
                     <div className={styles.mobileChatStatus}>
-                      {selectedConv.user.isOnline ? 'Online' : 'Offline'}
+                      {selectedConv.user.isOnline ? 'Online' : formatLastSeen(selectedConv.user.lastSeenAt)}
                     </div>
                   </div>
                 </div>
@@ -1042,6 +1178,7 @@ export const MessagesPage = () => {
                             )}
                             <div className={`${styles.msgTimestampInline} ${isUser ? styles.timestampRight : styles.timestampLeft}`}>
                               <span className={styles.msgTimestamp}>{msg.time}</span>
+                              {isUser && <ReadReceipt read={msg.read} />}
                             </div>
                           </div>
                         </div>
@@ -1397,6 +1534,9 @@ export const MessagesPage = () => {
                         {selectedConv.user.isVerified && <GradientBadgeCheck size={15} />}
                       </div>
                       <div className={styles.roomUsername}>@{selectedConv.user.username}</div>
+                      <div className={styles.roomLastSeen}>
+                        {selectedConv.user.isOnline ? 'Online' : formatLastSeen(selectedConv.user.lastSeenAt)}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1600,6 +1740,7 @@ export const MessagesPage = () => {
                             )}
                             <div className={`${styles.msgTimestampInline} ${isUser ? styles.timestampRight : styles.timestampLeft}`}>
                               <span className={styles.msgTimestamp}>{msg.time}</span>
+                              {isUser && <ReadReceipt read={msg.read} />}
                             </div>
                           </div>
                         </div>

@@ -1,0 +1,19 @@
+/* ================= READ RECEIPT ================= */
+.receipt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.sent {
+  color: inherit;
+  opacity: 0.45;
+}
+
+.read {
+  color: #e10075;
+  opacity: 1;
+}

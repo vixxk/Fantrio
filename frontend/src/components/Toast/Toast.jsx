@@ -36,9 +36,9 @@ export const ToastProvider = ({ children }) => {
     }
   }, []);
 
-  const pushToast = useCallback((type, message, duration = 3500) => {
+  const pushToast = useCallback((type, message, duration = 3500, onClick) => {
     const id = Date.now() + Math.random();
-    setToasts((list) => [...list, { id, type, message }]);
+    setToasts((list) => [...list, { id, type, message, onClick }]);
     timers.current[id] = setTimeout(() => removeToast(id), duration);
   }, [removeToast]);
 
@@ -48,10 +48,10 @@ export const ToastProvider = ({ children }) => {
   }, []);
 
   const toast = useMemo(() => ({
-    success: (m, d) => pushToast('success', m, d),
-    error: (m, d) => pushToast('error', m, d),
-    warning: (m, d) => pushToast('warning', m, d),
-    info: (m, d) => pushToast('info', m, d)
+    success: (m, d, onClick) => pushToast('success', m, d, onClick),
+    error: (m, d, onClick) => pushToast('error', m, d, onClick),
+    warning: (m, d, onClick) => pushToast('warning', m, d, onClick),
+    info: (m, d, onClick) => pushToast('info', m, d, onClick)
   }), [pushToast]);
 
   return (
@@ -61,10 +61,20 @@ export const ToastProvider = ({ children }) => {
       {/* Toast notifications */}
       <div className={`${styles.toastContainer} ${!darkMode ? styles.light : ''}`} aria-live="polite">
         {toasts.map((t) => (
-          <div key={t.id} className={`${styles.toast} ${styles['toast' + capitalize(t.type)]}`} role="status">
+          <div
+            key={t.id}
+            className={`${styles.toast} ${styles['toast' + capitalize(t.type)]} ${t.onClick ? styles.clickable : ''}`}
+            role="status"
+            onClick={() => {
+              if (t.onClick) {
+                t.onClick();
+                removeToast(t.id);
+              }
+            }}
+          >
             <span className={styles.toastIcon}>{iconFor(t.type)}</span>
             <span className={styles.toastMsg}>{t.message}</span>
-            <button className={styles.toastClose} onClick={() => removeToast(t.id)} aria-label="Dismiss">
+            <button className={styles.toastClose} onClick={(e) => { e.stopPropagation(); removeToast(t.id); }} aria-label="Dismiss">
               <X size={14} />
             </button>
           </div>

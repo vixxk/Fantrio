@@ -703,7 +703,18 @@ export const SubscriptionsPage = () => {
         confirmLabel="Confirm"
         busyLabel="Cancelling…"
         icon={<Trash2 size={22} />}
-        message="Are you sure you want to cancel this subscription?"
+        message={
+          cancelTarget ? (
+            <>
+              Are you sure you want to cancel your <strong>{cancelTarget.plan}</strong> subscription to <strong>{cancelTarget.creator?.displayName || 'this creator'}</strong>?
+              <span className={styles.cancelNotice}>
+                Nothing will be refunded. The subscription will simply be cancelled.
+              </span>
+            </>
+          ) : (
+            'Are you sure you want to cancel this subscription? Nothing will be refunded.'
+          )
+        }
         deleting={cancelling}
         darkMode={darkMode}
         onCancel={closeCancel}

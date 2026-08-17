@@ -7,6 +7,7 @@ import { useAppDialog } from '../components/AppDialog/AppDialog';
 import { pickAlternatePlaybackDevice } from '../services/agora';
 import { useAgoraCall } from './useAgoraCall';
 import { playRingtone, stopRingtone } from '../utils/ringtone';
+import { claimCall, releaseCall } from '../utils/callState';
 
 export const useOutgoingCall = ({ type }) => {
   const { user, balance, refreshBalance } = useApp();
@@ -31,6 +32,15 @@ export const useOutgoingCall = ({ type }) => {
 
   useEffect(() => {
     activeCallRef.current = activeCall;
+  }, [activeCall]);
+
+  // Report call presence so DM/unlock sounds mute while this call is ringing,
+  // connecting, or active. Released on change/unmount (ref-counted upstream).
+  useEffect(() => {
+    if (activeCall) {
+      claimCall();
+      return () => releaseCall();
+    }
   }, [activeCall]);
 
   useEffect(() => {

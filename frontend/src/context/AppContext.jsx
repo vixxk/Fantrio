@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useRef, useContext } from 'react';
+import { createContext, useState, useEffect, useRef, useCallback, useContext } from 'react';
 import { api } from '../services/api';
 import { getSocket, joinSocketRoom } from '../services/socket';
 
@@ -9,6 +9,10 @@ export const AppProvider = ({ children }) => {
   const [token, setToken] = useState('');
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
+  // Total number of conversations with unread messages (source of truth: the
+  // chat API). Kept here so the desktop sidebar, mobile bottom nav and header
+  // can all render the same real-time badge for fans and creators.
+  const [unreadConversations, setUnreadConversations] = useState(0);
    const [darkMode, setDarkMode] = useState(() => {
      const saved = localStorage.getItem('darkMode');
      if (saved === null) {
@@ -300,6 +304,7 @@ export const AppProvider = ({ children }) => {
       setToken('');
       setUser(null);
       setBalance(0);
+      setUnreadConversations(0);
       if (!window.location.pathname.startsWith('/login')) {
         window.history.replaceState(null, '', '/login');
       }
@@ -328,6 +333,53 @@ export const AppProvider = ({ children }) => {
       console.error('Socket init for balance failed:', err);
     }
   }, [user?.id]);
+
+  // Re-fetch the unread-conversations count from the server. The backend marks
+  // messages read when a conversation is opened, so this stays the authority
+  // for the badge across all surfaces (desktop sidebar, mobile nav, header).
+  const refreshUnreadCount = useCallback(async () => {
+    if (!user?.id) return;
+    try {
+      const res = await api.get('/chat/unread-count');
+      if (res && typeof res.unreadConversations === 'number') {
+        setUnreadConversations(res.unreadConversations);
+      }
+    } catch (err) {
+      console.error('Failed to load unread conversations count:', err);
+    }
+  }, [user?.id]);
+
+  // Initial fetch once the session is restored / changes
+  useEffect(() => {
+    if (!user?.id) return;
+    Promise.resolve().then(() => refreshUnreadCount());
+  }, [user?.id, refreshUnreadCount]);
+
+  // Keep the unread-conversations badge in sync in real time via Socket.io
+  useEffect(() => {
+    if (!user?.id) return;
+    let socket = null;
+    let debounceTimer = null;
+    try {
+      socket = getSocket();
+      joinSocketRoom(user.id);
+      const scheduleRefresh = () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => refreshUnreadCount(), 300);
+      };
+      socket.on('new_message', scheduleRefresh);
+      socket.on('message_deleted', scheduleRefresh);
+      socket.on('conversation_deleted', scheduleRefresh);
+      return () => {
+        socket.off('new_message', scheduleRefresh);
+        socket.off('message_deleted', scheduleRefresh);
+        socket.off('conversation_deleted', scheduleRefresh);
+        clearTimeout(debounceTimer);
+      };
+    } catch (err) {
+      console.error('Socket init for unread count failed:', err);
+    }
+  }, [user?.id, refreshUnreadCount]);
 
   const applyAuth = async (res) => {
     if (res.token) {
@@ -423,6 +475,7 @@ export const AppProvider = ({ children }) => {
     setToken('');
     setUser(null);
     setBalance(0);
+    setUnreadConversations(0);
     try {
       await api.post('/auth/logout');
     } catch (e) {
@@ -484,6 +537,8 @@ export const AppProvider = ({ children }) => {
         user,
         token,
         balance,
+        unreadConversations,
+        refreshUnreadCount,
         loading,
         darkMode,
         setDarkMode,

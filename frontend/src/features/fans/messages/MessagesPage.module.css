@@ -573,6 +573,11 @@
   color: rgba(255, 255, 255, 0.5);
 }
 
+.roomLastSeen {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
 /* Action Buttons */
 .roomActions {
   display: flex;
@@ -1005,6 +1010,24 @@
 .unlockBtn:hover {
   transform: scale(1.03);
   opacity: 0.95;
+}
+
+.unlockConfirmNotice {
+  display: block;
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(234, 179, 8, 0.12);
+  border: 1px solid rgba(234, 179, 8, 0.35);
+  color: #fbbf24;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.light .unlockConfirmNotice,
+.lightMobile .unlockConfirmNotice {
+  background: rgba(234, 179, 8, 0.1);
+  color: #b45309;
 }
 
 .unlockedNotice {
@@ -1604,6 +1627,10 @@
 
 .light .convTime, .light .convPreviewText, .light .roomUsername, .light .profileUsername, .light .detailLabel, .light .paywallSubtext {
   color: rgba(26, 22, 37, 0.55);
+}
+
+.light .roomLastSeen {
+  color: rgba(26, 22, 37, 0.4);
 }
 
 .light .detailValue {

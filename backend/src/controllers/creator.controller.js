@@ -256,7 +256,7 @@ exports.getProfileByUserId = catchAsync(async (req, res, next) => {
     return next(new ApiError(400, 'Invalid user ID'));
   }
 
-  const profile = await CreatorProfile.findOne({ userId }).populate('userId', 'email isVerified');
+  const profile = await CreatorProfile.findOne({ userId }).populate('userId', 'email isVerified isOnline lastSeenAt');
   if (!profile) {
     return next(new ApiError(404, 'Creator profile not found'));
   }
@@ -289,7 +289,11 @@ exports.getProfileByUserId = catchAsync(async (req, res, next) => {
     creator: profile,
     isSubscribed,
     subscribedPlan,
-    isBusy: !!activeCall
+    isBusy: !!activeCall,
+    // Presence context for the chat header "Last seen …" line on direct
+    // navigation (the creator's User carries the authoritative online flag + lastSeenAt).
+    lastSeenAt: profile.userId && profile.userId.lastSeenAt ? profile.userId.lastSeenAt : null,
+    isOnline: profile.userId ? !!profile.userId.isOnline : !!profile.isOnline
   });
 });
 

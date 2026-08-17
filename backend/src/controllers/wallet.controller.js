@@ -29,6 +29,8 @@ exports.getTransactions = catchAsync(async (req, res, next) => {
   const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 25));
   const { direction, type } = req.query;
 
+  const validTypes = ['deposit', 'withdrawal', 'subscription', 'tip', 'gift', 'ppv_unlock', 'call_billing', 'live_entry', 'store_purchase'];
+
   const query = {
     $or: [
       { senderId: req.user._id },
@@ -44,7 +46,7 @@ exports.getTransactions = catchAsync(async (req, res, next) => {
   }
 
   // Optional type filter (single transaction type)
-  if (validTypes.includes(type)) {
+  if (type && validTypes.includes(type)) {
     if (type === 'gift' || type === 'tip') {
       query.type = { $in: ['gift', 'tip'] };
     } else {

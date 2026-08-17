@@ -3,7 +3,9 @@ import { useApp } from '../../../context/AppContext';
 import { api } from '../../../services/api';
 import { getSocket, joinSocketRoom } from '../../../services/socket';
 import ShimmerSkeleton from '../../../components/ShimmerSkeleton/ShimmerSkeleton';
-import { ChevronLeft, MoreVertical, Send, Image as ImageIcon, Star, DollarSign, Gift, Ban, Lock, Check, Trash2 } from 'lucide-react';
+import { ReadReceipt } from '../../../components/ReadReceipt/ReadReceipt';
+import { formatLastSeen } from '../../../utils/lastSeen';
+import { ChevronLeft, MoreVertical, Send, Image as ImageIcon, Star, DollarSign, Gift, Ban, Lock, Check, Trash2, Unlock } from 'lucide-react';
 import styles from './CreatorMobileChatPage.module.css';
 import { ChatComposerExtras } from '../../../components/ChatComposerExtras/ChatComposerExtras';
 import { insertEmojiAtCaret } from '../../../components/ChatComposerExtras/chatComposerUtils';
@@ -11,6 +13,7 @@ import { ConfirmDeleteDialog } from '../../../components/ConfirmDeleteDialog/Con
 import { useConfirmDelete } from '../../../hooks/useConfirmDelete';
 import { useToast } from '../../../components/Toast/Toast';
 import { useAppDialog } from '../../../components/AppDialog/AppDialog';
+import { PpvMediaDialog } from '../../../components/PpvMediaDialog/PpvMediaDialog';
 import { GiftMessageCard, parseGiftMessage } from '../../gifts/GiftMessageCard';
 
 const DEFAULT_AVATAR = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80';
@@ -46,6 +49,7 @@ const mapMessage = (m, currentUserId) => {
     title: mediaType === 'image' ? 'Exclusive Photo' : mediaType === 'video' ? 'Premium Video' : 'Exclusive Media',
     textSub: m.isPaywall ? (isCreator ? 'Locked — fan needs to pay' : 'Locked — pay to view') : '',
     previewUrl: m.mediaUrl || '',
+    read: !!m.isOpened,
     createdAt: m.createdAt
   };
 };
@@ -63,6 +67,10 @@ export const CreatorMobileChatPage = () => {
   const menuRef = useRef(null);
   const inputRef = useRef(null);
   const mediaInputRef = useRef(null);
+  // Media file picked by the creator — drives the Send Media (free / PPV) popup
+  const [pendingMedia, setPendingMedia] = useState(null);
+  // Live "Fan unlocked your media" notices for this fan (realtime only)
+  const [unlockNotices, setUnlockNotices] = useState([]);
 
   const fanId = currentPath.split('/').filter(Boolean).pop();
   const currentUserId = user?.id || null;
@@ -149,6 +157,7 @@ export const CreatorMobileChatPage = () => {
             avatarUrl: conv._id.avatarUrl || DEFAULT_AVATAR,
             isVerified: !!profile.isVerifiedBadge,
             isOnline: !!profile.isOnline,
+            lastSeenAt: profile.lastSeenAt || null,
             isTopFan: false
           });
         }
@@ -177,10 +186,84 @@ export const CreatorMobileChatPage = () => {
           : String(msg.senderId);
         if (otherId === fanId) {
           setMessages((prev) => [...prev, mapMessage(msg, currentUserId)]);
+          // The user is actively viewing this conversation — mark the new
+          // message as read on the server so the unread badge stays accurate.
+          api.post(`/chat/read/${fanId}`).catch(() => {});
         }
       };
       socket.on('new_message', onNewMessage);
       return () => { socket.off('new_message', onNewMessage); };
+    } catch (err) {
+      console.error('Socket init failed:', err);
+    }
+  }, [fanId, currentUserId]);
+
+  // Live presence — keep the header's Online / "Last seen …" line in sync when
+  // the fan goes online or offline on any device.
+  useEffect(() => {
+    if (!currentUserId || !fanId) return;
+    let socket = null;
+    try {
+      socket = getSocket();
+      joinSocketRoom(currentUserId);
+      const onPresenceChange = ({ userId, isOnline, lastSeenAt }) => {
+        if (!userId || String(userId) !== fanId) return;
+        setFan(prev => prev ? {
+          ...prev,
+          isOnline: !!isOnline,
+          ...(lastSeenAt ? { lastSeenAt } : {})
+        } : prev);
+      };
+      socket.on('user_presence_change', onPresenceChange);
+      return () => { socket.off('user_presence_change', onPresenceChange); };
+    } catch (err) {
+      console.error('Socket init for presence failed:', err);
+    }
+  }, [fanId, currentUserId]);
+
+  // Live read receipts — when the fan reads our messages (here or on another
+  // device), flip the sent ticks to read ticks in real time.
+  useEffect(() => {
+    if (!currentUserId || !fanId) return;
+    let socket = null;
+    try {
+      socket = getSocket();
+      joinSocketRoom(currentUserId);
+      const onMessagesRead = (payload) => {
+        const peerId = payload && payload.peerId ? String(payload.peerId) : null;
+        if (!peerId || peerId !== fanId) return;
+        const ids = payload && Array.isArray(payload.messageIds) ? payload.messageIds.map(String) : [];
+        if (ids.length === 0) return;
+        const idSet = new Set(ids);
+        setMessages(prev => {
+          if (!prev.some(m => idSet.has(m.id) && !m.read)) return prev;
+          return prev.map(m => (idSet.has(m.id) ? { ...m, read: true } : m));
+        });
+      };
+      socket.on('messages_read', onMessagesRead);
+      return () => { socket.off('messages_read', onMessagesRead); };
+    } catch (err) {
+      console.error('Socket init failed:', err);
+    }
+  }, [fanId, currentUserId]);
+
+  // Live notice when the fan unlocks one of our paywalled media messages
+  useEffect(() => {
+    if (!currentUserId || !fanId) return;
+    let socket = null;
+    try {
+      socket = getSocket();
+      joinSocketRoom(currentUserId);
+      const onMessageUnlocked = (payload) => {
+        const unlockingFan = payload && payload.unlockedBy ? String(payload.unlockedBy) : null;
+        if (!unlockingFan || unlockingFan !== fanId) return;
+        setUnlockNotices(prev => [
+          ...prev,
+          { id: `${payload.messageId}-${Date.now()}`, coinPrice: payload.coinPrice || 0 }
+        ]);
+      };
+      socket.on('message_unlocked', onMessageUnlocked);
+      return () => { socket.off('message_unlocked', onMessageUnlocked); };
     } catch (err) {
       console.error('Socket init failed:', err);
     }
@@ -207,18 +290,28 @@ export const CreatorMobileChatPage = () => {
   };
 
   // Upload a picked image (via presigned URL) and send it as a media message
-  const handleSendImage = async (file) => {
+  // A file was picked in the composer — open the Send Media popup so the
+  // creator can choose between a free send and a paid (PPV) unlock.
+  const handlePickMedia = (file) => {
+    if (!file) return;
+    setPendingMedia(file);
+  };
+
+  // Upload the picked media (via presigned URL) and send it as a chat message.
+  // `price` is 0 for a free send, or the coin price for a PPV unlock (the fan
+  // pays `price` to view it and the creator receives it on unlock).
+  const sendMedia = async (file, price) => {
     if (!file || !fanId) return;
     const fileType = file.type || 'image/jpeg';
     const mediaType = fileType.startsWith('video/') ? 'video' : 'image';
+    const isPaywall = price > 0;
     try {
       const res = await api.post('/settings/presigned-upload', {
         fileName: (file.name || `chat-image-${Date.now()}.jpg`).replace(/[^a-zA-Z0-9._-]/g, '_'),
         fileType
       });
       if (res.status !== 'success') {
-        toast.error('Failed to get upload URL.');
-        return;
+        throw new Error('Failed to get upload URL.');
       }
       const putRes = await fetch(res.uploadUrl, {
         method: 'PUT',
@@ -226,21 +319,25 @@ export const CreatorMobileChatPage = () => {
         body: file
       });
       if (!putRes.ok) {
-        toast.error('Upload to storage failed.');
-        return;
+        throw new Error('Upload to storage failed.');
       }
       const msgRes = await api.post('/chat/message', {
         receiverId: fanId,
         content: '',
         mediaUrl: res.fileUrl,
-        mediaType
+        mediaType,
+        isPaywall,
+        coinPrice: isPaywall ? price : 0
       });
       if (msgRes.status === 'success' && msgRes.message) {
         setMessages((prev) => [...prev, mapMessage(msgRes.message, currentUserId)]);
+        setPendingMedia(null);
+      } else {
+        throw new Error('Failed to send media.');
       }
     } catch (err) {
-      console.error('Failed to send image:', err);
-      toast.error('Failed to send image. Please try again.');
+      console.error('Failed to send media:', err);
+      throw new Error('Failed to send media. Please try again.', { cause: err });
     }
   };
 
@@ -339,7 +436,7 @@ export const CreatorMobileChatPage = () => {
               {fan?.displayName || 'Fan'}
               {fan?.isTopFan && <Star size={12} fill="#eab308" color="#eab308" />}
             </div>
-            <span className={styles.status}>{fan?.isOnline ? 'Online' : 'Offline'}</span>
+            <span className={styles.status}>{fan?.isOnline ? 'Online' : formatLastSeen(fan?.lastSeenAt)}</span>
           </div>
         </div>
 
@@ -466,12 +563,23 @@ export const CreatorMobileChatPage = () => {
                       {msg.text && <p className={styles.bubbleText}>{msg.text}</p>}
                     </div>
                   )}
-                  <span className={`${styles.time} ${isCreator ? styles.timeRight : styles.timeLeft}`}>{msg.time}</span>
+                  <span className={`${styles.time} ${isCreator ? styles.timeRight : styles.timeLeft}`}>
+                    {msg.time}
+                    {isCreator && <ReadReceipt read={msg.read} />}
+                  </span>
                 </div>
               </div>
             );
           })
         )}
+        {unlockNotices.map((n) => (
+          <div key={n.id} className={styles.unlockNoticeRow}>
+            <span className={styles.unlockNotice}>
+              <Unlock size={11} className={styles.unlockNoticeIcon} />
+              {fan?.displayName || 'A fan'} unlocked your media{n.coinPrice > 0 ? ` · +${n.coinPrice} coins` : ''}
+            </span>
+          </div>
+        ))}
         <div ref={messagesEndRef} />
       </div>
 
@@ -483,7 +591,7 @@ export const CreatorMobileChatPage = () => {
           style={{ display: 'none' }}
           onChange={(e) => {
             const file = e.target.files?.[0];
-            if (file) handleSendImage(file);
+            if (file) handlePickMedia(file);
             e.target.value = '';
           }}
         />
@@ -534,6 +642,15 @@ export const CreatorMobileChatPage = () => {
         darkMode={darkMode}
         onCancel={closeBlock}
         onConfirm={confirmBlockUser}
+      />
+
+      {/* Send Media (Free / PPV) Popup */}
+      <PpvMediaDialog
+        open={!!pendingMedia}
+        file={pendingMedia}
+        darkMode={darkMode}
+        onCancel={() => setPendingMedia(null)}
+        onConfirm={(price) => sendMedia(pendingMedia, price)}
       />
     </div>
   );

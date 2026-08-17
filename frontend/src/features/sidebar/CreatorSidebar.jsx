@@ -1,6 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { api } from '../../services/api';
 import { 
   Home, 
   MessageSquare, 
@@ -30,7 +29,8 @@ export const CreatorSidebar = ({ onClose }) => {
     darkMode,
     setDarkMode,
     logout,
-    navigateTo
+    navigateTo,
+    unreadConversations
   } = useApp();
 
   const displayName = user?.displayName || user?.username || 'Creator';
@@ -40,23 +40,6 @@ export const CreatorSidebar = ({ onClose }) => {
 
   const [liveCallsExpanded, setLiveCallsExpanded] = useState(true);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  // Fetch total unread message count from the chat API
-  const loadUnreadCount = useCallback(async () => {
-    try {
-      const res = await api.get('/chat/conversations');
-      const conversations = res.conversations || [];
-      const total = conversations.filter(c => (c.unreadCount || 0) > 0).length;
-      setUnreadCount(total);
-    } catch (err) {
-      console.error('Failed to load unread count:', err);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadUnreadCount();
-  }, [loadUnreadCount, activeTab]);
 
   // Automatically expand Live Calls if we are on the overview or call pages
   // Auto-expand live-calls group when a call tab is active — adjusted during render
@@ -74,7 +57,7 @@ export const CreatorSidebar = ({ onClose }) => {
 
   const menuItems = [
     { name: 'Creator Dashboard', label: 'Dashboard', icon: Home, tab: 'Creator Dashboard' },
-    { name: 'Creator Messages', label: 'Messages', icon: MessageSquare, tab: 'Creator Messages', badge: unreadCount },
+    { name: 'Creator Messages', label: 'Messages', icon: MessageSquare, tab: 'Creator Messages', badge: unreadConversations },
     { name: 'Creator Content', label: 'Content', icon: FileText, tab: 'Creator Content' },
     { name: 'Creator Subscribers', label: 'Subscribers', icon: Users, tab: 'Creator Subscribers' },
     { name: 'Creator PPV Content', label: 'PPV Content', icon: Film, tab: 'Creator PPV Content' },

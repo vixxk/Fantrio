@@ -528,6 +528,23 @@
   border-top-color: rgba(0, 0, 0, 0.06);
 }
 
+.unlockConfirmNotice {
+  display: block;
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(234, 179, 8, 0.12);
+  border: 1px solid rgba(234, 179, 8, 0.35);
+  color: #fbbf24;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.light .unlockConfirmNotice {
+  background: rgba(234, 179, 8, 0.1);
+  color: #b45309;
+}
+
 /* ========== INPUT BAR ========== */
 .inputBar {
   display: flex;

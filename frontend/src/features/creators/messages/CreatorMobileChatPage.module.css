@@ -235,6 +235,39 @@
   background: rgba(0, 0, 0, 0.04);
 }
 
+.unlockNoticeRow {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 0.35rem 0;
+}
+
+.unlockNotice {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  background: rgba(225, 0, 117, 0.1);
+  border: 1px solid rgba(225, 0, 117, 0.25);
+  padding: 0.28rem 0.8rem;
+  border-radius: 99px;
+  max-width: 90%;
+  text-align: center;
+}
+
+.unlockNoticeIcon {
+  color: #e10075;
+  flex-shrink: 0;
+}
+
+.light .unlockNotice {
+  color: rgba(26, 22, 37, 0.65);
+  background: rgba(225, 0, 117, 0.08);
+  border-color: rgba(225, 0, 117, 0.28);
+}
+
 .msgRow {
   display: flex;
   align-items: flex-end;

@@ -7,7 +7,9 @@ const router = express.Router();
 router.use(protect);
 
 router.get('/conversations', chatController.getConversations);
+router.get('/unread-count', chatController.getUnreadCount);
 router.get('/messages/:receiverId', chatController.getMessages);
+router.post('/read/:receiverId', chatController.markMessagesRead);
 router.post('/message', chatController.sendMessage);
 router.post('/message/:messageId/unlock', chatController.unlockMessage);
 router.post('/mass-message', restrictTo('creator'), chatController.sendMassMessage);

@@ -66,6 +66,14 @@
   color: #ffffff;
 }
 
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
 /* Success */
 .toastSuccess {
   border-left-color: #10b981;
@@ -144,6 +152,10 @@
   background: linear-gradient(90deg, rgba(225, 0, 117, 0.12), transparent 65%), #ffffff;
 }
 .light .toastInfo .toastIcon { background: rgba(225, 0, 117, 0.12); }
+
+.light .clickable:hover {
+  border-color: rgba(0, 0, 0, 0.2);
+}
 
 /* Mobile: full-width toasts at top of screen below top header */
 @media (max-width: 768px) {

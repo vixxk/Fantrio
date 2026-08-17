@@ -11,6 +11,7 @@ import { GiftOverlay } from '../gifts/GiftOverlay';
 import { GiftPanel } from '../gifts/GiftPanel';
 import { QuickRecharge } from '../gifts/QuickRecharge';
 import { playRingtone, stopRingtone } from '../../utils/ringtone';
+import { claimCall, releaseCall } from '../../utils/callState';
 import { useAppDialog } from '../../components/AppDialog/AppDialog';
 import styles from './IncomingCall.module.css';
 
@@ -108,6 +109,15 @@ export const IncomingCallProvider = ({ children }) => {
   useEffect(() => {
     incomingRef.current = incoming;
   }, [incoming]);
+
+  // Report call presence (ringing or accepted) so DM/unlock sounds mute while
+  // the user is on an incoming call. Released on change/unmount (ref-counted).
+  useEffect(() => {
+    if (incoming || active) {
+      claimCall();
+      return () => releaseCall();
+    }
+  }, [incoming, active]);
 
   // Connect socket when user logs in and register to their room
   useEffect(() => {
