@@ -943,7 +943,20 @@ export const MessagesPage = () => {
 
               {/* Chats List */}
               <div className={styles.mobileConvList}>
-                {filteredConversations.length > 0 ? (
+                {loadingConversations ? (
+                  Array.from({ length: 6 }).map((_, idx) => (
+                    <div key={`mobile-skel-${idx}`} className={styles.convSkeletonItem}>
+                      <div className={`${styles.skeletonBlock} ${styles.convSkeletonAvatar}`} />
+                      <div className={styles.convSkeletonInfo}>
+                        <div className={styles.convSkeletonTopRow}>
+                          <div className={`${styles.skeletonBlock} ${styles.convSkeletonNameBar}`} />
+                          <div className={`${styles.skeletonBlock} ${styles.convSkeletonTimeBar}`} />
+                        </div>
+                        <div className={`${styles.skeletonBlock} ${styles.convSkeletonMsgBar}`} />
+                      </div>
+                    </div>
+                  ))
+                ) : filteredConversations.length > 0 ? (
                   filteredConversations.map((conv) => {
                     const isSelected = conv.id === selectedConvId;
                     return (
@@ -1192,6 +1205,18 @@ export const MessagesPage = () => {
 
               {/* Chat Input Bar */}
               <form className={styles.mobileChatInputBar} onSubmit={handleSendMessage}>
+                <input
+                  type="file"
+                  ref={chatMediaInputRef}
+                  accept="image/*,video/*"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      handleSendImage(e.target.files[0]);
+                      e.target.value = '';
+                    }
+                  }}
+                />
                 <button type="button" className={styles.inputAddBtn} title="Add Content">
                   <Plus size={20} />
                 </button>
@@ -1211,7 +1236,12 @@ export const MessagesPage = () => {
                     anchor="right"
                     onPickEmoji={handlePickEmoji}
                   />
-                  <button type="button" className={styles.inputIconButton} title="Attach Image">
+                  <button
+                    type="button"
+                    className={styles.inputIconButton}
+                    title="Attach Image"
+                    onClick={() => chatMediaInputRef.current?.click()}
+                  >
                     <ImageIcon size={19} />
                   </button>
                   <button type="submit" className={styles.sendSubmitBtn} title="Send Message">

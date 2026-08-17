@@ -17,6 +17,8 @@ import { ChatScreenSkeleton } from '../../../components/ChatThreadSkeleton/ChatT
 import { ReadReceipt } from '../../../components/ReadReceipt/ReadReceipt';
 import { formatLastSeen } from '../../../utils/lastSeen';
 import { GiftMessageCard, parseGiftMessage } from '../../gifts/GiftMessageCard';
+import { ChatComposerExtras } from '../../../components/ChatComposerExtras/ChatComposerExtras';
+import { insertEmojiAtCaret } from '../../../components/ChatComposerExtras/chatComposerUtils';
 
 const formatTime = (iso) => {
   if (!iso) return '';
@@ -46,6 +48,7 @@ const mapMessage = (m, currentUserId) => {
     isLocked: !!m.isLocked,
     coinPrice: m.coinPrice || 0,
     mediaType,
+    mediaUrl: m.mediaUrl || '',
     title: mediaType === 'image' ? 'Exclusive Photo' : mediaType === 'video' ? 'Premium Video' : 'Exclusive Media',
     textSub: m.isPaywall ? (isUser ? 'Unlocked media you sent' : 'Unlock to view this exclusive content') : '',
     previewUrl: m.mediaUrl || '',
@@ -287,6 +290,9 @@ export const MobileChatPage = () => {
     }
   }, [convId, currentUserId]);
 
+  const mediaInputRef = useRef(null);
+  const inputRef = useRef(null);
+
   const handleSend = async (e) => {
     e.preventDefault();
     if (!inputText.trim() || !convId) return;
@@ -301,6 +307,47 @@ export const MobileChatPage = () => {
       console.error('Failed to send message:', err);
       toast.error('Failed to send message. Please try again.');
     }
+  };
+
+  const handleSendImage = async (file) => {
+    if (!file || !convId) return;
+    const fileType = file.type || 'image/jpeg';
+    const mediaType = fileType.startsWith('video/') ? 'video' : 'image';
+    try {
+      const res = await api.post('/settings/presigned-upload', {
+        fileName: (file.name || `chat-image-${Date.now()}.jpg`).replace(/[^a-zA-Z0-9._-]/g, '_'),
+        fileType
+      });
+      if (res.status !== 'success') {
+        toast.error('Failed to get upload URL.');
+        return;
+      }
+      const putRes = await fetch(res.uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': fileType },
+        body: file
+      });
+      if (!putRes.ok) {
+        toast.error('Upload to storage failed.');
+        return;
+      }
+      const msgRes = await api.post('/chat/message', {
+        receiverId: convId,
+        content: '',
+        mediaUrl: res.fileUrl,
+        mediaType
+      });
+      if (msgRes.status === 'success' && msgRes.message) {
+        setMessages((prev) => [...prev, mapMessage(msgRes.message, currentUserId)]);
+      }
+    } catch (err) {
+      console.error('Failed to send image:', err);
+      toast.error('Failed to send image. Please try again.');
+    }
+  };
+
+  const handlePickEmoji = (emoji) => {
+    setInputText((prev) => insertEmojiAtCaret(prev, emoji, inputRef.current));
   };
 
   // Unlock PPV media — confirm the coin charge before unlocking
@@ -480,7 +527,12 @@ export const MobileChatPage = () => {
                     </div>
                   ) : (
                     <div className={`${styles.bubble} ${isMe ? styles.bubbleMe : styles.bubbleOther}`}>
-                      <p className={styles.bubbleText}>{msg.text}</p>
+                      {msg.mediaUrl && msg.mediaType === 'video' ? (
+                        <video src={msg.mediaUrl} controls className={styles.msgMedia} />
+                      ) : msg.mediaUrl ? (
+                        <img src={msg.mediaUrl} alt="Media" className={styles.msgMedia} />
+                      ) : null}
+                      {msg.text && <p className={styles.bubbleText}>{msg.text}</p>}
                     </div>
                   )}
                   <span className={`${styles.time} ${isMe ? styles.timeRight : styles.timeLeft}`}>
@@ -495,15 +547,39 @@ export const MobileChatPage = () => {
       </div>
 
       <form className={styles.inputBar} onSubmit={handleSend}>
-        <button type="button" className={styles.inputIcon}><ImageIcon size={20} /></button>
         <input
+          ref={mediaInputRef}
+          type="file"
+          accept="image/*,video/*"
+          style={{ display: 'none' }}
+          onChange={(e) => {
+            if (e.target.files && e.target.files[0]) {
+              handleSendImage(e.target.files[0]);
+              e.target.value = '';
+            }
+          }}
+        />
+        <button
+          type="button"
+          className={styles.inputIcon}
+          title="Attach Image"
+          onClick={() => mediaInputRef.current?.click()}
+        >
+          <ImageIcon size={20} />
+        </button>
+        <input
+          ref={inputRef}
           type="text"
           placeholder="Type a message..."
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           className={styles.input}
         />
-        <button type="button" className={styles.inputIcon}><Smile size={20} /></button>
+        <ChatComposerExtras
+          dark={darkMode}
+          anchor="right"
+          onPickEmoji={handlePickEmoji}
+        />
         <button type="submit" className={styles.sendBtn}>
           <Send size={18} />
         </button>
