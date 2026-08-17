@@ -1,7 +1,17 @@
+import { useEffect } from 'react';
 import { Scale } from 'lucide-react';
 import styles from './MorePage.module.css';
 
 export const TermsPage = () => {
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    const scrollables = document.querySelectorAll('main, .main-content, .subPageContainer, .moreContainer, .settingsContainer');
+    scrollables.forEach((el) => {
+      if (el) el.scrollTop = 0;
+    });
+  }, []);
   return (
     <div className={styles.subViewGrid}>
       <div className={styles.legalHeroCard}>

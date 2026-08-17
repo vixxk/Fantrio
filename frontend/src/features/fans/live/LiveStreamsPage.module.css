@@ -877,7 +877,9 @@
     box-sizing: border-box;
     margin-bottom: 0.35rem !important;
   }
-  .streamsGrid {
+  .streamsGrid,
+  .emptyContainer,
+  .loadingContainer {
     order: 4 !important;
   }
   .paginationRow {

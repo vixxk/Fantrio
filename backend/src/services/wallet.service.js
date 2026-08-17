@@ -52,7 +52,7 @@ const transferCoins = async (senderId, receiverId, amount, type, referenceId = n
       }
 
       // Apply commission on direct peer transactions
-      if (['subscription', 'tip', 'gift', 'ppv_unlock', 'call_billing', 'live_entry', 'store_purchase'].includes(type)) {
+      if (['subscription', 'tip', 'gift', 'ppv_unlock', 'call_billing', 'live_entry'].includes(type)) {
         const commission = amount * activeCommissionRate;
         netAmount = amount - commission;
       }

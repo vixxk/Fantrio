@@ -14,7 +14,7 @@ const transactionSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ['deposit', 'withdrawal', 'subscription', 'tip', 'gift', 'ppv_unlock', 'call_billing', 'live_entry', 'store_purchase'],
+      enum: ['deposit', 'withdrawal', 'subscription', 'tip', 'gift', 'ppv_unlock', 'call_billing', 'live_entry'],
       required: true
     },
     status: {

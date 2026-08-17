@@ -24,7 +24,6 @@ import { PPVContentPage } from './features/creators/ppv-content/PPVContentPage';
 import { SubscribersPage } from './features/creators/subscribers/SubscribersPage';
 import { CreatorLiveStreamsPage } from './features/creators/live-streams/CreatorLiveStreamsPage';
 import { EarningsPage } from './features/creators/earnings/EarningsPage';
-import { StorePage } from './features/creators/store/StorePage';
 import { CreatorSettingsPage } from './features/creators/settings/CreatorSettingsPage';
 import { AnnouncementsPage } from './features/fans/more/AnnouncementsPage';
 import { AudioCallsPage } from './features/fans/audio/AudioCallsPage';
@@ -283,12 +282,6 @@ const AppContent = () => {
         return (
           <div className="tabAnalytics">
             <EarningsPage />
-          </div>
-        );
-      case 'Creator Store':
-        return (
-          <div className="tabAnalytics">
-            <StorePage />
           </div>
         );
       case 'Creator Settings':

@@ -1,7 +1,17 @@
+import { useEffect } from 'react';
 import { Info, Sparkles, Heart, Shield, Globe, Award } from 'lucide-react';
 import styles from './MorePage.module.css';
 
 export const AboutPage = () => {
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    const scrollables = document.querySelectorAll('main, .main-content, .subPageContainer, .moreContainer, .settingsContainer');
+    scrollables.forEach((el) => {
+      if (el) el.scrollTop = 0;
+    });
+  }, []);
   return (
     <div className={styles.subViewGrid}>
       <div className={styles.legalHeroCard}>
@@ -17,7 +27,7 @@ export const AboutPage = () => {
           <div className={styles.pillarBox}>
             <Sparkles size={22} className={styles.pillarIcon} />
             <h4>Real-time Monetization</h4>
-            <p>Direct creator earnings through subscriptions, 1:1 audio/video calls, coin gifts, and exclusive digital stores.</p>
+            <p>Direct creator earnings through subscriptions, 1:1 audio/video calls, and coin gifts.</p>
           </div>
           <div className={styles.pillarBox}>
             <Shield size={22} className={styles.pillarIcon} />

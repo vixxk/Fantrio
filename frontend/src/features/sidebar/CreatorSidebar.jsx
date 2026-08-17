@@ -10,7 +10,6 @@ import {
   Video, 
   DollarSign, 
   BarChart3, 
-  ShoppingBag, 
   Settings, 
   ChevronDown, 
   ChevronUp, 
@@ -74,7 +73,6 @@ export const CreatorSidebar = ({ onClose }) => {
     { name: 'Creator Live Streams', label: 'Live Streams', icon: Video, tab: 'Creator Live Streams' },
     { name: 'Creator Earnings', label: 'Earnings', icon: DollarSign, tab: 'Creator Earnings' },
     { name: 'Creator Analytics', label: 'Analytics', icon: BarChart3, tab: 'Creator Analytics' },
-    { name: 'Creator Store', label: 'Store', icon: ShoppingBag, tab: 'Creator Store' },
     { name: 'Creator Settings', label: 'Settings', icon: Settings, tab: 'Creator Settings' }
   ];
 

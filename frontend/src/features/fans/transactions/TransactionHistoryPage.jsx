@@ -14,7 +14,6 @@ import {
   Phone,
   Video,
   Radio,
-  ShoppingBag,
   Banknote,
   ChevronLeft,
   ChevronRight,
@@ -33,8 +32,7 @@ const TYPE_META = {
   gift: { label: 'Gift', Icon: Gift, color: '#a78bfa' },
   ppv_unlock: { label: 'PPV Unlock', Icon: LockOpen, color: '#eab308' },
   call_billing: { label: 'Call Billing', Icon: Video, color: '#eab308' },
-  live_entry: { label: 'Live Stream Entry', Icon: Radio, color: '#06b6d4' },
-  store_purchase: { label: 'Store Purchase', Icon: ShoppingBag, color: '#f97316' }
+  live_entry: { label: 'Live Stream Entry', Icon: Radio, color: '#06b6d4' }
 };
 
 const getTxTypeMeta = (t) => {
@@ -58,8 +56,7 @@ const FILTERS = [
   { key: 'gift', label: 'Gifts' },
   { key: 'call_billing', label: 'Calls' },
   { key: 'ppv_unlock', label: 'PPV' },
-  { key: 'live_entry', label: 'Live' },
-  { key: 'store_purchase', label: 'Store' }
+  { key: 'live_entry', label: 'Live' }
 ];
 
 const STATUS_META = {
@@ -90,7 +87,6 @@ const getDescription = (t, userId) => {
   }
   if (t.type === 'withdrawal') return 'Withdrawal request';
   if (t.type === 'live_entry') return name ? `Live stream entry (${name})` : 'Live stream entry';
-  if (t.type === 'store_purchase') return name ? `Store purchase from ${name}` : 'Store purchase';
   if (t.type === 'call_billing') {
     const callTypeStr = t.metadata?.callType === 'audio' ? '1:1 Audio Call' : '1:1 Video Call';
     return name ? `${callTypeStr} session with ${name}` : `${callTypeStr} billing`;

@@ -585,7 +585,7 @@ exports.getCreatorDashboard = catchAsync(async (req, res, next) => {
   }
 
   // Retrieve all completed payouts / earnings
-  const COMMISSION_TYPES = ['subscription', 'tip', 'gift', 'ppv_unlock', 'call_billing', 'live_entry', 'store_purchase'];
+  const COMMISSION_TYPES = ['subscription', 'tip', 'gift', 'ppv_unlock', 'call_billing', 'live_entry'];
   const transactions = await Transaction.find({
     receiverId: req.user._id,
     status: 'completed'
@@ -601,7 +601,6 @@ exports.getCreatorDashboard = catchAsync(async (req, res, next) => {
   let ppvEarnings = 0;
   let callEarnings = 0;
   let liveEarnings = 0;
-  let storeEarnings = 0;
 
   for (const tx of transactions) {
     let creatorShare = tx.amountCoins;
@@ -622,8 +621,6 @@ exports.getCreatorDashboard = catchAsync(async (req, res, next) => {
       callEarnings += creatorShare;
     } else if (tx.type === 'live_entry') {
       liveEarnings += creatorShare;
-    } else if (tx.type === 'store_purchase') {
-      storeEarnings += creatorShare;
     }
   }
 
@@ -793,8 +790,7 @@ exports.getCreatorDashboard = catchAsync(async (req, res, next) => {
           tips: Number(tipEarnings.toFixed(2)),
           ppv: Number(ppvEarnings.toFixed(2)),
           calls: Number(callEarnings.toFixed(2)),
-          live: Number(liveEarnings.toFixed(2)),
-          store: Number(storeEarnings.toFixed(2))
+          live: Number(liveEarnings.toFixed(2))
         }
       },
       fans: populatedFans
@@ -820,8 +816,7 @@ exports.getCreatorDashboard = catchAsync(async (req, res, next) => {
           tips: Number(tipEarnings.toFixed(2)),
           ppv: Number(ppvEarnings.toFixed(2)),
           calls: Number(callEarnings.toFixed(2)),
-          live: Number(liveEarnings.toFixed(2)),
-          store: Number(storeEarnings.toFixed(2))
+          live: Number(liveEarnings.toFixed(2))
         }
       },
       upcomingStreams: upcomingStreams.map((s) => ({

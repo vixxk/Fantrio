@@ -57,8 +57,7 @@ export const NotificationsPage = ({ setStatus }) => {
       category: 'Transactions & Tips',
       icon: CreditCard,
       items: [
-        { key: 'tipsAndPayments', title: 'Tips & Coin Gifts', desc: 'Receive real-time notifications for tips, coin transfers, and gifts.' },
-        { key: 'productPurchases', title: 'Store Purchases', desc: 'Get notified when someone purchases your exclusive digital products.' },
+        { key: 'tipsAndPayments', title: 'Tips & Coin Gifts', desc: 'Receive real-time notifications for tips, coin transfers, and gifts.' }
       ]
     },
     {

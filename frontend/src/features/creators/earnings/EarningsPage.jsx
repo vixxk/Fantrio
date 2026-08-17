@@ -4,7 +4,7 @@ import { api } from '../../../services/api';
 import ShimmerSkeleton from '../../../components/ShimmerSkeleton/ShimmerSkeleton';
 import {
   DollarSign, Clock, CheckCircle, TrendingUp, Users, Gift,
-  Lock, Video, Phone, Radio, ShoppingBag, ChevronLeft,
+  Lock, Video, Phone, Radio, ChevronLeft,
   ChevronRight, Download, Wallet, Banknote
 } from 'lucide-react';
 import { PeriodDropdown } from '../analytics/PeriodDropdown';
@@ -20,8 +20,7 @@ const iconMap = {
   lock: Lock,
   video: Video,
   phone: Phone,
-  radio: Radio,
-  shopping: ShoppingBag
+  radio: Radio
 };
 
 const typeIconMap = {
@@ -30,7 +29,6 @@ const typeIconMap = {
   ppv_unlock: Lock,
   call_billing: Video,
   live_entry: Radio,
-  store_purchase: ShoppingBag,
   withdrawal: Wallet
 };
 
@@ -40,7 +38,6 @@ const typeLabelMap = {
   ppv_unlock: 'PPV Unlocks',
   call_billing: 'Video Calls',
   live_entry: 'Live Streams',
-  store_purchase: 'Store',
   withdrawal: 'Withdrawal'
 };
 

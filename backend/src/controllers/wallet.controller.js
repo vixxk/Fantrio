@@ -29,7 +29,7 @@ exports.getTransactions = catchAsync(async (req, res, next) => {
   const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 25));
   const { direction, type } = req.query;
 
-  const validTypes = ['deposit', 'withdrawal', 'subscription', 'tip', 'gift', 'ppv_unlock', 'call_billing', 'live_entry', 'store_purchase'];
+  const validTypes = ['deposit', 'withdrawal', 'subscription', 'tip', 'gift', 'ppv_unlock', 'call_billing', 'live_entry'];
 
   const query = {
     $or: [

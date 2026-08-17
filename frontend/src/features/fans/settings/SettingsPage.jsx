@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '../../../context/AppContext';
 import {
   ChevronRight,
@@ -54,6 +54,19 @@ export const SettingsPage = () => {
   };
 
   const activeSection = getSectionFromPath(currentPath);
+
+  // Scroll to top when activeSection changes
+  useEffect(() => {
+    if (activeSection) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      const scrollables = document.querySelectorAll('main, .main-content, .subPageContainer, .moreContainer, .settingsContainer');
+      scrollables.forEach((el) => {
+        if (el) el.scrollTop = 0;
+      });
+    }
+  }, [activeSection]);
 
   const settingsRows = [
     {

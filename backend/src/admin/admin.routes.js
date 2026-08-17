@@ -17,7 +17,6 @@ const subscriptionAdmin = require('./controllers/subscriptionAdmin.controller');
 const settingsAdmin = require('./controllers/settingsAdmin.controller');
 const reportAdmin = require('./controllers/reportAdmin.controller');
 const referralAdmin = require('./controllers/referralAdmin.controller');
-const storeAdmin = require('../controllers/store.controller');
 
 const router = express.Router();
 
@@ -93,11 +92,6 @@ router.delete('/user-reports/:id', reportAdmin.deleteReport);
 
 // Referrals overview
 router.get('/referrals', referralAdmin.getReferrals);
-
-// Store moderation (products & orders)
-router.get('/store/products', storeAdmin.adminGetProducts);
-router.get('/store/orders', storeAdmin.adminGetOrders);
-router.delete('/store/products/:productId', storeAdmin.adminDeleteProduct);
 
 // Chat logs moderation
 router.get('/chats', chatAdmin.getMessages);

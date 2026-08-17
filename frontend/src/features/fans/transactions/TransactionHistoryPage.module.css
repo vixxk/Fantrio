@@ -1044,11 +1044,13 @@
 
 @media (max-width: 768px) {
   .container {
-    padding: 0 0 2rem 0 !important;
+    padding: 0 0 5rem 0 !important;
   }
 
   .rightSidebar {
     grid-template-columns: 1fr;
+    margin-bottom: 3.5rem !important;
+    padding-bottom: 1.5rem !important;
   }
 
   /* Hide the My Wallet, Coin Usage and Safe & Transparent widgets on mobile */

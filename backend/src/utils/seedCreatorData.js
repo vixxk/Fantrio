@@ -9,8 +9,6 @@ const Subscription = require('../models/Subscription');
 const Transaction = require('../models/Transaction');
 const CallLog = require('../models/CallLog');
 const LiveStream = require('../models/LiveStream');
-const Product = require('../models/Product');
-const StoreOrder = require('../models/StoreOrder');
 const Message = require('../models/Message');
 const Wallet = require('../models/Wallet');
 
@@ -179,8 +177,6 @@ const seedCreatorData = async () => {
     });
     await CallLog.deleteMany({ receiverId: creator._id });
     await LiveStream.deleteMany({ creatorId: creator._id });
-    await Product.deleteMany({ creatorId: creator._id });
-    await StoreOrder.deleteMany({ creatorId: creator._id });
     await Message.deleteMany({
       $or: [{ senderId: creator._id }, { receiverId: creator._id }]
     });
@@ -609,76 +605,6 @@ const seedCreatorData = async () => {
     }
     console.log('Seeded tips + PPV transactions.');
 
-    // 10. Store products + orders
-    const productData = [
-      { name: 'Signed Polaroid', description: 'Personalized & signed photo', priceCoins: 250, inventory: 76, status: 'active', category: 'Merchandise', thumbnail: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=100&h=100&fit=crop', digital: false },
-      { name: 'Creator Hoodie', description: 'Limited edition hoodie', priceCoins: 450, inventory: 22, status: 'active', category: 'Apparel', thumbnail: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=100&h=100&fit=crop', digital: false },
-      { name: 'Video Shoutout', description: 'Personalized video message', priceCoins: 350, inventory: null, status: 'active', category: 'Digital', thumbnail: 'https://images.unsplash.com/photo-1598387993441-a364f854c3e1?w=100&h=100&fit=crop', digital: true },
-      { name: 'Phone Wallpaper Pack', description: 'High resolution pack', priceCoins: 50, inventory: null, status: 'active', category: 'Digital', thumbnail: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=100&h=100&fit=crop', digital: true },
-      { name: '2025 Calendar', description: 'Exclusive calendar', priceCoins: 300, inventory: 0, status: 'out_of_stock', category: 'Merchandise', thumbnail: 'https://images.unsplash.com/photo-1506784983877-45594efa4bbe?w=100&h=100&fit=crop', digital: false },
-      { name: 'Digital Music Album', description: 'Exclusive EP release', priceCoins: 120, inventory: null, status: 'active', category: 'Digital', thumbnail: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=100&h=100&fit=crop', digital: true },
-      { name: 'VIP Meet & Greet Pass', description: 'Exclusive fan experience', priceCoins: 990, inventory: 15, status: 'active', category: 'Experiences', thumbnail: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=100&h=100&fit=crop', digital: false },
-      { name: 'Exclusive Sticker Pack', description: 'Digital sticker set', priceCoins: 30, inventory: null, status: 'draft', category: 'Digital', thumbnail: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=100&h=100&fit=crop', digital: true }
-    ];
-    const seededProducts = [];
-    for (const p of productData) {
-      const product = await Product.create({
-        creatorId: creator._id,
-        name: p.name,
-        description: p.description,
-        priceCoins: p.priceCoins,
-        inventory: p.inventory,
-        status: p.status,
-        category: p.category,
-        thumbnailUrl: p.thumbnail,
-        media: [{ url: p.thumbnail, type: 'image' }],
-        isDigital: p.digital
-      });
-      seededProducts.push(product);
-    }
-
-    const purchaseItems = [
-      { fanIdx: 0, productIdx: 0, qty: 1, daysAgo: 6 },
-      { fanIdx: 1, productIdx: 1, qty: 1, daysAgo: 9 },
-      { fanIdx: 2, productIdx: 2, qty: 1, daysAgo: 12 },
-      { fanIdx: 3, productIdx: 3, qty: 2, daysAgo: 15 },
-      { fanIdx: 4, productIdx: 0, qty: 1, daysAgo: 20 },
-      { fanIdx: 5, productIdx: 6, qty: 1, daysAgo: 25 },
-      { fanIdx: 6, productIdx: 1, qty: 1, daysAgo: 32 },
-      { fanIdx: 7, productIdx: 5, qty: 1, daysAgo: 40 },
-      { fanIdx: 8, productIdx: 3, qty: 3, daysAgo: 2 },
-      { fanIdx: 9, productIdx: 2, qty: 1, daysAgo: 1 }
-    ];
-    for (const item of purchaseItems) {
-      const product = seededProducts[item.productIdx];
-      if (!product) continue;
-      const amount = product.priceCoins * item.qty;
-      const createdAt = daysAgo(item.daysAgo, 14);
-      const tx = await Transaction.create({
-        senderId: fans[item.fanIdx]._id,
-        receiverId: creator._id,
-        type: 'store_purchase',
-        status: 'completed',
-        amountCoins: amount,
-        referenceId: product._id,
-        gateway: 'internal',
-        createdAt,
-        updatedAt: createdAt
-      });
-      await StoreOrder.create({
-        productId: product._id,
-        creatorId: creator._id,
-        buyerId: fans[item.fanIdx]._id,
-        quantity: item.qty,
-        amountCoins: amount,
-        status: 'completed',
-        transactionId: tx._id,
-        createdAt,
-        updatedAt: createdAt
-      });
-      await Product.updateOne({ _id: product._id }, { $inc: { soldCount: item.qty, ...(product.inventory !== null ? { inventory: -item.qty } : {}) } });
-    }
-    console.log('Seeded store products + orders.');
 
     // 11. Withdrawals (payout history + pending)
     const withdrawals = [

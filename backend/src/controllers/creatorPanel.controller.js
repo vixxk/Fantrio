@@ -43,7 +43,7 @@ const pctChange = (current, previous) => {
 // Sum a numeric field over a set of transactions
 const sumTx = (txs, field = 'amountCoins') => txs.reduce((s, t) => s + (t[field] || 0), 0);
 
-const COMMISSION_TYPES = ['subscription', 'tip', 'gift', 'ppv_unlock', 'call_billing', 'live_entry', 'store_purchase'];
+const COMMISSION_TYPES = ['subscription', 'tip', 'gift', 'ppv_unlock', 'call_billing', 'live_entry'];
 
 // Net (after commission) share for a creator from a completed transaction
 const netOfCommission = (amount, commRate) => Number((amount * (1 - commRate)).toFixed(2));
@@ -424,8 +424,7 @@ exports.getEarnings = catchAsync(async (req, res, next) => {
     { key: 'ppv_unlock', source: 'PPV Content', icon: 'lock', color: '#3b82f6' },
     { key: 'video_calls', source: 'Video Calls', icon: 'video', color: '#10b981' },
     { key: 'audio_calls', source: 'Audio Calls', icon: 'phone', color: '#34d399' },
-    { key: 'live_entry', source: 'Live Streams', icon: 'radio', color: '#ef4444' },
-    { key: 'store_purchase', source: 'Store', icon: 'shopping', color: '#8b5cf6' }
+    { key: 'live_entry', source: 'Live Streams', icon: 'radio', color: '#ef4444' }
   ];
 
   // Previous period window (same length as the selected period, right before it)
@@ -482,7 +481,7 @@ exports.getEarnings = catchAsync(async (req, res, next) => {
     };
   });
 
-  const earningsTabs = ['All Transactions', 'Subscriptions', 'Gifts', 'PPV Unlocks', 'Video Calls', 'Audio Calls', 'Live Streams', 'Store'];
+  const earningsTabs = ['All Transactions', 'Subscriptions', 'Gifts', 'PPV Unlocks', 'Video Calls', 'Audio Calls', 'Live Streams'];
 
   // Pre-lookup CallLog call types for all call_billing transactions to ensure accurate Audio vs Video filtering
   const unmappedCallBillingTxs = allTx.filter((t) => t.type === 'call_billing' && (!t.metadata || !t.metadata.callType));
@@ -506,8 +505,7 @@ exports.getEarnings = catchAsync(async (req, res, next) => {
     'PPV Unlocks': 'ppv_unlock',
     'Video Calls': 'call_billing',
     'Audio Calls': 'call_billing',
-    'Live Streams': 'live_entry',
-    'Store': 'store_purchase'
+    'Live Streams': 'live_entry'
   };
   let historyTxs = allTx;
   if (tabTypeMap[tab]) {

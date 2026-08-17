@@ -244,11 +244,6 @@ export const Header = ({ onMenuToggle }) => {
           title: "Earnings",
           subtitle: "Track your revenue, payouts, and financial performance."
         };
-      case 'Creator Store':
-        return {
-          title: "Store",
-          subtitle: "Set up and manage your merchandise and digital products."
-        };
       case 'Creator Settings':
         return {
           title: "Settings",

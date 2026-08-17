@@ -20,8 +20,6 @@ const CallLog = require('../models/CallLog');
 const Report = require('../models/Report');
 const Announcement = require('../models/Announcement');
 const FeatureRequest = require('../models/FeatureRequest');
-const Product = require('../models/Product');
-const StoreOrder = require('../models/StoreOrder');
 const Message = require('../models/Message');
 
 const dbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/fantrio';
@@ -50,8 +48,6 @@ const seed = async () => {
     await Report.deleteMany({});
     await Announcement.deleteMany({});
     await FeatureRequest.deleteMany({});
-    await Product.deleteMany({});
-    await StoreOrder.deleteMany({});
     await Message.deleteMany({});
 
     console.log('Data cleared. Seeding users...');
@@ -1270,79 +1266,6 @@ const seed = async () => {
       createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
     });
 
-    console.log('Seeding store products and orders...');
-
-    // Creator store products (coin-priced to match platform currency)
-    const productData = [
-      { creatorId: molly._id, name: 'Signed Polaroid', description: 'Personalized & signed photo', priceCoins: 250, inventory: 76, status: 'active', category: 'Merchandise', thumbnail: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=100&h=100&fit=crop' },
-      { creatorId: molly._id, name: 'Bella Rose Hoodie', description: 'Limited edition hoodie', priceCoins: 450, inventory: 22, status: 'active', category: 'Apparel', thumbnail: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=100&h=100&fit=crop' },
-      { creatorId: molly._id, name: 'Video Shoutout', description: 'Personalized video message', priceCoins: 350, inventory: null, status: 'active', isDigital: true, category: 'Digital', thumbnail: 'https://images.unsplash.com/photo-1598387993441-a364f854c3e1?w=100&h=100&fit=crop' },
-      { creatorId: molly._id, name: 'Phone Wallpaper Pack', description: 'High resolution pack', priceCoins: 50, inventory: null, status: 'active', isDigital: true, category: 'Digital', thumbnail: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=100&h=100&fit=crop' },
-      { creatorId: molly._id, name: '2025 Calendar', description: 'Exclusive calendar', priceCoins: 300, inventory: 0, status: 'out_of_stock', category: 'Merchandise', thumbnail: 'https://images.unsplash.com/photo-1506784983877-45594efa4bbe?w=100&h=100&fit=crop' },
-      { creatorId: molly._id, name: 'Digital Music Album', description: 'Exclusive EP release', priceCoins: 120, inventory: null, status: 'active', isDigital: true, category: 'Digital', thumbnail: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=100&h=100&fit=crop' },
-      { creatorId: molly._id, name: 'VIP Meet & Greet Pass', description: 'Exclusive fan experience', priceCoins: 990, inventory: 15, status: 'active', category: 'Experiences', thumbnail: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=100&h=100&fit=crop' },
-      { creatorId: creatorUserIds['savannah_nguyen'], name: 'Signed Poster', description: '12x18 inch with signature', priceCoins: 250, inventory: 48, status: 'active', category: 'Merchandise', thumbnail: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=100&h=100&fit=crop' },
-      { creatorId: creatorUserIds['grace_kim'], name: 'Acoustic Session CD', description: 'Signed CD of my latest EP', priceCoins: 150, inventory: 30, status: 'active', category: 'Merchandise', thumbnail: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=100&h=100&fit=crop' }
-    ];
-
-    const seededProducts = [];
-    for (const p of productData) {
-      const product = await Product.create({
-        creatorId: p.creatorId,
-        name: p.name,
-        description: p.description,
-        priceCoins: p.priceCoins,
-        inventory: p.inventory,
-        status: p.status,
-        category: p.category,
-        thumbnailUrl: p.thumbnail,
-        media: [{ url: p.thumbnail, type: 'image' }],
-        isDigital: !!p.isDigital
-      });
-      seededProducts.push(product);
-    }
-
-    // Real store orders + store_purchase transactions (fans buying from Molly's store)
-    const purchaseItems = [
-      { fanIdx: 0, productIdx: 0, qty: 1, daysAgo: 6 },   // Sarah -> Signed Polaroid
-      { fanIdx: 1, productIdx: 1, qty: 1, daysAgo: 9 },   // Michael -> Hoodie
-      { fanIdx: 2, productIdx: 2, qty: 1, daysAgo: 12 },  // Emma -> Video Shoutout
-      { fanIdx: 3, productIdx: 3, qty: 2, daysAgo: 15 },  // David -> Wallpaper pack
-      { fanIdx: 4, productIdx: 0, qty: 1, daysAgo: 20 },  // Olivia -> Signed Polaroid
-      { fanIdx: 5, productIdx: 6, qty: 1, daysAgo: 25 },  // James -> VIP pass
-      { fanIdx: 6, productIdx: 1, qty: 1, daysAgo: 32 },  // Sophia -> Hoodie
-      { fanIdx: 7, productIdx: 5, qty: 1, daysAgo: 40 }   // Daniel -> Music album
-    ];
-
-    for (const item of purchaseItems) {
-      const product = seededProducts[item.productIdx];
-      if (!product) continue;
-      const amount = product.priceCoins * item.qty;
-      const createdAt = new Date(Date.now() - item.daysAgo * 24 * 60 * 60 * 1000);
-      const tx = await Transaction.create({
-        senderId: fans[item.fanIdx]._id,
-        receiverId: product.creatorId,
-        type: 'store_purchase',
-        status: 'completed',
-        amountCoins: amount,
-        referenceId: product._id,
-        gateway: 'internal',
-        createdAt,
-        updatedAt: createdAt
-      });
-      await StoreOrder.create({
-        productId: product._id,
-        creatorId: product.creatorId,
-        buyerId: fans[item.fanIdx]._id,
-        quantity: item.qty,
-        amountCoins: amount,
-        status: 'completed',
-        transactionId: tx._id,
-        createdAt,
-        updatedAt: createdAt
-      });
-      await Product.updateOne({ _id: product._id }, { $inc: { soldCount: item.qty, ...(product.inventory !== null ? { inventory: -item.qty } : {}) } });
-    }
 
     console.log('Seeding richer call logs + multi-month transactions...');
 

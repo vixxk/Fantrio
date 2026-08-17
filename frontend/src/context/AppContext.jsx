@@ -41,7 +41,6 @@ export const AppProvider = ({ children }) => {
     'Creator Subscribers': '/creators/subscribers',
     'Creator Live Streams': '/creators/live-streams',
     'Creator Earnings': '/creators/earnings',
-    'Creator Store': '/creators/store',
     'Creator Settings': '/creators/settings',
     'Creator Announcements': '/creators/announcements',
     'Live Streams': '/live',
@@ -73,7 +72,6 @@ export const AppProvider = ({ children }) => {
     '/creators/subscribers': 'Creator Subscribers',
     '/creators/live-streams': 'Creator Live Streams',
     '/creators/earnings': 'Creator Earnings',
-    '/creators/store': 'Creator Store',
     '/creators/settings': 'Creator Settings',
     '/creators/announcements': 'Creator Announcements',
     '/live': 'Live Streams',
@@ -107,7 +105,6 @@ export const AppProvider = ({ children }) => {
     if (pathname.startsWith('/creators/subscribers')) return 'Creator Subscribers';
     if (pathname.startsWith('/creators/live-streams')) return 'Creator Live Streams';
     if (pathname.startsWith('/creators/earnings')) return 'Creator Earnings';
-    if (pathname.startsWith('/creators/store')) return 'Creator Store';
     if (pathname.startsWith('/creators/settings')) return 'Creator Settings';
     if (pathname.startsWith('/post/')) return 'Post Detail';
     if (pathname.startsWith('/transactions')) return 'Transaction History';
@@ -128,6 +125,11 @@ export const AppProvider = ({ children }) => {
   };
 
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
+  const currentPathRef = useRef(currentPath);
+
+  useEffect(() => {
+    currentPathRef.current = currentPath;
+  }, [currentPath]);
 
   const [activeTab, setActiveTabState] = useState(getTabFromPath(window.location.pathname));
 
@@ -162,14 +164,34 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const isMobileSpecificConversationPath = (path) => {
+    if (typeof window === 'undefined') return false;
+    if (window.innerWidth > 768) return false;
+    if (!path) return false;
+    const cleanPath = path.split('?')[0].split('#')[0];
+    const segments = cleanPath.split('/').filter(Boolean);
+    // Fan chat: /messages/:id -> 2 segments (e.g. ['messages', '6a796f9f9bc1e62e651501e8'])
+    if (segments.length > 1 && segments[0] === 'messages') return true;
+    // Creator chat: /creators/messages/:id -> 3 segments (e.g. ['creators', 'messages', '6a796f9f9bc1e62e651501e8'])
+    if (segments.length > 2 && segments[0] === 'creators' && segments[1] === 'messages') return true;
+    return false;
+  };
+
   // Wrapper function to update state and push history
   const setActiveTab = (tab) => {
     const resolved = resolveAccessibleTab(tab);
-    setActiveTabState(resolved);
     const path = tabToPath[resolved] || '/discover';
-    if (window.location.pathname !== path) {
+    const currentFull = window.location.pathname + window.location.search;
+    if (currentFull !== path) {
+      if (isMobileSpecificConversationPath(currentPathRef.current || window.location.pathname)) {
+        window.location.href = path;
+        return;
+      }
+      setActiveTabState(resolved);
       window.history.pushState(null, '', path);
       setCurrentPath(path);
+    } else {
+      setActiveTabState(resolved);
     }
   };
 
@@ -178,6 +200,10 @@ export const AppProvider = ({ children }) => {
     const resolvedTab = resolveAccessibleTab(requestedTab);
     const currentFull = window.location.pathname + window.location.search;
     if (currentFull !== path) {
+      if (isMobileSpecificConversationPath(currentPathRef.current || window.location.pathname)) {
+        window.location.href = path;
+        return;
+      }
       // When the requested path is off-limits for the current role, land on
       // that role's allowed home instead of leaving the forbidden URL live.
       if (resolvedTab !== requestedTab) {
@@ -200,6 +226,10 @@ export const AppProvider = ({ children }) => {
     const requestedTab = getTabFromPath(path);
     const resolvedTab = resolveAccessibleTab(requestedTab);
     if (window.location.pathname !== path) {
+      if (isMobileSpecificConversationPath(currentPathRef.current || window.location.pathname)) {
+        window.location.replace(path);
+        return;
+      }
       if (resolvedTab !== requestedTab) {
         const homePath = tabToPath[resolvedTab];
         if (window.location.pathname !== homePath) {
@@ -217,8 +247,13 @@ export const AppProvider = ({ children }) => {
   // Listen to popstate event (back/forward navigation)
   useEffect(() => {
     const handlePopState = () => {
-      const nowPath = window.location.pathname;
-      const requestedTab = getTabFromPath(nowPath);
+      const nowPath = window.location.pathname + window.location.search;
+      const prevPath = currentPathRef.current || window.location.pathname;
+      if (isMobileSpecificConversationPath(prevPath) && prevPath !== nowPath) {
+        window.location.href = nowPath;
+        return;
+      }
+      const requestedTab = getTabFromPath(window.location.pathname);
       const matchingTab = resolveAccessibleTab(requestedTab, roleRef.current);
       if (matchingTab !== requestedTab) {
         const homePath = tabToPath[matchingTab];
@@ -227,7 +262,7 @@ export const AppProvider = ({ children }) => {
       } else {
         // Always sync currentPath so downstream components (e.g. MessagesPage)
         // can parse the full path including conversation IDs
-        setCurrentPath(nowPath);
+        setCurrentPath(window.location.pathname);
       }
       setActiveTabState(matchingTab);
     };

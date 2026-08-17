@@ -36,6 +36,19 @@ export const MorePage = () => {
 
   const subView = getSubViewFromPath(currentPath);
 
+  // Scroll to top when subView changes
+  useEffect(() => {
+    if (subView) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      const scrollables = document.querySelectorAll('main, .main-content, .subPageContainer, .moreContainer, .settingsContainer');
+      scrollables.forEach((el) => {
+        if (el) el.scrollTop = 0;
+      });
+    }
+  }, [subView]);
+
   // If a subview matches a Settings page subpage, redirect to the Settings version
   useEffect(() => {
     if (subView === 'tickets' || subView === 'my-issues' || subView === 'issues' || subView === 'support-tickets') {
