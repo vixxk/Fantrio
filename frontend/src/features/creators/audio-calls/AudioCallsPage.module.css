@@ -167,8 +167,8 @@
 .heroAiGraphic {
   position: relative;
   width: 360px;
-  height: 96px;
-  max-width: 55%;
+  height: 115px;
+  max-width: 52%;
   flex-shrink: 0;
   margin-left: auto;
   display: flex;
@@ -180,6 +180,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   border-radius: 14px;
   border: 1.5px solid rgba(168, 85, 247, 0.45);
   box-shadow: 0 4px 20px rgba(168, 85, 247, 0.35), 0 0 15px rgba(225, 0, 117, 0.25);
