@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../services/api';
-import { MessageSquare, X, Send, Trash2, Search, Check, AlertTriangle } from 'lucide-react';
+import { MessageSquare, X, Send, Trash2, Search, Check, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useAdminUI } from './AdminUI';
 import { SkeletonTable } from './AdminSkeletons';
 import { AdminPeriodFilter } from './AdminPeriodFilter';
@@ -18,7 +18,8 @@ const REPORT_STATUS_FILTERS = [
   { key: 'all', label: 'All' },
   { key: 'pending', label: 'Pending' },
   { key: 'reviewed', label: 'Reviewed' },
-  { key: 'resolved', label: 'Resolved' }
+  { key: 'resolved', label: 'Resolved' },
+  { key: 'closed', label: 'Closed' }
 ];
 
 // Ticket categories match the SupportTicket schema enum and the fan-side form
@@ -36,7 +37,7 @@ const statusBadge = (status) => {
 };
 
 const reportStatusBadge = (status) => {
-  if (status === 'resolved') return styles.badgeSuccess;
+  if (status === 'resolved' || status === 'closed') return styles.badgeSuccess;
   if (status === 'reviewed') return styles.badgeInfo;
   return styles.badgeWarning; // pending
 };
@@ -206,6 +207,18 @@ export const AdminTickets = () => {
     }
   };
 
+  const handleTicketStatus = async (id, status) => {
+    try {
+      const res = await api.put(`/admin/tickets/${id}`, { status });
+      if (res.status === 'success') {
+        toast.success(`Ticket marked as ${status}.`);
+        fetchTickets();
+      }
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
   const handleDeleteTicket = async (id) => {
     const ok = await confirm({
       title: 'Delete ticket?',
@@ -297,6 +310,14 @@ export const AdminTickets = () => {
               Resolve
             </button>
           )}
+          {r.status !== 'closed' && (
+            <button
+              className={`${styles.buttonControl} ${styles.btnWarning} ${styles.btnSm}`}
+              onClick={() => handleReportStatus(r.id, 'closed')}
+            >
+              Close
+            </button>
+          )}
           <button
             className={`${styles.buttonControl} ${styles.btnDanger} ${styles.btnSm}`}
             onClick={() => handleDeleteReport(r.id)}
@@ -383,6 +404,15 @@ export const AdminTickets = () => {
                             <MessageSquare size={12} />
                             Reply
                           </button>
+                          {t.status !== 'closed' ? (
+                            <button className={`${styles.buttonControl} ${styles.btnWarning} ${styles.btnSm}`} onClick={() => handleTicketStatus(t._id, 'closed')}>
+                              Close
+                            </button>
+                          ) : (
+                            <button className={`${styles.buttonControl} ${styles.btnGhost} ${styles.btnSm}`} onClick={() => handleTicketStatus(t._id, 'open')}>
+                              Reopen
+                            </button>
+                          )}
                           <button className={`${styles.buttonControl} ${styles.btnDanger} ${styles.btnSm}`} onClick={() => handleDeleteTicket(t._id)} aria-label="Delete ticket">
                             <Trash2 size={12} />
                             Delete
@@ -444,8 +474,17 @@ export const AdminTickets = () => {
                   </div>
                   <div className={styles.actionBtns} style={{ marginTop: 4, width: '100%' }}>
                     <button className={`${styles.buttonControl} ${styles.btnSolid}`} onClick={() => handleOpenReply(t)} style={{ flex: 1 }}>
-                      Reply Message
+                      Reply
                     </button>
+                    {t.status !== 'closed' ? (
+                      <button className={`${styles.buttonControl} ${styles.btnWarning}`} onClick={() => handleTicketStatus(t._id, 'closed')} style={{ flex: 1 }}>
+                        Close
+                      </button>
+                    ) : (
+                      <button className={`${styles.buttonControl} ${styles.btnGhost}`} onClick={() => handleTicketStatus(t._id, 'open')} style={{ flex: 1 }}>
+                        Reopen
+                      </button>
+                    )}
                     <button className={`${styles.buttonControl} ${styles.btnDanger}`} onClick={() => handleDeleteTicket(t._id)} aria-label="Delete ticket" style={{ flex: 1 }}>
                       Delete
                     </button>

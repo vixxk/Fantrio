@@ -571,10 +571,10 @@ export const SubscribersPage = () => {
             </div>
           </div>
 
-          {/* Top Subscribers */}
+          {/* Top Fans */}
           <div className={styles.topCard}>
             <div className={styles.topHeader}>
-              <h3 className={styles.topTitle}>Top Subscribers</h3>
+              <h3 className={styles.topTitle}>Top Fans</h3>
             </div>
             <div className={styles.topList}>
               {topSubscribers.length === 0 ? (

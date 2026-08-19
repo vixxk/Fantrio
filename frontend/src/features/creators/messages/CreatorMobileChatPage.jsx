@@ -473,12 +473,6 @@ export const CreatorMobileChatPage = () => {
             </button>
             {showMenu && (
               <div className={styles.dropdown}>
-                <button className={styles.dropdownItem} type="button" onClick={handleViewProfile}>
-                  <Star size={14} /> View Profile
-                </button>
-                <button className={styles.dropdownItem} type="button" onClick={handleSendTip}>
-                  <DollarSign size={14} /> Send Tip
-                </button>
                 <button className={styles.dropdownItem} type="button" onClick={handleSendPpv}>
                   <Gift size={14} /> PPV Offer
                 </button>

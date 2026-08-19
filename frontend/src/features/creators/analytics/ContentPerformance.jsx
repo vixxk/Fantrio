@@ -69,74 +69,82 @@ export const ContentPerformance = ({ isDark, contentPerformance = [], contentTab
             </tr>
           </thead>
           <tbody>
-            {filtered.map((item) => (
-              <tr key={item.id} className={styles.tableRow}>
-                <td className={styles.contentCell}>
-                  <div className={styles.contentInfo}>
-                    <img src={item.thumbnail} alt={item.title} className={styles.contentThumb} />
-                    <div className={styles.contentDetails}>
-                      <div className={styles.contentBadges}>
-                        <span className={getStatusClass(item.status)}>{item.status}</span>
-                        <span className={`${styles.typeBadge} ${styles.typeBadgeMobile} ${getTypeClass(item.type)}`}>{item.type}</span>
-                      </div>
-                      <span className={styles.contentName}>{item.title}</span>
-                      <span className={styles.contentDate}>{item.date}</span>
-                    </div>
-                  </div>
-                </td>
-                <td className={styles.tableCell}>
-                  <span className={`${styles.typeBadge} ${getTypeClass(item.type)}`}>{item.type}</span>
-                </td>
-                <td className={styles.tableCell}>{item.views}</td>
-                <td className={styles.tableCell}>{item.likes}</td>
-                <td className={styles.tableCell}>{item.comments}</td>
-                <td className={styles.tableCell}>{item.revenue}</td>
-                <td className={styles.tableCell}>
-                  <div className={styles.moreBtnWrap} data-kebab-menu>
-                    <button className={styles.moreBtn} onClick={() => toggleMenu(item.id)} aria-label="More actions">
-                      <MoreVertical size={16} />
-                    </button>
-                    {openMenuId === item.id && (
-                      <div className={styles.actionMenu} onClick={(e) => e.stopPropagation()}>
-                        <button className={styles.actionMenuItem} onClick={() => openDetails(item.id)}>
-                          <Eye size={13} /> View Details
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  {openDetailId === item.id && (
-                    <>
-                      <div className={styles.mobileDetailBackdrop} onClick={closeDetail} />
-                      <div className={styles.mobileDetailPopup}>
-                        <div className={styles.mobileDetailHeader}>
-                          <span className={getStatusClass(item.status)}>{item.status}</span>
-                          <span className={`${styles.typeBadge} ${getTypeClass(item.type)}`}>{item.type}</span>
-                        </div>
-                        <div className={styles.mobileDetailTitle}>{item.title}</div>
-                        <div className={styles.mobileDetailDate}>{item.date}</div>
-                        <div className={styles.mobileDetailDivider} />
-                        <div className={styles.mobileDetailRow}>
-                          <span className={styles.mobileDetailLabel}>Views</span>
-                          <span className={styles.mobileDetailValue}>{item.views}</span>
-                        </div>
-                        <div className={styles.mobileDetailRow}>
-                          <span className={styles.mobileDetailLabel}>Likes</span>
-                          <span className={styles.mobileDetailValue}>{item.likes}</span>
-                        </div>
-                        <div className={styles.mobileDetailRow}>
-                          <span className={styles.mobileDetailLabel}>Comments</span>
-                          <span className={styles.mobileDetailValue}>{item.comments}</span>
-                        </div>
-                        <div className={styles.mobileDetailRow}>
-                          <span className={styles.mobileDetailLabel}>Revenue</span>
-                          <span className={styles.mobileDetailValue}>{item.revenue}</span>
-                        </div>
-                      </div>
-                    </>
-                  )}
+            {filtered.length === 0 ? (
+              <tr>
+                <td colSpan={7} style={{ textAlign: 'center', padding: '2rem 1rem', color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)', fontSize: '0.88rem' }}>
+                  No content found for the selected view.
                 </td>
               </tr>
-            ))}
+            ) : (
+              filtered.map((item) => (
+                <tr key={item.id} className={styles.tableRow}>
+                  <td className={styles.contentCell}>
+                    <div className={styles.contentInfo}>
+                      <img src={item.thumbnail} alt={item.title} className={styles.contentThumb} />
+                      <div className={styles.contentDetails}>
+                        <div className={styles.contentBadges}>
+                          <span className={getStatusClass(item.status)}>{item.status}</span>
+                          <span className={`${styles.typeBadge} ${styles.typeBadgeMobile} ${getTypeClass(item.type)}`}>{item.type}</span>
+                        </div>
+                        <span className={styles.contentName}>{item.title}</span>
+                        <span className={styles.contentDate}>{item.date}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td className={styles.tableCell}>
+                    <span className={`${styles.typeBadge} ${getTypeClass(item.type)}`}>{item.type}</span>
+                  </td>
+                  <td className={styles.tableCell}>{item.views}</td>
+                  <td className={styles.tableCell}>{item.likes}</td>
+                  <td className={styles.tableCell}>{item.comments}</td>
+                  <td className={styles.tableCell}>{item.revenue}</td>
+                  <td className={styles.tableCell}>
+                    <div className={styles.moreBtnWrap} data-kebab-menu>
+                      <button className={styles.moreBtn} onClick={() => toggleMenu(item.id)} aria-label="More actions">
+                        <MoreVertical size={16} />
+                      </button>
+                      {openMenuId === item.id && (
+                        <div className={styles.actionMenu} onClick={(e) => e.stopPropagation()}>
+                          <button className={styles.actionMenuItem} onClick={() => openDetails(item.id)}>
+                            <Eye size={13} /> View Details
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    {openDetailId === item.id && (
+                      <>
+                        <div className={styles.mobileDetailBackdrop} onClick={closeDetail} />
+                        <div className={styles.mobileDetailPopup}>
+                          <div className={styles.mobileDetailHeader}>
+                            <span className={getStatusClass(item.status)}>{item.status}</span>
+                            <span className={`${styles.typeBadge} ${getTypeClass(item.type)}`}>{item.type}</span>
+                          </div>
+                          <div className={styles.mobileDetailTitle}>{item.title}</div>
+                          <div className={styles.mobileDetailDate}>{item.date}</div>
+                          <div className={styles.mobileDetailDivider} />
+                          <div className={styles.mobileDetailRow}>
+                            <span className={styles.mobileDetailLabel}>Views</span>
+                            <span className={styles.mobileDetailValue}>{item.views}</span>
+                          </div>
+                          <div className={styles.mobileDetailRow}>
+                            <span className={styles.mobileDetailLabel}>Likes</span>
+                            <span className={styles.mobileDetailValue}>{item.likes}</span>
+                          </div>
+                          <div className={styles.mobileDetailRow}>
+                            <span className={styles.mobileDetailLabel}>Comments</span>
+                            <span className={styles.mobileDetailValue}>{item.comments}</span>
+                          </div>
+                          <div className={styles.mobileDetailRow}>
+                            <span className={styles.mobileDetailLabel}>Revenue</span>
+                            <span className={styles.mobileDetailValue}>{item.revenue}</span>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

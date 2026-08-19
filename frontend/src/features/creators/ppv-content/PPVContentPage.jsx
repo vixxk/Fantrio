@@ -825,7 +825,6 @@ export const PPVContentPage = () => {
               <div className={styles.fieldGroup}>
                 <label className={styles.fieldLabel}>Unlock Price (Coins) *</label>
                 <div className={styles.priceInputWrap}>
-                  <DollarSign size={16} className={styles.priceIcon} />
                   <input
                     type="number"
                     min="1"

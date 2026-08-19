@@ -10,7 +10,7 @@ exports.getReports = catchAsync(async (req, res, next) => {
   const { search, status } = req.query;
 
   const query = {};
-  if (status && ['pending', 'reviewed', 'resolved'].includes(status)) {
+  if (status && ['pending', 'reviewed', 'resolved', 'closed'].includes(status)) {
     query.status = status;
   }
 
@@ -86,8 +86,8 @@ exports.updateReportStatus = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const { status, reply } = req.body;
 
-  if (status && !['pending', 'reviewed', 'resolved'].includes(status)) {
-    return next(new ApiError(400, "Please provide a valid status: 'pending', 'reviewed' or 'resolved'"));
+  if (status && !['pending', 'reviewed', 'resolved', 'closed'].includes(status)) {
+    return next(new ApiError(400, "Please provide a valid status: 'pending', 'reviewed', 'resolved' or 'closed'"));
   }
 
   const report = await Report.findById(id);

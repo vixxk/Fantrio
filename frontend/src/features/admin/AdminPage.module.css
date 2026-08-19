@@ -468,6 +468,20 @@
   min-width: 170px;
 }
 
+.userCellClickable {
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+  margin: -4px -6px;
+  transition: background 0.16s ease, transform 0.16s ease;
+}
+.userCellClickable:hover {
+  background: var(--bg-surface-2);
+}
+.userCellClickable:active {
+  transform: scale(0.98);
+}
+
 .userAvatar {
   width: 34px;
   height: 34px;

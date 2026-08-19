@@ -95,6 +95,7 @@ router.get('/referrals', referralAdmin.getReferrals);
 
 // Chat logs moderation
 router.get('/chats', chatAdmin.getMessages);
+router.get('/chats/thread/:user1Id/:user2Id', chatAdmin.getThread);
 router.delete('/chats/:id', chatAdmin.deleteMessage);
 
 // Calls & Live Streams monitoring

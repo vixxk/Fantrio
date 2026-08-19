@@ -300,7 +300,7 @@ export const EarningsPage = () => {
               <ShimmerSkeleton variant="button" width="100%" height="40px" marginTop="1rem" />
             </div>
 
-            {/* Top Subscribers Skeleton */}
+            {/* Top Fans Skeleton */}
             <div className={`${styles.sidebarCard} ${styles.subscribersCard}`}>
               <div className={styles.sidebarCardHeader}>
                 <ShimmerSkeleton variant="text" width="120px" height="18px" />
@@ -529,10 +529,10 @@ export const EarningsPage = () => {
             </button>
           </div>
 
-          {/* Top Subscribers */}
+          {/* Top Fans */}
           <div className={`${styles.sidebarCard} ${styles.subscribersCard}`}>
             <div className={styles.sidebarCardHeader}>
-              <h3 className={styles.sidebarCardTitle}>Top Subscribers</h3>
+              <h3 className={styles.sidebarCardTitle}>Top Fans</h3>
             </div>
             <div className={styles.subscribersList}>
               {data.topSubscribers.length === 0 && <p style={{ color: darkMode ? 'rgba(255,255,255,0.45)' : '#4b5563', padding: '0.5rem 0', fontWeight: 500 }}>No data yet.</p>}

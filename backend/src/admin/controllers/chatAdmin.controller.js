@@ -113,3 +113,45 @@ exports.deleteMessage = catchAsync(async (req, res, next) => {
     message: 'Message deleted successfully'
   });
 });
+
+// Retrieve full conversation thread between two users
+exports.getThread = catchAsync(async (req, res, next) => {
+  const { user1Id, user2Id } = req.params;
+
+  if (!user1Id || !user2Id) {
+    return next(new ApiError(400, 'Both user IDs are required'));
+  }
+
+  const query = {
+    $or: [
+      { senderId: user1Id, receiverId: user2Id },
+      { senderId: user2Id, receiverId: user1Id }
+    ]
+  };
+
+  const messages = await Message.find(query)
+    .populate('senderId', 'username displayName avatarUrl email role')
+    .populate('receiverId', 'username displayName avatarUrl email role')
+    .sort({ createdAt: 1 });
+
+  const enriched = await Promise.all(
+    messages.map(async (msg) => {
+      const m = msg.toObject();
+      m.mediaUrl = await presignMediaUrl(m.mediaUrl);
+      return m;
+    })
+  );
+
+  const [user1, user2] = await Promise.all([
+    User.findById(user1Id).select('username displayName avatarUrl email role'),
+    User.findById(user2Id).select('username displayName avatarUrl email role')
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    results: enriched.length,
+    user1,
+    user2,
+    messages: enriched
+  });
+});

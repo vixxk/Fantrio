@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { api } from '../../services/api';
 import {
   Trash2,
@@ -63,6 +63,7 @@ const MediaThumb = ({ msg, onView }) => {
         rel="noopener noreferrer"
         className={styles.mediaChip}
         title="Open attachment"
+        onClick={(e) => e.stopPropagation()}
       >
         {mediaIcon('media')}
         <span>Attachment</span>
@@ -75,7 +76,10 @@ const MediaThumb = ({ msg, onView }) => {
     <button
       type="button"
       className={styles.mediaThumb}
-      onClick={() => onView(msg)}
+      onClick={(e) => {
+        e.stopPropagation();
+        onView(msg);
+      }}
       aria-label={`View ${msg.mediaType} attachment`}
     >
       {isVideo ? (
@@ -156,6 +160,198 @@ const MediaLightbox = ({ msg, onClose }) => {
   );
 };
 
+/** Thread Modal to view all messages exchanged between Sender and Receiver from a selected user's POV */
+const ConversationThreadModal = ({ user1Id, user2Id, initialPovId, onClose, onDeleteMsg, onPreviewMedia }) => {
+  const [threadMessages, setThreadMessages] = useState([]);
+  const [user1, setUser1] = useState(null);
+  const [user2, setUser2] = useState(null);
+  const [povId, setPovId] = useState(String(initialPovId || ''));
+  const [loading, setLoading] = useState(true);
+  const chatBottomRef = useRef(null);
+
+  useEffect(() => {
+    fetchThread();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user1Id, user2Id]);
+
+  useEffect(() => {
+    if (!loading) {
+      chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [threadMessages, povId, loading]);
+
+  async function fetchThread() {
+    try {
+      setLoading(true);
+      const res = await api.get(`/admin/chats/thread/${user1Id}/${user2Id}`);
+      if (res.status === 'success') {
+        setThreadMessages(res.messages || []);
+        setUser1(res.user1);
+        setUser2(res.user2);
+      }
+    } catch (err) {
+      console.error('Failed to fetch thread:', err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const user1Str = String(user1?._id || user1Id || '');
+  const user2Str = String(user2?._id || user2Id || '');
+
+  const povUser = povId === user1Str ? user1 : user2;
+  const otherUser = povId === user1Str ? user2 : user1;
+
+  const togglePov = () => {
+    setPovId((prev) => (prev === user1Str ? user2Str : user1Str));
+  };
+
+  const handleCensor = async (msgId) => {
+    const ok = await onDeleteMsg(msgId);
+    if (ok) {
+      setThreadMessages((prev) => prev.filter((m) => m._id !== msgId));
+    }
+  };
+
+  return (
+    <div className={styles.customModalOverlay} onClick={onClose}>
+      <div
+        className={styles.customModalBody}
+        style={{ maxWidth: 680, width: '92%', height: '85vh', display: 'flex', flexDirection: 'column', padding: 20 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Modal Header */}
+        <div className={styles.modalHeader} style={{ paddingBottom: 12, borderBottom: '1px solid var(--border)', marginBottom: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+            <img
+              src={povUser?.avatarUrl || DEFAULT_AVATAR}
+              alt={povUser?.displayName || 'User'}
+              style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--brand)', flexShrink: 0 }}
+            />
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                <span>{povUser?.displayName || 'User'}</span>
+                <span className={`${styles.badge} ${povUser?.role === 'creator' ? styles.badgeDanger : styles.badgeInfo}`}>
+                  {povUser?.role === 'creator' ? 'Creator' : 'Fan'}
+                </span>
+                <span style={{ fontSize: 11, fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: 'rgba(225, 0, 117, 0.2)', color: 'var(--brand)' }}>
+                  POV
+                </span>
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                Chat history with <strong style={{ color: 'var(--text)' }}>{otherUser?.displayName || 'User'}</strong> ({threadMessages.length} message{threadMessages.length === 1 ? '' : 's'})
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+            <button
+              type="button"
+              className={`${styles.buttonControl} ${styles.btnBordered} ${styles.btnSm}`}
+              onClick={togglePov}
+              title={`Switch perspective to ${otherUser?.displayName || 'Other User'}`}
+            >
+              Switch POV to {otherUser?.displayName || 'Other User'}
+            </button>
+            <button className={styles.modalCloseBtn} onClick={onClose} aria-label="Close">
+              <X size={20} />
+            </button>
+          </div>
+        </div>
+
+        {/* Chat Thread Body */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '12px 6px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {loading ? (
+            <div className={styles.emptyState} style={{ padding: 40 }}>
+              <span>Loading conversation thread...</span>
+            </div>
+          ) : threadMessages.length === 0 ? (
+            <div className={styles.emptyState} style={{ padding: 40 }}>
+              <span>No messages exchanged between these users.</span>
+            </div>
+          ) : (
+            threadMessages.map((msg) => {
+              const msgSenderId = String(msg.senderId?._id || msg.senderId);
+              const isOutgoing = msgSenderId === String(povUser?._id || povId);
+              const senderObj = isOutgoing ? povUser : otherUser;
+
+              return (
+                <div
+                  key={msg._id}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: isOutgoing ? 'flex-end' : 'flex-start',
+                    maxWidth: '82%',
+                    alignSelf: isOutgoing ? 'flex-end' : 'flex-start'
+                  }}
+                >
+                  {/* Sender Label & Censor Button */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, fontSize: 11, color: 'var(--text-muted)' }}>
+                    <span>{senderObj?.displayName || (isOutgoing ? 'POV User' : 'Participant')}</span>
+                    <span>·</span>
+                    <span>{new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    <button
+                      type="button"
+                      onClick={() => handleCensor(msg._id)}
+                      style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: 2, display: 'flex', opacity: 0.7 }}
+                      title="Censor message"
+                    >
+                      <Trash2 size={11} />
+                    </button>
+                  </div>
+
+                  {/* Message Bubble */}
+                  <div
+                    style={{
+                      background: isOutgoing
+                        ? 'linear-gradient(135deg, #e10075 0%, #a80058 100%)'
+                        : 'rgba(255, 255, 255, 0.08)',
+                      color: '#ffffff',
+                      padding: '10px 14px',
+                      borderRadius: isOutgoing ? '16px 16px 2px 16px' : '16px 16px 16px 2px',
+                      border: isOutgoing ? 'none' : '1px solid rgba(255, 255, 255, 0.1)',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                      fontSize: 13.5,
+                      lineHeight: 1.45,
+                      wordBreak: 'break-word'
+                    }}
+                  >
+                    {msg.isPaywall && (
+                      <div style={{ marginBottom: 6, display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(0,0,0,0.3)', padding: '2px 8px', borderRadius: 999, fontSize: 11, fontWeight: 700, color: '#f59e0b' }}>
+                        <Lock size={11} /> {msg.coinPrice} coins unlock
+                      </div>
+                    )}
+
+                    {msg.content && <div>{msg.content}</div>}
+
+                    {msg.mediaType !== 'none' && msg.mediaUrl && (
+                      <div style={{ marginTop: msg.content ? 8 : 0 }}>
+                        <MediaThumb msg={msg} onView={onPreviewMedia} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })
+          )}
+          <div ref={chatBottomRef} />
+        </div>
+
+        {/* Footer info */}
+        <div style={{ paddingTop: 10, borderTop: '1px solid var(--border)', marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, color: 'var(--text-muted)' }}>
+          <span>
+            POV User: <strong style={{ color: 'var(--text)' }}>{povUser?.displayName}</strong> ({povUser?.email || 'N/A'})
+          </span>
+          <button className={`${styles.buttonControl} ${styles.btnBordered} ${styles.btnSm}`} onClick={onClose}>
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const AdminChats = () => {
   const { toast, confirm } = useAdminUI();
   const [messages, setMessages] = useState([]);
@@ -167,7 +363,7 @@ export const AdminChats = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [preview, setPreview] = useState(null);
-  // Sent Time column sort: null = default (newest first) | 'asc' | 'desc'
+  const [activeThread, setActiveThread] = useState(null); // { user1Id, user2Id, povId }
   const [dateSort, setDateSort] = useState(null);
 
   useEffect(() => {
@@ -230,21 +426,37 @@ export const AdminChats = () => {
       confirmText: 'Censor',
       danger: true
     });
-    if (!ok) return;
+    if (!ok) return false;
     try {
       const res = await api.delete(`/admin/chats/${id}`);
       if (res.status === 'success') {
         toast.success('Message deleted successfully.');
         if (preview && preview._id === id) setPreview(null);
         fetchChats();
+        return true;
       }
     } catch (err) {
       toast.error(err.message);
     }
+    return false;
+  };
+
+  const openThread = (sender, receiver, povUserObj) => {
+    const user1Id = sender?._id || sender;
+    const user2Id = receiver?._id || receiver;
+    const povId = povUserObj?._id || povUserObj;
+
+    if (!user1Id || !user2Id) return;
+    setActiveThread({ user1Id, user2Id, povId });
   };
 
   const renderSender = (msg, align) => (
-    <div className={styles.userCell} style={{ justifyContent: align === 'right' ? 'flex-end' : undefined }}>
+    <div
+      className={`${styles.userCell} ${styles.userCellClickable}`}
+      onClick={() => openThread(msg.senderId, msg.receiverId, msg.senderId)}
+      title="Click to view full chat history from Sender POV"
+      style={{ justifyContent: align === 'right' ? 'flex-end' : undefined }}
+    >
       <img
         src={msg.senderId?.avatarUrl || DEFAULT_AVATAR}
         alt={msg.senderId?.displayName || 'Sender'}
@@ -259,7 +471,11 @@ export const AdminChats = () => {
   );
 
   const renderReceiver = (msg) => (
-    <div className={styles.userCell}>
+    <div
+      className={`${styles.userCell} ${styles.userCellClickable}`}
+      onClick={() => openThread(msg.senderId, msg.receiverId, msg.receiverId)}
+      title="Click to view full chat history from Receiver POV"
+    >
       <img
         src={msg.receiverId?.avatarUrl || DEFAULT_AVATAR}
         alt={msg.receiverId?.displayName || 'Receiver'}
@@ -279,7 +495,7 @@ export const AdminChats = () => {
         <div>
           <h2 className={styles.pageTitle}>Chat Logs</h2>
           <p className={styles.pageSub}>
-            Review every conversation, text message and media attachment shared between fans and creators.
+            Review every conversation, text message and media attachment shared between fans and creators. Click any participant to open their conversation thread.
           </p>
         </div>
         <div className={styles.searchRow}>
@@ -420,7 +636,12 @@ export const AdminChats = () => {
               {messages.map((msg) => (
                 <div key={msg._id} className={styles.mobileCard}>
                   <div className={styles.chatParticipants}>
-                    <div className={styles.chatParticipant}>
+                    <div
+                      className={styles.chatParticipant}
+                      onClick={() => openThread(msg.senderId, msg.receiverId, msg.senderId)}
+                      style={{ cursor: 'pointer' }}
+                      title="Click to view thread from Sender POV"
+                    >
                       <img
                         src={msg.senderId?.avatarUrl || DEFAULT_AVATAR}
                         alt={msg.senderId?.displayName || 'Sender'}
@@ -437,7 +658,12 @@ export const AdminChats = () => {
                     <span className={styles.chatArrow}>
                       <ArrowRight size={14} />
                     </span>
-                    <div className={styles.chatParticipant}>
+                    <div
+                      className={styles.chatParticipant}
+                      onClick={() => openThread(msg.senderId, msg.receiverId, msg.receiverId)}
+                      style={{ cursor: 'pointer' }}
+                      title="Click to view thread from Receiver POV"
+                    >
                       <img
                         src={msg.receiverId?.avatarUrl || DEFAULT_AVATAR}
                         alt={msg.receiverId?.displayName || 'Receiver'}
@@ -517,6 +743,18 @@ export const AdminChats = () => {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Conversation Thread Modal */}
+      {activeThread && (
+        <ConversationThreadModal
+          user1Id={activeThread.user1Id}
+          user2Id={activeThread.user2Id}
+          initialPovId={activeThread.povId}
+          onClose={() => setActiveThread(null)}
+          onDeleteMsg={handleDeleteMsg}
+          onPreviewMedia={setPreview}
+        />
       )}
 
       {/* Media preview lightbox */}
