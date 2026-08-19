@@ -6,14 +6,26 @@ const emailService = require('../../services/email.service');
 
 // Retrieve all support tickets
 exports.getTickets = catchAsync(async (req, res, next) => {
+  const User = require('../../models/User');
   const { search, status, from, to } = req.query;
   const query = {};
-  if (search) {
+
+  if (search && search.trim()) {
+    const searchRegex = new RegExp(search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    const matchedUsers = await User.find({
+      $or: [{ displayName: searchRegex }, { username: searchRegex }, { email: searchRegex }]
+    }).select('_id').lean();
+    const userIds = matchedUsers.map((u) => u._id);
+
     query.$or = [
-      { subject: { $regex: search, $options: 'i' } },
-      { message: { $regex: search, $options: 'i' } }
+      { subject: searchRegex },
+      { message: searchRegex },
+      { category: searchRegex },
+      { status: searchRegex },
+      { userId: { $in: userIds } }
     ];
   }
+
   // Status filter matching the SupportTicket schema enum
   if (status && ['open', 'in-progress', 'closed'].includes(status)) {
     query.status = status;

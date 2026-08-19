@@ -66,12 +66,24 @@ exports.getReports = catchAsync(async (req, res, next) => {
 
   if (search) {
     const q = search.toLowerCase();
-    data = data.filter(
-      (r) =>
-        (r.reporterId && String(r.reporterId.displayName || '').toLowerCase().includes(q)) ||
-        (r.target && String(r.target.displayName || r.target.content || '').toLowerCase().includes(q)) ||
-        String(r.reason || '').toLowerCase().includes(q)
-    );
+    data = data.filter((r) => {
+      const reporterStr = r.reporterId ? `${r.reporterId.displayName} ${r.reporterId.username} ${r.reporterId.email}` : '';
+      const targetStr = r.target ? `${r.target.displayName || ''} ${r.target.username || ''} ${r.target.email || ''} ${r.target.content || ''} ${r.target.creatorDisplayName || ''}` : '';
+      const dateStr = new Date(r.createdAt).toLocaleDateString();
+      const fullDateStr = new Date(r.createdAt).toLocaleString();
+      const idStr = String(r._id || '');
+      return (
+        reporterStr.toLowerCase().includes(q) ||
+        targetStr.toLowerCase().includes(q) ||
+        String(r.reason || '').toLowerCase().includes(q) ||
+        String(r.details || '').toLowerCase().includes(q) ||
+        String(r.targetType || '').toLowerCase().includes(q) ||
+        String(r.status || '').toLowerCase().includes(q) ||
+        idStr.toLowerCase().includes(q) ||
+        dateStr.toLowerCase().includes(q) ||
+        fullDateStr.toLowerCase().includes(q)
+      );
+    });
   }
 
   res.status(200).json({

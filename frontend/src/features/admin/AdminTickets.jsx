@@ -79,7 +79,39 @@ export const AdminTickets = () => {
       if (period.to) params.set('to', period.to);
       const res = await api.get(`/admin/tickets?${params.toString()}`);
       if (res.status === 'success') {
-        setTickets(res.tickets || []);
+        let list = res.tickets || [];
+        const q = search.trim().toLowerCase();
+        if (q) {
+          list = list.filter((t) => {
+            const ticketIdStr = `#tk-${(t._id || '').slice(-6)}`.toLowerCase();
+            const rawIdStr = String(t._id || '').toLowerCase();
+            const fanName = String(t.userId?.displayName || '').toLowerCase();
+            const fanEmail = String(t.userId?.email || '').toLowerCase();
+            const fanUsername = String(t.userId?.username || '').toLowerCase();
+            const subject = String(t.subject || '').toLowerCase();
+            const message = String(t.message || '').toLowerCase();
+            const categoryKey = String(t.category || '').toLowerCase();
+            const categoryLabel = String(CATEGORY_LABELS[t.category] || '').toLowerCase();
+            const statusStr = String(t.status || '').toLowerCase();
+            const dateStr = new Date(t.createdAt).toLocaleDateString().toLowerCase();
+            const fullDateStr = new Date(t.createdAt).toLocaleString().toLowerCase();
+            return (
+              ticketIdStr.includes(q) ||
+              rawIdStr.includes(q) ||
+              fanName.includes(q) ||
+              fanEmail.includes(q) ||
+              fanUsername.includes(q) ||
+              subject.includes(q) ||
+              message.includes(q) ||
+              categoryKey.includes(q) ||
+              categoryLabel.includes(q) ||
+              statusStr.includes(q) ||
+              dateStr.includes(q) ||
+              fullDateStr.includes(q)
+            );
+          });
+        }
+        setTickets(list);
       }
     } catch (err) {
       console.error(err);
@@ -168,12 +200,32 @@ export const AdminTickets = () => {
       }
       const q = search.trim().toLowerCase();
       if (q) {
-        merged = merged.filter((r) =>
-          r.targetLabel.toLowerCase().includes(q) ||
-          r.reporter.toLowerCase().includes(q) ||
-          r.reason.toLowerCase().includes(q) ||
-          r.description.toLowerCase().includes(q)
-        );
+        merged = merged.filter((r) => {
+          const reportIdStr = `#rp-${(r.id || '').slice(-6)}`.toLowerCase();
+          const rawIdStr = String(r.id || '').toLowerCase();
+          const targetLabel = String(r.targetLabel || '').toLowerCase();
+          const targetDetail = String(r.targetDetail || '').toLowerCase();
+          const reporter = String(r.reporter || '').toLowerCase();
+          const reason = String(r.reason || '').toLowerCase();
+          const description = String(r.description || '').toLowerCase();
+          const statusStr = String(r.status || '').toLowerCase();
+          const targetTypeStr = String(r.targetType || '').toLowerCase();
+          const dateStr = new Date(r.date).toLocaleDateString().toLowerCase();
+          const fullDateStr = new Date(r.date).toLocaleString().toLowerCase();
+          return (
+            reportIdStr.includes(q) ||
+            rawIdStr.includes(q) ||
+            targetLabel.includes(q) ||
+            targetDetail.includes(q) ||
+            reporter.includes(q) ||
+            reason.includes(q) ||
+            description.includes(q) ||
+            statusStr.includes(q) ||
+            targetTypeStr.includes(q) ||
+            dateStr.includes(q) ||
+            fullDateStr.includes(q)
+          );
+        });
       }
       merged = merged.filter((r) => inPeriod(r.date));
       merged.sort((a, b) => new Date(b.date) - new Date(a.date));

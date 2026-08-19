@@ -41,11 +41,23 @@ const enrichPostMedia = async (post) => {
 
 // Retrieve all posts. Optional `filter` query param: 'open' (published and
 // not hidden), 'closed' (scheduled/unpublished or creator-hidden), 'ppv'
-// (pay-per-view posts). Omitted = all posts.
 exports.getAllPosts = catchAsync(async (req, res, next) => {
+  const User = require('../../models/User');
   const { search, from, to, filter } = req.query;
   const query = {};
-  if (search) query.content = { $regex: search, $options: 'i' };
+  if (search && search.trim()) {
+    const searchRegex = new RegExp(search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    const matchedUsers = await User.find({
+      $or: [{ displayName: searchRegex }, { username: searchRegex }, { email: searchRegex }]
+    }).select('_id').lean();
+    const userIds = matchedUsers.map((u) => u._id);
+
+    query.$or = [
+      { content: searchRegex },
+      { postType: searchRegex },
+      { creatorId: { $in: userIds } }
+    ];
+  }
   if (filter === 'open') {
     query.isPublished = true;
     query.isHidden = false;
@@ -145,11 +157,22 @@ exports.getReportedPosts = catchAsync(async (req, res, next) => {
   let combined = [...postMap.values()];
   if (search) {
     const q = search.toLowerCase();
-    combined = combined.filter(
-      (p) =>
-        (p.content && p.content.toLowerCase().includes(q)) ||
-        (p.creatorId && String(p.creatorId.displayName || '').toLowerCase().includes(q))
-    );
+    combined = combined.filter((p) => {
+      const creatorStr = p.creatorId ? `${p.creatorId.displayName} ${p.creatorId.username} ${p.creatorId.email}` : '';
+      const contentStr = String(p.content || '');
+      const idStr = String(p._id || '');
+      const postTypeStr = String(p.postType || '');
+      const reportReasons = (p.reports || []).map((r) => `${r.reason || ''} ${r.description || ''} ${r.userId?.displayName || ''} ${r.userId?.username || ''}`).join(' ');
+      const dateStr = new Date(p.createdAt).toLocaleDateString();
+      return (
+        creatorStr.toLowerCase().includes(q) ||
+        contentStr.toLowerCase().includes(q) ||
+        idStr.toLowerCase().includes(q) ||
+        postTypeStr.toLowerCase().includes(q) ||
+        reportReasons.toLowerCase().includes(q) ||
+        dateStr.toLowerCase().includes(q)
+      );
+    });
   }
   const latestReportDate = (p) => {
     if (!p.reports || !p.reports.length) return new Date(p.createdAt);

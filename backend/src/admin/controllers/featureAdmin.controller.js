@@ -4,7 +4,26 @@ const catchAsync = require('../../utils/catchAsync');
 
 // Retrieve all feature requests
 exports.getFeatures = catchAsync(async (req, res, next) => {
-  const features = await FeatureRequest.find()
+  const User = require('../../models/User');
+  const { search } = req.query;
+  const query = {};
+
+  if (search && search.trim()) {
+    const searchRegex = new RegExp(search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    const matchedUsers = await User.find({
+      $or: [{ displayName: searchRegex }, { username: searchRegex }, { email: searchRegex }]
+    }).select('_id').lean();
+    const userIds = matchedUsers.map((u) => u._id);
+
+    query.$or = [
+      { title: searchRegex },
+      { description: searchRegex },
+      { status: searchRegex },
+      { userId: { $in: userIds } }
+    ];
+  }
+
+  const features = await FeatureRequest.find(query)
     .populate('userId', 'username displayName email')
     .sort({ createdAt: -1 });
 

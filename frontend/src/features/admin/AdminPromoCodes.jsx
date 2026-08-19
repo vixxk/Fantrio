@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../../services/api';
-import { BadgePercent, Plus, Pencil, Trash2, X, Check, Power } from 'lucide-react';
+import { BadgePercent, Plus, Pencil, Trash2, X, Check, Power, Search } from 'lucide-react';
 import { useAdminUI } from './AdminUI';
 import { SkeletonTable } from './AdminSkeletons';
 import styles from './AdminPage.module.css';
@@ -27,6 +27,7 @@ export const AdminPromoCodes = () => {
   const { toast, confirm } = useAdminUI();
   const [promoCodes, setPromoCodes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
 
   // Create/Edit modal state — null = closed, 'create' = new code, object = editing
   const [modalState, setModalState] = useState(null);
@@ -181,6 +182,25 @@ export const AdminPromoCodes = () => {
     };
   };
 
+  const filteredPromoCodes = promoCodes.filter((p) => {
+    if (!search.trim()) return true;
+    const q = search.trim().toLowerCase();
+    const redeemers = (p.redeemedBy || []).map((u) => `${u?.displayName || ''} ${u?.username || ''}`).join(' ').toLowerCase();
+    const code = String(p.code || '').toLowerCase();
+    const desc = String(p.description || '').toLowerCase();
+    const bonus = String(p.bonusCoins || '').toLowerCase();
+    const status = p.isActive !== false ? 'active' : 'inactive';
+    const expiry = formatExpiry(p.expiresAt).toLowerCase();
+    return (
+      code.includes(q) ||
+      desc.includes(q) ||
+      bonus.includes(q) ||
+      status.includes(q) ||
+      expiry.includes(q) ||
+      redeemers.includes(q)
+    );
+  });
+
   return (
     <div>
       <div className={styles.pageHead}>
@@ -189,6 +209,16 @@ export const AdminPromoCodes = () => {
           <p className={styles.pageSub}>Create and manage promo codes fans can redeem for bonus coins.</p>
         </div>
         <div className={styles.searchRow}>
+          <div className={styles.searchBar}>
+            <Search size={18} className={styles.searchIcon} />
+            <input
+              type="text"
+              placeholder="Search promo codes, descriptions, fans..."
+              className={styles.searchInput}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
           <button className={`${styles.buttonControl} ${styles.btnSolid}`} onClick={openCreate}>
             <Plus size={16} />
             New Promo Code
@@ -215,7 +245,7 @@ export const AdminPromoCodes = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {promoCodes.map((promo) => {
+                  {filteredPromoCodes.map((promo) => {
                     const redeemers = formatRedeemers(promo);
                     return (
                     <tr key={promo._id}>
@@ -257,12 +287,12 @@ export const AdminPromoCodes = () => {
                     </tr>
                     );
                   })}
-                  {promoCodes.length === 0 && (
+                  {filteredPromoCodes.length === 0 && (
                     <tr>
                       <td colSpan="7">
                         <div className={styles.emptyState}>
                           <BadgePercent size={32} style={{ opacity: 0.4, marginBottom: 6 }} />
-                          No promo codes yet — create one to let fans redeem bonus coins.
+                          {search ? 'No promo codes match your search criteria.' : 'No promo codes yet — create one to let fans redeem bonus coins.'}
                         </div>
                       </td>
                     </tr>
@@ -273,7 +303,7 @@ export const AdminPromoCodes = () => {
 
             {/* Mobile View */}
             <div className={styles.mobileCardList}>
-              {promoCodes.map((promo) => {
+              {filteredPromoCodes.map((promo) => {
                 const redeemers = formatRedeemers(promo);
                 return (
                 <div key={promo._id} className={styles.mobileCard}>
@@ -320,10 +350,10 @@ export const AdminPromoCodes = () => {
                 </div>
                 );
               })}
-              {promoCodes.length === 0 && (
+              {filteredPromoCodes.length === 0 && (
                 <div className={styles.emptyState}>
                   <BadgePercent size={32} style={{ opacity: 0.4, marginBottom: 6 }} />
-                  No promo codes yet — create one to let fans redeem bonus coins.
+                  {search ? 'No promo codes match your search criteria.' : 'No promo codes yet — create one to let fans redeem bonus coins.'}
                 </div>
               )}
             </div>

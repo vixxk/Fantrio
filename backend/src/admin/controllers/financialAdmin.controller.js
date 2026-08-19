@@ -20,10 +20,19 @@ exports.getAllTransactions = catchAsync(async (req, res, next) => {
         const q = search.toLowerCase();
         const s = t.senderId ? `${t.senderId.displayName} ${t.senderId.username} ${t.senderId.email}` : '';
         const r = t.receiverId ? `${t.receiverId.displayName} ${t.receiverId.username} ${t.receiverId.email}` : '';
+        const idStr = String(t._id || '');
+        const amountStr = String(t.amountCoins || '');
+        const dateStr = new Date(t.createdAt).toLocaleDateString();
+        const fullDateStr = new Date(t.createdAt).toLocaleString();
         return (
           t.type.toLowerCase().includes(q) ||
+          String(t.status || '').toLowerCase().includes(q) ||
           s.toLowerCase().includes(q) ||
-          r.toLowerCase().includes(q)
+          r.toLowerCase().includes(q) ||
+          idStr.toLowerCase().includes(q) ||
+          amountStr.toLowerCase().includes(q) ||
+          dateStr.toLowerCase().includes(q) ||
+          fullDateStr.toLowerCase().includes(q)
         );
       })
     : transactions;
@@ -110,7 +119,18 @@ exports.getWithdrawals = catchAsync(async (req, res, next) => {
     ? withdrawals.filter((w) => {
         const q = search.toLowerCase();
         const s = w.senderId ? `${w.senderId.displayName} ${w.senderId.username} ${w.senderId.email}` : '';
-        return s.toLowerCase().includes(q) || w.status.toLowerCase().includes(q);
+        const idStr = String(w._id || '');
+        const amountStr = String(w.amountCoins || '');
+        const dateStr = new Date(w.createdAt).toLocaleDateString();
+        const fullDateStr = new Date(w.createdAt).toLocaleString();
+        return (
+          s.toLowerCase().includes(q) ||
+          String(w.status || '').toLowerCase().includes(q) ||
+          idStr.toLowerCase().includes(q) ||
+          amountStr.toLowerCase().includes(q) ||
+          dateStr.toLowerCase().includes(q) ||
+          fullDateStr.toLowerCase().includes(q)
+        );
       })
     : withdrawals;
 

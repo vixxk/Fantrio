@@ -136,9 +136,17 @@ export const AdminAnnouncements = () => {
   };
 
   const filteredAnnouncements = announcements.filter((a) => {
+    const q = search.trim().toLowerCase();
+    const catLabel = (CATEGORIES.find((c) => c.value === a.category)?.label || a.category).toLowerCase();
+    const dateStr = new Date(a.createdAt).toLocaleDateString().toLowerCase();
+    const fullDateStr = new Date(a.createdAt).toLocaleString().toLowerCase();
     const matchesSearch =
-      a.title.toLowerCase().includes(search.toLowerCase()) ||
-      a.content.toLowerCase().includes(search.toLowerCase());
+      a.title.toLowerCase().includes(q) ||
+      a.content.toLowerCase().includes(q) ||
+      a.category.toLowerCase().includes(q) ||
+      catLabel.includes(q) ||
+      dateStr.includes(q) ||
+      fullDateStr.includes(q);
     const matchesCategory = categoryFilter === 'all' || a.category === categoryFilter;
     return matchesSearch && matchesCategory;
   });

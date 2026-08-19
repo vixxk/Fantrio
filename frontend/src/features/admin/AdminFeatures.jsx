@@ -91,10 +91,16 @@ export const AdminFeatures = () => {
   };
 
   const filteredFeatures = features.filter((f) => {
+    const q = search.trim().toLowerCase();
+    const userStr = f.userId ? `${f.userId.displayName || ''} ${f.userId.username || ''} ${f.userId.email || ''}` : '';
+    const dateStr = new Date(f.createdAt).toLocaleDateString().toLowerCase();
+    const statusStr = String(f.status || '').toLowerCase();
     const matchesSearch =
-      f.title.toLowerCase().includes(search.toLowerCase()) ||
-      f.description.toLowerCase().includes(search.toLowerCase()) ||
-      (f.userId?.username && f.userId.username.toLowerCase().includes(search.toLowerCase()));
+      f.title.toLowerCase().includes(q) ||
+      f.description.toLowerCase().includes(q) ||
+      userStr.toLowerCase().includes(q) ||
+      statusStr.includes(q) ||
+      dateStr.includes(q);
 
     if (statusFilter === 'pending') return matchesSearch && f.isApproved === false;
     if (statusFilter === 'approved') return matchesSearch && f.isApproved !== false;

@@ -32,7 +32,9 @@ exports.getUsersList = catchAsync(async (req, res, next) => {
       { email: regex },
       { username: regex },
       { displayName: regex },
-      { bio: regex }
+      { bio: regex },
+      { referralCode: regex },
+      { role: regex }
     ];
   }
 

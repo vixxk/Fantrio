@@ -34,16 +34,27 @@ exports.getCreatorsList = catchAsync(async (req, res, next) => {
   if (search && search.trim()) {
     const q = search.trim().toLowerCase();
     const profileIds = await CreatorProfile.find(filter)
-      .populate('userId', 'username email displayName avatarUrl')
+      .populate('userId', 'username email displayName avatarUrl createdAt')
       .then((all) =>
         all
           .filter((p) => {
             const u = p.userId;
             if (!u) return false;
+            const uName = u.displayName || '';
+            const uUsername = u.username || '';
+            const uEmail = u.email || '';
+            const bio = p.bio || '';
+            const verStatus = p.verificationStatus || '';
+            const dateStr = u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '';
+            const fullDateStr = u.createdAt ? new Date(u.createdAt).toLocaleString() : '';
             return (
-              (u.displayName && u.displayName.toLowerCase().includes(q)) ||
-              (u.username && u.username.toLowerCase().includes(q)) ||
-              (u.email && u.email.toLowerCase().includes(q)) ||
+              uName.toLowerCase().includes(q) ||
+              uUsername.toLowerCase().includes(q) ||
+              uEmail.toLowerCase().includes(q) ||
+              bio.toLowerCase().includes(q) ||
+              verStatus.toLowerCase().includes(q) ||
+              dateStr.toLowerCase().includes(q) ||
+              fullDateStr.toLowerCase().includes(q) ||
               (p.categories || []).some((c) => String(c).toLowerCase().includes(q))
             );
           })
