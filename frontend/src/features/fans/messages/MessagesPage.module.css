@@ -807,6 +807,14 @@
   align-self: flex-end;
 }
 
+.msgAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
 .msgBubble {
   width: fit-content;
   max-width: 100%;

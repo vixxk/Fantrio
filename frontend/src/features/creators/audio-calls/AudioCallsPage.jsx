@@ -38,7 +38,8 @@ export const AudioCallsPage = () => {
 
   // Real-time SSE listener for Creator online/offline button state
   useEffect(() => {
-    const sseUrl = `${BASE_URL}/creators/presence/sse`;
+    const token = localStorage.getItem('token') || '';
+    const sseUrl = `${BASE_URL}/creators/presence/sse${token ? `?token=${encodeURIComponent(token)}` : ''}`;
     const sse = new EventSource(sseUrl, { withCredentials: true });
     sse.onmessage = (e) => {
       try {

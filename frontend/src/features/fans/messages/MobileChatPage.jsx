@@ -314,27 +314,39 @@ export const MobileChatPage = () => {
     const fileType = file.type || 'image/jpeg';
     const mediaType = fileType.startsWith('video/') ? 'video' : 'image';
     try {
-      const res = await api.post('/settings/presigned-upload', {
-        fileName: (file.name || `chat-image-${Date.now()}.jpg`).replace(/[^a-zA-Z0-9._-]/g, '_'),
-        fileType
-      });
-      if (res.status !== 'success') {
-        toast.error('Failed to get upload URL.');
-        return;
+      let mediaUrl = '';
+      try {
+        const res = await api.post('/settings/presigned-upload', {
+          fileName: (file.name || `chat-image-${Date.now()}.jpg`).replace(/[^a-zA-Z0-9._-]/g, '_'),
+          fileType
+        });
+        if (res.status === 'success' && res.uploadUrl) {
+          const putRes = await fetch(res.uploadUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': fileType },
+            body: file
+          });
+          if (putRes.ok) {
+            mediaUrl = res.fileUrl;
+          }
+        }
+      } catch (s3Err) {
+        console.warn('S3 direct upload failed, using Data URL fallback:', s3Err);
       }
-      const putRes = await fetch(res.uploadUrl, {
-        method: 'PUT',
-        headers: { 'Content-Type': fileType },
-        body: file
-      });
-      if (!putRes.ok) {
-        toast.error('Upload to storage failed.');
-        return;
+
+      if (!mediaUrl) {
+        mediaUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
       }
+
       const msgRes = await api.post('/chat/message', {
         receiverId: convId,
         content: '',
-        mediaUrl: res.fileUrl,
+        mediaUrl,
         mediaType
       });
       if (msgRes.status === 'success' && msgRes.message) {
@@ -485,8 +497,8 @@ export const MobileChatPage = () => {
           const parsedGift = parseGiftMessage(msg);
           return (
             <div key={msg.id} className={`${styles.msgRow} ${isMe ? styles.msgRight : styles.msgLeft}`}>
-              {!isMe && peer.avatarUrl && (
-                <img src={peer.avatarUrl} alt="" className={styles.msgAvatar} />
+              {!isMe && (
+                <img src={peer.avatarUrl || '/profile.png'} alt="" className={styles.msgAvatar} />
               )}
                 <div className={styles.msgContent}>
                   {parsedGift.isGift ? (

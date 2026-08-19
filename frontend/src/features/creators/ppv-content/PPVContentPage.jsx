@@ -4,7 +4,7 @@ import { api } from '../../../services/api';
 import ShimmerSkeleton from '../../../components/ShimmerSkeleton/ShimmerSkeleton';
 import {
   Lock, Eye, EyeOff, DollarSign, Flame, Image, Video,
-  MoreVertical, ChevronDown, Plus, Pencil, Trash2, Search, ArrowLeft, ArrowRight
+  MoreVertical, ChevronDown, Plus, Pencil, Trash2, Search, ArrowLeft, ArrowRight, X, Loader2
 } from 'lucide-react';
 import { ConfirmDeleteDialog } from '../../../components/ConfirmDeleteDialog/ConfirmDeleteDialog';
 import { EditPriceDialog } from './EditPriceDialog';
@@ -108,6 +108,92 @@ export const PPVContentPage = () => {
   const [visibilityTarget, setVisibilityTarget] = useState(null);
   const [visibilityBusy, setVisibilityBusy] = useState(false);
   const filterRef = useRef(null);
+
+  // Add PPV Upload Modal State
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [uploadFile, setUploadFile] = useState(null);
+  const [uploadCaption, setUploadCaption] = useState('');
+  const [uploadPrice, setUploadPrice] = useState('50');
+  const [uploadIsBlurred, setUploadIsBlurred] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handlePublishPPV = async (e) => {
+    e?.preventDefault();
+    if (!uploadFile) {
+      toast.error('Please select an image or video file.');
+      return;
+    }
+    const priceNum = Math.floor(Number(uploadPrice));
+    if (!uploadPrice || Number.isNaN(priceNum) || priceNum <= 0) {
+      toast.error('Please enter a valid coin price.');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const fileType = uploadFile.type || (uploadFile.name?.endsWith('.mp4') ? 'video/mp4' : 'image/jpeg');
+      let mediaUrl = '';
+      try {
+        const res = await api.post('/posts/upload-url', {
+          fileName: (uploadFile.name || `ppv-${Date.now()}`).replace(/[^a-zA-Z0-9._-]/g, '_'),
+          fileType
+        });
+        if (res.status === 'success' && res.uploadUrl) {
+          const putRes = await fetch(res.uploadUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': fileType },
+            body: uploadFile
+          });
+          if (putRes.ok) {
+            mediaUrl = res.fileUrl;
+          }
+        }
+      } catch (s3Err) {
+        console.warn('S3 upload failed, falling back to Data URL:', s3Err);
+      }
+
+      if (!mediaUrl) {
+        mediaUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(uploadFile);
+        });
+      }
+
+      const isVideo = fileType.startsWith('video/');
+      const payload = {
+        content: uploadCaption.trim() || 'Exclusive Locked Content',
+        media: [{
+          url: mediaUrl,
+          type: isVideo ? 'video' : 'image',
+          thumbnailUrl: isVideo ? '/video-thumb.png' : mediaUrl,
+          isLocked: true,
+          isBlurred: uploadIsBlurred
+        }],
+        postType: 'ppv',
+        coinPrice: priceNum
+      };
+
+      const res = await api.post('/posts', payload);
+      if (res.status === 'success' || res.post) {
+        toast.success('PPV content added successfully!');
+        setUploadOpen(false);
+        setUploadFile(null);
+        setUploadCaption('');
+        setUploadPrice('50');
+        loadPPV();
+      } else {
+        throw new Error(res.message || 'Failed to publish PPV content');
+      }
+    } catch (err) {
+      console.error('Failed to add PPV content:', err);
+      toast.error(err.message || 'Failed to publish PPV content');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   // Delete flow — shared confirm dialog state machine
   const {
@@ -382,7 +468,7 @@ export const PPVContentPage = () => {
               </div>
 
               {/* Add Button */}
-              <button className={styles.addBtn}>
+              <button className={styles.addBtn} onClick={() => setUploadOpen(true)}>
                 <Plus size={15} />
                 <span className={styles.addBtnText}>Add New PPV Content</span>
               </button>
@@ -654,6 +740,145 @@ export const PPVContentPage = () => {
         onCancel={closeVisibilityDialog}
         onConfirm={confirmVisibilityToggle}
       />
+
+      {/* Upload PPV Content Modal */}
+      {uploadOpen && (
+        <div className={styles.modalBackdrop} onClick={() => !uploading && setUploadOpen(false)}>
+          <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <div className={styles.modalHeaderTitle}>
+                <Lock size={20} className={styles.modalHeaderIcon} />
+                <h3>Add New PPV Content</h3>
+              </div>
+              <button
+                type="button"
+                className={styles.modalCloseBtn}
+                onClick={() => !uploading && setUploadOpen(false)}
+                disabled={uploading}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handlePublishPPV} className={styles.modalBody}>
+              {/* Media Picker */}
+              <div className={styles.fieldGroup}>
+                <label className={styles.fieldLabel}>Media File (Image or Video) *</label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*,video/*"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) setUploadFile(f);
+                  }}
+                />
+                {uploadFile ? (
+                  <div className={styles.fileSelectedBox}>
+                    {uploadFile.type?.startsWith('video/') ? (
+                      <Video size={24} color="#3b82f6" />
+                    ) : (
+                      <Image size={24} color="#10b981" />
+                    )}
+                    <div className={styles.fileSelectedInfo}>
+                      <span className={styles.fileName}>{uploadFile.name}</span>
+                      <span className={styles.fileSize}>
+                        {(uploadFile.size / (1024 * 1024)).toFixed(2)} MB
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      className={styles.changeFileBtn}
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                    >
+                      Change
+                    </button>
+                  </div>
+                ) : (
+                  <div
+                    className={styles.dropzone}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Plus size={28} className={styles.dropzoneIcon} />
+                    <span>Click to select Image or Video</span>
+                    <span className={styles.dropzoneSub}>PNG, JPG, MP4 up to 100MB</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Title / Description */}
+              <div className={styles.fieldGroup}>
+                <label className={styles.fieldLabel}>Title / Description</label>
+                <textarea
+                  placeholder="Describe your exclusive content..."
+                  value={uploadCaption}
+                  onChange={(e) => setUploadCaption(e.target.value)}
+                  className={styles.modalTextarea}
+                  disabled={uploading}
+                  rows={3}
+                />
+              </div>
+
+              {/* Coin Price */}
+              <div className={styles.fieldGroup}>
+                <label className={styles.fieldLabel}>Unlock Price (Coins) *</label>
+                <div className={styles.priceInputWrap}>
+                  <DollarSign size={16} className={styles.priceIcon} />
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="50"
+                    value={uploadPrice}
+                    onChange={(e) => setUploadPrice(e.target.value)}
+                    className={styles.modalInput}
+                    disabled={uploading}
+                  />
+                </div>
+              </div>
+
+              {/* Blur Toggle */}
+              <div className={styles.blurCheckboxRow}>
+                <input
+                  type="checkbox"
+                  id="blurCheck"
+                  checked={uploadIsBlurred}
+                  onChange={(e) => setUploadIsBlurred(e.target.checked)}
+                  disabled={uploading}
+                />
+                <label htmlFor="blurCheck">Blur media preview until unlocked by fan</label>
+              </div>
+
+              {/* Modal Actions */}
+              <div className={styles.modalFooter}>
+                <button
+                  type="button"
+                  className={styles.cancelBtn}
+                  onClick={() => setUploadOpen(false)}
+                  disabled={uploading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className={styles.submitBtn}
+                  disabled={uploading || !uploadFile}
+                >
+                  {uploading ? (
+                    <>
+                      <Loader2 size={16} className={styles.spinner} />
+                      Publishing…
+                    </>
+                  ) : (
+                    'Publish PPV Content'
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

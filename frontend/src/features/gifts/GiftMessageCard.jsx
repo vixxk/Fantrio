@@ -8,21 +8,22 @@ export const parseGiftMessage = (msg) => {
   // Explicit gift fields check
   if (msg.isGift || msg.giftName || msg.gift) {
     const giftObj = msg.gift || {};
-    const name = msg.giftName || giftObj.name || 'Gift';
+    const rawName = msg.giftName || giftObj.name || 'Gift';
+    const cleanName = rawName.replace(/\s*Gift$/i, '').trim() || rawName;
     const emoji = msg.giftEmoji || giftObj.emoji || '🎁';
     let coins = msg.giftCoins || giftObj.coins || 0;
 
-    if (!coins && name) {
+    if (!coins && cleanName) {
       const catalogMatch = GIFTS.find(g =>
-        g.name.toLowerCase() === name.toLowerCase() ||
-        name.toLowerCase().includes(g.name.toLowerCase()) ||
-        g.name.toLowerCase().includes(name.toLowerCase())
+        g.name.toLowerCase() === cleanName.toLowerCase() ||
+        cleanName.toLowerCase().includes(g.name.toLowerCase()) ||
+        g.name.toLowerCase().includes(cleanName.toLowerCase())
       );
       if (catalogMatch) coins = catalogMatch.coins;
     }
 
     const tier = msg.giftTier || giftObj.tier || (coins >= 500 ? 4 : coins >= 200 ? 3 : coins >= 50 ? 2 : 1);
-    return { isGift: true, name, emoji, coins, tier };
+    return { isGift: true, name: cleanName, emoji, coins, tier };
   }
 
   // String parsing for legacy or fallback gift message formats
@@ -33,7 +34,7 @@ export const parseGiftMessage = (msg) => {
     if (match) {
       const emoji = match[1]?.trim() || '🎁';
       const rawName = match[2]?.trim() || 'Gift';
-      const cleanName = rawName.replace(/\s*Gift$/i, '').trim();
+      const cleanName = rawName.replace(/\s*Gift$/i, '').trim() || rawName;
       let coins = match[3] ? parseInt(match[3].replace(/,/g, ''), 10) : 0;
 
       if (!coins && cleanName) {
@@ -74,7 +75,7 @@ export const GiftMessageCard = ({ msg, isCreator = false }) => {
       </div>
       <div className={styles.detailsBlock}>
         <div className={styles.cardHeader}>
-          <h4 className={styles.giftTitle}>{name} Gift</h4>
+          <h4 className={styles.giftTitle}>{name}</h4>
           {labelText && <span className={styles.tierLabel}>{labelText}</span>}
         </div>
         <p className={styles.subText}>

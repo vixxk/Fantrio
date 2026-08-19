@@ -499,14 +499,17 @@ export const CreatorMessagesPage = () => {
     confirm: confirmBlockUser,
     deleting: blocking,
   } = useConfirmDelete({
-    onConfirm: (conv) => api.post(`/block/${conv.user.id}`),
-    successMessage: (conv) => `${conv.user.displayName || 'User'} blocked`,
+    onConfirm: (conv) => api.post(`/block/${conv?.user?.id || conv?.id}`),
+    successMessage: (conv) => `${conv?.user?.displayName || 'User'} blocked successfully`,
     errorMessage: 'Failed to block user. Please try again.',
-    onSuccess: () => loadConversations(),
+    onSuccess: () => {
+      loadConversations();
+      navigateTo('/creators/messages');
+    },
   });
 
   const handleBlockUser = () => {
-    const userId = selectedConv?.user?.id;
+    const userId = selectedConv?.user?.id || selectedConv?.id;
     if (!userId) return;
     setShowMenu(false);
     openBlock(selectedConv);
@@ -600,25 +603,39 @@ export const CreatorMessagesPage = () => {
     const mediaType = fileType.startsWith('video/') ? 'video' : 'image';
     const isPaywall = price > 0;
     try {
-      const res = await api.post('/settings/presigned-upload', {
-        fileName: (file.name || `chat-image-${Date.now()}.jpg`).replace(/[^a-zA-Z0-9._-]/g, '_'),
-        fileType
-      });
-      if (res.status !== 'success') {
-        throw new Error('Failed to get upload URL.');
+      let mediaUrl = '';
+      try {
+        const res = await api.post('/settings/presigned-upload', {
+          fileName: (file.name || `chat-image-${Date.now()}.jpg`).replace(/[^a-zA-Z0-9._-]/g, '_'),
+          fileType
+        });
+        if (res.status === 'success' && res.uploadUrl) {
+          const putRes = await fetch(res.uploadUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': fileType },
+            body: file
+          });
+          if (putRes.ok) {
+            mediaUrl = res.fileUrl;
+          }
+        }
+      } catch (s3Err) {
+        console.warn('S3 direct upload failed, using Data URL fallback:', s3Err);
       }
-      const putRes = await fetch(res.uploadUrl, {
-        method: 'PUT',
-        headers: { 'Content-Type': fileType },
-        body: file
-      });
-      if (!putRes.ok) {
-        throw new Error('Upload to storage failed.');
+
+      if (!mediaUrl) {
+        mediaUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
       }
+
       const msgRes = await api.post('/chat/message', {
         receiverId: selectedConvId,
         content: '',
-        mediaUrl: res.fileUrl,
+        mediaUrl,
         mediaType,
         isPaywall,
         coinPrice: isPaywall ? price : 0
@@ -639,7 +656,7 @@ export const CreatorMessagesPage = () => {
       }
     } catch (err) {
       console.error('Failed to send media:', err);
-      throw new Error('Failed to send media. Please try again.', { cause: err });
+      toast.error('Failed to send media. Please try again.');
     }
   };
 
@@ -814,10 +831,6 @@ export const CreatorMessagesPage = () => {
                 </button>
                 {showMenu && (
                   <div className={styles.dropdownMenu}>
-                    <button className={styles.dropdownItem} onClick={() => { handleShowProfile(); setShowMenu(false); }} type="button">
-                      <Eye size={16} />
-                      <span>View Profile</span>
-                    </button>
                     <button className={styles.dropdownItem} onClick={handleBlockUser} type="button">
                       <Ban size={16} />
                       <span>Block User</span>
@@ -850,7 +863,7 @@ export const CreatorMessagesPage = () => {
                         style={isCreator ? { maxWidth: '85%' } : undefined}
                       >
                         {!isCreator && (
-                          <img src={selectedConv.user.avatarUrl} alt="" className={styles.msgAvatar} />
+                          <img src={selectedConv.user?.avatarUrl || '/profile.png'} alt="" className={styles.msgAvatar} />
                         )}
                         <div className={styles.msgContentWrapper}>
                           {parsedGift.isGift ? (
@@ -1004,19 +1017,22 @@ export const CreatorMessagesPage = () => {
 
               <div className={styles.actionsCard}>
                 <h4 className={styles.actionsTitle}>Quick Actions</h4>
-                <button className={`${styles.actionBtn} ${styles.actionViewProfile}`}>
-                  <div className={`${styles.actionIcon} ${styles.iconPink}`}><User size={22} /></div>
-                  <span>View Profile</span>
-                </button>
-                <button className={`${styles.actionBtn} ${styles.actionSendTip}`}>
-                  <div className={`${styles.actionIcon} ${styles.iconWhite}`}><DollarSign size={22} /></div>
-                  <span>Send Tip</span>
-                </button>
-                <button className={`${styles.actionBtn} ${styles.actionCreatePPV}`}>
+                <button
+                  type="button"
+                  className={`${styles.actionBtn} ${styles.actionCreatePPV}`}
+                  onClick={() => {
+                    handleBackToChat();
+                    setTimeout(() => chatMediaInputRef.current?.click(), 80);
+                  }}
+                >
                   <div className={`${styles.actionIcon} ${styles.iconPurple}`}><Gift size={22} /></div>
                   <span>Create PPV Offer</span>
                 </button>
-                <button className={`${styles.actionBtn} ${styles.actionBlockUser}`}>
+                <button
+                  type="button"
+                  className={`${styles.actionBtn} ${styles.actionBlockUser}`}
+                  onClick={handleBlockUser}
+                >
                   <div className={`${styles.actionIcon} ${styles.iconRed}`}><Ban size={22} /></div>
                   <span>Block User</span>
                 </button>
@@ -1246,10 +1262,6 @@ export const CreatorMessagesPage = () => {
                     </button>
                     {showMenu && (
                       <div className={styles.dropdownMenu}>
-                        <button className={styles.dropdownItem} onClick={handleShowProfile}>
-                          <Eye size={16} />
-                          <span>View Profile</span>
-                        </button>
                         <button className={styles.dropdownItem} onClick={handleBlockUser}>
                           <Ban size={16} />
                           <span>Block User</span>
@@ -1282,7 +1294,7 @@ export const CreatorMessagesPage = () => {
                           className={`${styles.msgRow} ${isCreator ? styles.msgRowRight : styles.msgRowLeft}`}
                         >
                           {!isCreator && (
-                            <img src={selectedConv.user.avatarUrl} alt="" className={styles.msgAvatar} />
+                            <img src={selectedConv.user?.avatarUrl || '/profile.png'} alt="" className={styles.msgAvatar} />
                           )}
                           <div className={styles.msgContentWrapper}>
                             {parsedGift.isGift ? (
@@ -1464,32 +1476,6 @@ export const CreatorMessagesPage = () => {
               {/* Quick Actions */}
               <div className={styles.actionsCard}>
                 <h4 className={styles.actionsTitle}>Quick Actions</h4>
-                <button
-                  type="button"
-                  className={`${styles.actionBtn} ${styles.actionViewProfile}`}
-                  onClick={() => {
-                    if (selectedConv?.user?.id) {
-                      navigateTo(`/creators/subscribers?search=${encodeURIComponent(selectedConv.user.displayName)}`);
-                    } else {
-                      handleShowProfile();
-                    }
-                  }}
-                >
-                  <div className={`${styles.actionIcon} ${styles.iconPink}`}>
-                    <User size={22} />
-                  </div>
-                  <span>View Profile</span>
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.actionBtn} ${styles.actionSendTip}`}
-                  onClick={() => chatInputRef.current?.focus()}
-                >
-                  <div className={`${styles.actionIcon} ${styles.iconWhite}`}>  
-                    <DollarSign size={22} />
-                  </div>
-                  <span>Send Gift</span>
-                </button>
                 <button
                   type="button"
                   className={`${styles.actionBtn} ${styles.actionCreatePPV}`}

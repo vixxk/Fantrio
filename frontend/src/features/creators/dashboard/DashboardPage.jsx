@@ -71,7 +71,8 @@ export const DashboardPage = () => {
 
   // Real-time SSE listener for Creator presence & quickActions online status sync on Dashboard
   useEffect(() => {
-    const sseUrl = `${BASE_URL}/creators/presence/sse`;
+    const token = localStorage.getItem('token') || '';
+    const sseUrl = `${BASE_URL}/creators/presence/sse${token ? `?token=${encodeURIComponent(token)}` : ''}`;
     const sse = new EventSource(sseUrl, { withCredentials: true });
     sse.onmessage = (e) => {
       try {

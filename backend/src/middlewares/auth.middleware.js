@@ -9,6 +9,8 @@ const protect = catchAsync(async (req, res, next) => {
   // 1) Get token and check if it exists
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.query && req.query.token) {
+    token = req.query.token;
   } else if (req.headers.cookie) {
     const cookies = req.headers.cookie.split(';').reduce((acc, cookie) => {
       const [key, value] = cookie.trim().split('=');
@@ -69,6 +71,8 @@ const protectOptional = catchAsync(async (req, res, next) => {
 
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.query && req.query.token) {
+    token = req.query.token;
   } else if (req.headers.cookie) {
     const cookies = req.headers.cookie.split(';').reduce((acc, cookie) => {
       const [key, value] = cookie.trim().split('=');

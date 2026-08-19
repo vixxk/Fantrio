@@ -53,8 +53,8 @@ export const EarningsOverviewChart = ({ isDark, data, value, onPeriodChange }) =
 
   const activeTooltip = {
     date: labels[activeIndex] || '',
-    total: Number(total[activeIndex] || 0).toLocaleString() + ' Total',
-    net: Number(net[activeIndex] || 0).toLocaleString() + ' Net'
+    total: Math.round(Number(total[activeIndex] || 0)).toLocaleString() + ' Total',
+    net: Math.round(Number(net[activeIndex] || 0)).toLocaleString() + ' Net'
   };
 
   const svgX = getX(activeIndex);

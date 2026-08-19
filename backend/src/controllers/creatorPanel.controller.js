@@ -89,9 +89,10 @@ exports.getAnalytics = catchAsync(async (req, res, next) => {
       : Promise.resolve([])
   ]);
 
-  const netEarned = sumTx(txCurrent);
-  const prevNetEarned = sumTx(txPrev);
-  const earningsChange = pctChange(netEarned, prevNetEarned);
+  const grossEarned = sumTx(txCurrent);
+  const netEarned = Math.round(txCurrent.reduce((s, t) => s + netOfCommission(t.amountCoins || 0, commRate), 0));
+  const prevGrossEarned = sumTx(txPrev);
+  const earningsChange = pctChange(grossEarned, prevGrossEarned);
 
   // --- Subscribers ---
   const subMatch = { creatorId, status: { $in: ['active', 'expired', 'cancelled'] } };
@@ -131,9 +132,6 @@ exports.getAnalytics = catchAsync(async (req, res, next) => {
     return v > 0 ? Number(((lc / v) * 100).toFixed(1)) : 0;
   };
 
-  // Selected window's content (value) and the immediately-preceding window
-  // (change baseline). For 'all time' there is no preceding window, so the
-  // change compares the trailing week vs the week before it (meaningful, real).
   const periodPosts = periodStart ? posts.filter((p) => p.createdAt >= periodStart) : posts;
   const prevWindowPosts = prevWindowStart
     ? posts.filter((p) => p.createdAt >= prevWindowStart && p.createdAt < periodStart)
@@ -179,10 +177,10 @@ exports.getAnalytics = catchAsync(async (req, res, next) => {
     },
     {
       id: 'tips',
-      label: 'Tips Received',
-      value: formatCoin(tipCoins),
-      change: changeVal(tipChange),
-      changeType: tipChange >= 0 ? 'positive' : 'negative',
+      label: 'Total Earnings',
+      value: formatCoin(grossEarned),
+      change: changeVal(earningsChange),
+      changeType: earningsChange >= 0 ? 'positive' : 'negative',
       period: changeLabel,
       icon: 'tips'
     },
@@ -197,37 +195,49 @@ exports.getAnalytics = catchAsync(async (req, res, next) => {
     }
   ];
 
-  // --- Subscriber growth chart (last 7 weeks) ---
+  // --- Dynamic chart step bucketing ---
+  let numSteps = 7;
+  let stepMs = 7 * 24 * 60 * 60 * 1000;
+  if (period === 'week') {
+    numSteps = 7;
+    stepMs = 24 * 60 * 60 * 1000;
+  } else if (period === 'month') {
+    numSteps = 6;
+    stepMs = 5 * 24 * 60 * 60 * 1000;
+  } else if (period === 'quarter') {
+    numSteps = 6;
+    stepMs = 15 * 24 * 60 * 60 * 1000;
+  }
+
+  // --- Subscriber growth chart ---
   const growthLabels = [];
   const growthTotal = [];
   const growthNew = [];
   const allSubs = await Subscription.find(subMatch).sort({ createdAt: 1 });
-  for (let i = 6; i >= 0; i--) {
-    const weekStart = new Date(Date.now() - (i + 1) * 7 * 24 * 60 * 60 * 1000);
-    const weekEnd = new Date(Date.now() - i * 7 * 24 * 60 * 60 * 1000);
-    growthLabels.push(weekEnd.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
-    growthNew.push(allSubs.filter((s) => s.createdAt >= weekStart && s.createdAt < weekEnd).length);
-    growthTotal.push(allSubs.filter((s) => s.createdAt < weekEnd).length);
+  for (let i = numSteps - 1; i >= 0; i--) {
+    const stepStart = new Date(Date.now() - (i + 1) * stepMs);
+    const stepEnd = new Date(Date.now() - i * stepMs);
+    growthLabels.push(stepEnd.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+    growthNew.push(allSubs.filter((s) => s.createdAt >= stepStart && s.createdAt < stepEnd).length);
+    growthTotal.push(allSubs.filter((s) => s.createdAt < stepEnd).length);
   }
 
-  // --- Earnings overview chart (last 7 weeks) ---
+  // --- Earnings overview chart ---
   const earnLabels = [];
   const earnTotal = [];
   const earnNet = [];
   const allEarnTxs = await Transaction.find(earningsMatch).sort({ createdAt: 1 });
-  for (let i = 6; i >= 0; i--) {
-    const weekStart = new Date(Date.now() - (i + 1) * 7 * 24 * 60 * 60 * 1000);
-    const weekEnd = new Date(Date.now() - i * 7 * 24 * 60 * 60 * 1000);
-    const weekTxs = allEarnTxs.filter((t) => t.createdAt >= weekStart && t.createdAt < weekEnd);
-    earnLabels.push(weekEnd.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
-    const gross = sumTx(weekTxs);
-    earnTotal.push(Number(gross.toFixed(2)));
-    earnNet.push(Number(weekTxs.reduce((s, t) => s + netOfCommission(t.amountCoins || 0, commRate), 0).toFixed(2)));
+  for (let i = numSteps - 1; i >= 0; i--) {
+    const stepStart = new Date(Date.now() - (i + 1) * stepMs);
+    const stepEnd = new Date(Date.now() - i * stepMs);
+    const stepTxs = allEarnTxs.filter((t) => t.createdAt >= stepStart && t.createdAt < stepEnd);
+    earnLabels.push(stepEnd.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+    const gross = sumTx(stepTxs);
+    earnTotal.push(Math.round(gross));
+    earnNet.push(Math.round(stepTxs.reduce((s, t) => s + netOfCommission(t.amountCoins || 0, commRate), 0)));
   }
 
   // --- Insights ---
-  // For 'all time' there is no previous window, so the change-driven insights
-  // show absolute all-time figures instead of comparisons.
   const insights = [
     {
       id: 'growth',
@@ -239,7 +249,7 @@ exports.getAnalytics = catchAsync(async (req, res, next) => {
     {
       id: 'views',
       icon: 'views',
-      text: `You earned ${formatCoin(netEarned)} in`,
+      text: `You earned ${formatCoin(grossEarned)} in`,
       highlight: allTime ? 'total.' : 'the selected period.',
       suffix: allTime ? 'Keep it up!' : (earningsChange >= 0 ? 'Keep it up!' : 'Try posting more exclusive content.')
     },

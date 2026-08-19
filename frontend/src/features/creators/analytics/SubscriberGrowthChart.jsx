@@ -54,8 +54,8 @@ export const SubscriberGrowthChart = ({ isDark, data, value, onPeriodChange }) =
 
   const activeTooltip = {
     date: labels[activeIndex] || '',
-    total: Number(total[activeIndex] || 0).toLocaleString() + ' Total',
-    new: '+' + (newSubs[activeIndex] || 0) + ' New'
+    total: Math.round(Number(total[activeIndex] || 0)).toLocaleString() + ' Total',
+    new: '+' + Math.round(Number(newSubs[activeIndex] || 0)).toLocaleString() + ' New'
   };
 
   const svgX = getX(activeIndex);

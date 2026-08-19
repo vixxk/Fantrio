@@ -654,27 +654,39 @@ export const MessagesPage = () => {
     const fileType = file.type || 'image/jpeg';
     const mediaType = fileType.startsWith('video/') ? 'video' : 'image';
     try {
-      const res = await api.post('/settings/presigned-upload', {
-        fileName: (file.name || `chat-image-${Date.now()}.jpg`).replace(/[^a-zA-Z0-9._-]/g, '_'),
-        fileType
-      });
-      if (res.status !== 'success') {
-        toast.error('Failed to get upload URL.');
-        return;
+      let mediaUrl = '';
+      try {
+        const res = await api.post('/settings/presigned-upload', {
+          fileName: (file.name || `chat-image-${Date.now()}.jpg`).replace(/[^a-zA-Z0-9._-]/g, '_'),
+          fileType
+        });
+        if (res.status === 'success' && res.uploadUrl) {
+          const putRes = await fetch(res.uploadUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': fileType },
+            body: file
+          });
+          if (putRes.ok) {
+            mediaUrl = res.fileUrl;
+          }
+        }
+      } catch (s3Err) {
+        console.warn('S3 direct upload failed, using Data URL fallback:', s3Err);
       }
-      const putRes = await fetch(res.uploadUrl, {
-        method: 'PUT',
-        headers: { 'Content-Type': fileType },
-        body: file
-      });
-      if (!putRes.ok) {
-        toast.error('Upload to storage failed.');
-        return;
+
+      if (!mediaUrl) {
+        mediaUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
       }
+
       const msgRes = await api.post('/chat/message', {
         receiverId: selectedConvId,
         content: '',
-        mediaUrl: res.fileUrl,
+        mediaUrl,
         mediaType
       });
       if (msgRes.status === 'success' && msgRes.message) {
@@ -1122,6 +1134,11 @@ export const MessagesPage = () => {
                             onClick={() => selectMessage(msg.id)}
                             style={{ cursor: 'pointer' }}
                           >
+                            <img
+                              src={selectedConv?.user?.avatarUrl || '/profile.png'}
+                              alt={selectedConv?.user?.displayName || 'Creator'}
+                              className={styles.msgAvatar}
+                            />
                             <div className={`${styles.paywallWrapper} ${selectedMsgId === msg.id ? styles.paywallSelected : ''}`}>
                               <span className={styles.paywallNoticeTitle}>{msg.title}</span>
 
@@ -1176,6 +1193,13 @@ export const MessagesPage = () => {
                           onClick={() => selectMessage(msg.id)}
                           style={{ cursor: 'pointer' }}
                         >
+                          {!isUser && (
+                            <img
+                              src={selectedConv?.user?.avatarUrl || '/profile.png'}
+                              alt={selectedConv?.user?.displayName || 'Creator'}
+                              className={styles.msgAvatar}
+                            />
+                          )}
                           <div className={styles.msgContentWrapper}>
                             {parsedGift.isGift ? (
                               <GiftMessageCard msg={msg} isCreator={!isUser} />
@@ -1690,6 +1714,11 @@ export const MessagesPage = () => {
                             onClick={() => selectMessage(msg.id)}
                             style={{ cursor: 'pointer' }}
                           >
+                            <img
+                              src={selectedConv?.user?.avatarUrl || '/profile.png'}
+                              alt={selectedConv?.user?.displayName || 'Creator'}
+                              className={styles.msgAvatar}
+                            />
                             <div className={`${styles.paywallWrapper} ${selectedMsgId === msg.id ? styles.paywallSelected : ''}`}>
                               <span className={styles.paywallNoticeTitle}>{msg.title}</span>
 
@@ -1745,6 +1774,13 @@ export const MessagesPage = () => {
                           onClick={() => selectMessage(msg.id)}
                           style={{ cursor: 'pointer' }}
                         >
+                          {!isUser && (
+                            <img
+                              src={selectedConv?.user?.avatarUrl || '/profile.png'}
+                              alt={selectedConv?.user?.displayName || 'Creator'}
+                              className={styles.msgAvatar}
+                            />
+                          )}
                           <div className={styles.msgContentWrapper}>
                             {parsedGift.isGift ? (
                               <GiftMessageCard msg={msg} isCreator={!isUser} />

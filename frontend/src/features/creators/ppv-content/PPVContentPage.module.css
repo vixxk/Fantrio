@@ -1654,3 +1654,371 @@
     font-size: 0.72rem !important;
   }
 }
+
+/* ================= ADD PPV MODAL ================= */
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modalCard {
+  background: #141414;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.modalHeaderTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.modalHeaderIcon {
+  color: #e10075;
+}
+
+.modalHeader h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.modalCloseBtn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 0.35rem;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalCloseBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.modalBody {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.fieldLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.dropzone {
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.02);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.dropzone:hover {
+  border-color: #e10075;
+  background: rgba(225, 0, 117, 0.05);
+  color: #ffffff;
+}
+
+.dropzoneIcon {
+  color: #e10075;
+}
+
+.dropzoneSub {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.fileSelectedBox {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+}
+
+.fileSelectedInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.fileName {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fileSize {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.changeFileBtn {
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.changeFileBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.modalTextarea {
+  width: 100%;
+  padding: 0.75rem 0.85rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+  resize: vertical;
+  min-height: 80px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+.modalTextarea:focus {
+  border-color: #e10075;
+}
+
+.priceInputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.priceIcon {
+  position: absolute;
+  left: 0.85rem;
+  color: #e10075;
+}
+
+.modalInput {
+  width: 100%;
+  padding: 0.75rem 0.85rem 0.75rem 2.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+.modalInput:focus {
+  border-color: #e10075;
+}
+
+.blurCheckboxRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  user-select: none;
+}
+
+.blurCheckboxRow input[type='checkbox'] {
+  accent-color: #e10075;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.modalFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.cancelBtn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.65rem 1.2rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+}
+
+.submitBtn {
+  background: #e10075;
+  border: none;
+  color: #ffffff;
+  padding: 0.65rem 1.4rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: #c5006a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(225, 0, 117, 0.35);
+}
+
+.submitBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.light .modalCard {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+}
+
+.light .modalHeader {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .modalHeader h3 {
+  color: #1a1625;
+}
+
+.light .fieldLabel,
+.light .blurCheckboxRow {
+  color: rgba(26, 22, 37, 0.8);
+}
+
+.light .dropzone {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .dropzoneSub {
+  color: rgba(26, 22, 37, 0.4);
+}
+
+.light .fileSelectedBox {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.light .fileName {
+  color: #1a1625;
+}
+
+.light .fileSize {
+  color: rgba(26, 22, 37, 0.5);
+}
+
+.light .modalTextarea,
+.light .modalInput {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #1a1625;
+}
+
+.light .cancelBtn {
+  border-color: rgba(0, 0, 0, 0.12);
+  color: rgba(26, 22, 37, 0.7);
+}
+
+.light .cancelBtn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.04);
+  color: #1a1625;
+}
+

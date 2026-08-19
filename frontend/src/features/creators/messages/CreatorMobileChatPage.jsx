@@ -306,25 +306,39 @@ export const CreatorMobileChatPage = () => {
     const mediaType = fileType.startsWith('video/') ? 'video' : 'image';
     const isPaywall = price > 0;
     try {
-      const res = await api.post('/settings/presigned-upload', {
-        fileName: (file.name || `chat-image-${Date.now()}.jpg`).replace(/[^a-zA-Z0-9._-]/g, '_'),
-        fileType
-      });
-      if (res.status !== 'success') {
-        throw new Error('Failed to get upload URL.');
+      let mediaUrl = '';
+      try {
+        const res = await api.post('/settings/presigned-upload', {
+          fileName: (file.name || `chat-image-${Date.now()}.jpg`).replace(/[^a-zA-Z0-9._-]/g, '_'),
+          fileType
+        });
+        if (res.status === 'success' && res.uploadUrl) {
+          const putRes = await fetch(res.uploadUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': fileType },
+            body: file
+          });
+          if (putRes.ok) {
+            mediaUrl = res.fileUrl;
+          }
+        }
+      } catch (s3Err) {
+        console.warn('S3 direct upload failed, using Data URL fallback:', s3Err);
       }
-      const putRes = await fetch(res.uploadUrl, {
-        method: 'PUT',
-        headers: { 'Content-Type': fileType },
-        body: file
-      });
-      if (!putRes.ok) {
-        throw new Error('Upload to storage failed.');
+
+      if (!mediaUrl) {
+        mediaUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
       }
+
       const msgRes = await api.post('/chat/message', {
         receiverId: fanId,
         content: '',
-        mediaUrl: res.fileUrl,
+        mediaUrl,
         mediaType,
         isPaywall,
         coinPrice: isPaywall ? price : 0
@@ -337,7 +351,7 @@ export const CreatorMobileChatPage = () => {
       }
     } catch (err) {
       console.error('Failed to send media:', err);
-      throw new Error('Failed to send media. Please try again.', { cause: err });
+      toast.error('Failed to send media. Please try again.');
     }
   };
 

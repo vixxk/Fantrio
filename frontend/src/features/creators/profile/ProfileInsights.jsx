@@ -28,24 +28,7 @@ export const ProfileInsights = ({ isDark, profileInsights, onPeriodChange }) => 
     <div className={`${styles.insightsCard} ${!isDark ? styles.light : ''}`}>
       <div className={styles.insightsHeader}>
         <h3 className={styles.cardTitle}>{insights.title}</h3>
-        <div className={styles.periodWrap} ref={ref}>
-          <button className={styles.periodBtn} onClick={() => setOpen(!open)}>
-            {period} <ChevronDown size={14} />
-          </button>
-          {open && (
-            <div className={styles.periodMenu}>
-              {periodOptions.map((opt) => (
-                <button
-                  key={opt}
-                  className={`${styles.periodMenuItem} ${opt === period ? styles.periodMenuItemActive : ''}`}
-                  onClick={() => selectPeriod(opt)}
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+
       </div>
       <div className={styles.insightsList}>
         {insights.stats.map((stat, index) => (
