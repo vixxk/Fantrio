@@ -243,7 +243,6 @@ export const AdminFeatures = () => {
 
                       <select
                         className={styles.formSelect}
-                        style={{ padding: '0.3rem 0.6rem', fontSize: '0.78rem', width: 'auto', background: '#181818' }}
                         value={f.status || 'suggestion'}
                         onChange={(e) => handleStatusChange(f._id, e.target.value)}
                       >

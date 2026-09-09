@@ -621,18 +621,37 @@
 }
 
 .rankBadgeContainer {
-  width: 45px;
-  display: flex;
+  min-width: 64px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
 .goldBadge, .silverBadge, .bronzeBadge {
-  font-size: 0.78rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 0.82rem;
   font-weight: 800;
-  padding: 0.2rem 0.5rem;
+  padding: 0.32rem 0.72rem;
   border-radius: 999px;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.badgeMedal {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.badgeNum {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
 }
 
 .goldBadge { background: rgba(234, 179, 8, 0.25); color: #eab308; }
@@ -640,9 +659,15 @@
 .bronzeBadge { background: rgba(217, 119, 6, 0.25); color: #f59e0b; }
 
 .normalRank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
   font-size: 0.85rem;
   font-weight: 700;
   color: #94a3b8;
+  white-space: nowrap;
+  line-height: 1;
 }
 
 .rankAvatar {

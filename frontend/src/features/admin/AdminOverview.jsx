@@ -287,6 +287,12 @@ const TransactionDistributionChart = ({ transactionBreakdown }) => {
 
 const MetricCard = ({ icon: Icon, label, value, color, bgColor, trend, trendLabel }) => (
   <div className={styles.metricCard}>
+    {trend !== undefined && (
+      <span className={`${styles.metricTrend} ${trend >= 0 ? styles.trendUp : styles.trendDown}`}>
+        {trend >= 0 ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
+        <span>{trendLabel || `${Math.abs(trend)}%`}</span>
+      </span>
+    )}
     <div className={styles.iconContainer} style={{ background: bgColor, color: color }}>
       <Icon size={24} />
     </div>
@@ -294,12 +300,6 @@ const MetricCard = ({ icon: Icon, label, value, color, bgColor, trend, trendLabe
       <span className={styles.metricLabel}>{label}</span>
       <div className={styles.metricValueRow}>
         <span className={styles.metricValue}>{value}</span>
-        {trend !== undefined && (
-          <span className={`${styles.metricTrend} ${trend >= 0 ? styles.trendUp : styles.trendDown}`}>
-            {trend >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-            <span>{trendLabel || `${Math.abs(trend)}%`}</span>
-          </span>
-        )}
       </div>
     </div>
   </div>

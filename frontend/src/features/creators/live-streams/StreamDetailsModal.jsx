@@ -265,9 +265,24 @@ export const StreamDetailsModal = ({ streamId, isAdmin = false, onClose }) => {
                       return (
                         <div key={item.userId} className={`${styles.rankCard} ${rank <= 3 ? styles[`rankCard${rank}`] : ''}`}>
                           <div className={styles.rankBadgeContainer}>
-                            {rank === 1 && <span className={styles.goldBadge}>🥇 #1</span>}
-                            {rank === 2 && <span className={styles.silverBadge}>🥈 #2</span>}
-                            {rank === 3 && <span className={styles.bronzeBadge}>🥉 #3</span>}
+                            {rank === 1 && (
+                              <span className={styles.goldBadge}>
+                                <span className={styles.badgeMedal}>🥇</span>
+                                <span className={styles.badgeNum}>#1</span>
+                              </span>
+                            )}
+                            {rank === 2 && (
+                              <span className={styles.silverBadge}>
+                                <span className={styles.badgeMedal}>🥈</span>
+                                <span className={styles.badgeNum}>#2</span>
+                              </span>
+                            )}
+                            {rank === 3 && (
+                              <span className={styles.bronzeBadge}>
+                                <span className={styles.badgeMedal}>🥉</span>
+                                <span className={styles.badgeNum}>#3</span>
+                              </span>
+                            )}
                             {rank > 3 && <span className={styles.normalRank}>#{rank}</span>}
                           </div>
 
