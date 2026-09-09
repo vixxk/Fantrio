@@ -286,8 +286,19 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const storedToken = localStorage.getItem('token');
-        if (storedToken) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const queryToken = urlParams.get('token');
+        let storedToken = localStorage.getItem('token');
+
+        if (queryToken) {
+          storedToken = queryToken;
+          api.setToken(queryToken);
+          setToken(queryToken);
+          urlParams.delete('token');
+          const cleanSearch = urlParams.toString();
+          const cleanUrl = window.location.pathname + (cleanSearch ? `?${cleanSearch}` : '');
+          window.history.replaceState({}, '', cleanUrl);
+        } else if (storedToken) {
           api.setToken(storedToken);
           setToken(storedToken);
         }
@@ -299,7 +310,10 @@ export const AppProvider = ({ children }) => {
             displayName: meRes.user.displayName,
             email: meRes.user.email,
             avatarUrl: meRes.user.avatarUrl || '',
-            role: meRes.user.role
+            role: meRes.user.role,
+            googleId: meRes.user.googleId,
+            xId: meRes.user.xId,
+            isOnboardingCompleted: meRes.user.isOnboardingCompleted
           });
           {
             const resolved = resolveAccessibleTab(activeTab, meRes.user.role);
@@ -469,7 +483,10 @@ export const AppProvider = ({ children }) => {
         email: meRes.user.email,
         avatarUrl: meRes.user.avatarUrl || '',
         role: meRes.user.role,
-        bio: meRes.user.bio || ''
+        bio: meRes.user.bio || '',
+        googleId: meRes.user.googleId,
+        xId: meRes.user.xId,
+        isOnboardingCompleted: meRes.user.isOnboardingCompleted
       });
       return meRes.user;
     } catch (err) {
@@ -499,6 +516,33 @@ export const AppProvider = ({ children }) => {
       // Navigate to discover after auto-login (development mode)
       // User will be on login page in production after OTP verification
       window.history.pushState(null, '', '/discover');
+    }
+    return res;
+  };
+
+  const loginWithOAuth = async (provider, payload) => {
+    const res = await api.post(`/auth/oauth/${provider}`, payload);
+    if (res.token) {
+      await applyAuth(res);
+      window.history.pushState(null, '', res.user?.role === 'creator' ? '/creators/dashboard' : '/discover');
+    }
+    return res;
+  };
+
+  const completeOnboarding = async ({ role, displayName, username, referralCode, agree }) => {
+    const res = await api.post('/auth/complete-onboarding', {
+      role,
+      displayName,
+      username,
+      referralCode,
+      agree
+    });
+    if (res.token) {
+      await applyAuth(res);
+      const destination = res.user?.role === 'creator' ? '/creators/dashboard' : '/discover';
+      window.history.pushState(null, '', destination);
+      setActiveTabState(res.user?.role === 'creator' ? 'Creator Dashboard' : 'Discover Feed');
+      setCurrentPath(destination);
     }
     return res;
   };
@@ -584,6 +628,8 @@ export const AppProvider = ({ children }) => {
         replacePath,
         login,
         register,
+        loginWithOAuth,
+        completeOnboarding,
         logout,
         verify2FALogin,
         refreshProfile,

@@ -40,6 +40,7 @@ import { AdminPage } from './features/admin/AdminPage';
 import { AdminLogin } from './features/admin/AdminLogin';
 import { LoginPage } from './features/auth/LoginPage';
 import { SignupPage } from './features/auth/SignupPage';
+import { OnboardingPage } from './features/auth/OnboardingPage';
 import { IncomingCallProvider } from './features/calls/IncomingCallProvider';
 import { ToastProvider } from './components/Toast/Toast';
 import { NewMessageNotifier } from './components/NewMessageNotifier/NewMessageNotifier';
@@ -378,6 +379,17 @@ const AppContent = () => {
       <div className={`authBootScreen ${darkMode ? 'darkTheme' : 'lightTheme'}`}>
         <img src="/Fantrio Logo.png" alt="Fantrio" className="authBootLogo" />
         <span className="authBootSpinner" />
+      </div>
+    );
+  }
+
+  // Strict Onboarding gate: users who registered via Google/X or have not filled required data
+  // CANNOT proceed to feeds, dashboards, settings, or any other app views.
+  // This persists across reloads, browser restarts, and subsequent logins until submitted.
+  if (user && user.isOnboardingCompleted === false) {
+    return (
+      <div className={`authPageRoot ${darkMode ? 'darkTheme' : 'lightTheme'}`}>
+        <OnboardingPage />
       </div>
     );
   }

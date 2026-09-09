@@ -1,5 +1,5 @@
 /* ============================================================
-   SignupPage.module.css — Spacious Proportional Screen Sizing
+   OnboardingPage.module.css — Gated Profile Completion Step
    ============================================================ */
 
 .formWrap {
@@ -10,12 +10,12 @@
 
 .cardHead {
   text-align: center;
-  margin-bottom: 1vh;
+  margin-bottom: 1.2vh;
 }
 
 .title {
   margin: 0 0 0.25rem;
-  font-size: 1.5rem;
+  font-size: 1.55rem;
   font-weight: 800;
   letter-spacing: -0.03em;
   color: inherit;
@@ -33,20 +33,68 @@
   margin: 0;
   font-size: 0.84rem;
   line-height: 1.4;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.65);
 }
 
 :global(.lightTheme) .subtitle,
 .light .subtitle {
-  color: rgba(26, 22, 37, 0.6);
+  color: rgba(26, 22, 37, 0.65);
+}
+
+/* Connected Social Account Banner */
+.connectedBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 auto 1.4vh;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  max-width: 95%;
+}
+
+:global(.lightTheme) .connectedBadge,
+.light .connectedBadge {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.connectedAvatar {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.connectedText {
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.85);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:global(.lightTheme) .connectedText,
+.light .connectedText {
+  color: #1e293b;
+}
+
+.connectedHighlight {
+  font-weight: 700;
+  color: #e10075;
 }
 
 /* ---------- Role Selection ---------- */
 .roleLabel {
   font-size: 0.78rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 0.4vh;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 0.5vh;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -60,7 +108,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  margin-bottom: 1vh;
+  margin-bottom: 1.2vh;
 }
 
 .roleCard {
@@ -146,7 +194,7 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: 0.8vh;
+  gap: 1vh;
   width: 100%;
 }
 
@@ -172,7 +220,7 @@
 .label {
   font-size: 0.78rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 :global(.lightTheme) .label,
@@ -202,7 +250,7 @@
 .input {
   width: 100%;
   height: 42px;
-  padding: 0 40px 0 38px;
+  padding: 0 14px 0 38px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.05);
@@ -243,220 +291,125 @@
   box-shadow: 0 0 0 2.5px rgba(225, 0, 117, 0.12);
 }
 
-.eyeBtn {
-  position: absolute;
-  right: 7px;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  border-radius: 7px;
-  color: rgba(255, 255, 255, 0.4);
-  cursor: pointer;
-  transition: color 0.15s, background 0.15s;
+.helperText {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 2px;
 }
 
-.eyeBtn:hover {
-  color: #e10075;
-  background: rgba(255, 255, 255, 0.06);
+:global(.lightTheme) .helperText,
+.light .helperText {
+  color: rgba(26, 22, 37, 0.5);
 }
 
-:global(.lightTheme) .eyeBtn,
-.light .eyeBtn {
-  color: rgba(26, 22, 37, 0.4);
-}
-
-/* ---------- Password Strength Meter ---------- */
-.strengthRow {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 3px;
-}
-
-.strengthBar {
-  display: flex;
-  gap: 3px;
-  flex: 1;
-}
-
-.strengthSeg {
-  flex: 1;
-  height: 3px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.1);
-  transition: background-color 0.2s;
-}
-
-:global(.lightTheme) .strengthSeg,
-.light .strengthSeg {
-  background: #e2e8f0;
-}
-
-.strengthOn {
-  background: #e10075;
-}
-
-.strengthBar[data-strength="0"] .strengthOn,
-.strengthBar[data-strength="1"] .strengthOn {
-  background: #ef4444;
-}
-
-.strengthBar[data-strength="2"] .strengthOn {
-  background: #f59e0b;
-}
-
-.strengthBar[data-strength="3"] .strengthOn,
-.strengthBar[data-strength="4"] .strengthOn {
-  background: #10b981;
-}
-
-.strengthLabel {
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.5);
-  min-width: 44px;
-  text-align: right;
-}
-
-:global(.lightTheme) .strengthLabel,
-.light .strengthLabel {
-  color: #64748b;
-}
-
-/* ---------- Terms Checkbox ---------- */
-.termsRow {
+/* Agreement Checkbox */
+.checkRow {
   display: flex;
   align-items: flex-start;
-  gap: 9px;
-  margin-top: 0.3vh;
+  gap: 10px;
+  margin: 0.5vh 0;
   cursor: pointer;
-  user-select: none;
 }
 
 .checkbox {
-  width: 17px;
-  height: 17px;
-  margin-top: 1px;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  accent-color: #e10075;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  border-radius: 5px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.04);
   cursor: pointer;
-  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.checkbox:checked {
+  background: linear-gradient(135deg, #e10075, #7e00f3);
+  border-color: #e10075;
+}
+
+.checkbox:checked::after {
+  content: '✓';
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  position: absolute;
 }
 
 :global(.lightTheme) .checkbox,
 .light .checkbox {
-  border-color: rgba(0, 0, 0, 0.2);
+  border-color: rgba(0, 0, 0, 0.25);
+  background: #ffffff;
 }
 
-.termsText {
+.checkText {
   font-size: 0.78rem;
-  line-height: 1.4;
-  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.75);
 }
 
-:global(.lightTheme) .termsText,
-.light .termsText {
-  color: #475569;
+:global(.lightTheme) .checkText,
+.light .checkText {
+  color: #334155;
 }
 
-.termsLink {
+.link {
   color: #e10075;
-  font-weight: 600;
   text-decoration: underline;
   cursor: pointer;
 }
 
-.termsLink:hover {
-  color: #ff2d95;
+.link:hover {
+  color: #ff2a8d;
 }
 
-/* ---------- Messages ---------- */
-.errorBox {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 10px;
-  background: rgba(248, 113, 113, 0.1);
-  border: 1px solid rgba(248, 113, 113, 0.28);
-  color: #fca5a5;
-  font-size: 0.8rem;
-  font-weight: 600;
-  line-height: 1.35;
-  animation: shake 0.3s ease;
-}
-
-.errorDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #f87171;
-  flex-shrink: 0;
-}
-
-.noticeBox {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 10px;
-  background: rgba(225, 0, 117, 0.12);
-  border: 1px solid rgba(225, 0, 117, 0.35);
-  color: #fca5a5;
-  font-size: 0.8rem;
-  font-weight: 500;
-  line-height: 1.35;
-}
-
-.noticeIcon {
-  flex-shrink: 0;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  75% { transform: translateX(4px); }
-}
-
-/* ---------- Submit Button ---------- */
+/* Submit Button */
 .submitBtn {
   width: 100%;
   height: 44px;
-  border-radius: 999px;
+  margin-top: 0.6vh;
+  border-radius: 9999px;
   border: none;
   background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
   color: #ffffff;
-  font-size: 0.96rem;
+  font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: 0 4px 16px rgba(225, 0, 117, 0.35);
-  transition: all 0.2s ease;
-  margin-top: 0.4vh;
+  font-family: inherit;
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 18px rgba(225, 0, 117, 0.35);
 }
 
 .submitBtn:hover:not(:disabled) {
   opacity: 0.95;
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(225, 0, 117, 0.45);
+  box-shadow: 0 6px 22px rgba(225, 0, 117, 0.45);
+}
+
+.submitBtn:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .submitBtn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
+/* Spinner */
 .spinner {
-  width: 17px;
-  height: 17px;
+  width: 18px;
+  height: 18px;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-top-color: #ffffff;
   border-radius: 50%;
@@ -464,148 +417,58 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-/* ---------- Switch Prompt ---------- */
-.switchPrompt {
+/* Error Alert */
+.errorAlert {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+  font-size: 0.8rem;
+  margin-bottom: 0.8vh;
+  line-height: 1.4;
+}
+
+:global(.lightTheme) .errorAlert,
+.light .errorAlert {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+/* Logout Row */
+.logoutRow {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  margin-top: 1vh;
-  font-size: 0.82rem;
+  margin-top: 1.4vh;
+  font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.55);
 }
 
-:global(.lightTheme) .switchPrompt,
-.light .switchPrompt {
-  color: #64748b;
+:global(.lightTheme) .logoutRow,
+.light .logoutRow {
+  color: rgba(26, 22, 37, 0.6);
 }
 
-.switchLink {
+.logoutBtn {
   background: none;
   border: none;
-  padding: 0;
   color: #e10075;
   font-weight: 700;
-  font-size: 0.82rem;
   cursor: pointer;
-  transition: color 0.15s;
-}
-
-.switchLink:hover {
-  color: #ff2d95;
+  font-size: inherit;
+  padding: 0;
   text-decoration: underline;
+  font-family: inherit;
 }
 
-/* ---------- Mobile Responsive Styles ---------- */
-@media (max-width: 640px) {
-  .cardHead {
-    margin-bottom: 0.65rem;
-  }
-
-  .title {
-    font-size: 1.35rem;
-    margin-bottom: 0.2rem;
-  }
-
-  .subtitle {
-    font-size: 0.78rem;
-    line-height: 1.35;
-  }
-
-  .roleLabel {
-    font-size: 0.72rem;
-    margin-bottom: 0.35rem;
-  }
-
-  .roleGrid {
-    gap: 8px;
-    margin-bottom: 0.65rem;
-  }
-
-  .roleCard {
-    padding: 7px 10px;
-    border-radius: 12px;
-  }
-
-  .roleIcon {
-    width: 16px;
-    height: 16px;
-  }
-
-  .roleName {
-    font-size: 0.84rem;
-  }
-
-  .roleDesc {
-    font-size: 0.66rem;
-    line-height: 1.25;
-  }
-
-  .form {
-    gap: 0.55rem;
-  }
-
-  .fieldRow {
-    gap: 8px;
-  }
-
-  .field {
-    gap: 0.2rem;
-  }
-
-  .label {
-    font-size: 0.74rem;
-  }
-
-  .input {
-    height: 38px;
-    font-size: 0.84rem;
-    padding: 0 36px 0 34px;
-    border-radius: 10px;
-  }
-
-  .inputIcon {
-    left: 11px;
-    width: 16px;
-    height: 16px;
-  }
-
-  .eyeBtn {
-    right: 5px;
-    width: 28px;
-    height: 28px;
-  }
-
-  .termsRow {
-    margin-top: 0.2rem;
-    gap: 7px;
-  }
-
-  .checkbox {
-    width: 15px;
-    height: 15px;
-  }
-
-  .termsText {
-    font-size: 0.73rem;
-    line-height: 1.35;
-  }
-
-  .submitBtn {
-    height: 42px;
-    font-size: 0.92rem;
-    margin-top: 0.35rem;
-  }
-
-  .switchPrompt {
-    margin-top: 0.75rem;
-    font-size: 0.78rem;
-  }
-
-  .switchLink {
-    font-size: 0.78rem;
-  }
+.logoutBtn:hover {
+  color: #ff2a8d;
 }

@@ -1,0 +1,610 @@
+/* ============================================================
+   Fantrio Split Auth Layout — % Screen Based Placement
+   ============================================================ */
+
+.authRoot {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.dark {
+  background:
+    radial-gradient(900px 500px at 15% -10%, rgba(225, 0, 117, 0.16), transparent 55%),
+    radial-gradient(1000px 600px at 110% 10%, rgba(126, 0, 243, 0.18), transparent 55%),
+    radial-gradient(800px 500px at 50% 120%, rgba(225, 0, 117, 0.08), transparent 55%),
+    #07040c;
+  color: #ffffff;
+}
+
+.light {
+  background:
+    radial-gradient(900px 500px at 15% -10%, rgba(225, 0, 117, 0.09), transparent 55%),
+    radial-gradient(1000px 600px at 110% 10%, rgba(126, 0, 243, 0.1), transparent 55%),
+    #f6f5fb;
+  color: #1a1625;
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 100vw;
+  flex: 1;
+  height: calc(100vh - 64px);
+  max-height: calc(100vh - 64px);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* ------------------------------------------------------------
+   LEFT PANE: 4 Reel Cards Proportional & Centered
+   ------------------------------------------------------------ */
+.leftPane {
+  width: 55%;
+  flex: 0 0 55%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5vh 2.5vw 2vh 3.5vw;
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+  user-select: none;
+  height: 100%;
+}
+
+/* 4 Reels / Shorts row sized in % */
+.reelsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3%;
+  width: 96%;
+  max-width: 900px;
+  margin: auto;
+  z-index: 2;
+  align-items: center;
+  justify-content: center;
+}
+
+.reelCard {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  width: 100%;
+  height: 60vh;
+  max-height: 500px;
+  min-height: 280px;
+  background-color: rgba(255, 255, 255, 0.03);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+}
+
+.light .reelCard {
+  background-color: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.reelCard:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 24px 50px rgba(225, 0, 117, 0.25);
+  border-color: rgba(225, 0, 117, 0.5);
+}
+
+.reelVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.videoBlur {
+  filter: blur(18px) brightness(0.85);
+  transform: scale(1.15);
+}
+
+.reelOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.45) 100%);
+  pointer-events: none;
+}
+
+.blurBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.blurBtn:hover {
+  background: rgba(225, 0, 117, 0.7);
+  transform: scale(1.1);
+}
+
+.playIndicator {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  opacity: 0.85;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.reelCard:hover .playIndicator {
+  opacity: 1;
+  transform: scale(1.08);
+}
+
+/* ------------------------------------------------------------
+   SECTION DIVIDER: Vertical Line Between Left & Right (Desktop)
+   ------------------------------------------------------------ */
+.sectionDivider {
+  width: 1.5px;
+  height: 68%;
+  max-height: 520px;
+  align-self: center;
+  flex-shrink: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.22) 15%,
+    rgba(255, 255, 255, 0.22) 85%,
+    transparent 100%
+  );
+  border-radius: 999px;
+  z-index: 2;
+}
+
+.light .sectionDivider {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.15) 15%,
+    rgba(0, 0, 0, 0.15) 85%,
+    transparent 100%
+  );
+}
+
+/* ------------------------------------------------------------
+   RIGHT PANE: Auth Card & Scrollable Container
+   ------------------------------------------------------------ */
+.rightPane {
+  width: calc(45% - 2px);
+  flex: 0 0 calc(45% - 2px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5vh 2.5vw 1.5vh 1.5vw;
+  box-sizing: border-box;
+  height: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+/* Hide scrollbars completely */
+.rightPane::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.authCard {
+  width: 92%;
+  max-width: 530px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 24px;
+  padding: 2.2vh 2.2vw;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  animation: cardIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.light .authCard {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(0, 0, 0, 0.06);
+  box-shadow: 0 20px 50px rgba(40, 20, 60, 0.08);
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Top Tab Pills: Sign up & Login */
+.topTabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 1.25rem;
+  width: 100%;
+}
+
+.topTabBtn {
+  flex: 1;
+  height: 44px;
+  border-radius: 999px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-family: inherit;
+}
+
+.tabActive {
+  background: linear-gradient(135deg, #e10075 0%, #7e00f3 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(225, 0, 117, 0.35);
+}
+
+.tabActive:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+}
+
+.tabInactive {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.light .tabInactive {
+  background: rgba(0, 0, 0, 0.03);
+  color: #475569;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.tabInactive:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.light .tabInactive:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: #0f172a;
+}
+
+/* Disclaimer text */
+.disclaimer {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.45;
+  text-align: center;
+  margin: 0.25rem 0 1.6rem;
+  padding: 0 0.5rem;
+}
+
+.light .disclaimer {
+  color: #64748b;
+}
+
+.linkText {
+  color: #e10075;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s;
+}
+
+.linkText:hover {
+  color: #ff2d95;
+}
+
+/* Notice Banner */
+.noticeBanner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(225, 0, 117, 0.12);
+  border: 1px solid rgba(225, 0, 117, 0.35);
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.82rem;
+  color: #fca5a5;
+  line-height: 1.4;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.noticeIcon {
+  flex-shrink: 0;
+  color: #e10075;
+}
+
+.noticeClose {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* ------------------------------------------------------------
+   3 AUTH BUTTONS: X, Google, Normal
+   ------------------------------------------------------------ */
+.actionButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.authButton {
+  position: relative;
+  width: 100%;
+  height: 48px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+/* Sign in with X button */
+.xButton {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+.light .xButton {
+  background: #ffffff;
+  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  color: #0f172a;
+}
+
+.xButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.light .xButton:hover {
+  background: #f8fafc;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Sign in with Google button */
+.googleButton {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+.light .googleButton {
+  background: #ffffff;
+  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  color: #0f172a;
+}
+
+.googleButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.light .googleButton:hover {
+  background: #f8fafc;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Normal / Continue with Email button */
+.normalButton {
+  background: linear-gradient(135deg, rgba(225, 0, 117, 0.14), rgba(126, 0, 243, 0.14));
+  border: 1px solid rgba(225, 0, 117, 0.35);
+  color: #ffffff;
+}
+
+.light .normalButton {
+  background: linear-gradient(135deg, rgba(225, 0, 117, 0.08), rgba(126, 0, 243, 0.08));
+  border: 1.5px solid rgba(225, 0, 117, 0.3);
+  color: #0f172a;
+}
+
+.normalButton:hover {
+  background: linear-gradient(135deg, rgba(225, 0, 117, 0.25), rgba(126, 0, 243, 0.25));
+  border-color: #e10075;
+  box-shadow: 0 4px 16px rgba(225, 0, 117, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Icon Badges */
+.btnIconBadge {
+  position: absolute;
+  left: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+}
+
+.googleIconBadge {
+  position: absolute;
+  left: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+}
+
+.btnText {
+  text-align: center;
+}
+
+/* ------------------------------------------------------------
+   Form Container (when Normal is chosen)
+   ------------------------------------------------------------ */
+.formContainer {
+  width: 100%;
+  animation: formIn 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes formIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: #e10075;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.backLink:hover {
+  background: rgba(225, 0, 117, 0.1);
+  color: #ff2d95;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ------------------------------------------------------------
+   RESPONSIVE DESIGN: Tablets & Mobile
+   ------------------------------------------------------------ */
+/* ------------------------------------------------------------
+   RESPONSIVE DESIGN: Mobile & Tablets (Hide Left Pane)
+   ------------------------------------------------------------ */
+@media (max-width: 1024px) {
+  .authRoot {
+    height: auto;
+    min-height: 100vh;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .container {
+    flex-direction: column;
+    height: auto;
+    min-height: calc(100vh - 64px);
+    max-height: none;
+    overflow: visible;
+  }
+
+  /* Completely hide left side things on mobile UI */
+  .leftPane,
+  .sectionDivider {
+    display: none !important;
+  }
+
+  /* Only show right side elements on mobile UI */
+  .rightPane {
+    width: 100%;
+    flex: 1 0 auto;
+    height: auto;
+    min-height: calc(100vh - 64px);
+    max-height: none;
+    padding: 1rem 1rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    overflow: visible;
+  }
+
+  .authCard {
+    width: 100%;
+    max-width: 480px;
+    padding: 1.5rem 1.25rem;
+    margin: auto;
+    border-radius: 20px;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    min-height: calc(100vh - clamp(48px, 7vh, 60px));
+  }
+
+  .rightPane {
+    min-height: calc(100vh - clamp(48px, 7vh, 60px));
+    padding: 0.75rem 0.75rem 2rem;
+  }
+
+  .authCard {
+    padding: 1.25rem 1rem;
+    border-radius: 18px;
+    margin: auto;
+  }
+}
+

@@ -58,7 +58,10 @@ const createSendToken = (user, statusCode, res) => {
       isVerified: user.isVerified,
       username: user.username,
       displayName: user.displayName,
-      avatarUrl: user.avatarUrl
+      avatarUrl: user.avatarUrl,
+      googleId: user.googleId,
+      xId: user.xId,
+      isOnboardingCompleted: user.isOnboardingCompleted !== false
     }
   });
 };
@@ -548,9 +551,62 @@ exports.getMe = catchAsync(async (req, res, next) => {
       username: req.user.username,
       displayName: req.user.displayName,
       avatarUrl: req.user.avatarUrl,
-      bio: req.user.bio
+      googleId: req.user.googleId,
+      xId: req.user.xId,
+      bio: req.user.bio,
+      isOnboardingCompleted: req.user.isOnboardingCompleted !== false
     }
   });
+});
+
+exports.completeOnboarding = catchAsync(async (req, res, next) => {
+  const { role, displayName, username, referralCode, agree } = req.body;
+
+  if (!agree) {
+    return next(new ApiError(400, 'You must agree to the Terms of Service and Privacy Policy to continue.'));
+  }
+
+  const selectedRole = role === 'creator' ? 'creator' : 'fan';
+
+  if (!displayName || displayName.trim().length < 2) {
+    return next(new ApiError(400, 'Please enter a valid full name (at least 2 characters).'));
+  }
+
+  const cleanUsername = (username || '').trim().toLowerCase();
+  if (!cleanUsername || !/^[a-z0-9_]{3,30}$/.test(cleanUsername)) {
+    return next(new ApiError(400, 'Username must be 3–30 characters using letters, numbers, or underscores.'));
+  }
+
+  // Check if username is taken by another user
+  const existingUsername = await User.findOne({
+    username: cleanUsername,
+    _id: { $ne: req.user._id }
+  });
+  if (existingUsername) {
+    return next(new ApiError(400, 'That username is already taken. Please choose another one.'));
+  }
+
+  // Update user profile
+  req.user.displayName = displayName.trim();
+  req.user.username = cleanUsername;
+  req.user.role = selectedRole;
+  req.user.isOnboardingCompleted = true;
+
+  // Apply referral code if provided
+  if (referralCode && referralCode.trim()) {
+    try {
+      await applyReferralCode(req.user, referralCode.trim());
+    } catch (e) {
+      console.warn('Failed to apply referral code during onboarding:', e);
+    }
+  }
+
+  // Ensure account setup (wallet and/or creator profile)
+  await ensureUserAccountSetup(req.user, selectedRole);
+
+  await req.user.save({ validateBeforeSave: false });
+
+  return createSendToken(req.user, 200, res);
 });
 
 exports.updateMe = catchAsync(async (req, res, next) => {
@@ -700,4 +756,357 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     status: 'success',
     message: 'User account and all associated data deleted successfully'
   });
+});
+
+// ============================================================
+// Google & X (Twitter) OAuth Controllers
+// ============================================================
+
+const ensureUserAccountSetup = async (user, role = 'fan') => {
+  const Wallet = require('../models/Wallet');
+  let userWallet = await Wallet.findOne({ userId: user._id });
+  if (!userWallet) {
+    await Wallet.create({ userId: user._id, balanceCoins: 0 });
+  }
+
+  if (role === 'creator' || user.role === 'creator') {
+    const existingProfile = await CreatorProfile.findOne({ userId: user._id });
+    if (!existingProfile) {
+      await CreatorProfile.create({
+        userId: user._id,
+        username: user.username,
+        displayName: user.displayName,
+        rates: {
+          audioCallPerMin: 5,
+          videoCallPerMin: 10
+        },
+        verificationStatus: 'approved'
+      });
+    }
+  }
+};
+
+exports.oauthGoogle = catchAsync(async (req, res, next) => {
+  const { credential, email, name, avatarUrl, googleId, role } = req.body;
+
+  let resolvedEmail = email;
+  let resolvedName = name;
+  let resolvedAvatar = avatarUrl;
+  let resolvedGoogleId = googleId;
+
+  // If a JWT credential was supplied directly by Google One Tap / Google Identity Service
+  if (credential && !resolvedEmail) {
+    try {
+      const parts = credential.split('.');
+      if (parts.length === 3) {
+        const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
+        resolvedEmail = payload.email;
+        resolvedName = payload.name || payload.given_name;
+        resolvedAvatar = payload.picture;
+        resolvedGoogleId = payload.sub;
+      }
+    } catch (e) {
+      console.warn('Failed to parse Google credential token:', e);
+    }
+  }
+
+  if (!resolvedEmail && !resolvedGoogleId) {
+    return next(new ApiError(400, 'Invalid Google authentication data. Email or Google ID required.'));
+  }
+
+  let user = null;
+  if (resolvedGoogleId) {
+    user = await User.findOne({ googleId: resolvedGoogleId });
+  }
+  if (!user && resolvedEmail) {
+    user = await User.findOne({ email: resolvedEmail.toLowerCase().trim() });
+  }
+
+  if (user) {
+    // Existing user
+    if (resolvedGoogleId && !user.googleId) {
+      user.googleId = resolvedGoogleId;
+    }
+    if (resolvedAvatar && !user.avatarUrl) {
+      user.avatarUrl = resolvedAvatar;
+    }
+    user.lastLogin = new Date();
+    user.loginActivity.unshift(buildLoginActivity(req));
+    if (user.loginActivity.length > 20) user.loginActivity = user.loginActivity.slice(0, 20);
+    await user.save({ validateBeforeSave: false });
+
+    await ensureUserAccountSetup(user, user.role);
+    return createSendToken(user, 200, res);
+  }
+
+  // New user registration via Google
+  const cleanEmail = (resolvedEmail || `google_${resolvedGoogleId}@oauth.fantrio.com`).toLowerCase().trim();
+  const suffix = crypto.randomBytes(3).toString('hex');
+  const baseSlug = (resolvedName || 'user').toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 15);
+  const username = `${baseSlug}_${suffix}`;
+  const randomPassword = crypto.randomBytes(32).toString('hex');
+
+  const selectedRole = (role === 'creator') ? 'creator' : 'fan';
+
+  const newUser = await User.create({
+    email: cleanEmail,
+    password: randomPassword,
+    googleId: resolvedGoogleId,
+    displayName: resolvedName || `User ${suffix}`,
+    username,
+    avatarUrl: resolvedAvatar || '',
+    role: selectedRole,
+    isVerified: true,
+    isOnboardingCompleted: false
+  });
+
+  await ensureUserAccountSetup(newUser, selectedRole);
+  newUser.loginActivity.unshift(buildLoginActivity(req));
+  await newUser.save({ validateBeforeSave: false });
+
+  return createSendToken(newUser, 201, res);
+});
+
+exports.initGoogleOAuth = catchAsync(async (req, res) => {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const redirectUri = process.env.GOOGLE_CALLBACK_URL || `${req.protocol}://${req.get('host')}/api/v1/auth/oauth/google/callback`;
+  const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+
+  if (!clientId || clientId === 'your_google_client_id_here') {
+    return res.redirect(`${clientUrl}/login?error=Google+OAuth+client+not+configured`);
+  }
+
+  const role = req.query.role || 'fan';
+  const state = Buffer.from(JSON.stringify({ role, redirect: req.query.redirect || '/discover' })).toString('base64');
+  const scope = encodeURIComponent('openid email profile');
+  const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scope}&state=${state}&access_type=offline&prompt=consent`;
+
+  res.redirect(googleAuthUrl);
+});
+
+exports.googleOAuthCallback = catchAsync(async (req, res) => {
+  const { code, state } = req.query;
+  const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+
+  if (!code) {
+    return res.redirect(`${clientUrl}/login?error=OAuth+authorization+declined`);
+  }
+
+  let role = 'fan';
+  try {
+    if (state) {
+      const decoded = JSON.parse(Buffer.from(state, 'base64').toString('utf8'));
+      if (decoded.role) role = decoded.role;
+    }
+  } catch (e) {
+    // default role
+  }
+
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+  const redirectUri = process.env.GOOGLE_CALLBACK_URL || `${req.protocol}://${req.get('host')}/api/v1/auth/oauth/google/callback`;
+
+  if (!clientId || !clientSecret || clientId === 'your_google_client_id_here') {
+    return res.redirect(`${clientUrl}/login?error=Google+OAuth+credentials+missing`);
+  }
+
+  try {
+    // Exchange authorization code for tokens
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        client_id: clientId,
+        client_secret: clientSecret,
+        redirect_uri: redirectUri,
+        grant_type: 'authorization_code'
+      })
+    });
+    const tokens = await tokenRes.json();
+
+    if (!tokens.access_token) {
+      return res.redirect(`${clientUrl}/login?error=Failed+to+exchange+Google+token`);
+    }
+
+    // Fetch profile
+    const userRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${tokens.access_token}` }
+    });
+    const profile = await userRes.json();
+
+    let user = await User.findOne({ $or: [{ googleId: profile.sub }, { email: profile.email.toLowerCase() }] });
+    if (!user) {
+      const suffix = crypto.randomBytes(3).toString('hex');
+      const baseSlug = (profile.name || 'user').toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 15);
+      user = await User.create({
+        email: profile.email.toLowerCase(),
+        password: crypto.randomBytes(32).toString('hex'),
+        googleId: profile.sub,
+        displayName: profile.name || `User ${suffix}`,
+        username: `${baseSlug}_${suffix}`,
+        avatarUrl: profile.picture || '',
+        role: role === 'creator' ? 'creator' : 'fan',
+        isVerified: true,
+        isOnboardingCompleted: false
+      });
+      await ensureUserAccountSetup(user, user.role);
+    } else {
+      if (!user.googleId) user.googleId = profile.sub;
+      user.lastLogin = new Date();
+      await user.save({ validateBeforeSave: false });
+    }
+
+    const token = signToken(user._id, user.role);
+    return res.redirect(`${clientUrl}/login?token=${token}`);
+  } catch (err) {
+    console.error('Google OAuth callback error:', err);
+    return res.redirect(`${clientUrl}/login?error=Google+OAuth+failed`);
+  }
+});
+
+exports.oauthX = catchAsync(async (req, res, next) => {
+  const { xId, username, name, email, avatarUrl, role } = req.body;
+
+  if (!xId && !username && !email) {
+    return next(new ApiError(400, 'Invalid X authentication data. X ID, username, or email required.'));
+  }
+
+  let user = null;
+  if (xId) {
+    user = await User.findOne({ xId });
+  }
+  if (!user && username) {
+    user = await User.findOne({ username: username.toLowerCase().trim() });
+  }
+  if (!user && email) {
+    user = await User.findOne({ email: email.toLowerCase().trim() });
+  }
+
+  if (user) {
+    if (xId && !user.xId) user.xId = xId;
+    user.lastLogin = new Date();
+    user.loginActivity.unshift(buildLoginActivity(req));
+    if (user.loginActivity.length > 20) user.loginActivity = user.loginActivity.slice(0, 20);
+    await user.save({ validateBeforeSave: false });
+
+    await ensureUserAccountSetup(user, user.role);
+    return createSendToken(user, 200, res);
+  }
+
+  const suffix = crypto.randomBytes(3).toString('hex');
+  const cleanUsername = (username || `x_${suffix}`).toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 20);
+  const cleanEmail = (email || `${cleanUsername}@x.fantrio.com`).toLowerCase().trim();
+  const selectedRole = role === 'creator' ? 'creator' : 'fan';
+
+  const newUser = await User.create({
+    email: cleanEmail,
+    password: crypto.randomBytes(32).toString('hex'),
+    xId: xId || `x_${suffix}`,
+    displayName: name || username || `X User ${suffix}`,
+    username: cleanUsername,
+    avatarUrl: avatarUrl || '',
+    role: selectedRole,
+    isVerified: true,
+    isOnboardingCompleted: false
+  });
+
+  await ensureUserAccountSetup(newUser, selectedRole);
+  newUser.loginActivity.unshift(buildLoginActivity(req));
+  await newUser.save({ validateBeforeSave: false });
+
+  return createSendToken(newUser, 201, res);
+});
+
+exports.initXOAuth = catchAsync(async (req, res) => {
+  const clientId = process.env.X_CLIENT_ID;
+  const redirectUri = process.env.X_CALLBACK_URL || `${req.protocol}://${req.get('host')}/api/v1/auth/oauth/x/callback`;
+  const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+
+  if (!clientId || clientId === 'your_x_client_id_here') {
+    return res.redirect(`${clientUrl}/login?error=X+OAuth+client+not+configured`);
+  }
+
+  const role = req.query.role || 'fan';
+  const state = Buffer.from(JSON.stringify({ role, redirect: req.query.redirect || '/discover' })).toString('base64');
+  const scope = encodeURIComponent('tweet.read users.read offline.access');
+  const xAuthUrl = `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&state=${state}&code_challenge=challenge&code_challenge_method=plain`;
+
+  res.redirect(xAuthUrl);
+});
+
+exports.xOAuthCallback = catchAsync(async (req, res) => {
+  const { code } = req.query;
+  const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+
+  if (!code) {
+    return res.redirect(`${clientUrl}/login?error=X+OAuth+authorization+declined`);
+  }
+
+  const clientId = process.env.X_CLIENT_ID;
+  const clientSecret = process.env.X_CLIENT_SECRET;
+  const redirectUri = process.env.X_CALLBACK_URL || `${req.protocol}://${req.get('host')}/api/v1/auth/oauth/x/callback`;
+
+  if (!clientId || !clientSecret || clientId === 'your_x_client_id_here') {
+    return res.redirect(`${clientUrl}/login?error=X+OAuth+credentials+missing`);
+  }
+
+  try {
+    const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+    const tokenRes = await fetch('https://api.twitter.com/2/oauth2/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Basic ${basicAuth}`
+      },
+      body: new URLSearchParams({
+        code,
+        grant_type: 'authorization_code',
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        code_verifier: 'challenge'
+      })
+    });
+    const tokens = await tokenRes.json();
+
+    if (!tokens.access_token) {
+      return res.redirect(`${clientUrl}/login?error=Failed+to+exchange+X+token`);
+    }
+
+    const userRes = await fetch('https://api.twitter.com/2/users/me?user.fields=profile_image_url,name,username', {
+      headers: { Authorization: `Bearer ${tokens.access_token}` }
+    });
+    const { data: profile } = await userRes.json();
+
+    if (!profile || !profile.id) {
+      return res.redirect(`${clientUrl}/login?error=Failed+to+fetch+X+profile`);
+    }
+
+    let user = await User.findOne({ xId: profile.id });
+    if (!user) {
+      const suffix = crypto.randomBytes(3).toString('hex');
+      const cleanUsername = (profile.username || `x_${suffix}`).toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 20);
+      user = await User.create({
+        email: `${cleanUsername}@x.fantrio.com`,
+        password: crypto.randomBytes(32).toString('hex'),
+        xId: profile.id,
+        displayName: profile.name || profile.username || `X User ${suffix}`,
+        username: cleanUsername,
+        avatarUrl: profile.profile_image_url || '',
+        role: 'fan',
+        isVerified: true,
+        isOnboardingCompleted: false
+      });
+      await ensureUserAccountSetup(user, user.role);
+    } else {
+      user.lastLogin = new Date();
+      await user.save({ validateBeforeSave: false });
+    }
+
+    const token = signToken(user._id, user.role);
+    return res.redirect(`${clientUrl}/login?token=${token}`);
+  } catch (err) {
+    console.error('X OAuth callback error:', err);
+    return res.redirect(`${clientUrl}/login?error=X+OAuth+failed`);
+  }
 });

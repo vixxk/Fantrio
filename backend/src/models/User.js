@@ -17,6 +17,16 @@ const userSchema = new mongoose.Schema(
       minlength: 8,
       select: false
     },
+    googleId: {
+      type: String,
+      sparse: true,
+      index: true
+    },
+    xId: {
+      type: String,
+      sparse: true,
+      index: true
+    },
     username: {
       type: String,
       unique: true,
@@ -54,6 +64,10 @@ const userSchema = new mongoose.Schema(
     isSuspended: {
       type: Boolean,
       default: false
+    },
+    isOnboardingCompleted: {
+      type: Boolean,
+      default: true
     },
     lastLogin: {
       type: Date

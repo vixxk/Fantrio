@@ -4,8 +4,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 88px;
-  padding: 0 2.5rem;
+  height: 64px;
+  padding: 0 2rem;
   flex-shrink: 0;
 }
 
@@ -13,18 +13,18 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   cursor: pointer;
   user-select: none;
 }
 
 .logo {
-  height: 120px;
-  width: 120px;
+  height: 80px;
+  width: 80px;
   object-fit: contain;
   display: block;
-  margin-left: -26px; /* visually center the sparkle artwork inside the padded PNG */
-  margin-right: -24px;
+  margin-left: -18px;
+  margin-right: -16px;
   transform: translateY(1px);
   filter: drop-shadow(0 0 14px rgba(225, 0, 117, 0.35));
   transition: transform 0.25s ease;
