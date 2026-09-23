@@ -867,10 +867,34 @@ exports.oauthGoogle = catchAsync(async (req, res, next) => {
   return createSendToken(newUser, 201, res);
 });
 
+const resolveOAuthCallbackUrl = (req, provider) => {
+  const envUrl = provider === 'google' ? process.env.GOOGLE_CALLBACK_URL : process.env.X_CALLBACK_URL;
+  const host = req.get('host') || '';
+  const isLocalHost = host.includes('localhost') || host.includes('127.0.0.1');
+
+  if (envUrl && (!envUrl.includes('localhost') || isLocalHost)) {
+    return envUrl;
+  }
+  const proto = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+  return `${proto}://${host}/api/v1/auth/oauth/${provider}/callback`;
+};
+
+const resolveOAuthClientUrl = (req) => {
+  const envClientUrl = process.env.CLIENT_URL;
+  const host = req.get('host') || '';
+  const isLocalHost = host.includes('localhost') || host.includes('127.0.0.1');
+
+  if (envClientUrl && (!envClientUrl.includes('localhost') || isLocalHost)) {
+    return envClientUrl.replace(/\/+$/, '');
+  }
+  const proto = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+  return `${proto}://${host}`;
+};
+
 exports.initGoogleOAuth = catchAsync(async (req, res) => {
   const clientId = process.env.GOOGLE_CLIENT_ID;
-  const redirectUri = process.env.GOOGLE_CALLBACK_URL || `${req.protocol}://${req.get('host')}/api/v1/auth/oauth/google/callback`;
-  const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+  const redirectUri = resolveOAuthCallbackUrl(req, 'google');
+  const clientUrl = resolveOAuthClientUrl(req);
 
   if (!clientId || clientId === 'your_google_client_id_here') {
     return res.redirect(`${clientUrl}/login?error=Google+OAuth+client+not+configured`);
@@ -886,7 +910,7 @@ exports.initGoogleOAuth = catchAsync(async (req, res) => {
 
 exports.googleOAuthCallback = catchAsync(async (req, res) => {
   const { code, state } = req.query;
-  const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+  const clientUrl = resolveOAuthClientUrl(req);
 
   if (!code) {
     return res.redirect(`${clientUrl}/login?error=OAuth+authorization+declined`);
@@ -904,7 +928,7 @@ exports.googleOAuthCallback = catchAsync(async (req, res) => {
 
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  const redirectUri = process.env.GOOGLE_CALLBACK_URL || `${req.protocol}://${req.get('host')}/api/v1/auth/oauth/google/callback`;
+  const redirectUri = resolveOAuthCallbackUrl(req, 'google');
 
   if (!clientId || !clientSecret || clientId === 'your_google_client_id_here') {
     return res.redirect(`${clientUrl}/login?error=Google+OAuth+credentials+missing`);
@@ -1020,8 +1044,8 @@ exports.oauthX = catchAsync(async (req, res, next) => {
 
 exports.initXOAuth = catchAsync(async (req, res) => {
   const clientId = process.env.X_CLIENT_ID;
-  const redirectUri = process.env.X_CALLBACK_URL || `${req.protocol}://${req.get('host')}/api/v1/auth/oauth/x/callback`;
-  const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+  const redirectUri = resolveOAuthCallbackUrl(req, 'x');
+  const clientUrl = resolveOAuthClientUrl(req);
 
   if (!clientId || clientId === 'your_x_client_id_here') {
     return res.redirect(`${clientUrl}/login?error=X+OAuth+client+not+configured`);
@@ -1037,7 +1061,7 @@ exports.initXOAuth = catchAsync(async (req, res) => {
 
 exports.xOAuthCallback = catchAsync(async (req, res) => {
   const { code } = req.query;
-  const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+  const clientUrl = resolveOAuthClientUrl(req);
 
   if (!code) {
     return res.redirect(`${clientUrl}/login?error=X+OAuth+authorization+declined`);
@@ -1045,7 +1069,7 @@ exports.xOAuthCallback = catchAsync(async (req, res) => {
 
   const clientId = process.env.X_CLIENT_ID;
   const clientSecret = process.env.X_CLIENT_SECRET;
-  const redirectUri = process.env.X_CALLBACK_URL || `${req.protocol}://${req.get('host')}/api/v1/auth/oauth/x/callback`;
+  const redirectUri = resolveOAuthCallbackUrl(req, 'x');
 
   if (!clientId || !clientSecret || clientId === 'your_x_client_id_here') {
     return res.redirect(`${clientUrl}/login?error=X+OAuth+credentials+missing`);

@@ -4,6 +4,19 @@ const helmet = require('helmet');
 
 const app = express();
 
+// Trust reverse proxy (e.g. Nginx, Cloudflare, AWS)
+app.enable('trust proxy');
+
+// Normalize duplicate slashes in request URL paths (e.g. //api/v1/... -> /api/v1/...)
+app.use((req, res, next) => {
+  if (req.url && req.url.includes('//')) {
+    const [pathname, ...query] = req.url.split('?');
+    const normalizedPath = pathname.replace(/\/+/g, '/');
+    req.url = normalizedPath + (query.length > 0 ? '?' + query.join('?') : '');
+  }
+  next();
+});
+
 // Set security HTTP headers
 app.use(helmet({
   crossOriginResourcePolicy: false
