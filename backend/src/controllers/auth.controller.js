@@ -880,28 +880,51 @@ const resolveOAuthCallbackUrl = (req, provider) => {
 };
 
 const resolveOAuthClientUrl = (req) => {
-  const envClientUrl = process.env.CLIENT_URL;
-  const host = req.get('host') || '';
-  const isLocalHost = host.includes('localhost') || host.includes('127.0.0.1');
-
-  if (envClientUrl && (!envClientUrl.includes('localhost') || isLocalHost)) {
-    return envClientUrl.replace(/\/+$/, '');
+  if (req && req.query && req.query.clientUrl) {
+    return req.query.clientUrl.replace(/\/+$/, '');
   }
-  const proto = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+
+  const envClientUrl = process.env.CLIENT_URL;
+  if (envClientUrl && envClientUrl.trim()) {
+    const trimmed = envClientUrl.trim().replace(/\/+$/, '');
+    const isLocal = trimmed.includes('localhost') || trimmed.includes('127.0.0.1');
+    const host = (req && req.get) ? (req.get('host') || '') : '';
+    const hostIsLocal = host.includes('localhost') || host.includes('127.0.0.1');
+    if (!isLocal || hostIsLocal) {
+      return trimmed;
+    }
+  }
+
+  if (req && req.headers && req.headers.referer) {
+    try {
+      const refererOrigin = new URL(req.headers.referer).origin;
+      const host = (req && req.get) ? (req.get('host') || '') : '';
+      if (refererOrigin && !refererOrigin.includes(host)) {
+        return refererOrigin;
+      }
+    } catch (e) {}
+  }
+
+  const host = (req && req.get) ? (req.get('host') || '') : '';
+  const proto = (req && req.headers && req.headers['x-forwarded-proto']) || (req && req.protocol) || 'http';
   return `${proto}://${host}`;
 };
 
 exports.initGoogleOAuth = catchAsync(async (req, res) => {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const redirectUri = resolveOAuthCallbackUrl(req, 'google');
-  const clientUrl = resolveOAuthClientUrl(req);
+  const clientUrl = (req.query.clientUrl || resolveOAuthClientUrl(req)).replace(/\/+$/, '');
 
   if (!clientId || clientId === 'your_google_client_id_here') {
     return res.redirect(`${clientUrl}/login?error=Google+OAuth+client+not+configured`);
   }
 
   const role = req.query.role || 'fan';
-  const state = Buffer.from(JSON.stringify({ role, redirect: req.query.redirect || '/discover' })).toString('base64');
+  const state = Buffer.from(JSON.stringify({ 
+    role, 
+    redirect: req.query.redirect || '/discover',
+    clientUrl
+  })).toString('base64');
   const scope = encodeURIComponent('openid email profile');
   const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scope}&state=${state}&access_type=offline&prompt=consent`;
 
@@ -910,20 +933,21 @@ exports.initGoogleOAuth = catchAsync(async (req, res) => {
 
 exports.googleOAuthCallback = catchAsync(async (req, res) => {
   const { code, state } = req.query;
-  const clientUrl = resolveOAuthClientUrl(req);
-
-  if (!code) {
-    return res.redirect(`${clientUrl}/login?error=OAuth+authorization+declined`);
-  }
-
+  let clientUrl = resolveOAuthClientUrl(req);
   let role = 'fan';
+
   try {
     if (state) {
       const decoded = JSON.parse(Buffer.from(state, 'base64').toString('utf8'));
       if (decoded.role) role = decoded.role;
+      if (decoded.clientUrl) clientUrl = decoded.clientUrl.replace(/\/+$/, '');
     }
   } catch (e) {
-    // default role
+    // default role / clientUrl
+  }
+
+  if (!code) {
+    return res.redirect(`${clientUrl}/login?error=OAuth+authorization+declined`);
   }
 
   const clientId = process.env.GOOGLE_CLIENT_ID;
@@ -1045,14 +1069,18 @@ exports.oauthX = catchAsync(async (req, res, next) => {
 exports.initXOAuth = catchAsync(async (req, res) => {
   const clientId = process.env.X_CLIENT_ID;
   const redirectUri = resolveOAuthCallbackUrl(req, 'x');
-  const clientUrl = resolveOAuthClientUrl(req);
+  const clientUrl = (req.query.clientUrl || resolveOAuthClientUrl(req)).replace(/\/+$/, '');
 
   if (!clientId || clientId === 'your_x_client_id_here') {
     return res.redirect(`${clientUrl}/login?error=X+OAuth+client+not+configured`);
   }
 
   const role = req.query.role || 'fan';
-  const state = Buffer.from(JSON.stringify({ role, redirect: req.query.redirect || '/discover' })).toString('base64');
+  const state = Buffer.from(JSON.stringify({ 
+    role, 
+    redirect: req.query.redirect || '/discover',
+    clientUrl
+  })).toString('base64');
   const scope = encodeURIComponent('tweet.read users.read offline.access');
   const xAuthUrl = `https://twitter.com/i/oauth2/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&state=${state}&code_challenge=challenge&code_challenge_method=plain`;
 
@@ -1060,8 +1088,17 @@ exports.initXOAuth = catchAsync(async (req, res) => {
 });
 
 exports.xOAuthCallback = catchAsync(async (req, res) => {
-  const { code } = req.query;
-  const clientUrl = resolveOAuthClientUrl(req);
+  const { code, state } = req.query;
+  let clientUrl = resolveOAuthClientUrl(req);
+
+  try {
+    if (state) {
+      const decoded = JSON.parse(Buffer.from(state, 'base64').toString('utf8'));
+      if (decoded.clientUrl) clientUrl = decoded.clientUrl.replace(/\/+$/, '');
+    }
+  } catch (e) {
+    // default
+  }
 
   if (!code) {
     return res.redirect(`${clientUrl}/login?error=X+OAuth+authorization+declined`);

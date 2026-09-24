@@ -52,14 +52,16 @@ export const LoginPage = () => {
     setError('');
     const rawUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     const backendUrl = rawUrl.replace(/\/+$/, '');
-    window.location.href = `${backendUrl}/api/v1/auth/oauth/google?prompt=consent`;
+    const clientUrl = encodeURIComponent(window.location.origin);
+    window.location.href = `${backendUrl}/api/v1/auth/oauth/google?prompt=consent&clientUrl=${clientUrl}`;
   };
 
   const handleOAuthX = () => {
     setError('');
     const rawUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     const backendUrl = rawUrl.replace(/\/+$/, '');
-    window.location.href = `${backendUrl}/api/v1/auth/oauth/x`;
+    const clientUrl = encodeURIComponent(window.location.origin);
+    window.location.href = `${backendUrl}/api/v1/auth/oauth/x?clientUrl=${clientUrl}`;
   };
 
   const handleSubmit = async (e) => {

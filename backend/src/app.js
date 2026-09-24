@@ -64,6 +64,21 @@ app.use('/api/v1/more', require('./routes/more.routes'));
 app.use('/api/v1/settings', require('./routes/settings.routes'));
 app.use('/api/v1/block', require('./routes/block.routes'));
 
+// Serve frontend static assets if available
+const path = require('path');
+const fs = require('fs');
+
+const frontendDistPath = path.resolve(__dirname, '../../frontend/dist');
+if (fs.existsSync(frontendDistPath)) {
+  app.use(express.static(frontendDistPath));
+  app.get('*', (req, res, next) => {
+    if (req.originalUrl.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.join(frontendDistPath, 'index.html'));
+  });
+}
+
 // Global 404 Route handler
 app.all('*', (req, res, next) => {
   const err = new Error(`Can't find ${req.originalUrl} on this server!`);
