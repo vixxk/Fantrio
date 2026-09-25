@@ -814,6 +814,15 @@
   margin: 0;
 }
 
+.aboutHeroLogo {
+  height: 40px;
+  width: auto;
+  max-width: 165px;
+  object-fit: contain;
+  margin-bottom: 0.65rem;
+  display: block;
+}
+
 /* --- Referral --- */
 .refCodeBox {
   width: 100%;

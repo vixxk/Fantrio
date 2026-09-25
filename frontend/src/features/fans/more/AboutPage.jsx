@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Info, Sparkles, Heart, Shield, Globe, Award } from 'lucide-react';
 import styles from './MorePage.module.css';
+import headerLogo from '../../../assets/new/fantrio-logo-header.png';
 
 export const AboutPage = () => {
   useEffect(() => {
@@ -17,6 +18,7 @@ export const AboutPage = () => {
       <div className={styles.legalHeroCard}>
         <Info size={120} className={styles.legalBannerWatermark} aria-hidden="true" />
         <div className={styles.legalHeroContent}>
+          <img src={headerLogo} alt="Fantrio" className={styles.aboutHeroLogo} />
           <h3>About Fantrio</h3>
           <p>Connecting creators and fans through real-time interactive streams, 1:1 calls, and exclusive media experiences.</p>
         </div>

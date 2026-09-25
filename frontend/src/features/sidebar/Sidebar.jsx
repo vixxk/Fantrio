@@ -16,6 +16,7 @@ import {
   LayoutDashboard
 } from 'lucide-react';
 import styles from './Sidebar.module.css';
+import headerLogo from '../../assets/new/fantrio-logo-header.png';
 
 export const Sidebar = ({ onClose }) => {
   const { 
@@ -59,10 +60,7 @@ export const Sidebar = ({ onClose }) => {
     <aside className={`${styles.sidebar} ${darkMode ? styles.dark : styles.light}`}>
       <div className={styles.logoContainer}>
         <div className={styles.logoInfo} onClick={() => { setActiveTab('Discover Feed'); if (onClose) onClose(); }}>
-          <img src="/Fantrio Logo.png" alt="Fantrio Logo" className={styles.logoIcon} />
-          <span className={styles.logoText}>
-            Fant<span className={styles.logoTextPink}>rio</span>
-          </span>
+          <img src={headerLogo} alt="Fantrio" className={styles.brandLogo} />
         </div>
         {onClose && (
           <button className={styles.closeMenuBtn} onClick={onClose}>

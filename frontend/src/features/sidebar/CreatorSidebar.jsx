@@ -19,6 +19,7 @@ import {
   Camera
 } from 'lucide-react';
 import styles from './CreatorSidebar.module.css';
+import headerLogo from '../../assets/new/fantrio-logo-header.png';
 
 export const CreatorSidebar = ({ onClose }) => {
   const { 
@@ -89,10 +90,7 @@ export const CreatorSidebar = ({ onClose }) => {
       {/* Logo */}
       <div className={styles.logoContainer}>
         <div className={styles.logoInfo} onClick={() => handleItemClick('Creator Analytics')}>
-          <img src="/Fantrio Logo.png" alt="Fantrio Logo" className={styles.logoIcon} />
-          <span className={styles.logoText}>
-            Fant<span className={styles.logoTextPink}>rio</span>
-          </span>
+          <img src={headerLogo} alt="Fantrio" className={styles.brandLogo} />
         </div>
         {onClose && (
           <button className={styles.closeMenuBtn} onClick={onClose}>

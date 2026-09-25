@@ -285,11 +285,11 @@ const TransactionDistributionChart = ({ transactionBreakdown }) => {
   );
 };
 
-const MetricCard = ({ icon: Icon, label, value, color, bgColor, trend, trendLabel }) => (
+const MetricCard = ({ icon: Icon, label, value, color, bgColor, trend, trendLabel, hideTrendIcon = false }) => (
   <div className={styles.metricCard}>
     {trend !== undefined && (
       <span className={`${styles.metricTrend} ${trend >= 0 ? styles.trendUp : styles.trendDown}`}>
-        {trend >= 0 ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
+        {!hideTrendIcon && (trend >= 0 ? <TrendingUp size={11} /> : <TrendingDown size={11} />)}
         <span>{trendLabel || `${Math.abs(trend)}%`}</span>
       </span>
     )}
@@ -433,6 +433,7 @@ export const AdminOverview = () => {
           bgColor="var(--warning-soft)"
           trend={revenueGrowth}
           trendLabel="+8.3%"
+          hideTrendIcon
         />
         <MetricCard
           icon={ShieldAlert}

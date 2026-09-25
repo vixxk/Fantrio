@@ -1,4 +1,5 @@
 import { useApp } from '../../context/AppContext';
+import loginLogo from '../../assets/new/fantrio-logo-login.png';
 import { Moon, Sun } from 'lucide-react';
 import styles from './AuthHeader.module.css';
 
@@ -17,11 +18,8 @@ export const AuthHeader = () => {
         </defs>
       </svg>
 
-      <div className={styles.brand}>
-        <img src="/Fantrio Logo.png" alt="Fantrio Logo" className={styles.logo} />
-        <span className={styles.brandName}>
-          Fant<span className={styles.brandPink}>rio</span>
-        </span>
+      <div className={styles.brand} onClick={() => window.location.href = '/'}>
+        <img src={loginLogo} alt="Fantrio" className={styles.logo} />
       </div>
 
       <button

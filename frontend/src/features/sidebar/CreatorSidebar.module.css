@@ -44,6 +44,19 @@
   background-color: rgba(255, 255, 255, 0.08);
 }
 
+.brandLogo {
+  height: 42px;
+  width: auto;
+  max-width: 175px;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.logoInfo:hover .brandLogo {
+  transform: scale(1.03);
+}
+
 .logoIcon {
   height: 64px;
   width: 64px;

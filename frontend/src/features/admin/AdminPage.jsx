@@ -30,6 +30,7 @@ import {
   LogOut
 } from 'lucide-react';
 import styles from './AdminPage.module.css';
+import faviconLogo from '../../assets/new/fantrio-logo-favicon.png';
 
 export const AdminPage = () => {
   return (
@@ -123,7 +124,7 @@ const AdminShell = () => {
             <Menu size={20} />
           </button>
           <div className={styles.logoMark}>
-            <img src="/favicon-v4.png" alt="Fantrio" className={styles.logoImg} />
+            <img src={faviconLogo} alt="Fantrio" className={styles.logoImg} />
           </div>
           <span className={styles.brandName}>Fantrio <span>Admin</span></span>
         </div>
@@ -149,7 +150,7 @@ const AdminShell = () => {
             <div className={styles.mobileNavDrawer}>
               <div className={styles.drawerHead}>
                 <div className={styles.drawerBrand}>
-                  <img src="/favicon-v4.png" alt="Fantrio" className={styles.drawerLogo} />
+                  <img src={faviconLogo} alt="Fantrio" className={styles.drawerLogo} />
                   <span className={styles.brandName}>Fantrio Admin</span>
                 </div>
                 <button className={styles.drawerClose} onClick={() => setShowMobileMenu(false)} aria-label="Close navigation">

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { LogIn, ArrowLeft } from 'lucide-react';
 import styles from './AdminPage.module.css';
+import faviconLogo from '../../assets/new/fantrio-logo-favicon.png';
 
 export const AdminLogin = () => {
   const { login, navigateTo } = useApp();
@@ -32,7 +33,7 @@ export const AdminLogin = () => {
     <div className={styles.adminLoginWrap}>
       <div className={styles.adminLoginCard}>
         <div className={styles.logoMark}>
-          <img src="/favicon-v4.png" alt="Fantrio" className={styles.logoImg} />
+          <img src={faviconLogo} alt="Fantrio" className={styles.logoImg} />
         </div>
         <h1 className={styles.adminLoginTitle}>Fantrio Admin</h1>
         <p className={styles.adminLoginSub}>Sign in with your administrator credentials to continue.</p>

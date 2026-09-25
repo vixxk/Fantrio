@@ -47,6 +47,7 @@ import { NewMessageNotifier } from './components/NewMessageNotifier/NewMessageNo
 import { UnlockNotifier } from './components/UnlockNotifier/UnlockNotifier';
 import { AppDialogProvider } from './components/AppDialog/AppDialog';
 import { Compass, Radio, Phone, MessageSquare, LayoutDashboard, PenSquare } from 'lucide-react';
+import bootLogo from './assets/new/fantrio-logo-favicon.png';
 import './App.css';
 
 const AppContent = () => {
@@ -377,7 +378,7 @@ const AppContent = () => {
   if (loading) {
     return (
       <div className={`authBootScreen ${darkMode ? 'darkTheme' : 'lightTheme'}`}>
-        <img src="/Fantrio Logo.png" alt="Fantrio" className="authBootLogo" />
+        <img src={bootLogo} alt="Fantrio" className="authBootLogo" />
         <span className="authBootSpinner" />
       </div>
     );
@@ -398,7 +399,7 @@ const AppContent = () => {
   if (user && isAuthPath(currentPath)) {
     return (
       <div className={`authBootScreen ${darkMode ? 'darkTheme' : 'lightTheme'}`}>
-        <img src="/Fantrio Logo.png" alt="Fantrio" className="authBootLogo" />
+        <img src={bootLogo} alt="Fantrio" className="authBootLogo" />
         <span className="authBootSpinner" />
       </div>
     );
